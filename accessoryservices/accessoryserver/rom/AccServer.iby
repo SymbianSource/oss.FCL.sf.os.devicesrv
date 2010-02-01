@@ -1,0 +1,44 @@
+/*
+* Copyright (c) 2002-2008 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  
+*
+*/
+
+
+#ifndef ACCSERVER_IBY
+#define ACCSERVER_IBY
+
+#ifdef __ACCESSORY_FW
+
+file=ABI_DIR\BUILD_DIR\AccAudioControl.dll              SHARED_LIB_DIR\AccAudioControl.dll
+file=ABI_DIR\BUILD_DIR\AccBTControl.dll                 SHARED_LIB_DIR\AccBTControl.dll
+file=ABI_DIR\BUILD_DIR\AccClient.dll                    SHARED_LIB_DIR\AccClient.dll
+file=ABI_DIR\BUILD_DIR\AccControl.dll                   SHARED_LIB_DIR\AccControl.dll
+file=ABI_DIR\BUILD_DIR\AccPolicy.dll                    SHARED_LIB_DIR\AccPolicy.dll
+file=ABI_DIR\BUILD_DIR\AccPolCom.dll                    SHARED_LIB_DIR\AccPolCom.dll
+file=ABI_DIR\BUILD_DIR\AccPolicyDB.dll                  SHARED_LIB_DIR\AccPolicyDB.dll
+file=ABI_DIR\BUILD_DIR\AccServer.exe                    PROGRAMS_DIR\AccServer.exe
+file=ABI_DIR\BUILD_DIR\AsyComms.dll                     SHARED_LIB_DIR\AsyComms.dll
+file=ABI_DIR\BUILD_DIR\AsyProxy.dll                     SHARED_LIB_DIR\AsyProxy.dll
+file=ABI_DIR\BUILD_DIR\accsrvutil.dll                   SHARED_LIB_DIR\accsrvutil.dll
+file=ABI_DIR\BUILD_DIR\AccChargerContext.dll            SHARED_LIB_DIR\AccChargerContext.dll
+file=ABI_DIR\BUILD_DIR\accpolaudiodevicetopology.dll	SHARED_LIB_DIR\accpolaudiodevicetopology.dll
+
+data=ZPRIVATE\100012A5\policy\10205030.spd              \private\100012A5\policy\10205030.spd
+
+#endif // __ACCESSORY_FW
+
+#endif // ACCSERVER_IBY
+
+// End of File

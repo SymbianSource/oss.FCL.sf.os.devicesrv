@@ -1,0 +1,3341 @@
+
+(object Petal
+    version    	43
+    _written   	"Rose 6.1.9113.5"
+    charSet    	0)
+
+(object Design "Logical View"
+    is_unit    	TRUE
+    is_loaded  	TRUE
+    quid       	"426E373D03AC"
+    defaults   	(object defaults
+	rightMargin 	0.250000
+	leftMargin 	0.250000
+	topMargin  	0.250000
+	bottomMargin 	0.500000
+	pageOverlap 	0.250000
+	clipIconLabels 	TRUE
+	autoResize 	TRUE
+	snapToGrid 	TRUE
+	gridX      	15
+	gridY      	15
+	defaultFont 	(object Font
+	    size       	10
+	    face       	"Arial"
+	    bold       	FALSE
+	    italics    	FALSE
+	    underline  	FALSE
+	    strike     	FALSE
+	    color      	0
+	    default_color 	TRUE)
+	showMessageNum 	3
+	showClassOfObject 	TRUE
+	notation   	"Unified")
+    root_usecase_package 	(object Class_Category "Use Case View"
+	quid       	"426E373D03AE"
+	exportControl 	"Public"
+	global     	TRUE
+	logical_models 	(list unit_reference_list)
+	logical_presentations 	(list unit_reference_list
+	    (object UseCaseDiagram "Main"
+		quid       	"426E373D03BC"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    root_category 	(object Class_Category "Logical View"
+	quid       	"426E373D03AD"
+	exportControl 	"Public"
+	global     	TRUE
+	subsystem  	"Component View"
+	quidu      	"426E373D03AF"
+	logical_models 	(list unit_reference_list
+	    (object Class "CActive"
+		quid       	"426E386F0244")
+	    (object Class "CSystemStarter"
+		quid       	"426E3BE90031"
+		documentation 	"System starter main controller class"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"426E3BE90032"
+			supplier   	"Logical View::CActive"
+			quidu      	"426E386F0244"))
+		realized_interfaces 	(list realize_rel_list
+		    (object Realize_Relationship
+			quid       	"426E47E702A2"
+			supplier   	"Logical View::MStartup"
+			quidu      	"426E46A1033E"))
+		operations 	(list Operations
+		    (object Operation "Start"
+			quid       	"426E3BF1037D"
+			result     	" "
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "RunL"
+			quid       	"426E405F011B"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "RunError"
+			quid       	"426E406502F0"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "DoCancel"
+			quid       	"426E406A01A8"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "RequestNotify"
+			quid       	"426E407D0283"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)))
+	    (object Class "CSystemStartup"
+		quid       	"426E41EA011B"
+		documentation 	"CSystemStartup"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"428A242802B0"
+			supplier   	"Logical View::MStartup"
+			quidu      	"426E46A1033E"))
+		realized_interfaces 	(list realize_rel_list
+		    (object Realize_Relationship
+			quid       	"426E483900FC"
+			supplier   	"Logical View::MStartup"
+			quidu      	"426E46A1033E"))
+		operations 	(list Operations
+		    (object Operation "GetNextStateL"
+			quid       	"426E43F5030F"
+			result     	"MStartupStateInfo*"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iFs"
+			quid       	"426E44A30189"
+			type       	"RFs")
+		    (object ClassAttribute "iReader"
+			quid       	"426E44A80244"
+			type       	"CResourceFileReader*")))
+	    (object Class "CResourceFileReader"
+		quid       	"426E4B66008F"
+		documentation 	"CResourceFileReader"
+		operations 	(list Operations
+		    (object Operation "GetStateInfoL"
+			quid       	"428A1D9C0389"
+			result     	"MStartupStateInfo*"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "LsSession"
+			quid       	"428A1DB502CD"
+			result     	"RApaLsSession&"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "Connect"
+			quid       	"428A1DEE0212"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "FindFirstStateEntryL"
+			quid       	"428A1E0B003D"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "ReadStateInformationL"
+			quid       	"428A1E22036A"
+			result     	"CSystemStartupStateInfo*"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "ReadCommandListL"
+			quid       	"428A1E3F00D9"
+			parameters 	(list Parameters
+			    (object Parameter "aCommandListId"
+				type       	"TUint32"))
+			result     	"CommandListType"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "ReadDllInfoL"
+			quid       	"428A1EAE0128"
+			parameters 	(list Parameters
+			    (object Parameter "aReader"
+				type       	"TResourceReader&"))
+			result     	"MStartupCommand*"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iFs"
+			quid       	"428A1EEE0147"
+			type       	"RFs")
+		    (object ClassAttribute "iResourceFile"
+			quid       	"428A1F02003D"
+			type       	"RResourceFile")
+		    (object ClassAttribute "iState"
+			quid       	"428A1F220260"
+			type       	"TInt32")
+		    (object ClassAttribute "iAppUiSession"
+			quid       	"428A1F340250"
+			type       	"REikAppUiSession")
+		    (object ClassAttribute "iLsSession"
+			quid       	"428A1F4C02FC"
+			type       	"RApaLsSession")))
+	    (object Class "CStartupState"
+		quid       	"428882C00309"
+		operations 	(list Operations
+		    (object Operation "StartL"
+			quid       	"428883060164"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "DoCommand"
+			quid       	"4288831B01A2"
+			parameters 	(list Parameters
+			    (object Parameter "aCommand"
+				type       	"MStartupCommand&"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iStateInfo"
+			quid       	"42888369003B"
+			type       	"MStartupStateInfo&")))
+	    (object Class "MStartupStateInfo"
+		quid       	"42888401023E"
+		operations 	(list Operations
+		    (object Operation "StateId"
+			quid       	"428884340386"
+			result     	"TUint8"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "Name"
+			quid       	"42888466027D"
+			result     	"TPtrC"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "GetCommandList"
+			quid       	"4288848302FA"
+			result     	"CommandListType"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "Count"
+			quid       	"428884A3021F"
+			documentation 	"Get a count of the number of commands in the list"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "NoOfRetries"
+			quid       	"428884D60135"
+			result     	"TNoOfRetries"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "ActionOnStateTransitionFailure"
+			quid       	"4288858A020F"
+			result     	"TActionOnStateTransitionFailure"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "GetCommand"
+			quid       	"428885B50377"
+			parameters 	(list Parameters
+			    (object Parameter "aIndex"
+				type       	"TInt"))
+			result     	"MStartupCommand*"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "TBootModeMapping"
+		quid       	"428886F8003B"
+		operations 	(list Operations
+		    (object Operation "GetResourceFileName"
+			quid       	"4288871703D5"
+			parameters 	(list Parameters
+			    (object Parameter "aBootMode"
+				type       	"TUint")
+			    (object Parameter "aResourceFileName"
+				type       	"TDes&"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CAppStarter"
+		quid       	"4289DD02005C"
+		operations 	(list Operations
+		    (object Operation "StartProcess"
+			quid       	"428B28F60114"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "StartAppL"
+			quid       	"428B290602E9"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iAppInfo"
+			quid       	"428B29340347"
+			type       	"const MStartupAppInfo*")
+		    (object ClassAttribute "iProvider"
+			quid       	"428B29590347"
+			type       	"MApaLsSessionProvider")))
+	    (object Class "CSystemStartupAppInfo"
+		quid       	"4289DD86002E"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"428A227501F3"
+			supplier   	"Logical View::MStartupAppInfo"
+			quidu      	"428A219C0166"))
+		operations 	(list Operations
+		    (object Operation "SetFailOnError"
+			quid       	"428A22A003D7"
+			parameters 	(list Parameters
+			    (object Parameter "aFail"
+				type       	"TBool"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetStartMethod"
+			quid       	"428A22D60252"
+			parameters 	(list Parameters
+			    (object Parameter "aStartMethod"
+				type       	"TInt"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetTimeout"
+			quid       	"428A22E501B6"
+			parameters 	(list Parameters
+			    (object Parameter "aStartType"
+				type       	"TInt"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetStartType"
+			quid       	"428A22F10291"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetViewless"
+			quid       	"428A22FD00AC"
+			parameters 	(list Parameters
+			    (object Parameter "aViewLess"
+				type       	"TBool"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetStartInBackground"
+			quid       	"428A23090233"
+			parameters 	(list Parameters
+			    (object Parameter "aStartInBackground"
+				type       	"TBool"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetNoOfRetries"
+			quid       	"428A231A008D"
+			parameters 	(list Parameters
+			    (object Parameter "aNoOfRetries"
+				type       	"TNoOfRetries"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CSystemStartupStateInfo"
+		quid       	"4289DF6203A8"
+		superclasses 	(list inheritance_relationship_list
+		    (object Inheritance_Relationship
+			quid       	"428A23AA0158"
+			supplier   	"Logical View::MStartupStateInfo"
+			quidu      	"42888401023E"))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iNoOfRetries"
+			quid       	"428B29A40183"
+			type       	"TNoOfRetries")
+		    (object ClassAttribute "iActionOnStateTransitionFailure"
+			quid       	"428B29BB01A3"
+			type       	"TActionOnStateTransitionFailure")
+		    (object ClassAttribute "iStateId"
+			quid       	"428B29E00388"
+			type       	"TInt")
+		    (object ClassAttribute "iName"
+			quid       	"428B29F10136"
+			type       	"HBufC*")
+		    (object ClassAttribute "iCommandList"
+			quid       	"428B2A06008B"
+			type       	"CommandListType")))
+	    (object Class "CDllStarter"
+		quid       	"428A1ABE00F9"
+		operations 	(list Operations
+		    (object Operation "Execute"
+			quid       	"428A1AD1009B"
+			parameters 	(list Parameters
+			    (object Parameter "aCallerStatus"
+				type       	"TRequestStatus&"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iDllInfo"
+			quid       	"428A1B0B000E"
+			type       	"CSystemStartupDllInfo*")))
+	    (object Class "MApaLsSessionProvider"
+		quid       	"428A1B7E008B"
+		operations 	(list Operations
+		    (object Operation "LsSession"
+			quid       	"428A1B940195"
+			result     	"RApaLsSession&"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "MStartup"
+		quid       	"426E46A1033E"
+		documentation 	
+|Retrieves the next stage that the system needs to move into
+|for example 'critical static'   
+		
+		operations 	(list Operations
+		    (object Operation "GetNextStateL"
+			quid       	"426E46E50189"
+			result     	"MStartupStateInfo*"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CSystemStartupDllInfo"
+		quid       	"428A1C3E00D9"
+		operations 	(list Operations
+		    (object Operation "SetDllName"
+			quid       	"428A1C530250"
+			parameters 	(list Parameters
+			    (object Parameter "aDllName"
+				type       	"const TDesC&"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetOrdinal"
+			quid       	"428A1C5C002E"
+			parameters 	(list Parameters
+			    (object Parameter "aSetOrdinal"
+				type       	"TUint8"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetFailOnError"
+			quid       	"428A1C62034A"
+			parameters 	(list Parameters
+			    (object Parameter "aFail"
+				type       	"TBool"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetNoOfRetries"
+			quid       	"428A1C6A0166"
+			parameters 	(list Parameters
+			    (object Parameter "aNoOfRetries"
+				type       	"TUint8"))
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "SetDllBuffer"
+			quid       	"428A1C71008B"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iDllName"
+			quid       	"428B2C4C0257"
+			type       	"HBufC*")
+		    (object ClassAttribute "iOrdinal"
+			quid       	"428B2C5C01AB"
+			type       	"TUint8")
+		    (object ClassAttribute "iFailOnError"
+			quid       	"428B2C6D013E"
+			type       	"TBool")
+		    (object ClassAttribute "iNoOfRetries"
+			quid       	"428B2C7B02F4"
+			type       	"TUint8")
+		    (object ClassAttribute "iDllBuffer"
+			quid       	"428B2C8D020A"
+			type       	"HBufC8*")))
+	    (object Class "MStartupAppInfo"
+		quid       	"428A219C0166"
+		operations 	(list Operations
+		    (object Operation "GetPath"
+			quid       	"428A21B001F3"
+			result     	"TPtrC"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "GetArgs"
+			quid       	"428A21CB000E"
+			result     	"TPtrC"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "StartMethod"
+			quid       	"428A21D900E9"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "TimeOut"
+			quid       	"428A21EA00D9"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "FailOnError"
+			quid       	"428A21FA000E"
+			result     	"TBool"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "StartType"
+			quid       	"428A2209003D"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "ViewLess"
+			quid       	"428A22170241"
+			result     	"TBool"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "StartInBackground"
+			quid       	"428A222603D7"
+			result     	"TBool"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)
+		    (object Operation "NoOfRetries"
+			quid       	"428A2239008B"
+			parameters 	(list Parameters
+			    (object Parameter "aFail"
+				type       	"TBool"))
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Class "CStartupSplashScreen"
+		quid       	"428A23DD00BC"
+		operations 	(list Operations
+		    (object Operation "StartSplashScreen"
+			quid       	"428B2B02031E"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0)
+		    (object Operation "KillSplashScreen"
+			quid       	"428B2B18012A"
+			result     	"TInt"
+			concurrency 	"Sequential"
+			opExportControl 	"Private"
+			uid        	0))
+		class_attributes 	(list class_attribute_list
+		    (object ClassAttribute "iStartSplash"
+			quid       	"428B2B3C0273"
+			type       	"TBool")
+		    (object ClassAttribute "iSplashPath"
+			quid       	"428B2B54007F"
+			type       	"HBufC*")))
+	    (object Class "CMultipleWait"
+		quid       	"434E70FB02C2"
+		operations 	(list Operations
+		    (object Operation "Execute"
+			quid       	"434E7118011D"
+			result     	"void"
+			concurrency 	"Sequential"
+			opExportControl 	"Public"
+			uid        	0)))
+	    (object Association "iReader"
+		quid       	"426E4B970060"
+		roles      	(list role_list
+		    (object Role "$UNNAMED$0"
+			quid       	"426E4B9A008F"
+			supplier   	"Logical View::CResourceFileReader"
+			quidu      	"426E4B66008F"
+			client_cardinality 	(value cardinality "1")
+			is_navigable 	TRUE)
+		    (object Role "$UNNAMED$1"
+			quid       	"426E4B9A0090"
+			supplier   	"Logical View::CSystemStartup"
+			quidu      	"426E41EA011B")))
+	    (object Association "$UNNAMED$2"
+		quid       	"4288868E0125"
+		roles      	(list role_list
+		    (object Role "$UNNAMED$3"
+			quid       	"4288868F026D"
+			supplier   	"Logical View::MStartupStateInfo"
+			quidu      	"42888401023E"
+			client_cardinality 	(value cardinality "1")
+			Containment 	"By Reference"
+			is_navigable 	TRUE)
+		    (object Role "$UNNAMED$4"
+			quid       	"4288868F027D"
+			supplier   	"Logical View::CStartupState"
+			quidu      	"428882C00309")))
+	    (object Association "iDllInfo"
+		quid       	"428B25AA02DE"
+		roles      	(list role_list
+		    (object Role "$UNNAMED$5"
+			quid       	"428B25AB0251"
+			supplier   	"Logical View::CSystemStartupDllInfo"
+			quidu      	"428A1C3E00D9"
+			client_cardinality 	(value cardinality "0..1")
+			exportControl 	"Private"
+			is_navigable 	TRUE)
+		    (object Role "iDllInfo"
+			quid       	"428B25AB0261"
+			label      	"iDllInfo"
+			supplier   	"Logical View::CDllStarter"
+			quidu      	"428A1ABE00F9"
+			is_principal 	TRUE)))
+	    (object Association "$UNNAMED$6"
+		quid       	"428B2764012E"
+		roles      	(list role_list
+		    (object Role "iAppInfo"
+			quid       	"428B276500E0"
+			label      	"iAppInfo"
+			supplier   	"Logical View::MStartupAppInfo"
+			quidu      	"428A219C0166"
+			client_cardinality 	(value cardinality "1")
+			is_navigable 	TRUE)
+		    (object Role "$UNNAMED$7"
+			quid       	"428B276500E1"
+			supplier   	"Logical View::CAppStarter"
+			quidu      	"4289DD02005C")))
+	    (object Association "$UNNAMED$8"
+		quid       	"428B277D013E"
+		roles      	(list role_list
+		    (object Role "$UNNAMED$9"
+			quid       	"428B27800005"
+			supplier   	"Logical View::MApaLsSessionProvider"
+			quidu      	"428A1B7E008B"
+			client_cardinality 	(value cardinality "1")
+			Containment 	"By Reference"
+			is_navigable 	TRUE)
+		    (object Role "$UNNAMED$10"
+			quid       	"428B27800015"
+			supplier   	"Logical View::CAppStarter"
+			quidu      	"4289DD02005C")))
+	    (object Mechanism @1
+		logical_models 	(list unit_reference_list
+		    (object Object "starter"
+			quid       	"42848A14022E"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"42848AB802BA"
+				supplier   	"state"
+				quidu      	"42848A9F0124"
+				messages   	(list Messages
+				    (object Message "StartL"
+					quid       	"4288B0D0006A"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"3"
+					ordinal    	2
+					quidu      	"428883060164")))
+			    (object Link
+				quid       	"4284A17D00B7"
+				supplier   	"RProperty"
+				quidu      	"4284A1660328"
+				messages   	(list Messages
+				    (object Message "Get( ..., bootmode)"
+					quid       	"4284A17D00B8"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1"
+					ordinal    	0)))
+			    (object Link
+				quid       	"4284A353026C"
+				supplier   	"RDmDomainManager"
+				quidu      	"4284A34501EF"
+				messages   	(list Messages
+				    (object Message "AddDomainHierarchy(KDmHierarchyIdStartup)"
+					quid       	"4288B01B0319"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"2"
+					ordinal    	1))))
+			class      	"Logical View::CSystemStarter"
+			quidu      	"426E3BE90031"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "state"
+			quid       	"42848A9F0124"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B01E01D0"
+				supplier   	"systemstartup"
+				quidu      	"4284B0070346"
+				messages   	(list Messages
+				    (object Message "NewLC(bootmode)"
+					quid       	"4284B01E01D1"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4"
+					ordinal    	3))))
+			class      	"Logical View::CStartupState"
+			quidu      	"428882C00309"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "RProperty"
+			quid       	"4284A1660328"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "RDmDomainManager"
+			quid       	"4284A34501EF"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "systemstartup"
+			quid       	"4284B0070346"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B03303C6"
+				supplier   	"systemstartup"
+				quidu      	"4284B0070346"
+				messages   	(list Messages
+				    (object Message "ConstructL(bootmode)"
+					quid       	"4284B03303C7"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4.1"
+					ordinal    	4)))
+			    (object Link
+				quid       	"4284B09E0217"
+				supplier   	"mapping"
+				quidu      	"4284B079006F"
+				messages   	(list Messages
+				    (object Message "GetResourceFileName"
+					quid       	"4284B09E0218"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4.1.1"
+					ordinal    	5
+					Operation  	"GetResourceFileName(TUint, TDes&)"
+					quidu      	"4288871703D5")))
+			    (object Link
+				quid       	"4284B2F70088"
+				supplier   	"iReader"
+				quidu      	"4284B2DF029A"
+				messages   	(list Messages
+				    (object Message " NewL(resourcefile, ...)"
+					quid       	"4284B2F70089"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4.2"
+					ordinal    	6))))
+			class      	"Logical View::CSystemStartup"
+			quidu      	"426E41EA011B"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "mapping"
+			quid       	"4284B079006F"
+			class      	"Logical View::TBootModeMapping"
+			quidu      	"428886F8003B"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "iReader"
+			quid       	"4284B2DF029A"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B341033C"
+				supplier   	"iReader"
+				quidu      	"4284B2DF029A"
+				messages   	(list Messages
+				    (object Message "ConstructL(resourcefile)"
+					quid       	"4284B341033D"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4.2.1"
+					ordinal    	7))))
+			class      	"Logical View::CResourceFileReader"
+			quidu      	"426E4B66008F"
+			persistence 	"Transient"
+			multi      	FALSE)))
+	    (object Mechanism @2
+		logical_models 	(list unit_reference_list
+		    (object Object "starter"
+			quid       	"4284B4B203E1"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B4DB02BA"
+				supplier   	"systemstartup"
+				quidu      	"4284B4CE021D"
+				messages   	(list Messages
+				    (object Message "GetNextStateL"
+					quid       	"4284B4DB02BB"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1"
+					ordinal    	0
+					Operation  	"GetNextStateL( )"
+					quidu      	"426E43F5030F"))))
+			class      	"Logical View::CSystemStarter"
+			quidu      	"426E3BE90031"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "systemstartup"
+			quid       	"4284B4CE021D"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B520000F"
+				supplier   	"iReader"
+				quidu      	"4284B50D029E"
+				messages   	(list Messages
+				    (object Message "GetStateInfoL"
+					quid       	"4284B5200010"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1"
+					ordinal    	1
+					Operation  	"GetStateInfoL( )"
+					quidu      	"428A1D9C0389"))))
+			class      	"Logical View::CSystemStartup"
+			quidu      	"426E41EA011B"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "iReader"
+			quid       	"4284B50D029E"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284B5530061"
+				supplier   	"iReader"
+				quidu      	"4284B50D029E"
+				messages   	(list Messages
+				    (object Message "ReadStateInformationL"
+					quid       	"4284B5530062"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.1"
+					ordinal    	2
+					Operation  	"ReadStateInformationL( )"
+					quidu      	"428A1E22036A")
+				    (object Message "FindFirstStateEntryL"
+					quid       	"4284B86501AC"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.2"
+					ordinal    	3
+					Operation  	"FindFirstStateEntryL( )"
+					quidu      	"428A1E0B003D")
+				    (object Message "ReadCommandListL(aCommandListId)"
+					quid       	"4284BB24015C"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.3"
+					ordinal    	5
+					Operation  	"ReadCommandListL(TUint32)"
+					quidu      	"428A1E3F00D9")
+				    (object Message "ReadCommandInfoL *"
+					quid       	"4284BDE9027D"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.4"
+					ordinal    	6)))
+			    (object Link
+				quid       	"4284BFB20200"
+				supplier   	"command"
+				quidu      	"4284BFA80115"
+				messages   	(list Messages
+				    (object Message "NewL(appInfo, ...)"
+					quid       	"4284BFB20201"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.6"
+					ordinal    	8)))
+			    (object Link
+				quid       	"4284C1AA028C"
+				supplier   	"stateInfo"
+				quidu      	"4284C16C0192"
+				messages   	(list Messages
+				    (object Message "NewL"
+					quid       	"4289DEE0027F"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.2.1"
+					ordinal    	4)
+				    (object Message "SetCommandList(CommandList)"
+					quid       	"4289DEF5031C"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.7"
+					ordinal    	9
+					Operation  	"SetCommandList")))
+			    (object Link
+				quid       	"4289DDFF02AE"
+				supplier   	"appInfo"
+				quidu      	"4289DD5F0389"
+				messages   	(list Messages
+				    (object Message "NewL"
+					quid       	"4289DDFF02AF"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1.5"
+					ordinal    	7))))
+			class      	"Logical View::CResourceFileReader"
+			quidu      	"426E4B66008F"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "command"
+			quid       	"4284BFA80115"
+			class      	"Logical View::CAppStarter"
+			quidu      	"4289DD02005C"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "stateInfo"
+			quid       	"4284C16C0192"
+			class      	"Logical View::CSystemStartupStateInfo"
+			quidu      	"4289DF6203A8"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "appInfo"
+			quid       	"4289DD5F0389"
+			class      	"Logical View::CSystemStartupAppInfo"
+			quidu      	"4289DD86002E"
+			persistence 	"Transient"
+			multi      	FALSE)))
+	    (object Mechanism @3
+		logical_models 	(list unit_reference_list
+		    (object Object "CSystemStarter"
+			quid       	"4284C2D000B7"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284C2E601E0"
+				supplier   	"state"
+				quidu      	"4284C2D9001B"
+				messages   	(list Messages
+				    (object Message "StartL"
+					quid       	"4284C2E601E1"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1"
+					ordinal    	0
+					quidu      	"428883060164"))))
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "state"
+			quid       	"4284C2D9001B"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284CE0B0115"
+				supplier   	"RDmManagerSession"
+				quidu      	"4284CDE90163"
+				messages   	(list Messages
+				    (object Message "RequestDomainTransition"
+					quid       	"4284CE0B0116"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"1.1"
+					ordinal    	1)))
+			    (object Link
+				quid       	"4284DCE401C9"
+				supplier   	"state"
+				quidu      	"4284C2D9001B"
+				messages   	(list Messages
+				    (object Message "DoCommand"
+					quid       	"4284DCE401CA"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"2"
+					ordinal    	2
+					Operation  	"DoCommand(MStartupCommand&)"
+					quidu      	"4288831B01A2")))
+			    (object Link
+				quid       	"4284DD17038E"
+				supplier   	"aCommand"
+				quidu      	"4284DCC90004"
+				messages   	(list Messages
+				    (object Message "Execute"
+					quid       	"4284DD17038F"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"3"
+					ordinal    	3
+					quidu      	"428A17DD034A")
+				    (object Message "Execute"
+					quid       	"428B503F006C"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4"
+					ordinal    	6
+					quidu      	"428A17DD034A")))
+			    (object Link
+				quid       	"428B52CB0381"
+				supplier   	"aCommand"
+				quidu      	"4284DCC90004"
+				messages   	(list Messages
+				    (object Message "Execute"
+					quid       	"428B52CB0382"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"5"
+					ordinal    	8
+					quidu      	"428A17DD034A")))
+			    (object Link
+				quid       	"428B567F00AF"
+				supplier   	"aComand"
+				quidu      	"428B56640310"
+				messages   	(list Messages
+				    (object Message "Execute"
+					quid       	"428B567F00B0"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"6"
+					ordinal    	9
+					quidu      	"428A17DD034A")))
+			    (object Link
+				quid       	"428B5A430148"
+				supplier   	"aCommand"
+				quidu      	"4284DCC90004"
+				messages   	(list Messages
+				    (object Message "Execute"
+					quid       	"428B5A430149"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"7"
+					ordinal    	10
+					quidu      	"428A17DD034A"))))
+			class      	"Logical View::CStartupState"
+			quidu      	"428882C00309"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "RDmManagerSession"
+			quid       	"4284CDE90163"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "aCommand"
+			quid       	"4284DCC90004"
+			collaborators 	(list link_list
+			    (object Link
+				quid       	"4284DDEE0302"
+				supplier   	"aCommand"
+				quidu      	"4284DCC90004"
+				messages   	(list Messages
+				    (object Message " Utility procs"
+					quid       	"4284DDEE0303"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"3.1"
+					ordinal    	4)
+				    (object Message "Utility procs"
+					quid       	"4284DE4701E8"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"3.1.1"
+					ordinal    	5)
+				    (object Message "Utility procs"
+					quid       	"428B5083008C"
+					frequency  	"Aperiodic"
+					synchronization 	"Simple"
+					dir        	"FromClientToSupplier"
+					sequence   	"4.1"
+					ordinal    	7))))
+			class      	"Logical View::CAppStarter"
+			quidu      	"4289DD02005C"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "aCommand"
+			quid       	"428B52A90371"
+			class      	"Logical View::CDllStarter"
+			quidu      	"428A1ABE00F9"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "aComand"
+			quid       	"428B56640310"
+			class      	"Logical View::CStartupSplashScreen"
+			quidu      	"428A23DD00BC"
+			persistence 	"Transient"
+			multi      	FALSE)
+		    (object Object "aCommand"
+			quid       	"428B5A0B0389"
+			class      	"C"
+			quidu      	"428A1A5A0389"
+			persistence 	"Transient"
+			multi      	FALSE))))
+	logical_presentations 	(list unit_reference_list
+	    (object ClassDiagram "Main"
+		quid       	"426E373D03B3"
+		title      	"Main"
+		zoom       	59
+		max_height 	28350
+		max_width  	21600
+		origin_x   	432
+		origin_y   	0
+		items      	(list diagram_item_list
+		    (object ClassView "Class" "Logical View::CActive" @4
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(240, 1770)
+			label      	(object ItemLabel
+			    Parent_View 	@4
+			    location   	(157, 1723)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	166
+			    justify    	0
+			    label      	"CActive")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"426E386F0244"
+			width      	184
+			height     	114
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CSystemStarter" @5
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(540, 2025)
+			label      	(object ItemLabel
+			    Parent_View 	@5
+			    location   	(381, 1861)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	318
+			    justify    	0
+			    label      	"CSystemStarter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"426E3BE90031"
+			compartment 	(object Compartment
+			    Parent_View 	@5
+			    location   	(381, 1914)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	6
+			    max_width  	315)
+			width      	336
+			height     	348
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @6
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"426E3BE90032"
+			client     	@5
+			supplier   	@4
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CResourceFileReader" @7
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(405, 1290)
+			label      	(object ItemLabel
+			    Parent_View 	@7
+			    location   	(69, 969)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	672
+			    justify    	0
+			    label      	"CResourceFileReader")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"426E4B66008F"
+			compartment 	(object Compartment
+			    Parent_View 	@7
+			    location   	(69, 1022)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	13
+			    max_width  	809)
+			width      	690
+			height     	662
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CSystemStartup" @8
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(315, 645)
+			label      	(object ItemLabel
+			    Parent_View 	@8
+			    location   	(40, 534)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	550
+			    justify    	0
+			    label      	"CSystemStartup")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"426E41EA011B"
+			compartment 	(object Compartment
+			    Parent_View 	@8
+			    location   	(40, 587)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	4
+			    max_width  	625)
+			width      	568
+			height     	242
+			annotation 	8
+			autoResize 	TRUE)
+		    (object AssociationViewNew "iReader" @9
+			location   	(344, 862)
+			label      	(object SegLabel @10
+			    Parent_View 	@9
+			    location   	(344, 803)
+			    font       	(object Font
+				italics    	TRUE)
+			    anchor     	1
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	600
+			    justify    	0
+			    label      	"iReader"
+			    pctDist    	0.500000
+			    height     	60
+			    orientation 	0)
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"426E4B970060"
+			roleview_list 	(list RoleViews
+			    (object RoleView "$UNNAMED$0" @11
+				Parent_View 	@9
+				location   	(-88, -210)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"426E4B9A008F"
+				client     	@9
+				supplier   	@7
+				line_style 	0
+				label      	(object SegLabel @12
+				    Parent_View 	@11
+				    location   	(304, 955)
+				    anchor     	2
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	15
+				    justify    	0
+				    label      	"1"
+				    pctDist    	0.900000
+				    height     	54
+				    orientation 	1))
+			    (object RoleView "$UNNAMED$1" @13
+				Parent_View 	@9
+				location   	(-88, -210)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"426E4B9A0090"
+				client     	@9
+				supplier   	@8
+				line_style 	0)))
+		    (object ClassView "Class" "Logical View::MStartupStateInfo" @14
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(3030, 1545)
+			label      	(object ItemLabel
+			    Parent_View 	@14
+			    location   	(2758, 1350)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	544
+			    justify    	0
+			    label      	"MStartupStateInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"42888401023E"
+			compartment 	(object Compartment
+			    Parent_View 	@14
+			    location   	(2758, 1403)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	8
+			    max_width  	615)
+			width      	562
+			height     	410
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CStartupState" @15
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(2385, 1680)
+			label      	(object ItemLabel
+			    Parent_View 	@15
+			    location   	(2134, 1569)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	502
+			    justify    	0
+			    label      	"CStartupState")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428882C00309"
+			compartment 	(object Compartment
+			    Parent_View 	@15
+			    location   	(2134, 1622)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	4
+			    max_width  	577)
+			width      	520
+			height     	242
+			annotation 	8
+			autoResize 	TRUE)
+		    (object AssociationViewNew "$UNNAMED$2" @16
+			location   	(2696, 1613)
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"4288868E0125"
+			roleview_list 	(list RoleViews
+			    (object RoleView "$UNNAMED$3" @17
+				Parent_View 	@16
+				location   	(1496, 1309)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"4288868F026D"
+				client     	@16
+				supplier   	@14
+				line_style 	0
+				label      	(object SegLabel @18
+				    Parent_View 	@17
+				    location   	(2754, 1656)
+				    anchor     	2
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	15
+				    justify    	0
+				    label      	"1"
+				    pctDist    	0.900000
+				    height     	54
+				    orientation 	1))
+			    (object RoleView "$UNNAMED$4" @19
+				Parent_View 	@16
+				location   	(1496, 1309)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"4288868F027D"
+				client     	@16
+				supplier   	@15
+				line_style 	0)))
+		    (object ClassView "Class" "Logical View::CSystemStartupAppInfo" @20
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(1485, 1905)
+			label      	(object ItemLabel
+			    Parent_View 	@20
+			    location   	(1007, 1691)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	956
+			    justify    	0
+			    label      	"CSystemStartupAppInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4289DD86002E"
+			compartment 	(object Compartment
+			    Parent_View 	@20
+			    location   	(1007, 1744)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	8
+			    max_width  	1030)
+			width      	974
+			height     	448
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CSystemStartupStateInfo" @21
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(2790, 2040)
+			label      	(object ItemLabel
+			    Parent_View 	@21
+			    location   	(2278, 1887)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	1024
+			    justify    	0
+			    label      	"CSystemStartupStateInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4289DF6203A8"
+			compartment 	(object Compartment
+			    Parent_View 	@21
+			    location   	(2278, 1940)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	6
+			    max_width  	1195)
+			width      	1042
+			height     	326
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::MStartup" @22
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			location   	(285, 195)
+			label      	(object ItemLabel
+			    Parent_View 	@22
+			    location   	(124, 121)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	322
+			    justify    	0
+			    label      	"MStartup")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"426E46A1033E"
+			compartment 	(object Compartment
+			    Parent_View 	@22
+			    location   	(124, 174)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	2
+			    max_width  	327)
+			width      	340
+			height     	168
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @23
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"428A23AA0158"
+			client     	@21
+			supplier   	@14
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CStartupSplashScreen" @24
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(2280, 885)
+			label      	(object ItemLabel
+			    Parent_View 	@24
+			    location   	(2038, 740)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	484
+			    justify    	0
+			    label      	"CStartupSplashScreen")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428A23DD00BC"
+			compartment 	(object Compartment
+			    Parent_View 	@24
+			    location   	(2038, 793)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	5
+			    max_width  	490)
+			width      	502
+			height     	310
+			annotation 	8
+			autoResize 	TRUE)
+		    (object InheritView "" @25
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"428A242802B0"
+			client     	@8
+			supplier   	@22
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CSystemStartupDllInfo" @26
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(1125, 555)
+			label      	(object ItemLabel
+			    Parent_View 	@26
+			    location   	(725, 272)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	800
+			    justify    	0
+			    label      	"CSystemStartupDllInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428A1C3E00D9"
+			compartment 	(object Compartment
+			    Parent_View 	@26
+			    location   	(725, 325)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	11
+			    max_width  	842)
+			width      	818
+			height     	586
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CDllStarter" @27
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(2160, 555)
+			label      	(object ItemLabel
+			    Parent_View 	@27
+			    location   	(1727, 460)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	867
+			    justify    	0
+			    label      	"CDllStarter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428A1ABE00F9"
+			compartment 	(object Compartment
+			    Parent_View 	@27
+			    location   	(1727, 513)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	3
+			    max_width  	1065)
+			width      	885
+			height     	210
+			annotation 	8
+			autoResize 	TRUE)
+		    (object AssociationViewNew "iDllInfo" @28
+			location   	(1625, 555)
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"428B25AA02DE"
+			roleview_list 	(list RoleViews
+			    (object RoleView "$UNNAMED$5" @29
+				Parent_View 	@28
+				location   	(-1045, 45)
+				label      	(object SegLabel @30
+				    Parent_View 	@29
+				    location   	(1562, 514)
+				    hidden     	TRUE
+				    anchor     	1
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	60
+				    justify    	0
+				    label      	""
+				    pctDist    	0.800000
+				    height     	42
+				    orientation 	1)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"428B25AB0251"
+				client     	@28
+				supplier   	@26
+				line_style 	0
+				label      	(object SegLabel @31
+				    Parent_View 	@29
+				    location   	(1543, 609)
+				    anchor     	2
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	15
+				    justify    	0
+				    label      	"0..1"
+				    pctDist    	0.900000
+				    height     	54
+				    orientation 	0))
+			    (object RoleView "iDllInfo" @32
+				Parent_View 	@28
+				location   	(-1045, 45)
+				label      	(object SegLabel @33
+				    Parent_View 	@32
+				    location   	(1675, 606)
+				    anchor     	1
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	139
+				    justify    	0
+				    label      	"+iDllInfo"
+				    pctDist    	0.550874
+				    height     	51
+				    orientation 	1)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"428B25AB0261"
+				client     	@28
+				supplier   	@27
+				line_style 	0)))
+		    (object ClassView "Class" "Logical View::MStartupAppInfo" @34
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(1470, 1185)
+			label      	(object ItemLabel
+			    Parent_View 	@34
+			    location   	(1174, 931)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	592
+			    justify    	0
+			    label      	"MStartupAppInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428A219C0166"
+			compartment 	(object Compartment
+			    Parent_View 	@34
+			    location   	(1174, 984)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	10
+			    max_width  	755)
+			width      	610
+			height     	528
+			annotation 	8
+			autoResize 	TRUE)
+		    (object ClassView "Class" "Logical View::CAppStarter" @35
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(2385, 1245)
+			label      	(object ItemLabel
+			    Parent_View 	@35
+			    location   	(2071, 1100)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	628
+			    justify    	0
+			    label      	"CAppStarter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4289DD02005C"
+			compartment 	(object Compartment
+			    Parent_View 	@35
+			    location   	(2071, 1153)
+			    icon_style 	"Icon"
+			    fill_color 	16777215
+			    anchor     	2
+			    nlines     	5
+			    max_width  	672)
+			width      	646
+			height     	310
+			annotation 	8
+			autoResize 	TRUE)
+		    (object AssociationViewNew "$UNNAMED$6" @36
+			location   	(1918, 1213)
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"428B2764012E"
+			roleview_list 	(list RoleViews
+			    (object RoleView "iAppInfo" @37
+				Parent_View 	@36
+				location   	(-1802, 463)
+				label      	(object SegLabel @38
+				    Parent_View 	@37
+				    location   	(1907, 1181)
+				    anchor     	1
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	172
+				    justify    	0
+				    label      	"+iAppInfo"
+				    pctDist    	0.056070
+				    height     	32
+				    orientation 	1)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"428B276500E0"
+				client     	@36
+				supplier   	@34
+				line_style 	0
+				label      	(object SegLabel @39
+				    Parent_View 	@37
+				    location   	(1788, 1259)
+				    anchor     	2
+				    anchor_loc 	1
+				    nlines     	1
+				    max_width  	15
+				    justify    	0
+				    label      	"1"
+				    pctDist    	0.900000
+				    height     	54
+				    orientation 	0))
+			    (object RoleView "$UNNAMED$7" @40
+				Parent_View 	@36
+				location   	(-1802, 463)
+				stereotype 	TRUE
+				line_color 	3342489
+				quidu      	"428B276500E1"
+				client     	@36
+				supplier   	@35
+				line_style 	0)))
+		    (object InheritView "" @41
+			stereotype 	TRUE
+			line_color 	3342489
+			quidu      	"428A227501F3"
+			client     	@20
+			supplier   	@34
+			line_style 	0)
+		    (object ClassView "Class" "Logical View::CMultipleWait" @42
+			ShowCompartmentStereotypes 	TRUE
+			IncludeAttribute 	TRUE
+			IncludeOperation 	TRUE
+			ShowOperationSignature 	TRUE
+			location   	(2955, 810)
+			label      	(object ItemLabel
+			    Parent_View 	@42
+			    location   	(2770, 710)
+			    fill_color 	13434879
+			    nlines     	1
+			    max_width  	371
+			    justify    	0
+			    label      	"CMultipleWait")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"434E70FB02C2"
+			compartment 	(object Compartment
+			    Parent_View 	@42
+			    location   	(2770, 763)
+			    icon_style 	"Icon"
+			    fill_color 	13434879
+			    anchor     	2
+			    nlines     	2
+			    max_width  	284)
+			width      	389
+			height     	220
+			annotation 	8
+			autoResize 	TRUE)))
+	    (object ClassDiagram "command classes"
+		quid       	"428A188B01B4"
+		title      	"command classes"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))
+	    (object InteractionDiagram "Initial Setup"
+		mechanism_ref 	@1
+		quid       	"42848A09028B"
+		title      	"Initial Setup"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list
+		    (object InterObjView "starter" @43
+			location   	(160, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@43
+			    location   	(160, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	302
+			    justify    	0
+			    label      	"starter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"42848A14022E"
+			width      	320
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @44
+			    location   	(160, 240)
+			    line_color 	3342489
+			    InterObjView 	@43
+			    height     	1260
+			    y_coord    	1200
+			    Nested     	FALSE))
+		    (object InterObjView "state" @45
+			location   	(1168, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@45
+			    location   	(1168, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"state")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"42848A9F0124"
+			width      	300
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @46
+			    location   	(1168, 688)
+			    line_color 	3342489
+			    InterObjView 	@45
+			    height     	752
+			    y_coord    	692
+			    Nested     	FALSE))
+		    (object InterObjView "systemstartup" @47
+			location   	(1504, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@47
+			    location   	(1504, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	367
+			    justify    	0
+			    label      	"systemstartup")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B0070346"
+			width      	385
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @48
+			    location   	(1504, 736)
+			    line_color 	3342489
+			    InterObjView 	@47
+			    height     	644
+			    y_coord    	584
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @49
+			    location   	(1504, 800)
+			    line_color 	3342489
+			    InterObjView 	@47
+			    height     	248
+			    y_coord    	188
+			    Nested     	TRUE))
+		    (object InterObjView "mapping" @50
+			location   	(1904, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@50
+			    location   	(1904, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	372
+			    justify    	0
+			    label      	"mapping")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B079006F"
+			width      	390
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @51
+			    location   	(1904, 928)
+			    line_color 	3342489
+			    InterObjView 	@50
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "iReader" @52
+			location   	(2385, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@52
+			    location   	(2385, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	506
+			    justify    	0
+			    label      	"iReader")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B2DF029A"
+			width      	524
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @53
+			    location   	(2385, 1072)
+			    line_color 	3342489
+			    InterObjView 	@52
+			    height     	248
+			    y_coord    	188
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @54
+			    location   	(2385, 1200)
+			    line_color 	3342489
+			    InterObjView 	@52
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE))
+		    (object InterObjView "RDmDomainManager" @55
+			location   	(832, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@55
+			    location   	(832, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"RDmDomainManager")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284A34501EF"
+			width      	300
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @56
+			    location   	(832, 576)
+			    line_color 	3342489
+			    InterObjView 	@55
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "RProperty" @57
+			location   	(512, 224)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@57
+			    location   	(512, 224)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"RProperty")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284A1660328"
+			width      	300
+			height     	1365
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @58
+			    location   	(512, 416)
+			    line_color 	3342489
+			    InterObjView 	@57
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterMessView "" @59
+			location   	(16, 416)
+			label      	(object SegLabel @60
+			    Parent_View 	@59
+			    location   	(398, 373)
+			    quidu      	"4284A17D00B8"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	417
+			    justify    	0
+			    label      	"Get( ..., bootmode)"
+			    pctDist    	0.697819
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@43
+			supplier   	@57
+			Focus_Src  	@44
+			Focus_Entry 	@58
+			origin     	(175, 416)
+			terminus   	(496, 416)
+			ordinal    	0)
+		    (object InterMessView "" @61
+			location   	(16, 736)
+			label      	(object SegLabel @62
+			    Parent_View 	@61
+			    location   	(1415, 678)
+			    quidu      	"4284B01E01D1"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	408
+			    justify    	0
+			    label      	"NewLC(bootmode)"
+			    pctDist    	0.760656
+			    height     	59
+			    orientation 	0)
+			line_color 	3342489
+			client     	@45
+			supplier   	@47
+			Focus_Src  	@46
+			Focus_Entry 	@48
+			origin     	(1183, 736)
+			terminus   	(1488, 736)
+			ordinal    	3)
+		    (object SelfMessView "" @63
+			location   	(16, 800)
+			label      	(object SegLabel @64
+			    Parent_View 	@63
+			    location   	(1803, 760)
+			    quidu      	"4284B03303C7"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	498
+			    justify    	0
+			    label      	"ConstructL(bootmode)"
+			    pctDist    	1.893333
+			    height     	41
+			    orientation 	0)
+			line_color 	3342489
+			client     	@47
+			supplier   	@47
+			Focus_Src  	@48
+			Focus_Entry 	@49
+			origin     	(1520, 800)
+			terminus   	(1670, 800)
+			ordinal    	4)
+		    (object InterMessView "" @65
+			location   	(16, 928)
+			label      	(object SegLabel @66
+			    Parent_View 	@65
+			    location   	(1835, 902)
+			    quidu      	"4284B09E0218"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	540
+			    justify    	0
+			    label      	"GetResourceFileName"
+			    pctDist    	0.858357
+			    height     	27
+			    orientation 	0)
+			line_color 	3342489
+			client     	@47
+			supplier   	@50
+			Focus_Src  	@49
+			Focus_Entry 	@51
+			origin     	(1519, 928)
+			terminus   	(1888, 928)
+			ordinal    	5)
+		    (object InterMessView "" @67
+			location   	(16, 1072)
+			label      	(object SegLabel @68
+			    Parent_View 	@67
+			    location   	(1944, 1028)
+			    quidu      	"4284B2F70089"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	495
+			    justify    	0
+			    label      	" NewL(resourcefile, ...)"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@47
+			supplier   	@52
+			Focus_Src  	@48
+			Focus_Entry 	@53
+			origin     	(1519, 1072)
+			terminus   	(2369, 1072)
+			ordinal    	6)
+		    (object SelfMessView "" @69
+			location   	(16, 1200)
+			label      	(object SegLabel @70
+			    Parent_View 	@69
+			    location   	(2696, 1158)
+			    quidu      	"4284B341033D"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	555
+			    justify    	0
+			    label      	"ConstructL(resourcefile)"
+			    pctDist    	1.973333
+			    height     	43
+			    orientation 	0)
+			line_color 	3342489
+			client     	@52
+			supplier   	@52
+			Focus_Src  	@53
+			Focus_Entry 	@54
+			origin     	(2401, 1200)
+			terminus   	(2551, 1200)
+			ordinal    	7)
+		    (object InterMessView "" @71
+			location   	(16, 576)
+			label      	(object SegLabel @72
+			    Parent_View 	@71
+			    location   	(608, 533)
+			    quidu      	"4288B01B0319"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	920
+			    justify    	0
+			    label      	"AddDomainHierarchy(KDmHierarchyIdStartup)"
+			    pctDist    	0.676838
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@43
+			supplier   	@55
+			Focus_Src  	@44
+			Focus_Entry 	@56
+			origin     	(175, 576)
+			terminus   	(816, 576)
+			ordinal    	1)
+		    (object InterMessView "" @73
+			location   	(16, 688)
+			label      	(object SegLabel @74
+			    Parent_View 	@73
+			    location   	(663, 644)
+			    quidu      	"4288B0D0006A"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	159
+			    justify    	0
+			    label      	"StartL"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@43
+			supplier   	@45
+			Focus_Src  	@44
+			Focus_Entry 	@46
+			origin     	(175, 688)
+			terminus   	(1152, 688)
+			ordinal    	2)))
+	    (object InteractionDiagram "Reading State Information from SSC"
+		mechanism_ref 	@2
+		quid       	"4284B4AF024A"
+		title      	"Reading State Information from SSC"
+		zoom       	68
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	21
+		items      	(list diagram_item_list
+		    (object InterObjView "starter" @75
+			location   	(180, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@75
+			    location   	(180, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	302
+			    justify    	0
+			    label      	"starter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B4B203E1"
+			width      	320
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @76
+			    location   	(180, 368)
+			    line_color 	3342489
+			    InterObjView 	@75
+			    height     	1672
+			    y_coord    	1612
+			    Nested     	FALSE))
+		    (object InterObjView "systemstartup" @77
+			location   	(540, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@77
+			    location   	(540, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	322
+			    justify    	0
+			    label      	"systemstartup")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B4CE021D"
+			width      	340
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @78
+			    location   	(540, 384)
+			    line_color 	3342489
+			    InterObjView 	@77
+			    height     	1596
+			    y_coord    	1536
+			    Nested     	FALSE))
+		    (object InterObjView "iReader" @79
+			location   	(960, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@79
+			    location   	(960, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	420
+			    justify    	0
+			    label      	"iReader")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284B50D029E"
+			width      	438
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @80
+			    location   	(960, 400)
+			    line_color 	3342489
+			    InterObjView 	@79
+			    height     	1520
+			    y_coord    	1460
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @81
+			    location   	(960, 448)
+			    line_color 	3342489
+			    InterObjView 	@79
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @82
+			    location   	(960, 600)
+			    line_color 	3342489
+			    InterObjView 	@79
+			    height     	225
+			    y_coord    	165
+			    Nested     	TRUE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @83
+			    location   	(960, 1065)
+			    line_color 	3342489
+			    InterObjView 	@79
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @84
+			    location   	(960, 1215)
+			    line_color 	3342489
+			    InterObjView 	@79
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE))
+		    (object InterObjView "command" @85
+			location   	(1965, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@85
+			    location   	(1965, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"command")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284BFA80115"
+			width      	300
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @86
+			    location   	(1965, 1455)
+			    line_color 	3342489
+			    InterObjView 	@85
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "stateInfo" @87
+			location   	(2415, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@87
+			    location   	(2415, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	492
+			    justify    	0
+			    label      	"stateInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284C16C0192"
+			width      	510
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @88
+			    location   	(2415, 705)
+			    line_color 	3342489
+			    InterObjView 	@87
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @89
+			    location   	(2415, 1800)
+			    line_color 	3342489
+			    InterObjView 	@87
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "appInfo" @90
+			location   	(1560, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@90
+			    location   	(1560, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	432
+			    justify    	0
+			    label      	"appInfo")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4289DD5F0389"
+			width      	450
+			height     	1905
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @91
+			    location   	(1560, 1335)
+			    line_color 	3342489
+			    InterObjView 	@90
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterMessView "" @92
+			location   	(16, 384)
+			label      	(object SegLabel @93
+			    Parent_View 	@92
+			    location   	(359, 340)
+			    quidu      	"4284B4DB02BB"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	633
+			    justify    	0
+			    label      	"GetNextStateL"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@75
+			supplier   	@77
+			Focus_Src  	@76
+			Focus_Entry 	@78
+			origin     	(195, 384)
+			terminus   	(524, 384)
+			ordinal    	0)
+		    (object InterMessView "" @94
+			location   	(16, 400)
+			label      	(object SegLabel @95
+			    Parent_View 	@94
+			    location   	(748, 357)
+			    quidu      	"4284B5200010"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	610
+			    justify    	0
+			    label      	"GetStateInfoL"
+			    pctDist    	0.498361
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@77
+			supplier   	@79
+			Focus_Src  	@78
+			Focus_Entry 	@80
+			origin     	(555, 400)
+			terminus   	(944, 400)
+			ordinal    	1)
+		    (object SelfMessView "" @96
+			location   	(16, 448)
+			label      	(object SegLabel @97
+			    Parent_View 	@96
+			    location   	(1223, 421)
+			    quidu      	"4284B5530062"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	950
+			    justify    	0
+			    label      	"ReadStateInformationL"
+			    pctDist    	1.646667
+			    height     	28
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@79
+			Focus_Src  	@80
+			Focus_Entry 	@81
+			origin     	(976, 448)
+			terminus   	(1126, 448)
+			ordinal    	2)
+		    (object SelfMessView "" @98
+			location   	(15, 600)
+			label      	(object SegLabel @99
+			    Parent_View 	@98
+			    location   	(1184, 573)
+			    quidu      	"4284B86501AC"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	853
+			    justify    	0
+			    label      	"FindFirstStateEntryL"
+			    pctDist    	1.386667
+			    height     	28
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@79
+			Focus_Src  	@80
+			Focus_Entry 	@82
+			origin     	(976, 600)
+			terminus   	(1126, 600)
+			ordinal    	3)
+		    (object SelfMessView "" @100
+			location   	(15, 1065)
+			label      	(object SegLabel @101
+			    Parent_View 	@100
+			    location   	(1388, 1023)
+			    quidu      	"4284BB24015C"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	1492
+			    justify    	0
+			    label      	"ReadCommandListL(aCommandListId)"
+			    pctDist    	2.746667
+			    height     	43
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@79
+			Focus_Src  	@80
+			Focus_Entry 	@83
+			origin     	(976, 1065)
+			terminus   	(1126, 1065)
+			ordinal    	5)
+		    (object SelfMessView "" @102
+			location   	(15, 1215)
+			label      	(object SegLabel @103
+			    Parent_View 	@102
+			    location   	(1184, 1172)
+			    quidu      	"4284BDE9027D"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	722
+			    justify    	0
+			    label      	"ReadCommandInfoL *"
+			    pctDist    	1.393333
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@79
+			Focus_Src  	@80
+			Focus_Entry 	@84
+			origin     	(976, 1215)
+			terminus   	(1126, 1215)
+			ordinal    	6)
+		    (object InterMessView "" @104
+			location   	(15, 1455)
+			label      	(object SegLabel @105
+			    Parent_View 	@104
+			    location   	(1462, 1411)
+			    quidu      	"4284BFB20201"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	720
+			    justify    	0
+			    label      	"NewL(appInfo, ...)"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@85
+			Focus_Src  	@80
+			Focus_Entry 	@86
+			origin     	(975, 1455)
+			terminus   	(1949, 1455)
+			ordinal    	8)
+		    (object Label @106
+			location   	(1170, 510)
+			nlines     	1
+			max_width  	600
+			label      	"[state = 0]")
+		    (object Label @107
+			location   	(1185, 945)
+			nlines     	1
+			max_width  	600
+			label      	"[type == EStartupProcess]")
+		    (object NoteView @108
+			location   	(1965, 1005)
+			font       	(object Font
+			    size       	8)
+			label      	(object ItemLabel
+			    Parent_View 	@108
+			    location   	(1827, 945)
+			    fill_color 	13434879
+			    nlines     	2
+			    max_width  	240
+			    label      	"Type could be app/DLL etc")
+			line_color 	3342489
+			fill_color 	13434879
+			width      	300
+			height     	132)
+		    (object NoteView @109
+			location   	(2040, 1140)
+			font       	(object Font
+			    size       	8)
+			label      	(object ItemLabel
+			    Parent_View 	@109
+			    location   	(1902, 1080)
+			    fill_color 	13434879
+			    nlines     	2
+			    max_width  	240
+			    label      	"Repeat for each command")
+			line_color 	3342489
+			fill_color 	13434879
+			width      	300
+			height     	132)
+		    (object InterMessView "" @110
+			location   	(15, 1335)
+			label      	(object SegLabel @111
+			    Parent_View 	@110
+			    location   	(1259, 1291)
+			    quidu      	"4289DDFF02AF"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	302
+			    justify    	0
+			    label      	"NewL"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@90
+			Focus_Src  	@80
+			Focus_Entry 	@91
+			origin     	(975, 1335)
+			terminus   	(1544, 1335)
+			ordinal    	7)
+		    (object InterMessView "" @112
+			location   	(15, 705)
+			label      	(object SegLabel @113
+			    Parent_View 	@112
+			    location   	(1687, 661)
+			    quidu      	"4289DEE0027F"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	302
+			    justify    	0
+			    label      	"NewL"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@87
+			Focus_Src  	@82
+			Focus_Entry 	@88
+			origin     	(975, 705)
+			terminus   	(2399, 705)
+			ordinal    	4)
+		    (object InterMessView "" @114
+			location   	(15, 1800)
+			label      	(object SegLabel @115
+			    Parent_View 	@114
+			    location   	(1687, 1756)
+			    quidu      	"4289DEF5031C"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	1304
+			    justify    	0
+			    label      	"SetCommandList(CommandList)"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@79
+			supplier   	@87
+			Focus_Src  	@80
+			Focus_Entry 	@89
+			origin     	(975, 1800)
+			terminus   	(2399, 1800)
+			ordinal    	9)))
+	    (object InteractionDiagram "Executing commands for one state"
+		mechanism_ref 	@3
+		quid       	"4284C2C90079"
+		title      	"Executing commands for one state"
+		zoom       	79
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list
+		    (object InterObjView "CSystemStarter" @116
+			location   	(165, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@116
+			    location   	(165, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"CSystemStarter")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284C2D000B7"
+			width      	300
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @117
+			    location   	(165, 320)
+			    line_color 	3342489
+			    InterObjView 	@116
+			    height     	260
+			    y_coord    	200
+			    Nested     	FALSE))
+		    (object InterObjView "state" @118
+			location   	(480, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@118
+			    location   	(480, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"state")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284C2D9001B"
+			width      	300
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @119
+			    location   	(480, 352)
+			    line_color 	3342489
+			    InterObjView 	@118
+			    height     	168
+			    y_coord    	108
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @120
+			    location   	(480, 624)
+			    line_color 	3342489
+			    InterObjView 	@118
+			    height     	966
+			    y_coord    	906
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @121
+			    location   	(480, 640)
+			    line_color 	3342489
+			    fill_color 	13434879
+			    InterObjView 	@118
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE))
+		    (object InterObjView "RDmManagerSession" @122
+			location   	(795, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@122
+			    location   	(795, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	282
+			    justify    	0
+			    label      	"RDmManagerSession")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284CDE90163"
+			width      	300
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @123
+			    location   	(795, 400)
+			    line_color 	3342489
+			    InterObjView 	@122
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "aCommand" @124
+			location   	(1125, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@124
+			    location   	(1125, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	308
+			    justify    	0
+			    label      	"aCommand")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"4284DCC90004"
+			width      	326
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @125
+			    location   	(1125, 752)
+			    line_color 	3342489
+			    InterObjView 	@124
+			    height     	388
+			    y_coord    	328
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @126
+			    location   	(1125, 832)
+			    line_color 	3342489
+			    InterObjView 	@124
+			    height     	248
+			    y_coord    	188
+			    Nested     	TRUE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @127
+			    location   	(1125, 960)
+			    line_color 	3342489
+			    InterObjView 	@124
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @128
+			    location   	(1125, 1065)
+			    line_color 	3342489
+			    InterObjView 	@124
+			    height     	240
+			    y_coord    	180
+			    Nested     	FALSE)
+			Focus_Of_Control 	(object Focus_Of_Control "" @129
+			    location   	(1125, 1185)
+			    line_color 	3342489
+			    InterObjView 	@124
+			    height     	60
+			    y_coord    	0
+			    Nested     	TRUE))
+		    (object InterObjView "aCommand" @130
+			location   	(1455, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@130
+			    location   	(1455, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	294
+			    justify    	0
+			    label      	"aCommand")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428B52A90371"
+			width      	312
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @131
+			    location   	(1455, 1305)
+			    line_color 	3342489
+			    InterObjView 	@130
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "aComand" @132
+			location   	(1845, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@132
+			    location   	(1845, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	420
+			    justify    	0
+			    label      	"aComand")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428B56640310"
+			width      	438
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @133
+			    location   	(1845, 1395)
+			    line_color 	3342489
+			    InterObjView 	@132
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterObjView "aCommand" @134
+			location   	(2265, 225)
+			font       	(object Font
+			    underline  	TRUE)
+			label      	(object ItemLabel
+			    Parent_View 	@134
+			    location   	(2265, 225)
+			    fill_color 	13434879
+			    anchor_loc 	1
+			    nlines     	2
+			    max_width  	348
+			    justify    	0
+			    label      	"aCommand")
+			icon_style 	"Icon"
+			line_color 	3342489
+			fill_color 	13434879
+			quidu      	"428B5A0B0389"
+			width      	366
+			height     	1455
+			icon_height 	0
+			icon_width 	0
+			icon_y_offset 	0
+			annotation 	1
+			Focus_Of_Control 	(object Focus_Of_Control "" @135
+			    location   	(2265, 1470)
+			    line_color 	3342489
+			    InterObjView 	@134
+			    height     	60
+			    y_coord    	0
+			    Nested     	FALSE))
+		    (object InterMessView "" @136
+			location   	(16, 352)
+			label      	(object SegLabel @137
+			    Parent_View 	@136
+			    location   	(322, 308)
+			    quidu      	"4284C2E601E1"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	277
+			    justify    	0
+			    label      	"StartL"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@116
+			supplier   	@118
+			Focus_Src  	@117
+			Focus_Entry 	@119
+			origin     	(180, 352)
+			terminus   	(464, 352)
+			ordinal    	0)
+		    (object InterMessView "" @138
+			location   	(16, 400)
+			label      	(object SegLabel @139
+			    Parent_View 	@138
+			    location   	(771, 357)
+			    quidu      	"4284CE0B0116"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	899
+			    justify    	0
+			    label      	"RequestDomainTransition"
+			    pctDist    	0.975352
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@122
+			Focus_Src  	@119
+			Focus_Entry 	@123
+			origin     	(495, 400)
+			terminus   	(779, 400)
+			ordinal    	1)
+		    (object SelfMessView "" @140
+			location   	(16, 640)
+			label      	(object SegLabel @141
+			    Parent_View 	@140
+			    location   	(646, 597)
+			    quidu      	"4284DCE401CA"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	483
+			    justify    	0
+			    label      	"DoCommand"
+			    pctDist    	1.000000
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			fill_color 	8454143
+			client     	@118
+			supplier   	@118
+			Focus_Src  	@120
+			Focus_Entry 	@121
+			origin     	(496, 640)
+			terminus   	(646, 640)
+			ordinal    	2)
+		    (object InterMessView "" @142
+			location   	(16, 752)
+			label      	(object SegLabel @143
+			    Parent_View 	@142
+			    location   	(802, 708)
+			    quidu      	"4284DD17038F"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	333
+			    justify    	0
+			    label      	"Execute"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@124
+			Focus_Src  	@120
+			Focus_Entry 	@125
+			origin     	(495, 752)
+			terminus   	(1109, 752)
+			ordinal    	3)
+		    (object SelfMessView "" @144
+			location   	(16, 832)
+			label      	(object SegLabel @145
+			    Parent_View 	@144
+			    location   	(1216, 788)
+			    quidu      	"4284DDEE0303"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	376
+			    justify    	0
+			    label      	" Utility procs"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@124
+			supplier   	@124
+			Focus_Src  	@125
+			Focus_Entry 	@126
+			origin     	(1141, 832)
+			terminus   	(1291, 832)
+			ordinal    	4)
+		    (object SelfMessView "" @146
+			location   	(16, 960)
+			label      	(object SegLabel @147
+			    Parent_View 	@146
+			    location   	(1216, 916)
+			    quidu      	"4284DE4701E8"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	363
+			    justify    	0
+			    label      	"Utility procs"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@124
+			supplier   	@124
+			Focus_Src  	@126
+			Focus_Entry 	@127
+			origin     	(1141, 960)
+			terminus   	(1291, 960)
+			ordinal    	5)
+		    (object InterMessView "" @148
+			location   	(15, 1065)
+			label      	(object SegLabel @149
+			    Parent_View 	@148
+			    location   	(801, 1022)
+			    quidu      	"428B503F006C"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	333
+			    justify    	0
+			    label      	"Execute"
+			    pctDist    	0.499454
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@124
+			Focus_Src  	@120
+			Focus_Entry 	@128
+			origin     	(495, 1065)
+			terminus   	(1109, 1065)
+			ordinal    	6)
+		    (object SelfMessView "" @150
+			location   	(15, 1185)
+			label      	(object SegLabel @151
+			    Parent_View 	@150
+			    location   	(1245, 1142)
+			    quidu      	"428B5083008C"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	363
+			    justify    	0
+			    label      	"Utility procs"
+			    pctDist    	0.700000
+			    height     	44
+			    orientation 	0)
+			line_color 	3342489
+			client     	@124
+			supplier   	@124
+			Focus_Src  	@128
+			Focus_Entry 	@129
+			origin     	(1141, 1185)
+			terminus   	(1291, 1185)
+			ordinal    	7)
+		    (object InterMessView "" @152
+			location   	(15, 1305)
+			label      	(object SegLabel @153
+			    Parent_View 	@152
+			    location   	(967, 1261)
+			    quidu      	"428B52CB0382"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	333
+			    justify    	0
+			    label      	"Execute"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@130
+			Focus_Src  	@120
+			Focus_Entry 	@131
+			origin     	(495, 1305)
+			terminus   	(1439, 1305)
+			ordinal    	8)
+		    (object InterMessView "" @154
+			location   	(15, 1395)
+			label      	(object SegLabel @155
+			    Parent_View 	@154
+			    location   	(1162, 1351)
+			    quidu      	"428B567F00B0"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	368
+			    justify    	0
+			    label      	"Execute"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@132
+			Focus_Src  	@120
+			Focus_Entry 	@133
+			origin     	(495, 1395)
+			terminus   	(1829, 1395)
+			ordinal    	9)
+		    (object InterMessView "" @156
+			location   	(15, 1470)
+			label      	(object SegLabel @157
+			    Parent_View 	@156
+			    location   	(1372, 1426)
+			    quidu      	"428B5A430149"
+			    anchor_loc 	1
+			    nlines     	1
+			    max_width  	368
+			    justify    	0
+			    label      	"Execute"
+			    pctDist    	0.500000
+			    height     	45
+			    orientation 	0)
+			line_color 	3342489
+			client     	@118
+			supplier   	@134
+			Focus_Src  	@120
+			Focus_Entry 	@135
+			origin     	(495, 1470)
+			terminus   	(2249, 1470)
+			ordinal    	10)))))
+    root_subsystem 	(object SubSystem "Component View"
+	quid       	"426E373D03AF"
+	physical_models 	(list unit_reference_list)
+	physical_presentations 	(list unit_reference_list
+	    (object Module_Diagram "Main"
+		quid       	"426E373D03BB"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    process_structure 	(object Processes
+	quid       	"426E373D03B0"
+	ProcsNDevs 	(list
+	    (object Process_Diagram "Deployment View"
+		quid       	"426E373D03B2"
+		title      	"Deployment View"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    properties 	(object Properties
+	attributes 	(list Attribute_Set
+	    (object Attribute
+		tool       	"DDL"
+		name       	"propertyId"
+		value      	"809135966")
+	    (object Attribute
+		tool       	"DDL"
+		name       	"default__Project"
+		value      	(list Attribute_Set
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Directory"
+			value      	"AUTO GENERATE")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DataBase"
+			value      	("DataBaseSet" 800))
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DataBaseSet"
+			value      	(list Attribute_Set
+			    (object Attribute
+				tool       	"DDL"
+				name       	"ANSI"
+				value      	800)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Oracle"
+				value      	801)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"SQLServer"
+				value      	802)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Sybase"
+				value      	803)
+			    (object Attribute
+				tool       	"DDL"
+				name       	"Watcom"
+				value      	804)))
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKeyColumnName"
+			value      	"Id")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKeyColumnType"
+			value      	"NUMBER(5)")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"ViewName"
+			value      	"V_")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"TableName"
+			value      	"T_")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"InheritSuffix"
+			value      	"_V")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DropClause"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"BaseViews"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"DDLScriptFilename"
+			value      	"DDL1.SQL")))
+	    (object Attribute
+		tool       	"DDL"
+		name       	"default__Attribute"
+		value      	(list Attribute_Set
+		    (object Attribute
+			tool       	"DDL"
+			name       	"ColumnType"
+			value      	"VARCHAR")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Length"
+			value      	"")
+		    (object Attribute
+			tool       	"DDL"
+			name       	"NullsOK"
+			value      	TRUE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"PrimaryKey"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"Unique"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"CompositeUnique"
+			value      	FALSE)
+		    (object Attribute
+			tool       	"DDL"
+			name       	"CheckConstraint"
+			value      	"")))
+	    (object Attribute
+		tool       	"DDL"
+		name       	"HiddenTool"
+		value      	FALSE)
+	    (object Attribute
+		tool       	"RequisitePro"
+		name       	"HiddenTool"
+		value      	FALSE)
+	    (object Attribute
+		tool       	"Rose Model Integrator"
+		name       	"HiddenTool"
+		value      	FALSE)
+	    (object Attribute
+		tool       	"Version Control"
+		name       	"HiddenTool"
+		value      	FALSE))
+	quid       	"426E373D03B1"))

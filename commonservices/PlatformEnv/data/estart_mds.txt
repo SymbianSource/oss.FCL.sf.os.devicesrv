@@ -1,0 +1,21 @@
+#
+# Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
+
+
+E:  1  EFAT32  FAT   0       FS_FORMAT_CORRUPT                      # MEMORYCARD 1 Partition 0
+F:  2  EFAT32  FAT   0       FS_FORMAT_CORRUPT                      # MEMORYCARD 1 Partition 1
+G:  3  EFAT32  FAT   0       FS_FORMAT_CORRUPT                      # MEMORYCARD 2 Partition 0
+H:  4  EFAT32  FAT   0       FS_FORMAT_CORRUPT                      # MEMORYCARD 2 Partition 1

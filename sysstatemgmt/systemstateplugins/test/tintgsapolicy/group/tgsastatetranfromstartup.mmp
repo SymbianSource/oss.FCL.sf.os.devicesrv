@@ -1,0 +1,58 @@
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+//
+
+TARGET			tgsastatetranfromstartup.exe
+TARGETTYPE		exe
+TARGETPATH		/sys/bin
+
+CAPABILITY  	PowerMgmt
+
+UID           	0xA000A180
+VENDORID 		0x70000001
+
+#if defined(WINS)
+SOURCEPATH			../resource
+START RESOURCE		tgsa_statetranfromstartup.rss
+TARGETPATH			/private/2000d75b/test
+END
+
+SOURCEPATH			../resource
+START RESOURCE		tgsa_statetranfromstartuptoshutdown.rss
+TARGETPATH			/private/2000d75b/test
+END
+
+#endif
+
+SOURCEPATH    	../src
+SOURCE			tgsastatetran_base.cpp
+SOURCE        	tgsastatetranfromstartup.cpp
+
+USERINCLUDE   	.
+USERINCLUDE   	../inc
+
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+
+LIBRARY     	euser.lib ssmcmn.lib efsrv.lib  estor.lib 
+
+
+
+
+
+
+
+
+
+
+SMPSAFE

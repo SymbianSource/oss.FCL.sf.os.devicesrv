@@ -1,0 +1,6 @@
+EXPORTS
+	_ZN11SysLangUtil15IsValidLanguageERKiP3RFs @ 1 NONAME
+	_ZN11SysLangUtil18GetDefaultLanguageERiP3RFs @ 2 NONAME
+	_ZN11SysLangUtil18RestoreSIMLanguageERiP3RFs @ 3 NONAME
+	_ZN11SysLangUtil21GetInstalledLanguagesERP13CArrayFixFlatIiEP3RFs @ 4 NONAME
+

@@ -1,0 +1,115 @@
+/*
+* Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+* Name        : strtdevlockcheck.h
+* Part of     : System Startup / StrtDevLockPlg
+* Declaration of CStrtDevLockCheck class.
+* Version     : %version: 1 %
+* This material, including documentation and any related computer
+* programs, is protected by copyright controlled by Nokia.  All
+* rights are reserved.  Copying, including reproducing, storing,
+* adapting or translating, any or all of this material requires the
+* prior written consent of Nokia.  This material also contains
+* confidential information which may not be disclosed to others
+* without the prior written consent of Nokia.
+* Template version: 4.2
+* Nokia Core OS *
+* File renamed from strtdevlockcheck.h to cmddevicesecuritycheck.h as part of Core OS transfer.
+*
+*/
+
+
+
+
+/**
+ @file
+ @internalComponent
+ @released
+*/
+
+#ifndef __CMDDEVICESECURITYCHECK_H__
+#define __CMDDEVICESECURITYCHECK_H__
+
+#include <ssm/ssmcustomcommand.h>
+#include "ssmsecuritychecknotifier.h"
+#include <etel.h> 
+#include <etelmm.h>
+
+NONSHARABLE_CLASS (CCustomCmdDeviceSecurityCheck) : public CActive , public MSsmCustomCommand
+	{
+public:
+	static CCustomCmdDeviceSecurityCheck* NewL();
+
+	// from MSsmcustomCommand
+	TInt Initialize(CSsmCustomCommandEnv* aCmdEnv);
+	void Execute(const TDesC8& aParams, TRequestStatus& aStatus);
+	void Close();
+	void Release();
+	void ExecuteCancel();
+
+protected:
+	// from CActive
+	void RunL();
+	void DoCancel();
+	TInt RunError(TInt aError);
+
+protected:
+	void ConstructL();
+	void Cleanup(TInt aError);
+
+private:
+	CCustomCmdDeviceSecurityCheck();
+    ~CCustomCmdDeviceSecurityCheck();
+
+private:
+    //Response to LockPhoneDevice lock status query has been received.
+    void LockPhoneDeviceRespReceivedL();
+
+    //Response to LockPhoneToIcc lock status query has been received.
+    void LockPhoneToIccRespReceivedL();
+
+    //Response to security code request from user has been received.
+    void SecCodeQueryRespReceivedL();
+
+    //Query the security code from the user.
+    void QuerySecCodeL();
+
+    void CompleteClientRequest(TInt aReason);
+
+private:
+    //Internal state
+    enum TDeviceSecurityCheckState
+        {
+        EDeviceSecurityCheckNone = 0,
+        EGetLockPhoneDevice,
+        EGetLockPhoneToIcc,
+        EQuerySecCode,
+        EDeviceSecurityCheckMaxState
+        };
+
+private:
+	TDeviceSecurityCheckState iState;
+	RTelServer iServer;
+    RMobilePhone iPhone;
+    RMobilePhone::TMobilePhoneLockInfoV1 iLockInfo;
+    RMobilePhone::TMobilePhoneLockInfoV1Pckg iLockInfoPckg;
+    HBufC* iTsyModuleName;
+	TRequestStatus* iExecuteRequest;
+	CSsmSecurityCheckNotifier* iSsmSecurityCheckNotifier;
+
+#ifdef TEST_CUSTCMD_MACRO
+	friend class CCustomCmdTestDeviceSecurityCheck;
+#endif
+	};
+#endif // __CMDDEVICESECURITYCHECK_H__

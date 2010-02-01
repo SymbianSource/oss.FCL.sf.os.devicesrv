@@ -1,0 +1,54 @@
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+//
+
+
+
+
+#ifndef __HWRESOURCEMANAGER_IBY__
+#define __HWRESOURCEMANAGER_IBY__
+
+#include <featreg.iby> // Feature Registry (featreg.dll)
+
+file=ABI_DIR\DEBUG_DIR\HWRMCommon.dll        SYSTEM_BINDIR\HWRMCommon.dll
+file=ABI_DIR\DEBUG_DIR\HWRMServer.exe        SYSTEM_BINDIR\HWRMServer.exe
+file=ABI_DIR\DEBUG_DIR\HWRMClient.dll        SYSTEM_BINDIR\HWRMClient.dll
+file=ABI_DIR\DEBUG_DIR\HWRMVibraClient.dll   SYSTEM_BINDIR\HWRMVibraClient.dll
+file=ABI_DIR\DEBUG_DIR\HWRMLightClient.dll   SYSTEM_BINDIR\HWRMLightClient.dll
+file=ABI_DIR\DEBUG_DIR\HWRMExtendedLightClient.dll   SYSTEM_BINDIR\HWRMExtendedLightClient.dll
+file=ABI_DIR\DEBUG_DIR\HWRMPowerClient.dll   SYSTEM_BINDIR\HWRMPowerClient.dll
+
+// Backup and Restore
+data=DATAZ_\private\101f7a02\backup_registration.xml	private\101f7a02\backup_registration.xml
+
+// NOTE: 
+// cenrep registration files should be included here
+
+//Product specific policy files, customized on a per product basis, depending on the device requirements.
+//Product specific policy overrides customer specific policy, if same SID is defined in both policies.
+data=DATAZ_\private\101f7a02\ProductHWRMLightsPolicy.ini   private\101f7a02\ProductHWRMLightsPolicy.ini
+data=DATAZ_\private\101f7a02\ProductHWRMVibraPolicy.ini    private\101f7a02\ProductHWRMVibraPolicy.ini
+data=DATAZ_\private\101f7a02\ProductHWRMFmTxPolicy.ini     private\101f7a02\ProductHWRMFmTxPolicy.ini
+
+//Platform internal policies (customer specific), customized by licensees to control policy at a platform level. 
+data=DATAZ_\private\101f7a02\CustomerHWRMLightsPolicy.ini  private\101f7a02\CustomerHWRMLightsPolicy.ini
+data=DATAZ_\private\101f7a02\CustomerHWRMVibraPolicy.ini   private\101f7a02\CustomerHWRMVibraPolicy.ini
+data=DATAZ_\private\101f7a02\CustomerHWRMFmTxPolicy.ini    private\101f7a02\CustomerHWRMFmTxPolicy.ini
+
+// FM Tx RDS text conversion
+data=DATAZ_\private\101f7a02\ConvertFromUnicode.dat     private\101f7a02\ConvertFromUnicode.dat
+
+#endif // __HWRESOURCEMANAGER_IBY__
+
+//  End of File  

@@ -1,0 +1,56 @@
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+//
+
+TARGET			mctest_f.exe
+TARGETTYPE		exe
+UID				0x102857BB	0x102857BB
+VENDORID        0x70000001
+CAPABILITY 		all -tcb
+
+SOURCEPATH		.
+SOURCE			main.cpp
+SOURCE			mctest_f.cpp
+
+SOURCEPATH      ../common
+SOURCE			testcasecontroller.cpp
+SOURCE          TestScheduler.cpp
+
+SOURCEPATH		../McFramework
+SOURCE            McFramework.cpp
+
+USERINCLUDE		.
+USERINCLUDE     ../common
+USERINCLUDE		../McFramework
+
+#ifndef SYMBIAN_OLD_EXPORT_LOCATION
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+MW_LAYER_SYSTEMINCLUDE_SYMBIAN
+SYSTEMINCLUDE	/epoc32/include/platform/hwrm
+#else
+SYSTEMINCLUDE	/epoc32/include
+SYSTEMINCLUDE	/epoc32/include/hwrm
+#endif
+
+LIBRARY         centralrepository.lib
+LIBRARY			euser.lib
+LIBRARY			efsrv.lib 
+LIBRARY			estor.lib
+LIBRARY         hwrmclient.lib 
+LIBRARY         hwrmvibraclient.lib 
+LIBRARY         hwrmlightclient.lib 
+LIBRARY         hwrmextendedlightclient.lib
+LIBRARY         hwrmfmtxclient.lib 
+
+SMPSAFE

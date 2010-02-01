@@ -1,0 +1,113 @@
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+// Name        : strtsecuritynotecontroller.cpp
+// Part of     : System Startup / StrtSecObs
+// Implementation of CStrtSecurityNoteController class
+// Version     : %version: 1 % << Don't touch! Updated by Synergy at check-out.
+// This material, including documentation and any related computer
+// programs, is protected by copyright controlled by Nokia.  All
+// rights are reserved.  Copying, including reproducing, storing,
+// adapting or translating, any or all of this material requires the
+// prior written consent of Nokia.  This material also contains
+// confidential information which may not be disclosed to others
+// without the prior written consent of Nokia.
+// Template version: 4.1.1
+// Nokia Core OS *
+// File renamed from strtsecuritynotecontroller.cpp to ssmsecuritynotecontroller.cpp as part of Core OS transfer.
+//
+
+
+
+#include "strtsecnoterequestqueue.h"
+#include "ssmsecuritynotecontroller.h"
+#include "ssmsecuritychecknotifier.h"
+#include "ssmdebug.h"
+
+CStrtSecurityNoteController* CStrtSecurityNoteController::NewL()
+    {
+    CStrtSecurityNoteController* self = new( ELeave ) CStrtSecurityNoteController;
+    CleanupStack::PushL( self );
+    self->ConstructL();
+    CleanupStack::Pop( self );
+    return self;
+    }
+
+CStrtSecurityNoteController::~CStrtSecurityNoteController()
+    {
+    Cancel();
+    delete iSecurityNote;
+    delete iQueue;
+    }
+
+TInt CStrtSecurityNoteController::SecurityNoteRequested(
+    const TStrtSecurityNoteType aNoteType )
+    {
+    TInt errorCode = iQueue->Add(aNoteType);
+    if(KErrNone != errorCode)
+    	{
+    	DEBUGPRINT2A("Failed to add security note request to the queue "
+    			"with error %d", errorCode);
+    	}
+
+    if ((errorCode == KErrNone) && !IsActive())
+        {
+        CompleteSelf(); // Jump to RunL
+        }
+    return errorCode;
+    }
+
+void CStrtSecurityNoteController::SecurityCodeVerified(
+    const TStrtSecurityNoteType aNoteType )
+    {
+    iQueue->Remove( aNoteType );
+    // No need to care about the security code which is currently being
+    // requested, SecurityNotifier completes that request.
+    }
+
+void CStrtSecurityNoteController::DoCancel()
+    {
+    iSecurityNote->Cancel();
+    }
+
+void CStrtSecurityNoteController::RunL()
+    {
+    TStrtSecurityNoteType code = iQueue->GetFirst();
+    if ( code != ESecNoteNone )
+        {
+        iSecurityNote->ShowNoteL(code, iStatus );
+        SetActive();
+        }
+    }
+
+CStrtSecurityNoteController::CStrtSecurityNoteController()
+  : CActive( EPriorityStandard ),    
+    iQueue( NULL ),
+    iSecurityNote( NULL )
+    {
+    CActiveScheduler::Add( this );
+    }
+
+void CStrtSecurityNoteController::ConstructL()
+    {
+    iQueue = CStrtSecNoteRequestQueue::NewL();
+    iSecurityNote = CSsmSecurityCheckNotifier::NewL();
+    }
+
+void CStrtSecurityNoteController::CompleteSelf()
+    {
+    iStatus = KRequestPending;
+    TRequestStatus* status = &iStatus;
+    User::RequestComplete( status, KErrNone );
+    SetActive();
+    }

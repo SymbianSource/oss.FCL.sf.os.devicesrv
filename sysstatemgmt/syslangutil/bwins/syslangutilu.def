@@ -1,0 +1,6 @@
+EXPORTS
+	?GetDefaultLanguage@SysLangUtil@@SAHAAHPAVRFs@@@Z @ 1 NONAME ; int SysLangUtil::GetDefaultLanguage(int &, class RFs *)
+	?GetInstalledLanguages@SysLangUtil@@SAHAAPAV?$CArrayFixFlat@H@@PAVRFs@@@Z @ 2 NONAME ; int SysLangUtil::GetInstalledLanguages(class CArrayFixFlat<int> * &, class RFs *)
+	?IsValidLanguage@SysLangUtil@@SAHABHPAVRFs@@@Z @ 3 NONAME ; int SysLangUtil::IsValidLanguage(int const &, class RFs *)
+	?RestoreSIMLanguage@SysLangUtil@@SAHAAHPAVRFs@@@Z @ 4 NONAME ; int SysLangUtil::RestoreSIMLanguage(int &, class RFs *)
+
