@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -36,8 +36,12 @@ class RSsmAdaptationBase: public RSessionBase
 public:
 	IMPORT_C TInt Connect();
 	IMPORT_C TInt Connect(TInt aAsyncMessageSlotCount);
+	//Used by testcode only
+#ifdef TEST_SSM_SERVER
+    TInt Connect(const TDesC& aServerName);
+#endif //TEST_SSM_SERVER
 private:
-	TInt DoConnect(TInt aAsyncMessageSlotCount);
+    TInt DoConnect(const TDesC& aServerName, TInt aAsyncMessageSlotCount);
 	TVersion Version() const;
 	};
 

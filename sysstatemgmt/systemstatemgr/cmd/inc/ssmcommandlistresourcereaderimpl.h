@@ -55,7 +55,8 @@ private:
 		EInitialiseNextStep,
 		EInitialiseSysDriveStep,
 		EPrepareFirstStep,
-		EPrepareNextStep
+		EPrepareNextStep,
+		EInitialiseExtFolderStep
 		};
 
 	NONSHARABLE_CLASS(TMapping)
@@ -118,6 +119,9 @@ private:
 		void DoInitialiseNextStepL();
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 		void DoInitialiseSysDriveStepL();
+#ifdef __WINS__ 
+		void DoInitialiseExtFolderStepL();
+#endif
 #endif
 		CResourceFile* OpenResourceFileL(const TDesC& aFileName);
 		void ParseFileL(CResourceFile* aResourceFile);
@@ -135,6 +139,12 @@ private:
 		RBuf iSystemDrivePath;
 		CDir* iRssFileEntriesInSysDrive;
 		TInt iSysDriveEntryIndex;
+#ifdef __WINS__ 
+	    CDir* iExtendedResourceFileEntries;
+	    RBuf iExtendedPath;
+	    TInt iExtendedEntryIndex;
+#endif //__WINS__
+	      
 #endif	//SYMBIAN_SSM_FLEXIBLE_MERGE
 		};
 

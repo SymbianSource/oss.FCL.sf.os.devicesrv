@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -155,10 +155,16 @@ void CSsmSimStatusObserver::DoCancel()
  * 
  * @internalComponent
  */
+#ifdef _DEBUG
 TInt CSsmSimStatusObserver::RunError(TInt aError)
+#else 
+TInt CSsmSimStatusObserver::RunError(TInt)
+#endif // _DEBUG
 	{
 	DEBUGPRINT2A("CSsmSimStatusObserver RunError received error: %d", aError);
-	return aError;
+	//Errors are thrown if SWP transitions are not allowed.
+	//So, handles such errors gracefully.
+	return KErrNone;
 	}
 
 /**

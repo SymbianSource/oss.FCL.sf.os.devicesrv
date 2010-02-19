@@ -291,7 +291,86 @@ void CEDIDHandler::CreateHdmiAudioFormatL( RAccPolHdmiAudioFormatArray& aHdmiAud
 
                     // Set audio format
                     TUid audioFormat;
-                    audioFormat.iUid = audioDataBlock->iAudioFormatCode;
+                    // Map the audio format code defined in 
+                    // cea861ediddatatypes.h to accpolhdmiaudioformat.h
+                    switch ( audioDataBlock->iAudioFormatCode )
+                        {
+                        case KAudioFormatCodePCM:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatPCM16;
+                            break;
+                            }
+                        case KAudioFormatCodeAC3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatAC3;
+                            break;
+                            }
+                        case KAudioFormatCodeMPEG1:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMPEG1;
+                            break;
+                            }
+                        case KAudioFormatCodeMP3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMP3;
+                            break;
+                            }
+                        case KAudioFormatCodeMPEG2:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMPEG2;
+                            break;
+                            }
+                        case KAudioFormatCodeAACLC:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatAACLC;
+                            break;
+                            }
+                        case KAudioFormatCodeDTS:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDTS;
+                            break;
+                            }
+                        case KAudioFormatCodeATRAC:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatATRAC;
+                            break;
+                            }
+                        case KAudioFormatCodeDSD:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDSD;
+                            break;
+                            }
+                        case KAudioFormatCodeEAC3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatEAC3;
+                            break;
+                            }
+                        case KAudioFormatCodeDTSHD:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDTSHD;
+                            break;
+                            }
+                        case KAudioFormatCodeMLP:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMLP;
+                            break;
+                            }
+                        case KAudioFormatCodeDST:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDST;
+                            break;
+                            }
+                        case KAudioFormatCodeWMAPRO:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatWMAPRO;
+                            break;
+                            }
+                        default:
+                            {
+                            audioFormat.iUid = KAudioFormatCodeNA;
+                            break;
+                            }
+                        }
                     hdmiAudioFormat->SetAudioFormat( audioFormat ); // const TUid aAudioFormat,
 
                     // Set bit resolution

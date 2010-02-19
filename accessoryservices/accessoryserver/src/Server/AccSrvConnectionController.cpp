@@ -796,7 +796,6 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
 			    case EAccModeLoopset:
 			    case EAccModeMusicStand:
 			    case EAccModeTVOut:
-			    case EAccModeHDMI:
 			    case EAccModeHeadphones:
 			    {
 				  TAccPolGenericID genericID;

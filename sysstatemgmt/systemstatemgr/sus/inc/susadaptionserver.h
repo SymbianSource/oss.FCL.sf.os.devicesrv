@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -37,6 +37,8 @@ class CSsmAdaptationServer : public CPolicyServer
 	{	
 public:
 	static CSsmAdaptationServer* NewLC();
+	static CSsmAdaptationServer* NewLC(const TDesC& aServerName);
+
 	~CSsmAdaptationServer();
 
 	//State Adaptation services 
@@ -73,7 +75,7 @@ public:
 	void DoDeactivateRfForEmergencyCallL(const RMessage2& aMessage);
 	void DoEmergencyCallRfCancelL(const RMessage2& aMessage);
 	TInt SetAsPriorityClientL(CSsmAdaptationSession* aSession);
-	void RemovePriorityClient(CSsmAdaptationSession* aSession);
+	void RemovePriorityClient(CSsmAdaptationSession* aSession);	
 #ifdef _DEBUG
 	void UnloadAdaptationsAndObservers();
 #endif
@@ -86,7 +88,7 @@ private:
 //From Policy Server
 	CPolicyServer::TCustomResult CustomSecurityCheckL(const RMessage2& aMsg, TInt& aAction, TSecurityInfo& aMissing);
 	CSsmAdaptationServer();
-	void ConstructL();
+	void ConstructL(const TDesC& aServerName);
 	//from CServer2
 	CSession2* NewSessionL(const TVersion& aVersion, const RMessage2& aMessage) const;
 	void LoadStateAdaptationL();

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -92,10 +92,9 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 #endif // __JAVA
         r_cmd_watcher,
         r_cmd_dmutilsrv,
-	r_cmd_mediasyncserver,  // Should be executed before contentharvester
         // prio 0xFFA7
         r_cmd_contentharvester,
-        r_cmd_harvestersrv,
+        r_cmd_mdswatchdog,
         r_cmd_predefinedcontacts,
         r_cmd_xnthemesrv,
         r_cmd_ncnlist,
@@ -115,7 +114,8 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 #ifdef FF_LBT_ENGINE
         r_cmd_lbtsrv,
 #endif // FF_LBT_ENGINE
-        r_cmd_fsemail,
+        r_cmd_emailsrvrmon,
+        r_cmd_taskswitcher,
         // prio 0xFFA6
         r_cmd_dmfirstbootreason,
         r_cmd_fota,
@@ -124,6 +124,8 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0x7F97
 	r_cmd_dcmo,
         r_cmd_amastart,
+	      // prio 0x7F96
+	      r_cmd_multiple_wait,
         // prio 0x7EFF
         r_cmd_activitymonitor1,
         // prio 0x7EFE
@@ -160,7 +162,13 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 	r_cmd_activitymonitor9,
 	// prio 0x7EEC
 	r_cmd_mylocationsengine,
-	    r_cmd_startupready      // Last command, prio 0x0000
+#ifdef FF_ATT_ADDRESS_BK
+	//prio 0x7EEA
+	r_cmd_activitymonitor10,
+	//prio 0x7EE9
+	r_cmd_aab,
+#endif
+	r_cmd_startupready      // Last command, prio 0x0000
         };
     }
 
@@ -168,6 +176,21 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // Command items in alphabetical order
 // ===========================================================================
 //
+
+// -----------------------------------------------------------------------------
+// r_cmd_aab
+// -----------------------------------------------------------------------------
+//
+#ifdef FF_ATT_ADDRESS_BK 
+RESOURCE SSM_START_APP_INFO r_cmd_aab
+    {
+    priority = 0x7EE9;
+    name = "z:\\sys\\bin\\AABPhonebookapp.exe";
+    retries = 2;
+    background = 1; // To background
+    monitor_info = r_mon_3_restarts_ignore;
+    }
+#endif
 
 // ---------------------------------------------------------------------------
 // r_cmd_activitymonitor1
@@ -303,6 +326,23 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
     retries = 2;
     dll_data = r_dlldata_activitymonitor_timeout;
     }
+	
+// ---------------------------------------------------------------------------
+// r_cmd_activitymonitor10
+// ---------------------------------------------------------------------------
+//
+#ifdef FF_ATT_ADDRESS_BK
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
+    {
+    priority = 0x7EEA;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
+#endif
 	
 // ---------------------------------------------------------------------------
 // r_cmd_adtupdater
@@ -508,17 +548,14 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_fota
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_fsemail
+// r_cmd_emailsrvrmon
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_APP_INFO r_cmd_fsemail
+RESOURCE SSM_START_APP_INFO r_cmd_emailsrvrmon
     {
     priority = 0xFFA7;
-    name = "fsmailserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
-    monitor_info = r_mon_3_restarts_ignore;
+    name = "emailservermonitor.exe";
+    execution_behaviour = ESsmFireAndForget;
     conditional_information = r_cond_feat_emailfw;
     }
 
@@ -537,16 +574,14 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_gsserver
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_harvestersrv
+// r_cmd_mdswatchdog
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_PROCESS_INFO r_cmd_harvestersrv
+RESOURCE SSM_START_PROCESS_INFO r_cmd_mdswatchdog
     {
     priority = 0xFFA7;
-    name = "harvesterserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
+    name = "mdswatchdog.exe";
+    execution_behaviour = ESsmFireAndForget;
     }
 
 // ---------------------------------------------------------------------------
@@ -626,19 +661,6 @@ RESOURCE SSM_START_APP_INFO r_cmd_mce
     background = 1; // To background
     }
 	
-// ---------------------------------------------------------------------------
-// r_cmd_mediasyncserver
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mediasyncserver
-    {
-    priority = 0xFFA6;
-    name = "z:\\sys\\bin\\mediasyncserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-		
 // ---------------------------------------------------------------------------
 // r_cmd_ncnlist
 // ---------------------------------------------------------------------------
@@ -1083,6 +1105,27 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_mylocationsengine
     name = "z:\\sys\\bin\\mylocationsengine.exe";
     execution_behaviour = ESsmFireAndForget;
     }
+
+// ---------------------------------------------------------------------------
+// r_cmd_item_taskswitcher
+// ---------------------------------------------------------------------------  
+RESOURCE SSM_START_APP_INFO r_cmd_taskswitcher
+     {
+     priority = 0xFFA7;
+     name = "z:\\sys\\bin\\taskswitcher.exe";
+     execution_behaviour = ESsmDeferredWaitForSignal;
+     background = 1; // To background
+     monitor_info = r_mon_3_restarts_ignore;
+     }
+
+// ---------------------------------------------------------------------------
+// r_cmd_multiple_wait
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiple_wait
+     {
+     priority = 0x7F96;     
+     }
 
 // ===========================================================================
 // Conditional blocks in alphabetical order

@@ -126,10 +126,14 @@ CTestStep* CCmdTestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CCustomCmdTestCoopSysStateChange();
 		}
-	else if (aStepName == KTCCustomCmdTestPublishStartupMode)
+	else if (aStepName == KTestPublishStartupModeWithCap)
 		{
-		testStep = new CCustomCmdTestPublishStartupMode();
+		testStep = new CCustomCmdTestPublishStartupMode(KTestPublishStartupModeWithCap);
 		}
+	else if (aStepName == KTestPublishStartupModeWithoutCap)
+        {
+        testStep = new CCustomCmdTestPublishStartupMode(KTestPublishStartupModeWithoutCap);
+        }
 	else if (aStepName == KTCCustomCmdTestPublishSimOwnedAndChanged)
 	    {
 	    testStep = new CCustomCmdTestPublishSimOwnedAndChanged();
