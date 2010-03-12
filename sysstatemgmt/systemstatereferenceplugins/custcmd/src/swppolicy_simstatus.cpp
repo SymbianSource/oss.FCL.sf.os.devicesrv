@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -11,19 +11,7 @@
 // Contributors:
 //
 // Description:
-// Name        : strtsimstatusmgr.cpp
-// Part of     : System Startup / Starter
 // Implementation of TStrtSimStatusMgr class.
-// Version     : %version: 7 %
-// This material, including documentation and any related computer
-// programs, is protected by copyright controlled by Nokia.  All
-// rights are reserved.  Copying, including reproducing, storing,
-// adapting or translating, any or all of this material requires the
-// prior written consent of Nokia.  This material also contains
-// confidential information which may not be disclosed to others
-// without the prior written consent of Nokia.
-// Template version: 4.1
-// Nokia Core OS *
 //
 
 
@@ -37,6 +25,7 @@
 
 #include "ssmuiproviderdll.h"
 #include "swppolicy_simstatus.h"
+#include "ssmdebug.h"
 
 #include <ssm/ssmswppolicy.h>
 #include <ssm/ssmstatemanager.h>
@@ -221,9 +210,20 @@ void CSimStatuspolicy::HandleCleReturnValue(const TSsmSwp& aSwp, TInt aError, TI
 	{
 	(void)aSwp;
 	(void)aSeverity;
+	(void)aError;
 	
 	TRequestStatus* rs = &aStatus;
+#if defined(_DEBUG)
+	if(KErrNone != aError)
+		{
+		DEBUGPRINT3A("ERROR: Request SwP change for SIM status (SwP key %d) completed with error %d", aSwp.Key(), aError);
+		}
+	//Complete the status with the error which inturn panics SSM server	
 	User::RequestComplete(rs, aError);
+#else // _DEBUG
+	//Completing the status with KErrNone to avoid panic in SSM server
+	User::RequestComplete(rs, KErrNone);
+#endif // _DEBUG
 	}
 
 void CSimStatuspolicy::HandleCleReturnValueCancel()

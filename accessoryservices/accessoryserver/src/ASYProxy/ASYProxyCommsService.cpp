@@ -141,10 +141,10 @@ CASYProxyCommsService::~CASYProxyCommsService()
     {
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::~CASYProxyCommsService()" );
 
-    Destroy( KDeleteAllRecords );
-
     if ( iAsyProxyCommsStack )
         {
+        Destroy( KDeleteAllRecords );
+
         delete iAsyProxyCommsStack;
         iAsyProxyCommsStack = 0;
         }

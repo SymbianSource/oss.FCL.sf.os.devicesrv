@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -226,7 +226,7 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_locod
     name = "z:\\sys\\bin\\locod.exe";
     execution_behaviour = ESsmFireAndForget;
     monitor_info = r_mon_3_restarts_ignore;
-    conditional_information = r_cond_feat_testatcommand;
+    conditional_information = r_cond_testatcommand_or_enableisicommunicationinusbchargingmode;
     }
 
 // ---------------------------------------------------------------------------
@@ -535,6 +535,26 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_testatcommand
     feature_id = KFeatureIdTestATCommand;
     }
 
+// ---------------------------------------------------------------------------
+// r_cond_feat_enableisicommunicationinusbchargingmode
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_enableisicommunicationinusbchargingmode
+    {
+    feature_id = KFeatureIdEnableIsiCommunicationInUsbChargingMode;
+    }	
+	
+// ---------------------------------------------------------------------------
+// r_cond_testatcommand_or_certtesting
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_CND_LOGICAL_OR r_cond_testatcommand_or_enableisicommunicationinusbchargingmode
+    {
+    lhs = r_cond_feat_testatcommand;
+    rhs = r_cond_feat_enableisicommunicationinusbchargingmode;
+    }
+	
+	
 // monitoring.rss contains resource definitions, so it may not be included
 // before entry point.
 #include "monitoring.rss"

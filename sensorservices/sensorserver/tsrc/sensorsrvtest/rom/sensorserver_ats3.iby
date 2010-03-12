@@ -29,9 +29,6 @@ ECOM_PLUGIN(SSYStub1.dll, SSYStub1.rsc)
 
 ECOM_PLUGIN(sensrvcondeval.dll, sensrvcondeval.rsc)
 
-data=ZPRIVATE\10202BE9\10282DEE_stub.txt                  PRIVATE\10202BE9\10282DEE.txt
-data=ZPRIVATE\10202BE9\1020507E_stub.txt                  PRIVATE\10202BE9\1020507E.txt
-
 
 #endif // SENSORSERVERTEST_IBY
 

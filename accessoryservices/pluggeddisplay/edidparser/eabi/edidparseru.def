@@ -56,4 +56,5 @@ EXPORTS
 	_ZTI17CCea861EdidParser @ 55 NONAME ; #<TI>#
 	_ZTV17CCea861EdidParser @ 56 NONAME ; #<VT>#
 	_ZN15CEdidParserBase18GetStandardTimingsEi @ 57 NONAME
+	_ZN17CCea861EdidParser19HasIEEERegistrationEv @ 58 NONAME
 

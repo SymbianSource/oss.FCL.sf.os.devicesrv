@@ -54,4 +54,5 @@ EXPORTS
 	?GetInterlacedAudioLatency@CCea861EdidParser@@QAEEXZ @ 53 NONAME ; unsigned char CCea861EdidParser::GetInterlacedAudioLatency(void)
 	?GetInterlacedVideoLatency@CCea861EdidParser@@QAEEXZ @ 54 NONAME ; unsigned char CCea861EdidParser::GetInterlacedVideoLatency(void)
 	?GetStandardTimings@CEdidParserBase@@QAEEH@Z @ 55 NONAME ; unsigned char CEdidParserBase::GetStandardTimings(int)
+	?HasIEEERegistration@CCea861EdidParser@@QAEHXZ @ 56 NONAME ; int CCea861EdidParser::HasIEEERegistration(void)
 

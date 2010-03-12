@@ -27,15 +27,13 @@ PRJ_TESTEXPORTS
 // NOTE: If using ARS requirements all export operations should be done under this.
 // 'abld test export'
 
+
+../cenrepsample/sensorframework.confml               OS_LAYER_CONFML(sensorframework.confml)
+../cenrepsample/sensorframework_10282DEE.crml 	     OS_LAYER_CRML(sensorframework_10282DEE.crml)
+
 ../../conf/SensorTestModule.cfg   /epoc32/winscw/c/testframework/SensorTestModule.cfg
 ../../init/SensorTestModule.ini   /epoc32/winscw/c/testframework/SensorTestModule.ini
-../cenrepsample/10282DEE.txt /epoc32/RELEASE/winscw/UDEB/Z/private/10202BE9/10282DEE.txt
-../cenrepsample/10282DEE.txt /epoc32/RELEASE/winscw/UREL/Z/private/10202BE9/10282DEE.txt
-../cenrepsample/10282DEE.txt /epoc32/data/Z/private/10202BE9/10282DEE_stub.txt
 
-../cenrepsample/1020507E.txt /epoc32/RELEASE/winscw/UDEB/Z/private/10202BE9/1020507E.txt
-../cenrepsample/1020507E.txt /epoc32/RELEASE/winscw/UREL/Z/private/10202BE9/1020507E.txt
-../cenrepsample/1020507E.txt /epoc32/data/Z/private/10202BE9/1020507E_stub.txt
 
 ../../rom/SensorServer_ats3.iby CORE_OS_LAYER_IBY_EXPORT_PATH(SensorServer_ats3.iby)
 

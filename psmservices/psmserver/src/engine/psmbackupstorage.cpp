@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -194,6 +194,7 @@ TXmlEngElement CPsmBackupStorage::FindSetItemL( const TXmlEngElement& aConfigSet
     // Search correct set item for aKey
     TBool setFound( EFalse );
     RXmlEngNodeList<TXmlEngElement> nodeList;
+    CleanupClosePushL(nodeList);
     aConfigSet.GetElementsByTagNameL(nodeList, KPsmSetItem);
     TXmlEngElement setItem = nodeList.Next().AsElement();       
 
@@ -205,7 +206,7 @@ TXmlEngElement CPsmBackupStorage::FindSetItemL( const TXmlEngElement& aConfigSet
 
         if ( aKey == setItemKey )
             {
-            // Set found, no need to loop anumore
+            // Set found, no need to loop any more
             setFound = ETrue;
             }
         else
@@ -214,7 +215,8 @@ TXmlEngElement CPsmBackupStorage::FindSetItemL( const TXmlEngElement& aConfigSet
             setItem = nodeList.Next().AsElement();            
             }
         }
-
+        
+    CleanupStack::PopAndDestroy(&nodeList);
     if ( !setFound )
         {
         COMPONENT_TRACE( ( _L( "PSM Server - CPsmBackupStorage::FindSetItemL() - Not found id:%i, LEAVE" ), aKey ) );

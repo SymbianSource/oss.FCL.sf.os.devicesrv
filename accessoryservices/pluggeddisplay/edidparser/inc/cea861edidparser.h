@@ -156,6 +156,14 @@ public:
     IMPORT_C TBool IsVendorSpecificDataBlockSupported();        
     
     /**
+     * Indicates whether the sink has IEEE registration or not in the vendor specific data block
+     *
+     * @param   none
+     * @return  true/false
+     */
+    IMPORT_C TBool HasIEEERegistration();        
+    
+    /**
      * Indicates whether or not Speaker Allocation Data Block is supported
      *
      *

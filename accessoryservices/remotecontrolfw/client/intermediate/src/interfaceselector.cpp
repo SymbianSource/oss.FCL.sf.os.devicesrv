@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -431,6 +431,7 @@ EXPORT_C void CRemConInterfaceSelector::OpenTargetL()
 		{
 		delete iTargetSession;
 		iTargetSession = NULL;
+		LEAVEL(err);
 		}
 	}
 
@@ -485,6 +486,7 @@ EXPORT_C void CRemConInterfaceSelector::OpenTargetL(TPlayerType aPlayerType, TPl
 		{
 		delete iTargetSession;
 		iTargetSession = NULL;
+		LEAVEL(err);
 		}
 	}
 

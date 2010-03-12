@@ -205,26 +205,15 @@ CCea861ExtEdidInformation::~CCea861ExtEdidInformation()
     // delete all descriptor blocks
     while( iDescriptorBlocks )
         {
-        TCEA861TEdidDescriptorBlockList* prev = iDescriptorBlocks;
-        TCEA861TEdidDescriptorBlockList* last = prev;
-        /* coverity[var_deref_op]*/
-        if( prev->iNext )
-            {
-            last = prev->iNext;
-            }
-        while( last->iNext ) // go to last block
-            {
-            prev = prev->iNext;
-            last = last->iNext;
-            }
-        prev->iNext = NULL;
-        if( last == iDescriptorBlocks )
-            {
-            iDescriptorBlocks = NULL;
-            prev = NULL;
-            }
-        delete last;
+        TCEA861TEdidDescriptorBlockList* node;
+        
+        node = iDescriptorBlocks;
+        iDescriptorBlocks = iDescriptorBlocks->iNext;
+        
+        delete node;
         }
+    iDescriptorBlocks = NULL;
+    
     }
 
 // End of file

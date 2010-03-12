@@ -408,6 +408,8 @@ void CAccSrvSubBTControl::NotifyBluetoothAudioLinkOpenReqL(
             TPckg<TBTDevAddr> BTDevAddrPckg( BTDevAddr );
             
             aMessage.ReadL( KAccServParamPosFirst, BTDevAddrPckg );
+			// coverity[check_return]
+			// coverity[unchecked_value]
             iServerModel->FindWithDeviceAddressL( MakeTUint64( BTDevAddr ), uniqueID );
             iConnectionController->NotificationQueue().CompleteControlMessageL(
                 EBluetoothAudioLinkOpenReq, KErrNone, uniqueID );

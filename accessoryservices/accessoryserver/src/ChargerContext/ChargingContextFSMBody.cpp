@@ -78,7 +78,7 @@ CChargingContextFSMBody::~CChargingContextFSMBody()
             }
         }
     // Delete state objects
-    for (TInt i = 1; i <= EChargerContextStateMaxValue; i++ )
+    for (TInt i = 1; i < EChargerContextStateMaxValue; i++ )
         {
         delete iStateArray[i];
         iStateArray[i] = NULL;
@@ -111,7 +111,7 @@ TBool CChargingContextFSMBody::Transit( TFSMState aNextState )
     COM_TRACE_( "[AccFW:AccServer] CChargingContextFSMBody::Transit()" );
     TBool retVal(EFalse);
     if ( ( EChargerContextStateUndefined < aNextState ) && 
-         (  EChargerContextStateMaxValue >= aNextState ) )
+         (  EChargerContextStateMaxValue > aNextState ) )
         {
         iCurrentStateId = aNextState;
         if ( NULL != iStateArray[iCurrentStateId])
@@ -173,7 +173,7 @@ MFSMState* CChargingContextFSMBody::CurrentState()
     COM_TRACE_( "[AccFW:AccServer] CChargingContextFSMBody::CurrentState()" );
     MFSMState* currentState( NULL );
     if ( ( EChargerContextStateUndefined < iCurrentStateId ) && 
-            ( EChargerContextStateMaxValue >= iCurrentStateId ))
+            ( EChargerContextStateMaxValue > iCurrentStateId ))
         {
         currentState = iStateArray[iCurrentStateId];
         }
@@ -191,7 +191,7 @@ TPtrC CChargingContextFSMBody::CurrentStateName()
     TPtrC currentStateName;
     currentStateName.Set( KNullDesC );
     if ( ( EChargerContextStateUndefined < iCurrentStateId ) && 
-         ( EChargerContextStateMaxValue >= iCurrentStateId ))
+         ( EChargerContextStateMaxValue > iCurrentStateId ))
         {
         currentStateName.Set( iStateArray[iCurrentStateId]->Name() );
         }

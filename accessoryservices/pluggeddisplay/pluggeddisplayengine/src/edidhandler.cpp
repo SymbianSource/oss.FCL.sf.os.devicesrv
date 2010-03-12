@@ -1413,24 +1413,45 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 
 			availableIndex++;
 			}
-		
-		    if( ( (KDefaultCEAModePhysImgAspRatioNr == iEdidParserPtr->GetAspectRatioLandscape()) 
-		            && (KDefaultCEAModePhysImgAspRatioDr == iEdidParserPtr->GetAspectRatioPortrait()) ) 
-		            && !defaultCEAmode )		    
 
+			// If the Vendor Specific Data Block supported and it has IEEE registration number then it is HDMI
+			if ( iExtensionParserPtr && iExtensionParserPtr->IsVendorSpecificDataBlockSupported() && iExtensionParserPtr->HasIEEERegistration() )
 			{
-            THdmiDviTimings timings;
-            
-            // Get a timing item for default CEA Mode (1)
-            const TTimingItem* item = TimingByIndex( KDefaultCEAModeIndex, ETimingModeCEA );
-            if( item )
-                {
-                Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
-                FillHdmiDviTimings( *item, timings );
-                retVal = aHdmiConfigs.Append( timings );
-                ERROR( retVal, "Failed to append CEA timing in available config array" );
-                }
-			}
+			    INFO( "<<<<<<<<<<<<<<It is HDMI connector>>>>>>>>>>>>>>" );
+				// Add default CEA mode 1 to the list if it is not there already
+			    if( ( (KDefaultCEAModePhysImgAspRatioNr == iEdidParserPtr->GetAspectRatioLandscape()) 
+			            && (KDefaultCEAModePhysImgAspRatioDr == iEdidParserPtr->GetAspectRatioPortrait()) ) 
+			            && !defaultCEAmode )		    
+	
+				{
+	            THdmiDviTimings timings;
+	            
+	            // Get a timing item for default CEA Mode (1)
+	            const TTimingItem* item = TimingByIndex( KDefaultCEAModeIndex, ETimingModeCEA );
+	            if( item )
+	                {
+	                Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
+	                FillHdmiDviTimings( *item, timings );
+	                retVal = aHdmiConfigs.Append( timings );
+	                ERROR( retVal, "Failed to append CEA timing in available config array" );
+	                }
+				}
+		    }
+		    else // It is DVI connector
+		    {
+				TInt modecount = aHdmiConfigs.Count();
+				
+				INFO( "<<<<<<<<<<<<<<It is DVI connector>>>>>>>>>>>>>>" );
+				while( modecount-- )
+				  {
+					// Change it to DVI mode as it is existing in both Supported and available configurations
+					aHdmiConfigs[ modecount ].iConnector = TTvSettings::EDVI;
+					
+					// Version should be zeroed for non-HDMI
+					aHdmiConfigs[ modecount ].iTvHdmiVersion = 0;
+					aHdmiConfigs[ modecount ].iTvHdmiRevision = 0;			  
+				  }
+		    }
 
 		INFO( "Filtered list -- END" );
 		supportedModes.Close();
