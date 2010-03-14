@@ -32,6 +32,7 @@
 #include <ssm/startupdomainpskeys.h>
 #include <ssm/starterdomaincrkeys.h>
 #include <e32property.h>
+#include <e32cmn.h>
 #include <centralrepository.h>
 
 //Exe name which defines startup PS keys
@@ -44,12 +45,19 @@ CCustomCmdTestPublishStartupMode::~CCustomCmdTestPublishStartupMode()
     delete iAsyncStopScheduler;
 	}
 
-CCustomCmdTestPublishStartupMode::CCustomCmdTestPublishStartupMode()
+CCustomCmdTestPublishStartupMode::CCustomCmdTestPublishStartupMode(const TDesC& aTestStepName):iTestStepName(aTestStepName)
 	{
-	SetTestStepName(KTCCustomCmdTestPublishStartupMode);
+    if (iTestStepName == KTestPublishStartupModeWithCap)
+        {
+        SetTestStepName(KTestPublishStartupModeWithCap);
+        }
+    else
+        {
+        SetTestStepName(KTestPublishStartupModeWithoutCap);
+        }
 	}
 
-//
+
 static TInt CallBackL(TAny* aCCustomCmdTestPublishStartupMode)
     {
     //Call back function to stop active scheduler
@@ -74,32 +82,35 @@ void CCustomCmdTestPublishStartupMode::CallBackRunL()
 
 TVerdict CCustomCmdTestPublishStartupMode::doTestStepPreambleL()
 	{
-	INFO_PRINTF1(_L("doTestStepPreambleL"));
-	//Create and install active scheduler
-	iActiveScheduler = new(ELeave) CActiveScheduler;
-	CActiveScheduler::Install (iActiveScheduler);
-
-   //Needed for calling callback for stopping active scheduler
-    iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
-
-	INFO_PRINTF1(_L("Define global startup mode property"));
-
-    RProcess process;
-	//Start the test exe which defines startup related property keys
-	TInt err = process.Create(KExeToDefineStartUpPS, KStartUpPSKeys());
-	INFO_PRINTF2(_L("Define global startup mode property process created with %d"), err);
-	TEST(KErrNone == err);
-	User::LeaveIfError(err);
-	process.Resume();
-	
-	process.Rendezvous(iRequestStatus);
-	User::WaitForRequest(iRequestStatus);
-	TEST(KErrNone == iRequestStatus.Int());
-	
-	//Kill the define startup ps process
-	process.Kill(KErrNone);
-	process.Close();
-
+    INFO_PRINTF1(_L("doTestStepPreambleL"));
+    if (iTestStepName == KTestPublishStartupModeWithCap)
+        {
+        RProcess process;
+        CleanupClosePushL(process);
+        //Create and install active scheduler
+        iActiveScheduler = new(ELeave) CActiveScheduler;
+        CActiveScheduler::Install (iActiveScheduler);
+    
+        //Needed for calling callback for stopping active scheduler
+        iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
+    
+        INFO_PRINTF1(_L("Define global startup mode property"));
+    
+        //Start the test exe which defines startup related property keys
+        TInt err = process.Create(KExeToDefineStartUpPS, KStartUpPSKeys());
+        INFO_PRINTF2(_L("Define global startup mode property process created with %d"), err);
+        TEST(KErrNone == err);
+        User::LeaveIfError(err);
+        process.Resume();
+    
+        process.Rendezvous(iRequestStatus);
+        User::WaitForRequest(iRequestStatus);
+        TEST(KErrNone == iRequestStatus.Int());
+    
+        //Kill the define startup ps process
+        process.Kill(KErrNone);
+        CleanupStack::PopAndDestroy(&process);
+        }
 	return CTestStep::doTestStepPreambleL();
 	}
 
@@ -112,13 +123,30 @@ TVerdict CCustomCmdTestPublishStartupMode::doTestStepL()
 	{
 	INFO_PRINTF1(_L("Entering test for publish startup mode custom command"));
 	__UHEAP_MARK;
-	
-	TRAPD(err, doTestCreateExecuteAndDestroyL());
-	TEST(err == KErrNone);
-	
-	TRAP(err, doTestFactoryCreateAndExecuteCancelL());
-	TEST(err == KErrNone);
-	
+	RProcess process(KCurrentProcessHandle);
+    if(!(process.HasCapability(ECapabilityPowerMgmt) && 
+       process.HasCapability(ECapabilityWriteDeviceData)&& 
+       process.HasCapability(ECapabilityProtServ)))
+		{
+		TUid KCentRepId = {0x101f8762}; 
+		CRepository* repository = NULL;
+		repository  = CRepository::NewL(KCentRepId);
+       
+		TInt ret = repository->Set(KStartupReason, ENormalStartup); 
+		delete repository;
+		INFO_PRINTF3(_L("Setting Central Repository key 101f8762 Return value = %d Expected value = %d"),ret, KErrPermissionDenied);
+		TEST(ret == KErrPermissionDenied);
+		}
+    else
+        {
+        TRAPD(err, doTestCreateExecuteAndDestroyL());
+        TEST(err == KErrNone);
+        
+        TRAP(err, doTestFactoryCreateAndExecuteCancelL());
+        TEST(err == KErrNone);
+        
+        
+        }
 	__UHEAP_MARKEND;
 	INFO_PRINTF1(_L("Leaving test for publish startup mode custom command"));
 	return TestStepResult();
@@ -138,8 +166,10 @@ void CCustomCmdTestPublishStartupMode::doTestCreateExecuteAndDestroyL()
     TUid KCentRepId = {0x101f8762}; 
     CRepository* repository = CRepository::NewL(KCentRepId);
     TInt ret = repository->Set(KStartupReason, ENormalStartup); 
-    delete repository;
-	
+    delete repository;  
+    INFO_PRINTF3(_L("Setting Central Repository key 101f8762 Return value = %d Expected value = %d"),ret, KErrNone);
+    TEST(ret == KErrNone);
+
     TInt startUpMode = -1;
     
     //Setting inital value of startUpMode as -1

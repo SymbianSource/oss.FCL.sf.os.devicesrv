@@ -28,3 +28,6 @@
 
 "\epoc32\release\armv5\urel\mediatortest.dll"-"c:\sys\bin\mediatortest.dll"
 "..\init\mediatortest.ini"-"c:\testframework\mediatortest.ini"
+"\epoc32\release\armv5\urel\MediatorTestPlugin.dll"-"c:\sys\bin\MediatorTestPlugin.dll"
+"\epoc32\data\z\resource\plugins\MediatorTestPlugin.rsc"-"c:\data\z\resource\plugins\MediatorTestPlugin.rsc"
+"\epoc32\data\z\private\10207449\events\StaticEvents.rsc"-"c:\data\z\private\10207449\events\StaticEvents.rsc"

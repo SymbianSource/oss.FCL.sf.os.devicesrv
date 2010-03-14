@@ -29,3 +29,11 @@
 "..\conf\PsmTestModule.cfg"-"c:\testframework\PsmTestModule.cfg"
 "..\init\PsmTestModule_armi.ini"-"c:\testframework\PsmTestModule_armi.ini"
 
+;data files
+
+"\epoc32\data\z\private\2000B187\10200EE1.xml"-"c:\private\2000B187\10200EE1.xml"
+"\epoc32\data\z\private\2000B187\10200EE2.xml"-"c:\private\2000B187\10200EE2.xml"
+"\epoc32\data\z\private\2000B187\10200EE4.xml"-"c:\private\2000B187\10200EE4.xml"
+"\epoc32\data\z\private\2000B187\10200EE5.xml"-"c:\private\2000B187\10200EE5.xml"
+"\epoc32\data\z\private\2000B187\cenrep\10200EE3.xml"-"c:\private\2000B187\cenrep\10200EE3.xml"
+"\epoc32\data\z\private\10202BE9\10200EE3.txt"-"c:\private\10202BE9\10200EE3.txt"

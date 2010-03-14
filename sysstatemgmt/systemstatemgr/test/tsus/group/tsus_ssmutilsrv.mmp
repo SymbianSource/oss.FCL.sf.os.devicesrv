@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -33,6 +33,9 @@ CAPABILITY 		DiskAdmin PowerMgmt ProtServ SwEvent WriteDeviceData ReadDeviceData
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
+// Used for making the production code changes in the server available only for test code.
+macro			TEST_SSM_SERVER
+
 
 // production code
 USERINCLUDE		../../../localinc
@@ -57,6 +60,7 @@ SOURCE			susrtcadaptation.cpp
 SOURCE			susmiscadaptation.cpp
 SOURCE			susemergencycallrfadaptation.cpp
 SOURCE 			susadaptationpluginloader.cpp
+SOURCE 			ssmadaptationcli.cpp
 
 
 // testcode
@@ -69,6 +73,7 @@ SOURCEPATH		../src
 SOURCE			tsus_server.cpp
 SOURCE			tsus_ssmsuscli.cpp
 SOURCE			tsus_startserver.cpp
+SOURCE			tsus_startadaptationserver.cpp
 SOURCE			tsus_step_supinfo.cpp
 SOURCE			tsus_step_suploader.cpp
 SOURCE			tsus_step_platsec.cpp
@@ -79,12 +84,12 @@ SOURCE          tsus_step_loadplugin.cpp
 SOURCE          tsus_step_susadaptationpluginloader.cpp
 SOURCE 			tsus_step_loadadaptationserver.cpp
 
+
 LIBRARY			euser.lib
 LIBRARY			efsrv.lib
 LIBRARY			estor.lib
 LIBRARY			testexecuteutils.lib 
 LIBRARY			testexecutelogclient.lib 
 LIBRARY			ssmcmn.lib
-LIBRARY 		ssmadaptationcli.lib
 
 SMPSAFE

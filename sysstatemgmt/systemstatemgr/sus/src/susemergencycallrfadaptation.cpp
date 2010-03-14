@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,23 +18,27 @@
 #include <e32debug.h>
 #include <ssm/ssmadaptation.h>
 #include "susemergencycallrfadaptation.h"
+#include "suspanic.h"
 
 
+//Count to reserve space for one Activate Rf call + one Deactive Rf message in Queue
+const TInt KReserveCount = 2;
 /**
- * Function used to cleanup the CAdaptationMessage object which is pushed to cleanup stack incase of Leave
- * CAdaptationMessage message will be freed back to reserved heap incase of it is created using reserved heap.
+ * Function used to cleanup the CAdaptationMessage object which is pushed on to the cleanup stack incase of Leave.
+ * CAdaptationMessage message will be reset to hold default values, if it is using the precreated message pointer.
  * or else message will be deleted.
  */
 static void DoCleanUp(TAny* aAdaptationMessage)
     {
-    TStoreAdaptationMessage* storeMessage = static_cast <TStoreAdaptationMessage*>(aAdaptationMessage);
-    if(storeMessage->iAdaptationMessage->iUsingReservedHeap)
+    CEmergencyAdaptationMessage* storeAdaptationMessage = static_cast <CEmergencyAdaptationMessage*>(aAdaptationMessage);
+    storeAdaptationMessage->Complete(KErrNone);
+    if(storeAdaptationMessage->IsMessageReserved())
         {
-        storeMessage->iReservedHeap->Free(storeMessage->iAdaptationMessage);
+        storeAdaptationMessage->UnsetMessageStatus(EMsgInUse);
         }
     else
         {
-        delete storeMessage->iAdaptationMessage;
+        delete storeAdaptationMessage;
         }
     }
 
@@ -43,71 +47,83 @@ static void DoCleanUp(TAny* aAdaptationMessage)
 */
 void CEmergencyCallRfAdaptation::SubmitOrQueueL(const RMessage2 &aMessage)
 	{
-	CAdaptationMessage *messageCopy = NULL;	
-	TRAPD(err , messageCopy = new(ELeave) CAdaptationMessage(aMessage));
-	//Use preallocated heap for creating CAdaptationMessage under OOM condition, if it is a priority client
+    CEmergencyAdaptationMessage *storeAdaptationMessage = NULL;
+    TRAPD(err, storeAdaptationMessage = CEmergencyAdaptationMessage::NewL(aMessage));    
+    
+    //Allow only priority client to perform emergency call.
     if (KErrNoMemory == err && aMessage.Session() == iPriorityClientSession)
         {
-        DEBUGPRINT1A("CAdaptationMessage will be created using Reserved Heap");
-        TAny* messagePtr = iReservedHeap->AllocL(sizeof(CAdaptationMessage));
-        messageCopy = new (messagePtr)CAdaptationMessage(aMessage);
-        messageCopy->iUsingReservedHeap = ETrue;
+        DEBUGPRINT1A("CEmergencyAdaptationMessage will be created using reserved pointers");
+        if ( iReserveMsgCount == 0 )
+           {
+           DEBUGPRINT1A("There is no reserved message to perform emergency call");
+           User::Leave(err);
+           }
+        //Traverse through the reserved message array to look for free message.
+        for ( TInt index = 0 ; index < KReserveCount ; ++index )
+            {
+            //Use the reserve message, if it is not already used.
+            if (!(iAdaptationReservedMessageArray[index]->IsMessageInuse()))
+                {
+                iAdaptationReservedMessageArray[index]->SetMessage(aMessage);
+                iAdaptationReservedMessageArray[index]->SetMessageStatus(EMsgInUse);
+                storeAdaptationMessage = iAdaptationReservedMessageArray[index];
+                --iReserveMsgCount;
+                break;
+                }
+            }
         }
     else
         {
         User::LeaveIfError(err);
         }
-	  
 	if(!IsActive())
 		{
-		Submit(messageCopy);
+		Submit(storeAdaptationMessage);
 		}
 	else 
 		{
-		//Store the CAdaptationMessage pointer and iReservedHeap in a struct inorder to cleanup 
-		//depending on the reserved heap/normal heap used.
-		TStoreAdaptationMessage storeMessage;
-		storeMessage.iAdaptationMessage = messageCopy;
-		storeMessage.iReservedHeap = iReservedHeap;
-		CleanupStack::PushL(TCleanupItem(DoCleanUp, &storeMessage ));
+		//Push the CEmergencyAdaptationMessage pointer on to the cleanup stack and reset/delete the pointer
+		//depending on using precreated pointer/new pointer.
+		CleanupStack::PushL(TCleanupItem(DoCleanUp, storeAdaptationMessage ));
 		DEBUGPRINT2A("CEmergencyCallRfAdaptationRequests queueing request with function id: %d", aMessage.Function());
-		//Reserve heap only in non OOM condition
-		if(messageCopy->iUsingReservedHeap == EFalse)
+		//Reserve slot only in non OOM condition
+		if(!(storeAdaptationMessage->IsMessageReserved()))
 		    {
-		    //Always reserve 2 slots in queue for Emergency call requests. Slots will be reserved if count
-		    //to request memory(RPointerArray.Reserve(count)) is greater than the existing reserved memory in
-		    //RPonterArray. So there will be memory allocation only when
-		    //iPendingRequestsQueue.Count()+ reserveCount + 1(for the present message))
-		    // > already reserved memory.
-		    const TInt reserveCount = 2;
-		    err = iPendingRequestsQueue.Reserve(iPendingRequestsQueue.Count() + reserveCount + 1 );
+		    //Priority clients are allowed to queue only two(KReserveCount) emergengency call request in the OOM condition.
+		    //So always request to reserve only iPendingRequestsQueue.Count()+ iReserveMsgCount + 1
+		    //slots.
+		    //Memory will be only reserved if (iPendingRequestsQueue.Count()+ iReserveMsgCount + 1) > 
+		    //already reserved memory
+            TRAP(err, iPendingEmergencyRequestsQueue.ReserveL(iPendingEmergencyRequestsQueue.Count() + iReserveMsgCount + 1 )); 
 		    }
 		if(KErrNone == err || (KErrNoMemory == err && aMessage.Session() == iPriorityClientSession))
 		    {	 
-		    User::LeaveIfError(iPendingRequestsQueue.Queue(messageCopy));
+		    iPendingEmergencyRequestsQueue.AppendL(storeAdaptationMessage);
 		    }
 		else
 		    {
 		    User::Leave(err);
 		    }
-		CleanupStack::Pop(&storeMessage);
+		CleanupStack::Pop(storeAdaptationMessage);
 		}	
 	}
 
-void CEmergencyCallRfAdaptation::Submit(CAdaptationMessage*& aMessage)
+void CEmergencyCallRfAdaptation::Submit(CEmergencyAdaptationMessage*& aMessage)
 	{
+    __ASSERT_ALWAYS((iEmergencyCallRfAdaptation != NULL), User::Panic(KPanicSsmSus, EEmergencyCallRfAdaptationNullPtrError1));
 	DEBUGPRINT2A("CEmergencyCallRfAdaptationRequests immediate submission of request with function id: %d", aMessage->Function());
 	iCurrentMessage = aMessage;
 	switch(aMessage->Function())
 		{
 		case EActivateRfForEmergencyCall :
 			{
-			iEmergencyCallRfAdaptation.ActivateRfForEmergencyCall(iStatus);
+			iEmergencyCallRfAdaptation->ActivateRfForEmergencyCall(iStatus);
 			break;	
 			}
 		case EDeactivateRfForEmergencyCall :
 			{
-			iEmergencyCallRfAdaptation.DeactivateRfForEmergencyCall(iStatus);
+			iEmergencyCallRfAdaptation->DeactivateRfForEmergencyCall(iStatus);
 			break;	
 			}
 		default :
@@ -126,53 +142,80 @@ will be owned by CEmergencyCallRfAdaptation.
 @internalComponent
 */
 
-CEmergencyCallRfAdaptation* CEmergencyCallRfAdaptation::NewL(MEmergencyCallRfAdaptation& aAdaptation)
+CEmergencyCallRfAdaptation* CEmergencyCallRfAdaptation::NewL(MEmergencyCallRfAdaptation* aAdaptation)
 	{
-	CEmergencyCallRfAdaptation* self = new(ELeave) CEmergencyCallRfAdaptation(aAdaptation);
-	return self;	
+	CEmergencyCallRfAdaptation* self = new(ELeave) CEmergencyCallRfAdaptation();
+	CleanupStack::PushL(self);
+	self->ConstructL(aAdaptation);
+	CleanupStack::Pop(self);
+	return self;
 	}
+
+void CEmergencyCallRfAdaptation::ConstructL(MEmergencyCallRfAdaptation* aAdaptation)
+    {
+    ReserveMemoryL();
+    //Taking the ownership of emergencyCallRfAdaptationPlugin after all the leaving function have passed.
+    //If some function leaves before taking ownership of emergencyCallRfAdaptationPlugin, it will be released twice, which causes system to panic.
+    iEmergencyCallRfAdaptation = aAdaptation;
+    }
+
 /**
  * Function to reserve memory to make emergency call during OOM condition
  */
 void CEmergencyCallRfAdaptation :: ReserveMemoryL()
     {
     //Reserve space for one Activate Rf call + one Deactive Rf message in Queue.
-    const TInt reserveCount = 2;
-    // heap requested for one Active Rf call + one Deactive Rf
-    const TInt reservedHeap = reserveCount * sizeof(CAdaptationMessage);    
-    //heap is reserved for storing CAdaptationMessage during OOM condition.
-    iReservedHeap = UserHeap::ChunkHeap(NULL, reservedHeap, reservedHeap); 
-    //Leave with KErrNoMemory if iReservedHeap is NULL    
-    if(iReservedHeap == NULL)
+    iPendingEmergencyRequestsQueue.ReserveL(KReserveCount);
+    
+    //Pre-create an array to hold CEmergencyAdaptationMessage pointer, this is of size CEmergencyAdaptationMessage.
+    RMessage2 message;    
+    for( TInt index = 0 ; index < KReserveCount ; ++index )
         {
-        User::Leave(KErrNoMemory);
+        CEmergencyAdaptationMessage* adaptationMessage = NULL;
+        adaptationMessage = CEmergencyAdaptationMessage::NewL(message, EMsgReserved);
+        CleanupStack::PushL(adaptationMessage);
+        iAdaptationReservedMessageArray.AppendL(adaptationMessage);
+        CleanupStack::Pop(adaptationMessage);
         }
-    User::LeaveIfError(iPendingRequestsQueue.Reserve(reserveCount));   
     }
-
 
 CEmergencyCallRfAdaptation::~CEmergencyCallRfAdaptation()
 	{
-	iPendingRequestsQueue.NotifyAndRemoveAll(iReservedHeap);
+    NotifyAndRemoveAll();
 	Cancel();
-	iPendingRequestsQueue.Close();
-	if(iReservedHeap != NULL)
-	    {
-        iReservedHeap->Reset();
-        iReservedHeap->Close();
-	    }
+	iPendingEmergencyRequestsQueue.Close();	
+	iAdaptationReservedMessageArray.ResetAndDestroy();	 
 	Release();
 	}
 
-CEmergencyCallRfAdaptation::CEmergencyCallRfAdaptation(MEmergencyCallRfAdaptation& aAdaptation) : CActive(EPriorityStandard), iEmergencyCallRfAdaptation(aAdaptation)
-, iReservedHeap(NULL)
+void CEmergencyCallRfAdaptation::NotifyAndRemoveAll()
+    {
+    TInt count = iPendingEmergencyRequestsQueue.Count();
+    
+    for(TInt index =0; index < count; ++index)
+        {
+        iPendingEmergencyRequestsQueue[index]->Complete(KErrServerTerminated);
+        if (!(iPendingEmergencyRequestsQueue[index]->IsMessageReserved()))
+            {
+            delete iPendingEmergencyRequestsQueue[index];
+            }
+        iPendingEmergencyRequestsQueue[index] = NULL;
+        }
+    iPendingEmergencyRequestsQueue.Reset();
+    }
+
+CEmergencyCallRfAdaptation::CEmergencyCallRfAdaptation() : CActive(EPriorityStandard)
+,iReserveMsgCount(KReserveCount)
 	{
 	CActiveScheduler::Add(this);
 	}
 
 void CEmergencyCallRfAdaptation::Release()
 	{
-	iEmergencyCallRfAdaptation.Release();
+	if(iEmergencyCallRfAdaptation != NULL)
+	    {
+	    iEmergencyCallRfAdaptation->Release();
+	    }
 	}
 
 void CEmergencyCallRfAdaptation::DoActivateRfForEmergencyCallL(const RMessage2& aMessage)
@@ -187,15 +230,37 @@ void CEmergencyCallRfAdaptation::DoDeactivateRfForEmergencyCallL(const RMessage2
 
 void CEmergencyCallRfAdaptation::DoEmergencyCallRfAdaptationCancelL(const RMessage2& aMessage)
 	{
-
+    __ASSERT_ALWAYS((iEmergencyCallRfAdaptation != NULL), User::Panic(KPanicSsmSus, EEmergencyCallRfAdaptationNullPtrError2));
+    
 	if(iCurrentMessage != NULL)	
 		{
 		if(aMessage.Session() == iCurrentMessage->Session())
 			{
 			DEBUGPRINT1A("CEmergencyCallRfAdaptationRequests cancelling current request as requested");
-			iEmergencyCallRfAdaptation.Cancel();
+			iEmergencyCallRfAdaptation->Cancel();
 			}
-		iPendingRequestsQueue.RemoveFromQueueAndComplete(aMessage, iReservedHeap);
+		CEmergencyAdaptationMessage *messageToBeDeleted;
+        for(TInt index = 0; index < iPendingEmergencyRequestsQueue.Count(); ++index )
+            {
+            if(aMessage.Session() == iPendingEmergencyRequestsQueue[index]->Session())
+                {
+                messageToBeDeleted = iPendingEmergencyRequestsQueue[index];
+                DEBUGPRINT2A("RSsmAdaptationRequestQueue(aMessage,ReservedHeap)called to cancel the request with function id: %d", messageToBeDeleted->Function());
+                iPendingEmergencyRequestsQueue.Remove(index);
+                messageToBeDeleted->Complete(KErrCancel);
+                //Reset the AdaptationMessage if it is created using reserved pointer or delete the pointer 
+                if(messageToBeDeleted->IsMessageReserved())
+                    {
+                    messageToBeDeleted->UnsetMessageStatus(EMsgInUse);
+                    ++iReserveMsgCount;
+                    }
+                else
+                    {
+                    delete messageToBeDeleted;
+                    }
+                --index;
+                }
+            }
 		
 		aMessage.Complete(KErrNone);
 		}
@@ -209,23 +274,16 @@ void CEmergencyCallRfAdaptation::DoEmergencyCallRfAdaptationCancelL(const RMessa
 
 void CEmergencyCallRfAdaptation::RunL()
 	{
-	
+    __ASSERT_DEBUG((iCurrentMessage != NULL), User::Panic(KPanicSsmSus, EEmergencyAdaptationMessageNullPtrError));
 	DEBUGPRINT2A("CEmergencyCallRfAdaptationRequests processed the request with funtion id: %d", iCurrentMessage->Function());
 	iCurrentMessage->Complete(iStatus.Int());
-	if(iCurrentMessage->iUsingReservedHeap)
-        {
-        iReservedHeap->Free(iCurrentMessage);
-        }
-    else
-        {
-        delete iCurrentMessage;
-        }
+	DeleteAdaptationMessage();
 	iCurrentMessage = NULL;  
 
-	if( (iPendingRequestsQueue.IsEmpty()) == EFalse )
+	if( (iPendingEmergencyRequestsQueue.Count()) > 0 )
 		{
-		CAdaptationMessage *messageCopy = NULL;
-		iPendingRequestsQueue.Dequeue(messageCopy);		
+        CEmergencyAdaptationMessage *messageCopy = NULL;
+        Dequeue(messageCopy);				
 		Submit(messageCopy);
 		} 
 	}
@@ -235,32 +293,18 @@ TInt CEmergencyCallRfAdaptation::RunError( TInt aError )
 	
 	if(iCurrentMessage != NULL)	
 		{
-		iCurrentMessage->Complete(aError);
-        if(iCurrentMessage->iUsingReservedHeap)
-            {
-            iReservedHeap->Free(iCurrentMessage);
-            }
-        else
-            {
-            delete iCurrentMessage;
-            }
+        iCurrentMessage->Complete(aError);
+		DeleteAdaptationMessage();
 		iCurrentMessage = NULL;
 		}
 	
-	while( (iPendingRequestsQueue.IsEmpty()) == EFalse )
-		{
-		iPendingRequestsQueue.Dequeue(iCurrentMessage);
-		iCurrentMessage->Complete(aError);
-		if(iCurrentMessage->iUsingReservedHeap)
-            {
-            iReservedHeap->Free(iCurrentMessage);
-            }
-        else
-            {
-            delete iCurrentMessage;
-            }
-		iCurrentMessage = NULL;
-		}
+	while( (iPendingEmergencyRequestsQueue.Count() > 0 ))
+        {
+        Dequeue(iCurrentMessage);
+        iCurrentMessage->Complete(aError);
+        DeleteAdaptationMessage();
+        iCurrentMessage = NULL;
+        }
 	
 	return KErrNone;
 		
@@ -271,30 +315,16 @@ void CEmergencyCallRfAdaptation::DoCancel()
 	if(iCurrentMessage != NULL)	
 		{
 		iCurrentMessage->Complete(KErrCancel);
-		if(iCurrentMessage->iUsingReservedHeap)
-            {
-            iReservedHeap->Free(iCurrentMessage);
-            }
-        else
-            {
-            delete iCurrentMessage;
-            }
+		DeleteAdaptationMessage();
 		iCurrentMessage = NULL;
 		}
 		
-	while( (iPendingRequestsQueue.IsEmpty()) == EFalse )
+	while( (iPendingEmergencyRequestsQueue.Count() > 0 ))
 		{
-		iPendingRequestsQueue.Dequeue(iCurrentMessage);
-		iCurrentMessage->Complete(KErrCancel);
-		if(iCurrentMessage->iUsingReservedHeap)
-            {
-            iReservedHeap->Free(iCurrentMessage);
-            }
-        else
-            {
-            delete iCurrentMessage;
-            }
-		iCurrentMessage = NULL;
+        Dequeue(iCurrentMessage);
+        iCurrentMessage->Complete(KErrCancel);
+        DeleteAdaptationMessage();
+        iCurrentMessage = NULL;
 		}
 	}
 
@@ -312,5 +342,130 @@ void CEmergencyCallRfAdaptation::SetPriorityClientSession(CSsmAdaptationSession*
 void CEmergencyCallRfAdaptation::RemovePriorityClientSession()
     {
     iPriorityClientSession = NULL;
+    }
+
+/**
+ * Reset the AdaptationMessage if it is created using reserved pointer or delete the pointer
+ */
+void CEmergencyCallRfAdaptation::DeleteAdaptationMessage()
+    {
+    if(iCurrentMessage->IsMessageReserved())
+        {
+        iCurrentMessage->UnsetMessageStatus(EMsgInUse);
+        ++iReserveMsgCount;
+        }
+    else
+        {
+        delete iCurrentMessage;
+        }    
+    }
+
+void CEmergencyCallRfAdaptation::Dequeue(CEmergencyAdaptationMessage *&aCurrentMessage)
+    {
+    aCurrentMessage = iPendingEmergencyRequestsQueue[0];
+    iPendingEmergencyRequestsQueue.Remove(0);
+    }
+
+/**
+ * Constructor.
+ */
+CEmergencyAdaptationMessage::CEmergencyAdaptationMessage(const TInt8 aMessageStatus): iAdaptationMessage(NULL), iMessageStatus(0)
+    {
+    iMessageStatus |= aMessageStatus ;
+    }
+
+/**
+ * Destructor.
+ */
+CEmergencyAdaptationMessage::~CEmergencyAdaptationMessage()
+    {
+    if (iAdaptationMessage != NULL)
+        {
+        delete iAdaptationMessage;
+        }
+    }
+
+CEmergencyAdaptationMessage* CEmergencyAdaptationMessage::NewL(const RMessage2& aMessage)
+    {
+    return CEmergencyAdaptationMessage::NewL(aMessage, EMsgStatusNULL);
+    }
+
+CEmergencyAdaptationMessage* CEmergencyAdaptationMessage::NewL(const RMessage2& aMessage, const TInt8 aMessageStatus)
+    {
+    CEmergencyAdaptationMessage* self = new(ELeave) CEmergencyAdaptationMessage(aMessageStatus);
+    //custom cleanup is not required here as it is a normal message till this point.
+    CleanupStack::PushL(self);
+    self->ConstructL(aMessage);
+    CleanupStack::Pop(self);
+    return self;
+    }
+
+void CEmergencyAdaptationMessage::ConstructL(const RMessage2& aMessage)
+    {
+    iAdaptationMessage = new (ELeave)CAdaptationMessage(aMessage);     
+    }
+
+void CEmergencyAdaptationMessage::Complete(TInt aReason)
+    {
+    if (iAdaptationMessage != NULL)
+        {
+        iAdaptationMessage->Complete(aReason);
+        }
+    }
+
+/**
+ * Function to check whether the messages is using reserved heap or not.
+ */
+inline TBool CEmergencyAdaptationMessage::IsMessageReserved()  const
+    {    
+    return (iMessageStatus & EMsgReserved)? ETrue:EFalse;    
+    }
+
+/**
+ * Function to check whether the reserved messages is in use or not.
+ */
+inline TBool CEmergencyAdaptationMessage::IsMessageInuse() const 
+    {    
+    return (iMessageStatus & EMsgInUse)? ETrue:EFalse;    
+    }
+
+/**
+ * Unset the message status .
+ */
+inline void CEmergencyAdaptationMessage::UnsetMessageStatus(const TInt8 aMessageStatus)
+    {    
+    iMessageStatus &= ~aMessageStatus ;
+    }
+
+/**
+ * Set the message status .
+ */
+inline void CEmergencyAdaptationMessage::SetMessageStatus(const TInt8 aMessageStatus)
+    {    
+    iMessageStatus |= aMessageStatus ;
+    }
+
+/**
+ * Sets the RMessage2 .
+ */
+void CEmergencyAdaptationMessage::SetMessage(const RMessage2& aMessage)
+    {    
+    iAdaptationMessage->SetMessage(aMessage);
+    }
+
+/**
+ * Returns the Function .
+ */
+TInt CEmergencyAdaptationMessage::Function() const
+    {    
+    return iAdaptationMessage->Function();
+    }
+
+/**
+ * Returns the Session .
+ */
+CSession2 *CEmergencyAdaptationMessage::Session() const
+    {
+    return iAdaptationMessage->Session();
     }
 

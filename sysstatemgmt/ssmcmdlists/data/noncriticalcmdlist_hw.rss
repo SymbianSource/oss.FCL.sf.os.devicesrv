@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -72,7 +72,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_sipprofilesrv,
 #endif // defined !SYMBIAN_EXCLUDE_SIP
         r_cmd_remotelock,
-        r_cmd_hotspotsrv,
 	// prio 0x7EF1
 	r_cmd_activitymonitor1,
 	// prio 0x7EF0
@@ -132,19 +131,6 @@ RESOURCE SSM_START_APP_INFO r_cmd_devencstarter
     } 
 	
 	
-// ---------------------------------------------------------------------------
-// r_cmd_hotspotsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_hotspotsrv
-    {
-    priority = 0xFFA7;
-    name = "hotspotserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    conditional_information = r_cond_protwlan_and_firstboot_or_deeprfs_or_normalrfs;
-    }
-
 // ---------------------------------------------------------------------------
 // r_cmd_provisioning
 // ---------------------------------------------------------------------------
@@ -206,26 +192,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_item_nwnotifier
 //
 
 // ---------------------------------------------------------------------------
-// r_cond_ps_firstboot
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_firstboot
-    {
-    category		  = 0x101F8766; // KPSUidStartup
-    key           = 0x00000013; // KPSStartupFirstBoot
-    value         = 101;        // EPSStartupFirstBoot
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_protocolwlan
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_protocolwlan
-    {
-    feature_id = KFeatureIdProtocolWlan;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_feat_remotelock
 // ---------------------------------------------------------------------------
 //
@@ -242,60 +208,6 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_smartcardprov
     {
     feature_id = KFeatureIdSmartCardProv;
     }
-
-// ---------------------------------------------------------------------------
-// r_cond_firstboot_or_deeprfs
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_firstboot_or_deeprfs
-    {
-    lhs = r_cond_ps_deep_rfs;
-    rhs = r_cond_ps_firstboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_firstboot_or_deeprfs_or_normalrfs
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_firstboot_or_deeprfs_or_normalrfs
-    {
-    lhs = r_cond_ps_normal_rfs;
-    rhs = r_cond_firstboot_or_deeprfs;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_ps_normal_rfs
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_normal_rfs
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000045;      // KPSStartupReason
-    value = ENormalRFSReset;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_ps_deep_rfs
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_deep_rfs
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000045;      // KPSStartupReason
-    value = EDeepRFSReset;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_protwlan_and_firstboot_or_deeprfs_or_normalrfs
-// ( protocol WLAN ) AND ( first boot OR deep RFS OR normal RFS )
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_AND r_cond_protwlan_and_firstboot_or_deeprfs_or_normalrfs
-    {
-    lhs = r_cond_feat_protocolwlan;
-    rhs = r_cond_firstboot_or_deeprfs_or_normalrfs;
-    }
-	
 
 // ---------------------------------------------------------------------------
 // r_dlldata_activitymonitor_timeout
