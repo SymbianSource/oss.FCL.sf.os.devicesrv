@@ -431,11 +431,11 @@ class TTvSettings
 
         ///ETrue if iLeftTopCorner&iRightBottomCorner are used instead of iHorizontalOverScan&iVerticalOverScan
         TBool iCornerPointsUsed;
-        /** Overscan in pixels. Set Left Top corner point. Zero when Tv supports overscan (0=underscan enabled)
+        /** Overscan in pixels. Set Left Top corner point. Zero when Tv supports underscan (0=underscan enabled)
             This should be "point" to active image area. Cannot point out of active image area.
             Cannot across with iRightBottomCorner. And this allows overscan and position tuning. */
         TPoint iLeftTopCorner;
-        /** Overscan in pixels. Set Right Bottom corner point (offset from left top corner).
+        /** Overscan in pixels. Set Right Bottom corner point (offset from Tv's left top corner).
             @see iLeftTopCorner
             Driver returns KErrExtensionNotSupported if driver does not support this settings.
             If driver supports centralizing only, then this has to be same as iLeftTopCorner. */
@@ -571,17 +571,18 @@ class THdmiDviTimings
         ///Vertical sync polarity, EFalse=Negative, ETrue=Positive. With CEA mode 1 this is EFalse.
         TBool iVerticalSyncPolarity;
         /** Wanted pixel repeat, can be used if mode supports. Otherwise horisontal resolution can be increased also.
+            Value minus one. 0 -> sent once. 9 -> pixel sent 10 times.
             0 when repeat is disabled. With CEA mode 1 this is 0. */
         TUint8 iPixelRepeat;
 
         /** ETrue if Tv supports underscan, and it is enabled (to be always enabled when supported/possible),
             EFalse otherwise */
         TBool iUnderscanEnabled;
-        /** Overscan in pixels. Set Left Top corner point. Zero when Tv supports overscan (0=underscan enabled)
+        /** Overscan in pixels. Set Left Top corner point. Zero when Tv supports underscan (0=underscan enabled)
             This should be "point" to active image area. Cannot point out of active image area.
             Cannot across with iRightBottomCorner. And this allows overscan and position tuning. */
         TPoint iLeftTopCorner;
-        /** Overscan in pixels. Set Right Bottom corner point (offset from left top corner).
+        /** Overscan in pixels. Set Right Bottom corner point (offset from Tv's left top corner).
             @see iLeftTopCorner. Has not affect if iCentralizingOnly==ETrue. */
         TPoint iRightBottomCorner;
 
@@ -614,7 +615,13 @@ class THdmiDviTimings
     };
 
 /**
-Standby Figure Format
+Standby Figure Format. Fully deprecated since TB10.2.
+Note for TB9.2 and TB10.1: 
+- iLeftTopColumn & iLeftTopRow are deprecated and those can be ignored.
+- the icon of iColumns x iRows is scaled by (iScaleNumeratorWidth/iScaleDenominatorWidth) and (iScaleNumeratorHeight/iScaleDenominatorHeight)
+- the resulting icon is centered to the layer's extent which contained the protected surface
+- the scaled and centered icon is clipped against layer extent and screen size.
+- pixels inside the layer's extent not covered by the scaled and centered icon are filled with iBackGroundColor.
 */
 class TStandByFigure
     {
@@ -659,9 +666,9 @@ class TStandByFigure
         TUint16 iScaleNumeratorHeight;
         ///Height scaler denominator
         TUint16 iScaleDenominatorHeight;
-        ///Start column
+        ///Start column. Deprecated!
         TUint16 iLeftTopColumn;
-        ///Start row
+        ///Start row. Deprecated!
         TUint16 iLeftTopRow;
         ///Back ground color. Input RGB565 RRRR RGGG GGGB BBBB.
         TUint16 iBackGroundColor;

@@ -808,7 +808,9 @@ void CSSYChannel::GetAllPropertiesL( const TSensrvChannelId aChannelId,
         {
         aChannelPropertyList.Append( channelProperties[index] );
         }
-
+    
+    channelProperties.Close();
+    
     SSY_TRACE_OUT();
     }
 

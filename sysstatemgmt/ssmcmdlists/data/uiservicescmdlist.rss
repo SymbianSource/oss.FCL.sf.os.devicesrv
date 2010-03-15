@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:
-* Command list for the UI-Services startup state (UI shell version).
+* Command list for the UI-Services startup state (UI shell version) for minimal startup.
 *
 */
 
@@ -81,18 +81,13 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0xFFA7
         r_cmd_splash,
         // prio 0xFF97
-        r_cmd_tzsrv,
-        r_cmd_cntsrv,
-        r_cmd_mediator,
-        r_cmd_hwrmsrv,
         r_cmd_rtc,
-        // prio 0xFF96 - tzsrv, cntsrv, mediator, hwrmsrv
+        // prio 0xFF96 - rtc (tzsrv, cntsrv, mediator & hwrmsrv have been moved to extended startup list but use the same multiplewait command)
         r_cmd_multiwaitforever1,
         // prio 0xFF87
-        r_cmd_dbrecovery,
         r_cmd_accsrv,
         r_cmd_selectlanguage,   // Select UI language to use
-        // prio 0xFF86 - dbrecovery, accsrv, seleclanguage
+        // prio 0xFF86 - accsrv, seleclanguage (dbrecovery has been moved to extended startup list but uses the same multiplewait command)
         r_cmd_multiwaitforever2,
         // prio 0xFF85
         r_cmd_loadlocalesup,    // Observes changes in locale data
@@ -144,57 +139,6 @@ RESOURCE SSM_WAIT_FOR_APPARC_INIT r_cmd_apparc_init
     {
     priority = 0xFF77;
     severity = ECmdCriticalSeverity;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_cntsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_cntsrv
-    {
-    priority = 0xFF97;
-    name = "Z:\\sys\\bin\\cntsrv.exe";
-    args = "-nontransient";
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_dbrecovery
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_dbrecovery
-    {
-    priority = 0xFF87;
-    name = "z:\\sys\\bin\\dbrecovery.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_hwrmsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_hwrmsrv
-    {
-    priority = 0xFF97;
-    name = "Z:\\sys\\bin\\hwrmserver.exe";
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    retries = 2;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_mediator
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mediator
-    {
-    priority = 0xFF97;
-    name = "Z:\\sys\\bin\\mediatorserver.exe";
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    monitor_info = r_mon_3_restarts_reset;
-    conditional_information = r_cond_feat_mediator;
     }
 
 // ---------------------------------------------------------------------------
@@ -410,18 +354,6 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_startupmode
     retries = 2;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_tzsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_tzsrv
-    {
-    priority = 0xFF97;
-    name = "Z:\\sys\\bin\\tzserver.exe";
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    }
-
 // ===========================================================================
 // DLL data items in alphabetical order
 // ===========================================================================
@@ -475,14 +407,6 @@ RESOURCE SSM_CND_CENT_REP_VALUE r_cond_cenrep_rfs_normal
     value         = 102;        // ENormalRFSReset
     }
 
-// ---------------------------------------------------------------------------
-// r_cond_feat_mediator
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_mediator
-    {
-    feature_id = KFeatureIdMediator;
-    }
 
 // monitoring.rss contains resource definitions, so it may not be included
 // before entry point.

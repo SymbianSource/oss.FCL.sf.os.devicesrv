@@ -38,4 +38,8 @@ file=ABI_DIR\BUILD_DIR\ssm.swp.policy.simstatus.dll             SHARED_LIB_DIR\s
 
 data=DATAZ_\private\10202be9\2001d2aa.txt                       \private\10202be9\2001d2aa.txt
 
+#ifdef FF_SIM_CONSECUTIVE_6F00_ERRORS_HANDLING
+patchdata ssmcmn.dll @ KSsmInvalidSim 0xFFFFFFFF //enable the feature to check whether sim is invalid
+#endif //FF_SIM_CONSECUTIVE_6F00_ERRORS_HANDLING
+
 #endif // SSMCOMPATIBILITY_IBY

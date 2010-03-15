@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:
-* Command list for the Non-critical startup state.
+* Command list for the Non-critical startup state in minimal startup mode.
 *
 */
 
@@ -73,102 +73,16 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_psstate,          // prio 0xFFF0
         // prio 0xFFE7
         r_cmd_simcheck,
-	r_cmd_clearstartupreason,
+        r_cmd_clearstartupreason,
         r_cmd_createswp_uiphase,
         r_cmd_createswp_rfstatus,
         r_cmd_waitforofflinequery,
-        // prio 0xFFD7
-        r_cmd_setswp_uistart,   // After offline query has been made
-        r_cmd_adtupdater,       // Location, date & time queries
-        r_cmd_bsengine,
-        r_cmd_waitforphone,
+        r_cmd_setswp_uistart,   // After offline query has been made // prio 0xFFD7 
+        r_cmd_bsengine,					// prio 0xFFD3      
         // prio 0xFFC7
         r_cmd_setswp_rfon,
         r_cmd_setswp_rfoff,
-        r_cmd_waitidle,
-        // prio 0xFFB7
-#ifdef __JAVA        
-        r_cmd_javacaptain,
-#endif // __JAVA
-        r_cmd_watcher,
-        r_cmd_dmutilsrv,
-        // prio 0xFFA7
-        r_cmd_contentharvester,
-        r_cmd_mdswatchdog,
-        r_cmd_predefinedcontacts,
-        r_cmd_xnthemesrv,
-        r_cmd_ncnlist,
-        r_cmd_satsrv,
-        r_cmd_cbssrv,
-        r_cmd_schedsrv,
-        r_cmd_aosrv,
-        r_cmd_ippushman,
-        r_cmd_remotefe,
-        r_cmd_supllistener,
-        r_cmd_autolock,
-        r_cmd_pocstarter,
-        r_cmd_gsserver,
-        r_cmd_vcommandmgr,
-        r_cmd_dmallreasons,
-        r_cmd_locod,
-#ifdef FF_LBT_ENGINE
-        r_cmd_lbtsrv,
-#endif // FF_LBT_ENGINE
-        r_cmd_emailsrvrmon,
-        r_cmd_taskswitcher,
-        // prio 0xFFA6
-        r_cmd_dmfirstbootreason,
-        r_cmd_fota,
-        // prio 0x7F87
-        r_cmd_waitcleanbootinfo,
-        // prio 0x7F97
-	r_cmd_dcmo,
-        r_cmd_amastart,
-	      // prio 0x7F96
-	      r_cmd_multiple_wait,
-        // prio 0x7EFF
-        r_cmd_activitymonitor1,
-        // prio 0x7EFE
-        r_cmd_logs,
-        // prio 0x7EFD
-        r_cmd_activitymonitor2,
-        // prio 0x7EFC
-        r_cmd_pbk2,
-        // prio 0x7EFB
-        r_cmd_activitymonitor3,
-        // prio 0x7EFA
-        r_cmd_mce,
-        // prio 0x7EF9
-        r_cmd_activitymonitor4,
-        // prio 0x7EF8
-        r_cmd_clockapp,
-        // prio 0x7EF7
-        r_cmd_activitymonitor5,
-        // prio 0x7EF6
-        r_cmd_videocenter,
-        // prio 0x7EF5
-        r_cmd_activitymonitor6,
-        // prio 0x7EF4
-        r_cmd_iaupdatebg,
-        // prio 0x7EF3
-        r_cmd_activitymonitor7,
-        // prio 0x7EF2
-	r_cmd_screensaver,
-	// prio 0x7EEF
-	r_cmd_activitymonitor8,
-	// prio 0x7EEE
-	r_cmd_autosync,
-	// prio 0x7EED
-	r_cmd_activitymonitor9,
-	// prio 0x7EEC
-	r_cmd_mylocationsengine,
-#ifdef FF_ATT_ADDRESS_BK
-	//prio 0x7EEA
-	r_cmd_activitymonitor10,
-	//prio 0x7EE9
-	r_cmd_aab,
-#endif
-	r_cmd_startupready      // Last command, prio 0x0000
+        r_cmd_startupready      // Last command, prio 0x0000
         };
     }
 
@@ -176,270 +90,16 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // Command items in alphabetical order
 // ===========================================================================
 //
-
-// -----------------------------------------------------------------------------
-// r_cmd_aab
-// -----------------------------------------------------------------------------
-//
-#ifdef FF_ATT_ADDRESS_BK 
-RESOURCE SSM_START_APP_INFO r_cmd_aab
-    {
-    priority = 0x7EE9;
-    name = "z:\\sys\\bin\\AABPhonebookapp.exe";
-    retries = 2;
-    background = 1; // To background
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-#endif
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor1
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor1
-    {
-    priority = 0x7EFF;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor2
-    {
-    priority = 0x7EFD;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor3
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor3
-    {
-    priority = 0x7EFB;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor4
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor4
-    {
-    priority = 0x7EF9;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor5
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor5
-    {
-    priority = 0x7EF7;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor6
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor6
-    {
-    priority = 0x7EF5;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor7
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor7
-    {
-    priority = 0x7EF3;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor8
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor8
-    {
-    priority = 0x7EEF;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor9
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
-    {
-    priority = 0x7EED;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor10
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_ATT_ADDRESS_BK
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
-    {
-    priority = 0x7EEA;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-#endif
-	
-// ---------------------------------------------------------------------------
-// r_cmd_adtupdater
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_adtupdater
-    {
-    priority = 0xFFD7;
-    name = "adtupdater.exe";
-    execution_behaviour = ESsmFireAndForget;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_amastart
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_AMA_STARTER r_cmd_amastart
-    {
-    priority = 0x7F97;
-    conditional_information = r_cond_ps_normalboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_autosync
-// ---------------------------------------------------------------------------
-//	
-RESOURCE SSM_START_PROCESS_INFO r_cmd_autosync
-    {
-    priority = 0x7EEE;
-    execution_behaviour = ESsmFireAndForget;
-    retries = 3;
-    name = "cctautosync.exe";
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_aosrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_aosrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\alwaysonlinestarter.exe";
-    execution_behaviour = ESsmFireAndForget;
-    conditional_information = r_cond_feat_alwaysonline;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
 // ---------------------------------------------------------------------------
 // r_cmd_bsengine
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_START_PROCESS_INFO r_cmd_bsengine
     {
-    priority = 0xFFD7;
+    priority = 0xFFD3;
     name = "z:\\sys\\bin\\bsengine.exe";
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_autolock
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_autolock
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\lockapp.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_cbssrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_cbssrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\cbsserver.exe";
-    execution_behaviour = ESsmFireAndForget;
-    conditional_information = r_cond_feat_cellbroadcast;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_clockapp
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_clockapp
-    {
-    priority = 0x7EF8;
-    name = "z:\\sys\\bin\\clockapp.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
     }
 
 // ---------------------------------------------------------------------------
@@ -467,253 +127,6 @@ RESOURCE SSM_CREATE_SYSTEM_WIDE_PROPERTY r_cmd_createswp_uiphase
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_contentharvester
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_contentharvester
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\contentharvester.exe";
-    execution_behaviour = ESsmFireAndForget;	//behavior changed from ESsmWaitForSignal as part of SCB CR MSOI-7XARNT
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_dcmo
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_dcmo
-    {
-    priority = 0x7F97;
-    execution_behaviour = ESsmFireAndForget;
-    dllname = "dcmostartupcustcmd.dll";
-    ordinal = 1; // DCMO command
-    conditional_information = r_cond_feat_runtime_dcmo;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_dmallreasons
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_dmallreasons
-    {
-    priority = 0xFFA7;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "fotacustcmds.dll";
-    ordinal = 1; // AllReasons command
-    retries = 2;
-    conditional_information = r_cond_syncml_dm_or_pnp_mobile_services;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_dmfirstbootreason
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_dmfirstbootreason
-    {
-    priority = 0xFFA6;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "fotacustcmds.dll";
-    ordinal = 3; // FirstBoot command
-    retries = 2;
-    conditional_information = r_cond_pnp_mobile_services_and_firstboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_dmutilsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_dmutilsrv
-    {
-    priority = 0xFFB7;
-    name = "z:\\sys\\bin\\dmutilserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_reset;
-    conditional_information = r_cond_feat_sappolicymgmt;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_fota
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_fota
-    {
-    priority = 0xFFA6;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "fotacustcmds.dll";
-    ordinal = 2; // Fota command
-    retries = 2;
-    conditional_information = r_cond_syncml_dm_fota_and_fotareset;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_emailsrvrmon
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_emailsrvrmon
-    {
-    priority = 0xFFA7;
-    name = "emailservermonitor.exe";
-    execution_behaviour = ESsmFireAndForget;
-    conditional_information = r_cond_feat_emailfw;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_gsserver
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_gsserver
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\gsserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    conditional_information = r_cond_feat_tvout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_mdswatchdog
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mdswatchdog
-    {
-    priority = 0xFFA7;
-    name = "mdswatchdog.exe";
-    execution_behaviour = ESsmFireAndForget;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_iaupdatebg
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_iaupdatebg
-    {
-    priority = 0x7EF4;
-    name = "iaupdatebg.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    conditional_information = r_cond_feat_iadv2;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_loadsup_ippushman
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_ippushman
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\ippushman.exe";
-    execution_behaviour = ESsmFireAndForget; // -- does not call Rendezvous() --
-    conditional_information = r_cond_feat_ippush;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_lbtsrv
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_LBT_ENGINE
-RESOURCE SSM_START_PROCESS_INFO r_cmd_lbtsrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\lbtserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    }
-#endif // FF_LBT_ENGINE
-
-// ---------------------------------------------------------------------------
-// r_cmd_locod
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_locod
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\locod.exe";
-    execution_behaviour = ESsmFireAndForget;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_logs
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_logs
-    {
-    priority = 0x7EFE;
-    name = "z:\\sys\\bin\\logs.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_mce
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_mce
-    {
-    priority = 0x7EFA;
-    name = "mce.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_ncnlist
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_ncnlist
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\ncnlist.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_pbk2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_pbk2
-    {
-    priority = 0x7EFC;
-    name = "z:\\sys\\bin\\phonebook2.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    background = 1; // To background
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_pocstarter
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_pocstarter
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\pocstarter.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    conditional_information = r_cond_feat_omapoc;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_predefinedcontacts
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_predefinedcontacts
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\predefinedcontacts.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    retries = 2;
-    conditional_information = r_cond_firstboot_or_fotareset_or_deeprfsreset;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cmd_psstate
 // ---------------------------------------------------------------------------
 //
@@ -738,19 +151,6 @@ RESOURCE SSM_PUBLISH_SYSTEM_STATE r_cmd_publishstate
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_remotefe
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_remotefe
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\rsfwbootmounter.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    conditional_information = r_cond_feat_remotestoragefw;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cmd_sastate
 // ---------------------------------------------------------------------------
 //
@@ -763,46 +163,6 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_sastate
     unload_on_finish = ENeverUnload;
     retries = 2;
     dll_data = r_dlldata_sastate;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_satsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_satsrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\satserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    conditional_information = r_cond_feat_simcard;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_schedsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_schedsrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\schexe.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_screensaver
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_screensaver
-    {
-    priority = 0x7EF2;
-    name = "z:\\sys\\bin\\screensaver.exe";
-    background = 1; // To background
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
     }
 
 // ---------------------------------------------------------------------------
@@ -871,88 +231,7 @@ RESOURCE SSM_SET_PUBLISH_AND_SUBSCRIBE r_cmd_startupready
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_supllistener
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_supllistener
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\epos_omasupllistener.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    conditional_information = r_cond_feat_omasuplplugins;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_systemams
-// ---------------------------------------------------------------------------
-//
-#ifdef __JAVA
-RESOURCE SSM_START_PROCESS_INFO r_cmd_javacaptain
-    {
-    priority = 0xFFB7;
-    name = "javacaptain.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    }
-#endif // __JAVA
-// ---------------------------------------------------------------------------
-// r_cmd_vcommandmgr
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_vcommandmgr
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\vcommandmanager.exe";
-    background = 1; // To background
-    execution_behaviour = ESsmFireAndForget; // -- does not call Rendezvous() --
-    conditional_information = r_cond_sind_and_no_sdnd;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_videocenter
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_videocenter
-    {
-    priority = 0x7EF6;
-    name = "cseschedulerserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_waitcleanbootinfo
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitcleanbootinfo
-    {
-    priority = 0x7F87;
-    severity = ECmdCriticalSeverity;
-    dllname = "ssmsystemcmds.dll";
-    ordinal = 6; // WaitPsKeyRange
-    dll_data = r_dlldata_waitcleanbootinfo;
-    retries = 2;
-    execution_behaviour = ESsmWaitForSignal;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_waitforidle
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitidle
-    {
-    priority = 0xFFC7;
-    severity = ECmdCriticalSeverity;
-    dllname = "ssmsystemcmds.dll";
-    ordinal = 5; // WaitPsKeyExact
-    dll_data = r_dlldata_waitidle;
-    unload_on_finish = ENeverUnload;
-    retries = 2;
-    execution_behaviour = ESsmWaitForSignal;
-    }
-
+ 
 // ---------------------------------------------------------------------------
 // r_cmd_waitforofflinequery
 // ---------------------------------------------------------------------------
@@ -970,46 +249,6 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitforofflinequery
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_waitforphone
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitforphone
-    {
-    priority = 0xFFD7;
-    severity = ECmdCriticalSeverity;
-    dllname = "ssmsystemcmds.dll";
-    ordinal = 5; // WaitPsKeyExact
-    dll_data = r_dlldata_waitphone;
-    unload_on_finish = ENeverUnload;
-    retries = 2;
-    execution_behaviour = ESsmWaitForSignal;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_watcher
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_watcher
-    {
-    priority = 0xFFB7;
-    name = "z:\\sys\\bin\\watcher.exe";
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_xnthemesrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_xnthemesrv
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\xnthemeserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-	
-// ---------------------------------------------------------------------------
 // r_cmd_clearstartupreason
 // ---------------------------------------------------------------------------
 //
@@ -1022,7 +261,6 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_clearstartupreason
     retries = 2;
     execution_behaviour = ESsmWaitForSignal;
     }
-
 
 // ===========================================================================
 // DLL data items in alphabetical order
@@ -1061,17 +299,6 @@ RESOURCE CMD_PARAM_WAIT_PS_2 r_dlldata_waitcleanbootinfo
     }
 
 // ---------------------------------------------------------------------------
-// r_dlldata_waitidle
-// ---------------------------------------------------------------------------
-//
-RESOURCE CMD_PARAM_WAIT_PS r_dlldata_waitidle
-    {
-    category = 0x101F8766;  // KPSUidStartup
-    key = 0x00000043;       // KPSIdlePhase1Ok
-    target = 101;           // EIdlePhase1Ok
-    }
-
-// ---------------------------------------------------------------------------
 // r_dlldata_waitofflinequery
 // ---------------------------------------------------------------------------
 //
@@ -1082,50 +309,6 @@ RESOURCE CMD_PARAM_WAIT_PS_2 r_dlldata_waitofflinequery
     target1 = 101;          // EBootIntoOnlineMode
     target2 = 102;          // EBootIntoOfflineMode
     }
-
-// ---------------------------------------------------------------------------
-// r_dlldata_waitphone
-// ---------------------------------------------------------------------------
-//
-RESOURCE CMD_PARAM_WAIT_PS r_dlldata_waitphone
-    {
-    category = 0x101F8766;  // KPSUidStartup
-    key = 0x00000044;       // KPSPhonePhase1Ok
-    target = 101;           // EPhonePhase1Ok
-    }
-	
-	
-// ---------------------------------------------------------------------------
-// r_cmd_mylocationsengine
-// ---------------------------------------------------------------------------
-//	
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mylocationsengine
-    {
-    priority = 0x7EEC;
-    name = "z:\\sys\\bin\\mylocationsengine.exe";
-    execution_behaviour = ESsmFireAndForget;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_item_taskswitcher
-// ---------------------------------------------------------------------------  
-RESOURCE SSM_START_APP_INFO r_cmd_taskswitcher
-     {
-     priority = 0xFFA7;
-     name = "z:\\sys\\bin\\taskswitcher.exe";
-     execution_behaviour = ESsmDeferredWaitForSignal;
-     background = 1; // To background
-     monitor_info = r_mon_3_restarts_ignore;
-     }
-
-// ---------------------------------------------------------------------------
-// r_cmd_multiple_wait
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiple_wait
-     {
-     priority = 0x7F96;     
-     }
 
 // ===========================================================================
 // Conditional blocks in alphabetical order
@@ -1144,69 +327,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_firstboot
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_alwaysonline
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_alwaysonline
-    {
-    feature_id = KFeatureIdAlwaysOnLine;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_cellbroadcast
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_cellbroadcast
-    {
-    feature_id = KFeatureIdCellBroadcast;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_emailfw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_emailfw
-    {
-    feature_id = KFeatureIdFfEmailFramework;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_iadv2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_iadv2
-    {
-    feature_id = KFeatureIdFfIaupdatePhase2;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_ippush
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_ippush
-    {
-    feature_id = KFeatureIdIpPush;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_omapoc
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_omapoc
-    {
-    feature_id = KFeatureIdOmaPoc;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_omasuplplugins
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_omasuplplugins
-    {
-    feature_id = KFeatureIdOmaSuplPlugins;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_feat_pnp_mobile_services
 // ---------------------------------------------------------------------------
 //
@@ -1216,48 +336,12 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_pnp_mobile_services
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_remotestoragefw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_remotestoragefw
-    {
-    feature_id = KFeatureIdRemoteStorageFw;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_runtime_dcmo;
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_runtime_dcmo
-    {
-    feature_id = KFeatureIdFfRuntimeDeviceCapabilityConfiguration;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cond_feat_sappolicymgmt
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_sappolicymgmt
-    {
-    feature_id = KFeatureIdSapPolicyManagement;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_feat_sdnd
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_sdnd
     {
     feature_id = KFeatureIdSdnd;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_simcard
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_simcard
-    {
-    feature_id = KFeatureIdSimCard;
     }
 
 // ---------------------------------------------------------------------------
@@ -1288,51 +372,12 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_syncml_dm_fota
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_tvout
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_tvout
-    {
-    feature_id = KFeatureIdTvOut;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_firstboot_or_fotareset_or_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_firstboot_or_fotareset_or_deeprfsreset
-    {
-    lhs = r_cond_fotareset_or_deeprfsreset;
-    rhs = r_cond_ps_firstboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_fotareset_or_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_fotareset_or_deeprfsreset
-    {
-    lhs = r_cond_ps_fotareset;
-    rhs = r_cond_ps_deeprfsreset;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_no_sdnd
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_CND_LOGICAL_NOT r_cond_no_sdnd
     {
     sub_condition = r_cond_feat_sdnd;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_pnp_mobile_services_and_firstboot
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_AND r_cond_pnp_mobile_services_and_firstboot
-    {
-    lhs = r_cond_feat_pnp_mobile_services;
-    rhs = r_cond_ps_firstboot;
     }
 
 // ---------------------------------------------------------------------------
@@ -1358,17 +403,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_bootonline
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_ps_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_deeprfsreset
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000045;      // KPSStartupReason
-    value = EDeepRFSReset;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_ps_fotareset
 // ---------------------------------------------------------------------------
 //
@@ -1377,17 +411,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_fotareset
     category = 0x101F8766; // KPSUidStartup
     key = 0x00000045;      // KPSStartupReason
     value = EFirmwareUpdate;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_ps_normalboot
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_normalboot
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000012;      // KStartupCleanBoot
-    value = 101;           // EStartupNormalBoot
     }
 
 // ---------------------------------------------------------------------------

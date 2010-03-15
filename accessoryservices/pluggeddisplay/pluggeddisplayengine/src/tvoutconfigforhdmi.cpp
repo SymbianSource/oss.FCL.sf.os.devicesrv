@@ -34,6 +34,11 @@
 // CONSTANTS
 
 // MACROS
+#define SEND_VIA_PDENGINE(event) \
+                        ((CHDMICableStatusFSM*)&iFSM)->GetPDEngine()->Input( \
+                        EPDEFSMIdHDMICableStatus, \
+                        EPDEIfTVOutConfig, \
+                        event )
 
 // LOCAL CONSTANTS AND MACROS
 
@@ -435,9 +440,8 @@ void CTVOutConfigForHDMI::RunL()
                 }
             else if ( iTvConfig->HdmiCableConnected() )
                 {
-                iFSM.Input( 
-                        EPDEIfTVOutConfig, 
-                        EIfTVOutConfigEventCableConnected );
+                    // Send connected event to FSM via PDEngine where the multiple connection(analog and hdmi) logic is handled.
+                    SEND_VIA_PDENGINE(EIfTVOutConfigEventCableConnected);
                 }
             else
                 {

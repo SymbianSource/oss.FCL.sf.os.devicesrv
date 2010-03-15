@@ -333,6 +333,7 @@ CSsmCommandBase* SsmCommandFactory::ConstructCommandFromCommandLC(const MSsmComm
     {
     CSsmCommandBase* cmd = NULL;
     TSsmCommandType const cmdType = aSsmCommand.Type();
+    DEBUGPRINT2A("Adding command type in CLE commandlist: %d", cmdType);    
     
     switch(cmdType)
         {
