@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -47,8 +47,8 @@ PRJ_EXPORTS
 ../inc/securitynotification.h			SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(ssm/securitynotification.h)
 ../inc/ssmpropertyobserver.h			SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(ssm/ssmpropertyobserver.h)
 ../inc/strtsecuritystatus.h				SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(ssm/strtsecuritystatus.h)
-#ifdef SYMBIAN_OLD_EXPORT_LOCATION
-../inc/startupadaptationadapter.h		/epoc32/include/ssm/startupadaptationadapter.h
-#endif
+
+../inc/startupadaptationadapter.h		SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(ssm/startupadaptationadapter.h)
+
 ../inc/clayerswp.hrh 					/epoc32/include/ssm/clayerswp.hrh
 ../inc/clayerdlldatadefs.rh				SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(ssm/clayerdlldatadefs.rh)

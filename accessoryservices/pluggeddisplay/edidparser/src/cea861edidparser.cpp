@@ -19,6 +19,8 @@
 #include "cea861edidparser.h"
 #include "trace.h"
 
+const TInt KIEEERegistrationID = 0x00000C03;
+
 // ======== LOCAL FUNCTIONS ========
 
 
@@ -300,6 +302,24 @@ EXPORT_C TBool CCea861EdidParser::IsVendorSpecificDataBlockSupported()
     }
 
 // ----------------------------------------------------------------------------
+// CCea861EdidParser::HasIEEERegistration
+//
+// ----------------------------------------------------------------------------
+//
+EXPORT_C TBool CCea861EdidParser::HasIEEERegistration()
+    {
+    FUNC_LOG;
+
+	if ( iVendorSpecificDataBlockSupported && iParsedInfo->iVendorSpecificData &&
+		iParsedInfo->iVendorSpecificData->iIEEE24bitRegistrationIdentifier == KIEEERegistrationID )
+		{
+		return ETrue;
+		}
+
+    return EFalse;
+    }
+
+// ----------------------------------------------------------------------------
 // CCea861EdidParser::GetParsedInformation
 //
 // ----------------------------------------------------------------------------
@@ -577,6 +597,8 @@ TInt CCea861EdidParser::ReadCeaVersion1L( const TExtDataBlock& aData,
         {
         return KErrOverflow;
         }
+        
+    TCEA861TEdidDescriptorBlockList* lastnode = iParsedInfo->iDescriptorBlocks;
 
     for( TInt index = aIndex; index < KEdidParserSizeOfEdidBlock; index++ )
         {
@@ -594,32 +616,21 @@ TInt CCea861EdidParser::ReadCeaVersion1L( const TExtDataBlock& aData,
 
         if( aData[index] != KEdidPaddingByte ) // padding = 0x00
             {
-            // start of 18-byte descriptors: See section 3.10.2 of VESA E-EDID Standard [10]
-
-            TBool first = ETrue;
-            if( iParsedInfo->iDescriptorBlocks == 0 )
-                {
-                iParsedInfo->iDescriptorBlocks
-                    = new ( ELeave ) TCEA861TEdidDescriptorBlockList();
-                }
-
+            // start of 18-byte descriptors: See section 3.10.2 of E-EDID Standard [10]
             // read the descriptors here
             TEdidDescriptorBlock tmp = GetDescriptorBlock( aData, index );
-            if( first )
+			
+            if( iParsedInfo->iDescriptorBlocks == 0 )
                 {
-                first = EFalse;
-                iParsedInfo->iDescriptorBlocks->iData = tmp;
-                continue;
+                iParsedInfo->iDescriptorBlocks = new ( ELeave ) TCEA861TEdidDescriptorBlockList();
+                lastnode = iParsedInfo->iDescriptorBlocks;
                 }
-            TCEA861TEdidDescriptorBlockList* last =
-                iParsedInfo->iDescriptorBlocks;
-            while( last->iNext != 0 ) // go to last block
+            else
                 {
-                last = last->iNext;
+                lastnode->iNext = new ( ELeave ) TCEA861TEdidDescriptorBlockList();
+                lastnode = lastnode->iNext;
                 }
-            last->iNext = new ( ELeave ) TCEA861TEdidDescriptorBlockList();
-            last = last->iNext;
-            last->iData = tmp;
+            lastnode->iData = tmp;
             }
         else
             {
@@ -1482,7 +1493,7 @@ TInt CCea861EdidParser::ReadCeaDataBlockCollectionL( const TExtDataBlock& aData,
             ReadCea861SpeakerAllocationDataBlock( aData, aIndex, L1 );
             break;
         case 5:
-            //VESA DTC Data Block
+            //DTC Data Block
             ReadUnknownTagCode( aData, aIndex, L1 );
             break;
         case 6:
@@ -1507,10 +1518,6 @@ TInt CCea861EdidParser::ReadCeaDataBlockCollectionL( const TExtDataBlock& aData,
                 {
                 }
             // TODO: these should be read as well, not just as unknown
-            ReadUnknownTagCode( aData, aIndex, L1 );
-            break;
-        default:
-            // if tag-code is unknown, we still must read through it
             ReadUnknownTagCode( aData, aIndex, L1 );
             break;
         }

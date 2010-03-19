@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -33,8 +33,7 @@ const TInt KAsyncMessageSlots = -1;
  */
 EXPORT_C TInt RSsmAdaptationBase::Connect()
 	{
-	const TInt err = DoConnect(KAsyncMessageSlots);
-	return err;
+	return Connect(KAsyncMessageSlots);	 
 	}
 
 /**
@@ -52,15 +51,30 @@ EXPORT_C TInt RSsmAdaptationBase::Connect()
  */
 EXPORT_C TInt RSsmAdaptationBase::Connect(TInt aAsyncMessageSlotCount)
 	{
-	const TInt err = DoConnect(aAsyncMessageSlotCount);
+	const TInt err = DoConnect(KSusAdaptionServerName, aAsyncMessageSlotCount);
 	return err;
-	}
+	} 
 
-TInt RSsmAdaptationBase::DoConnect(TInt aAsyncMessageSlotCount)
+/**
+ * This exists for testing purposes only
+ * @internalComponent
+ */
+#ifdef TEST_SSM_SERVER
+
+TInt RSsmAdaptationBase::Connect(const TDesC& aServerName)
+    {
+    return DoConnect(aServerName, KAsyncMessageSlots);
+    }
+#endif //TEST_SSM_SERVER
+
+/**
+ @internalComponent
+ */
+TInt RSsmAdaptationBase::DoConnect(const TDesC& aServerName, const TInt aAsyncMessageSlotCount)
 	{
 	if(!Handle())
 		{
-		return CreateSession(KSusAdaptionServerName, Version(), aAsyncMessageSlotCount);
+		return CreateSession(aServerName, Version(), aAsyncMessageSlotCount);
 		}
 	
 	return KErrAlreadyExists;

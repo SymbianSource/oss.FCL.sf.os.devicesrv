@@ -291,7 +291,86 @@ void CEDIDHandler::CreateHdmiAudioFormatL( RAccPolHdmiAudioFormatArray& aHdmiAud
 
                     // Set audio format
                     TUid audioFormat;
-                    audioFormat.iUid = audioDataBlock->iAudioFormatCode;
+                    // Map the audio format code defined in 
+                    // cea861ediddatatypes.h to accpolhdmiaudioformat.h
+                    switch ( audioDataBlock->iAudioFormatCode )
+                        {
+                        case KAudioFormatCodePCM:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatPCM16;
+                            break;
+                            }
+                        case KAudioFormatCodeAC3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatAC3;
+                            break;
+                            }
+                        case KAudioFormatCodeMPEG1:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMPEG1;
+                            break;
+                            }
+                        case KAudioFormatCodeMP3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMP3;
+                            break;
+                            }
+                        case KAudioFormatCodeMPEG2:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMPEG2;
+                            break;
+                            }
+                        case KAudioFormatCodeAACLC:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatAACLC;
+                            break;
+                            }
+                        case KAudioFormatCodeDTS:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDTS;
+                            break;
+                            }
+                        case KAudioFormatCodeATRAC:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatATRAC;
+                            break;
+                            }
+                        case KAudioFormatCodeDSD:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDSD;
+                            break;
+                            }
+                        case KAudioFormatCodeEAC3:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatEAC3;
+                            break;
+                            }
+                        case KAudioFormatCodeDTSHD:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDTSHD;
+                            break;
+                            }
+                        case KAudioFormatCodeMLP:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatMLP;
+                            break;
+                            }
+                        case KAudioFormatCodeDST:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatDST;
+                            break;
+                            }
+                        case KAudioFormatCodeWMAPRO:
+                            {
+                            audioFormat = HdmiAudioFormat::KUidFormatWMAPRO;
+                            break;
+                            }
+                        default:
+                            {
+                            audioFormat.iUid = KAudioFormatCodeNA;
+                            break;
+                            }
+                        }
                     hdmiAudioFormat->SetAudioFormat( audioFormat ); // const TUid aAudioFormat,
 
                     // Set bit resolution
@@ -1334,24 +1413,45 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 
 			availableIndex++;
 			}
-		
-		    if( ( (KDefaultCEAModePhysImgAspRatioNr == iEdidParserPtr->GetAspectRatioLandscape()) 
-		            && (KDefaultCEAModePhysImgAspRatioDr == iEdidParserPtr->GetAspectRatioPortrait()) ) 
-		            && !defaultCEAmode )		    
 
+			// If the Vendor Specific Data Block supported and it has IEEE registration number then it is HDMI
+			if ( iExtensionParserPtr && iExtensionParserPtr->IsVendorSpecificDataBlockSupported() && iExtensionParserPtr->HasIEEERegistration() )
 			{
-            THdmiDviTimings timings;
-            
-            // Get a timing item for default CEA Mode (1)
-            const TTimingItem* item = TimingByIndex( KDefaultCEAModeIndex, ETimingModeCEA );
-            if( item )
-                {
-                Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
-                FillHdmiDviTimings( *item, timings );
-                retVal = aHdmiConfigs.Append( timings );
-                ERROR( retVal, "Failed to append CEA timing in available config array" );
-                }
-			}
+			    INFO( "<<<<<<<<<<<<<<It is HDMI connector>>>>>>>>>>>>>>" );
+				// Add default CEA mode 1 to the list if it is not there already
+			    if( ( (KDefaultCEAModePhysImgAspRatioNr == iEdidParserPtr->GetAspectRatioLandscape()) 
+			            && (KDefaultCEAModePhysImgAspRatioDr == iEdidParserPtr->GetAspectRatioPortrait()) ) 
+			            && !defaultCEAmode )		    
+	
+				{
+	            THdmiDviTimings timings;
+	            
+	            // Get a timing item for default CEA Mode (1)
+	            const TTimingItem* item = TimingByIndex( KDefaultCEAModeIndex, ETimingModeCEA );
+	            if( item )
+	                {
+	                Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
+	                FillHdmiDviTimings( *item, timings );
+	                retVal = aHdmiConfigs.Append( timings );
+	                ERROR( retVal, "Failed to append CEA timing in available config array" );
+	                }
+				}
+		    }
+		    else // It is DVI connector
+		    {
+				TInt modecount = aHdmiConfigs.Count();
+				
+				INFO( "<<<<<<<<<<<<<<It is DVI connector>>>>>>>>>>>>>>" );
+				while( modecount-- )
+				  {
+					// Change it to DVI mode as it is existing in both Supported and available configurations
+					aHdmiConfigs[ modecount ].iConnector = TTvSettings::EDVI;
+					
+					// Version should be zeroed for non-HDMI
+					aHdmiConfigs[ modecount ].iTvHdmiVersion = 0;
+					aHdmiConfigs[ modecount ].iTvHdmiRevision = 0;			  
+				  }
+		    }
 
 		INFO( "Filtered list -- END" );
 		supportedModes.Close();

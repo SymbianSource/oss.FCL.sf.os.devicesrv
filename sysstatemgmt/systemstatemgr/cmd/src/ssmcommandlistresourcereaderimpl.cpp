@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -29,7 +29,25 @@
 #include "ssmpanic.h"
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 #include "ssmcommandlistimpl.h"
-#endif
+#ifdef __WINS__
+#include <u32hal.h>
+
+//Literal to be appended with the main folder path to get the extended folder path
+_LIT(KExtendedCommandListPath, "_ext\\");
+
+//Used for checking the presence of keyword for using extended folder in epoc.ini
+static TBool IsExtendedFolderDisabled()
+    {
+    TBool isMinimalBootDisable = EFalse;
+    
+    //If the keyword "MINIMALSTART" is found in epoc.ini then only commands from main folder are 
+    //executed else commands from both main and extended folder are executed.
+    UserSvr::HalFunction(EHalGroupEmulator, EEmulatorHalBoolProperty, (TAny*)"MINIMALSTART", &isMinimalBootDisable);
+    return isMinimalBootDisable;
+    }
+#endif // __WINS__
+#endif //SYMBIAN_SSM_FLEXIBLE_MERGE
+
 
 CSsmCommandListResourceReaderImpl* CSsmCommandListResourceReaderImpl::NewL(RFs& aFs, const TDesC& aCommandListPath, MSsmConditionalCallback& aConditionalCallback)
 	{
@@ -180,7 +198,7 @@ void CSsmCommandListResourceReaderImpl::CResourcePool::UpdateMappingArrayL(TInt 
 			break;
 			}
 		}
-	DEBUGPRINT3(_L("Mapping Array for substate %d Contains %d entries"), iMappings[mappingIndex].iCommandListId, aMappingArray.Count());
+	DEBUGPRINT3(_L("Mapping Array for substate %04x Contains %d entries"), iMappings[mappingIndex].iCommandListId, aMappingArray.Count());
 	}
 
 #else
@@ -276,6 +294,9 @@ CSsmCommandListResourceReaderImpl::CInitialiser* CSsmCommandListResourceReaderIm
 
 CSsmCommandListResourceReaderImpl::CInitialiser::CInitialiser(RFs& aFs, CResourcePool& aResourcePool)
 	:CActiveBase(EPriorityStandard),  iFs(aFs), iResourcePool(aResourcePool)
+#if defined(SYMBIAN_SSM_FLEXIBLE_MERGE) && defined(__WINS__)
+	, iExtendedEntryIndex(0)
+#endif //SYMBIAN_SSM_FLEXIBLE_MERGE && __WINS__
 	{
 	CActiveScheduler::Add(this);
 	}
@@ -287,6 +308,10 @@ CSsmCommandListResourceReaderImpl::CInitialiser::~CInitialiser()
 	iPath.Close();
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 	iSystemDrivePath.Close();
+#ifdef __WINS__ 
+	iExtendedPath.Close();
+#endif //__WINS__
+
 #endif
 	}
 
@@ -300,6 +325,10 @@ void CSsmCommandListResourceReaderImpl::CInitialiser::ResetToUninitialisedState(
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 	delete iRssFileEntriesInSysDrive;
 	iRssFileEntriesInSysDrive = NULL;
+#ifdef __WINS__ 
+	delete iExtendedResourceFileEntries;
+	iExtendedResourceFileEntries = NULL;
+#endif //__WINS__
 #endif
 	}
 
@@ -351,7 +380,12 @@ void CSsmCommandListResourceReaderImpl::CInitialiser::RunL()
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 	case EInitialiseSysDriveStep:
 		DoInitialiseSysDriveStepL();
-		break;		
+		break;
+#ifdef __WINS__ 
+	case EInitialiseExtFolderStep:
+	    DoInitialiseExtFolderStepL();
+	    break;
+#endif //__WINS__
 #endif
 	default:
 		PanicNow(KPanicCmdResourceReader, EInvalidRunLAction);
@@ -404,6 +438,24 @@ void CSsmCommandListResourceReaderImpl::CInitialiser::DoInitialiseFirstStepL()
 	iEntryIndex = iResourceFileEntries->Count();
 
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
+#ifdef __WINS__
+	if(!IsExtendedFolderDisabled())
+	    {
+	    TFileName extPath(iPath);
+	    extPath.Replace(iPath.Length() - 1, 1, KExtendedCommandListPath);
+	    iExtendedPath.CreateL(extPath);
+	    DEBUGPRINT2(_L("Extended list path is %S"), &extPath);
+
+	    extPath.Append(KStar);
+	    const TInt extErr = (iFs.GetDir(extPath, TUidType(KUidResourceFile, TUid::Uid(KUidSsmCommandListResourceFile)), ESortNone, iExtendedResourceFileEntries));
+	    if (KErrNone == extErr)
+	        {
+	        iExtendedEntryIndex = iExtendedResourceFileEntries->Count();
+	        DEBUGPRINT2(_L("Number of resource files in extended folder : %d"), iExtendedEntryIndex);
+	        }	    
+	    }
+#endif //__WINS__
+
 	DEBUGPRINT2(_L("Number of resource files in ROM Drive : %d"),iEntryIndex );
 	// Now, get list of command list resource filenames from system drive too
 	TFileName sysPath(iSystemDrivePath);
@@ -471,16 +523,44 @@ void CSsmCommandListResourceReaderImpl::CInitialiser::DoInitialiseSysDriveStepL(
 		}
 	else
 		{
-		// initialisation complete
-		iAction = EIdle;
-		delete iRssFileEntriesInSysDrive;
-		iRssFileEntriesInSysDrive = NULL;
+        iAction = EIdle;
+        delete iRssFileEntriesInSysDrive;
+        iRssFileEntriesInSysDrive = NULL;
+
+#ifdef __WINS__
+        if(!IsExtendedFolderDisabled())
+            {
+            //Initialise the command list from extended list only if it is enabled
+            iAction = EInitialiseExtFolderStep;    
+            }
+#endif //__WINS__
 		}
 	}
-#endif
+
+#ifdef __WINS__
+void CSsmCommandListResourceReaderImpl::CInitialiser::DoInitialiseExtFolderStepL()
+    {
+    //Append the file names from the extended folder only if it is enabled 
+    if (iExtendedEntryIndex--)
+        {
+        TFileName filename(iExtendedPath);
+        filename.Append((*iExtendedResourceFileEntries)[iExtendedEntryIndex].iName);
+        CResourceFile* const resourceFile = OpenResourceFileL(filename);
+        ParseFileL(resourceFile);
+        }
+    else
+        {
+        // initialisation complete
+        iAction = EIdle;
+        delete iExtendedResourceFileEntries;
+        iExtendedResourceFileEntries = NULL;
+        }
+    }
+#endif //__WINS__
+#endif //SYMBIAN_SSM_FLEXIBLE_MERGE
+
 CResourceFile* CSsmCommandListResourceReaderImpl::CInitialiser::OpenResourceFileL(const TDesC& aFileName)
 	{
-
 	// open the resource file
 	RFile file;
 	CleanupClosePushL(file);
@@ -721,6 +801,12 @@ void CSsmCommandListResourceReaderImpl::CPreparer::DoPrepareNextStepL()
 				inProgress = EFalse;
 				break;
 				}
+			else if((iCommandIndexInRssFile[iCurrentCommandListInMapping] == 0))
+					{
+					//The current commandlist is empty 
+					//go to the next commandlist in the mapping.
+					continue;
+					}
 			else
 				{
 				//open the next resource id and read the commands
@@ -733,7 +819,6 @@ void CSsmCommandListResourceReaderImpl::CPreparer::DoPrepareNextStepL()
 				iListReader.AdvanceL(sizeof(TUint16));
 				}
 			}
-		DEBUGPRINT2A("The value of RssFile's current command is %d ", iCommandIndexInRssFile[iCurrentCommandListInMapping]);
 #else
 	while(iCommandIndex && iBatchIndex--)
 		{
@@ -741,7 +826,6 @@ void CSsmCommandListResourceReaderImpl::CPreparer::DoPrepareNextStepL()
 #endif
 		// open command resource
 		const TInt commandResourceId = iListReader.ReadInt32L();
-		DEBUGPRINT2A("Reading command resource id %x", commandResourceId);
 		RResourceReader commandReader;
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 		commandReader.OpenLC(iMappingArray[iCurrentCommandListInMapping].iResourceFile, commandResourceId);

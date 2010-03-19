@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -162,45 +162,6 @@ void MT_RStarterSession::T_RStarterSession_EndSplashScreenL(  )
     EUNIT_ASSERT_DESC( err == KErrNone, "Incorrect return value" );
     }
     
-void MT_RStarterSession::T_RStarterSession_AddItemInStartListLL(  )
-    {
-    TPtrC8 md5hash( KNullDesC8 );
-    TInt err = iRStarterSession.AddItemInStartListL(
-        KNullDesC,
-        EMonNone,
-        EExecutableType,
-        0,
-        md5hash );
-    EUNIT_PRINT( _L("AddItemInStartListL() err = %d"), err );
-    EUNIT_ASSERT_DESC( err == KErrPermissionDenied, "Incorrect return value. SID check has failed" );
-    }
-    
-void MT_RStarterSession::T_RStarterSession_AddItemInStartListL2L(  )
-    {
-    TInt err = iRStarterSession.AddItemInStartListL(
-        KNullDesC,
-        EMonNone,
-        EExecutableType,
-        0 );
-    EUNIT_PRINT( _L("AddItemInStartListL() err = %d"), err );
-    EUNIT_ASSERT_DESC( err == KErrPermissionDenied, "Incorrect return value. SID check has failed" );
-    }
-    
-void MT_RStarterSession::T_RStarterSession_RemoveItemFromStartListLL(  )
-    {
-    TInt err = iRStarterSession.RemoveItemFromStartListL( KNullDesC );
-    EUNIT_PRINT( _L("RemoveItemFromStartListL() err = %d"), err );
-    EUNIT_ASSERT_DESC( err == KErrPermissionDenied, "Incorrect return value. SID check has failed" );
-    }
-    
-void MT_RStarterSession::T_RStarterSession_SearchStartlistLL(  )
-    {
-    TInt err = iRStarterSession.SearchStartlistL( KNullDesC );
-    EUNIT_PRINT( _L("SearchStartlistL() err = %d"), err );
-    EUNIT_ASSERT_DESC( err == KErrPermissionDenied, "Incorrect return value. SID check has failed" );
-    }
-    
-
 //  TEST TABLE
 EUNIT_BEGIN_TEST_TABLE(
     MT_RStarterSession,
@@ -263,33 +224,6 @@ EUNIT_TEST(
     "FUNCTIONALITY",
     SetupL, T_RStarterSession_EndSplashScreenL, Teardown)
     
-EUNIT_TEST(
-    "AddItemInStartListL - test9",
-    "RStarterSession",
-    "AddItemInStartListL - test9",
-    "FUNCTIONALITY",
-    SetupL, T_RStarterSession_AddItemInStartListLL, Teardown)
-    
-EUNIT_TEST(
-    "AddItemInStartListL - test10",
-    "RStarterSession",
-    "AddItemInStartListL - test10",
-    "FUNCTIONALITY",
-    SetupL, T_RStarterSession_AddItemInStartListL2L, Teardown)
-    
-EUNIT_TEST(
-    "RemoveItemFromStartListL - test11",
-    "RStarterSession",
-    "RemoveItemFromStartListL - test11",
-    "FUNCTIONALITY",
-    SetupL, T_RStarterSession_RemoveItemFromStartListLL, Teardown)
-    
-EUNIT_TEST(
-    "SearchStartlistL - test12",
-    "RStarterSession",
-    "SearchStartlistL - test12",
-    "FUNCTIONALITY",
-    SetupL, T_RStarterSession_SearchStartlistLL, Teardown)
 /*    
 EUNIT_TEST(
     "Shutdown - test3",

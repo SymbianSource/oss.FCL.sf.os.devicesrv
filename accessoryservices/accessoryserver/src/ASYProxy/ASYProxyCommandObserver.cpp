@@ -438,34 +438,34 @@ void CASYProxyCommandObserver::DoProcessResponseL( const CAccPolObjectCon& aObje
     TInt trId = iAsyProxyTRRecord->TrId();
     DoDestroy( trId );
 
-    //Reset buffer
-    iObjectBuf->Reset();    
-    if ( ECmdGetObjectValue == iAsyProxyTRRecord->CmdId() )	
-        {
-        iObjectBuf->ResizeL( KAccSrvObjectBaseStreamBufMaxSize );
-        //Externalize aValue to aBuf
-        RBufWriteStream wStrm;    
-        (void) wStrm.Open( *iObjectBuf );
-        CleanupClosePushL( wStrm );    
-        aObjectCon.ExternalizeL( wStrm );
-        wStrm.CommitL();         
-        CleanupStack::PopAndDestroy( &wStrm );
-       }
-       else
-       {
-        COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoProcessResponseL() - Nothing do to!");
-       }
-    
-    // Release allocated buffer
     if ( iObjectBuf )
         {
+		    //Reset buffer
+		    iObjectBuf->Reset();    
+		    if ( ECmdGetObjectValue == iAsyProxyTRRecord->CmdId() )	
+		        {
+		        iObjectBuf->ResizeL( KAccSrvObjectBaseStreamBufMaxSize );
+		        //Externalize aValue to aBuf
+		        RBufWriteStream wStrm;    
+		        (void) wStrm.Open( *iObjectBuf );
+		        CleanupClosePushL( wStrm );    
+		        aObjectCon.ExternalizeL( wStrm );
+		        wStrm.CommitL();         
+		        CleanupStack::PopAndDestroy( &wStrm );
+		       }
+		       else
+		       {
+		        COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoProcessResponseL() - Nothing do to!");
+		       }
+		    
+		    // Release allocated buffer
         TPtr8 ptr( iObjectBuf->Ptr(0) );   
         iAsyProxyCommsSrvc->iAsyComms.ProcessResponse( trId, 
                                                        &ptr,
                                                        aErrCode ); 
         delete iObjectBuf;
-    	iObjectBuf = NULL;
-        }
+    	  iObjectBuf = NULL;
+		    }
     else
         {
         iAsyProxyCommsSrvc->iAsyComms.ProcessResponse( trId, 

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,7 @@
 /**
  @file
  @test
- @internalComponent - Internal Symbian test code 
+ @internalComponent - Internal test code 
 */
  
 
@@ -33,8 +33,14 @@ _LIT(KTSusAdaptionServerStep,"SusAdaptionServerStep");
 class RTestSusAdaptationCli : public RSsmEmergencyCallRfAdaptation
     {
 public:
+#ifdef TEST_SSM_SERVER
+    TInt Connect(const TDesC& aServerName);
+#endif 
     TInt SetHeapFailure(TInt aFailureRate);
     TInt UnSetHeapFailure();
+    TInt SetHeapMark();
+    TInt UnSetHeapMark();
+    
     };
 
 class CSusAdaptionServerTest : public CTestStep
@@ -51,11 +57,15 @@ public:
 private:
 	void doTestForMemoryLeaksL();
 	void doTestProcessCriticalL();
-	void doTestOOML();
-	void doTestForEmergencyCallOOM();
+	void doTestOOML();	
 	void StartAndDestroyServerL();
+#ifdef TEST_SSM_SERVER
+	void doTestForEmergencyCallOOM();
 	void doTestForSettingPriorityClient();
 	void doTestForNormalEmergencyCallinOOM();
+	void doTestForMultipleClientinOOMcondition();
+	void doTestForEmergencyCallOOMIterative();
+#endif
 	};
 
 #endif

@@ -25,12 +25,13 @@
 
 #include <test/testexecutestepbase.h>
 
-_LIT(KTCCustomCmdTestPublishStartupMode, "CCustomCmdTestPublishStartupMode");
+_LIT(KTestPublishStartupModeWithCap, "TestPublishStartupModeWithCap");
+_LIT(KTestPublishStartupModeWithoutCap,"TestPublishStartupModeWithoutCap");
 
 class CCustomCmdTestPublishStartupMode: public CTestStep
 	{
 public:
-	CCustomCmdTestPublishStartupMode();
+	CCustomCmdTestPublishStartupMode(const TDesC& aTestStepName);
 	~CCustomCmdTestPublishStartupMode();
 
 	//from CTestStep
@@ -48,6 +49,7 @@ private:
     CActiveScheduler* iActiveScheduler;
     CAsyncCallBack* iAsyncStopScheduler;
     TRequestStatus iRequestStatus;
+    const TDesC& iTestStepName;
 	};
 
 #endif	// __TCMD_STEP_PUBLISHSTARTUPMODE_H__

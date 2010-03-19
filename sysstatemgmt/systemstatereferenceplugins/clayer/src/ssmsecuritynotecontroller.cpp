@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -11,20 +11,7 @@
 // Contributors:
 //
 // Description:
-// Name        : strtsecuritynotecontroller.cpp
-// Part of     : System Startup / StrtSecObs
 // Implementation of CStrtSecurityNoteController class
-// Version     : %version: 1 % << Don't touch! Updated by Synergy at check-out.
-// This material, including documentation and any related computer
-// programs, is protected by copyright controlled by Nokia.  All
-// rights are reserved.  Copying, including reproducing, storing,
-// adapting or translating, any or all of this material requires the
-// prior written consent of Nokia.  This material also contains
-// confidential information which may not be disclosed to others
-// without the prior written consent of Nokia.
-// Template version: 4.1.1
-// Nokia Core OS *
-// File renamed from strtsecuritynotecontroller.cpp to ssmsecuritynotecontroller.cpp as part of Core OS transfer.
 //
 
 
@@ -33,6 +20,9 @@
 #include "ssmsecuritynotecontroller.h"
 #include "ssmsecuritychecknotifier.h"
 #include "ssmdebug.h"
+#include "ssmpanic.h"
+#include <ssm/ssmstatemanager.h>
+#include <ssm/startupreason.h>
 
 CStrtSecurityNoteController* CStrtSecurityNoteController::NewL()
     {
@@ -88,6 +78,36 @@ void CStrtSecurityNoteController::RunL()
         iSecurityNote->ShowNoteL(code, iStatus );
         SetActive();
         }
+    }
+#ifdef _DEBUG
+TInt CStrtSecurityNoteController::RunError(TInt aError)
+#else
+TInt CStrtSecurityNoteController::RunError(TInt)
+#endif // _DEBUG
+    {
+    DEBUGPRINT2A("CStrtSecurityNoteController RunL completed with error %d", aError);
+#ifdef _DEBUG
+	PanicNow(KPanicSecurityNoteController, aError);
+#else
+    RSsmStateManager session;
+    TInt errorCode = session.Connect();
+    if ( KErrNone == errorCode )
+        {
+        TSsmStateTransition stateinfo( ESsmShutdown, KSsmAnySubState, EUnknownReset );
+        errorCode = session.RequestStateTransition( stateinfo );
+        if( KErrNone != errorCode )
+            {
+            PanicNow(KPanicSecurityNoteController, errorCode);
+            }
+        session.Close();
+        }
+	else
+		{
+        PanicNow(KPanicSecurityNoteController, errorCode);	
+		}
+#endif //_DEBUG
+
+    return KErrNone;
     }
 
 CStrtSecurityNoteController::CStrtSecurityNoteController()

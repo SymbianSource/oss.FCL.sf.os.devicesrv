@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -70,10 +70,6 @@ NONSHARABLE_CLASS( MT_RStarterSession )
         void T_RStarterSession_ActivateRfForEmergencyCallL();
         void T_RStarterSession_DeactivateRfAfterEmergencyCallL();
         void T_RStarterSession_EndSplashScreenL();
-        void T_RStarterSession_AddItemInStartListLL();
-        void T_RStarterSession_AddItemInStartListL2L();
-        void T_RStarterSession_RemoveItemFromStartListLL();
-        void T_RStarterSession_SearchStartlistLL();
 
     private:    // Data
 		

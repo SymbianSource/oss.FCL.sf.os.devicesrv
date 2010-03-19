@@ -12,20 +12,8 @@
 * Contributors:
 *
 * Description:
-* Name        : starterclient.h
-* Part of     : System Startup / Starter
 * Interface   : Domain, System State Control API and Extended Startup API
 * Declaration of RStarterSession interface
-* Version     : %version: ou1s60rt#8 %
-* This material, including documentation and any related computer
-* programs, is protected by copyright controlled by Nokia.  All
-* rights are reserved.  Copying, including reproducing, storing,
-* adapting or translating, any or all of this material requires the
-* prior written consent of Nokia.  This material also contains
-* confidential information which may not be disclosed to others
-* without the prior written consent of Nokia.
-* Template version: 4.0
-* Nokia Core OS *
 *
 */
 

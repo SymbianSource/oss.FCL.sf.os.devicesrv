@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -30,13 +30,11 @@ public:
 	TInt Int0() const;
 	void ReadL(TInt aParamNumber,TPtr8 aParam);
 	TInt GetDesLength(TInt aParam);
+	void SetMessage(const RMessage2& aMessage);
 private:
 	RMessage2 iMessage;
-	TBool iMessageAvailable;
 public :
-	TSusAdaptionServerRequests iRequestType;
-	//To know whether the object is created using reserved heap or not.
-	TBool iUsingReservedHeap;
+	TSusAdaptionServerRequests iRequestType;	
 	};
 
 class RSsmAdaptationRequestQueue
@@ -48,14 +46,11 @@ public:
 	void RemoveFromQueueAndComplete(const RMessage2 &aMessage);
 	TInt Queue(CAdaptationMessage *aPendingRequest);
 	void NotifyAndRemoveAll();
-	void RemoveFromQueueAndComplete(const RMessage2 &aMessage, RHeap *aReservedHeap);	
-	void NotifyAndRemoveAll(RHeap *aReservedHeap);
-	TInt Reserve(TInt aReserverCount);
-	TInt Count();
-	
+	TInt Count();	
 private:
 	RPointerArray<CAdaptationMessage > iQueue;
 		
 	};
+
 
 #endif	__SSMADAPTATIONCMN_H__

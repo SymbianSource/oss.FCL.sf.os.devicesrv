@@ -19,6 +19,7 @@
 #include "ssmpanic.h"
 #include "ssmcommandlistresourcereaderimpl.h"
 #include "ssmcommandlistimpl.h"
+#include "ssmdebug.h"
 
 /**
 Constructs a new command list resource reader object.
@@ -207,6 +208,7 @@ Subsequent calls to this method with no prepare inbetween will return NULL.
 EXPORT_C CSsmCommandList* CSsmCommandListResourceReader::GetCommandList()
 	{
 	__ASSERT_DEBUG(iImpl->IsCommandListReady(), PanicNow(KPanicCmdResourceReader, ENoPreparedCommandList));
+	DEBUGPRINT2A("CSsmCommandListResourceReader::GetCommandList - List Count() = %d", iCommandList->Count());
 	CSsmCommandList* const commandList = iCommandList;
 	iCommandList = NULL; // return ownership of command list to the caller
 	return commandList;

@@ -237,8 +237,6 @@ void CSsmCommandListImpl::ExternalizeL( RWriteStream& aWriteStream ) const
 //@panic ECmdNullPtr if the information used to create command is null
 void CSsmCommandListImpl::Execute( const TInt aIndex, TRequestStatus& aStatus )
 	{
-	DEBUGPRINT2A("CSsmCommandListImpl::Execute - List Count() = %d", Count());
-	
 	__ASSERT_DEBUG( __IN_RANGE(aIndex, iCmdList.Count()), PanicNow(KPanicCmdList, ECmdListBadIdx));
 	__ASSERT_DEBUG( iCmdList[ aIndex ], PanicNow(KPanicCmdList, ECmdNullPtr));
 	
@@ -333,9 +331,9 @@ void CSsmCommandListImpl::AppendL(MSsmCommand* aCmd)
 		SSMLOGLEAVE(KErrArgument);
 		}
 	
-	const TSsmCommandType cmdType = aCmd->Type();	
+	const TSsmCommandType cmdType = aCmd->Type();
 	DEBUGPRINT2A("Adding command type: %d", cmdType);
-	
+
     if (ESsmCmdPublishSystemState == cmdType) 
         {
         ++iPublishSysStateCmdCount;

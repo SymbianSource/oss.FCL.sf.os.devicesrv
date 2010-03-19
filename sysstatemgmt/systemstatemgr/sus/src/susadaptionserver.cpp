@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -59,8 +59,8 @@ const TUint8 KElementsIndex[KRangeCount] =
 	};
 
 //ESetAsPriorityClient request is allowed only for priotity clients(Telephony). Inorder to prevent the access
-//client request will be policed using C32 SID
-#define KC32SecureId 0x10003D33
+//client request will be policed using C32exe.exe SID
+#define KC32SecureId 0x101F7989
 
 /**
  Array containing the different security checks performed by this server 
@@ -168,8 +168,7 @@ CPolicyServer::TCustomResult CSsmAdaptationServer::CustomSecurityCheckL(const RM
 	}
  
  
-CSsmAdaptationServer::CSsmAdaptationServer( ): CPolicyServer(EPriorityStandard, KSusAdaptionServerPolicy)
-,iPriorityClientSession(NULL)
+CSsmAdaptationServer::CSsmAdaptationServer(): CPolicyServer(EPriorityStandard, KSusAdaptionServerPolicy)
 	{
 	}
 
@@ -207,15 +206,26 @@ CSsmAdaptationServer::~CSsmAdaptationServer( )
  */
 CSsmAdaptationServer* CSsmAdaptationServer::NewLC( )
 	{
-	CSsmAdaptationServer* server = new(ELeave) CSsmAdaptationServer();
-	CleanupStack::PushL (server );
-	server->ConstructL ( );
-	return server;
+	return CSsmAdaptationServer::NewLC(KSusAdaptionServerName);
 	}
 
 /**
+ * Overloaded NewLC, which starts the server with the provided name.
+ @param aServerName - Name of the Server.
  */
-void CSsmAdaptationServer::ConstructL( )
+CSsmAdaptationServer* CSsmAdaptationServer::NewLC(const TDesC& aServerName)
+    {
+    CSsmAdaptationServer* server = new(ELeave) CSsmAdaptationServer();
+    CleanupStack::PushL(server);
+    server->ConstructL(aServerName);
+    return server;
+    }
+
+
+/**
+ * ConstructL()
+ */
+void CSsmAdaptationServer::ConstructL(const TDesC& aServerName)
 	{
 
 	__ASSERT_ALWAYS( KErrNone == User::SetCritical(User::ESystemCritical),
@@ -225,7 +235,7 @@ void CSsmAdaptationServer::ConstructL( )
 			User::Panic(KPanicSsmSus, EAdaptionServerError2));
 
 	iSusAdaptationPluginLoader = CSusAdaptationPluginLoader::NewL();
-	TInt err = Start(KSusAdaptionServerName);
+	TInt err = Start(aServerName);
 #ifdef  TESTSUSADAPTATIONPLUGINLOAD_OOM
 	if (err != KErrNone && err != KErrAlreadyExists)
 		{
@@ -501,12 +511,8 @@ void CSsmAdaptationServer::DoEmergencyCallRfCancelL(const RMessage2& aMessage)
         {
         LoadEmergencyCallRfAdaptationL();    
         }
-
 	iEmergencyCallRfAdaptation->DoEmergencyCallRfAdaptationCancelL(aMessage);
 	}
-
-
-	
 	
 void CSsmAdaptationServer::LoadStateAdaptationL()
 	{
@@ -564,11 +570,9 @@ void CSsmAdaptationServer::LoadEmergencyCallRfAdaptationL()
 	{
 	MEmergencyCallRfAdaptation *emergencyCallRfAdaptationPlugin = iSusAdaptationPluginLoader->CreateEmergencyCallRfAdaptationL();
     CleanupReleasePushL(*emergencyCallRfAdaptationPlugin);
-    //From here emergencyCallRfAdaptationPlugin object will be owned by iEmergencyCallRfAdaptation
-    iEmergencyCallRfAdaptation = CEmergencyCallRfAdaptation::NewL(*emergencyCallRfAdaptationPlugin);    
+	//From here emergencyCallRfAdaptationPlugin object will be owned by iEmergencyCallRfAdaptation
+    iEmergencyCallRfAdaptation = CEmergencyCallRfAdaptation::NewL(emergencyCallRfAdaptationPlugin);    
     CleanupStack::Pop(emergencyCallRfAdaptationPlugin);
-    //Reserve memory for performing Emergency call during OOM condition
-    iEmergencyCallRfAdaptation->ReserveMemoryL();    
 	}
 
 #ifdef _DEBUG
@@ -656,15 +660,21 @@ void CAdaptationMessage::WriteL(TInt aParam, const TDesC8 &aDes)
 	}
 
 CAdaptationMessage::CAdaptationMessage(const RMessage2 &aMessage): CBase(),iMessage(aMessage)
-,iMessageAvailable(ETrue),iUsingReservedHeap(EFalse)
 	{
 	}
  
 void CAdaptationMessage::Complete(TInt aReason)
 	{
-	iMessage.Complete(aReason);  	
+    if (!(iMessage.IsNull()))
+        {
+        iMessage.Complete(aReason);  	
+        }
 	}
 
+void CAdaptationMessage::SetMessage(const RMessage2& aMessage)
+    {
+    iMessage = const_cast<RMessage2&> (aMessage);
+    }
 
 void RSsmAdaptationRequestQueue::NotifyAndRemoveAll()
 	{
@@ -678,26 +688,6 @@ void RSsmAdaptationRequestQueue::NotifyAndRemoveAll()
 		}
 	iQueue.Reset();		
 	}
-
-void RSsmAdaptationRequestQueue::NotifyAndRemoveAll(RHeap *aReservedHeap)
-    {
-    TInt index,count = iQueue.Count();
-    
-    for(index =0;index < count ;index++)
-        {
-        iQueue[index]->Complete(KErrServerTerminated);
-        if(iQueue[index]->iUsingReservedHeap)
-            {
-            aReservedHeap->Free(iQueue[index]);
-            }
-        else
-            {
-            delete iQueue[index];
-            }
-        iQueue[index] = NULL;
-        }
-    iQueue.Reset();     
-    }
 
 void RSsmAdaptationRequestQueue::Close()
 	{
@@ -736,33 +726,6 @@ void RSsmAdaptationRequestQueue::RemoveFromQueueAndComplete(const RMessage2 &aMe
 	
 	}
 
-void RSsmAdaptationRequestQueue::RemoveFromQueueAndComplete(const RMessage2 &aMessage, RHeap *aReservedHeap )
-    {
-
-    CAdaptationMessage *messageToBeDeleted;
-    
-    // iQueue.Count() is recalculated each time as the object is removed from the 
-    // array(which reduces the number of object pointers in the array
-    for(TInt index = 0; index < iQueue.Count(); ++index )
-        {
-        if(aMessage.Session() == iQueue[index]->Session())
-            {
-            messageToBeDeleted = iQueue[index];
-            DEBUGPRINT2A("RSsmAdaptationRequestQueue(aMessage,ReservedHeap)called to cancel the request with function id: %d", messageToBeDeleted->Function());
-            iQueue.Remove(index);
-            messageToBeDeleted->Complete(KErrCancel);
-            if(messageToBeDeleted->iUsingReservedHeap)
-                {
-                aReservedHeap->Free(messageToBeDeleted);
-                }
-            else
-                {
-                delete messageToBeDeleted;
-                }
-            --index;
-            }
-        }
-    }
 void RSsmAdaptationRequestQueue::Dequeue(CAdaptationMessage *&aCurrentMessage)
 	{
 	aCurrentMessage = iQueue[0];
@@ -772,11 +735,6 @@ TInt RSsmAdaptationRequestQueue::Queue(CAdaptationMessage *aPendingRequest)
 	{
 	return iQueue.Append(aPendingRequest);
 	} 
-
-TInt RSsmAdaptationRequestQueue::Reserve(TInt aReserverCount)
-    {
-    return(iQueue.Reserve(aReserverCount));
-    }
 
 /**
  * Method to get number of object pointers in the Queue

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -112,6 +112,7 @@ TXmlEngElement CPsmStorage::FindConfigurationSetL( const TInt aMode )
     TBool setFound( EFalse );
     TXmlEngElement settings;
     RXmlEngNodeList<TXmlEngElement> nodeList;   
+    CleanupClosePushL(nodeList);
 
     if ( iStorageRoot.NotNull() )
         {
@@ -141,7 +142,7 @@ TXmlEngElement CPsmStorage::FindConfigurationSetL( const TInt aMode )
             settings = nodeList.Next().AsElement();            
             }
         }
-
+    CleanupStack::PopAndDestroy(&nodeList);
     if ( !setFound )
         {
         COMPONENT_TRACE( ( _L( "PSM Server - CPsmStorage::FindConfigurationSet() - Mode not found: %i, LEAVE" ), aMode ) );
@@ -166,6 +167,7 @@ void CPsmStorage::CreateConfigArrayL( RConfigInfoArray& aPsmConfigArray, const T
 
     // Get first setElemens
     RXmlEngNodeList<TXmlEngElement> nodeList;
+    CleanupClosePushL(nodeList);
     settings.GetElementsByTagNameL(nodeList, KPsmSetItem);
     TXmlEngElement setElement = nodeList.Next().AsElement();
 
@@ -207,7 +209,7 @@ void CPsmStorage::CreateConfigArrayL( RConfigInfoArray& aPsmConfigArray, const T
         // handle next element set
         setElement = nodeList.Next().AsElement();
         }
-
+    CleanupStack::PopAndDestroy(&nodeList);
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmStorage::CreateConfigArrayL() - return" ) ) );
     }
 
@@ -227,6 +229,7 @@ void CPsmStorage::GetConfigurationL( RConfigInfoArray& aConfigArray )
 
     // Get first setElemens
     RXmlEngNodeList<TXmlEngElement> nodeList;
+    CleanupClosePushL(nodeList);
     settings.GetElementsByTagNameL(nodeList, KPsmSetItem);
     TXmlEngElement setElement = nodeList.Next().AsElement();
 
@@ -287,6 +290,7 @@ void CPsmStorage::GetConfigurationL( RConfigInfoArray& aConfigArray )
         setElement = nodeList.Next().AsElement();
         }
 
+    CleanupStack::PopAndDestroy(&nodeList);
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmStorage::GetConfigurationL() - return" ) ) );
     }
 

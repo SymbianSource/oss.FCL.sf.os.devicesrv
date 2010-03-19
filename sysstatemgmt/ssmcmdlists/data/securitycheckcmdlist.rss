@@ -69,19 +69,15 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_publishstate, // prio 0xFFF1
         r_cmd_psstate,      // prio 0xFFF0
         // prio 0xFFE7
-		r_cmd_menu,
-        r_cmd_idle,
-        // prio 0xFFE6
+        r_cmd_hbthemeserver,
+	    // prio 0xFFE6
         r_cmd_multiwaitforever1,
         // prio 0xFFE3
         r_cmd_startup,
         r_cmd_phone,
-        r_cmd_nitz,
-        // prio 0xFFE2
         r_cmd_multiwaitforever2,
         // prio 0xFFDF
-        r_cmd_touchscreen,
-        r_cmd_touchplg,
+        r_cmd_idle,
         // prio 0xFFDE
         r_cmd_multiwaitforever3,
         // prio 0xFFD8
@@ -109,29 +105,29 @@ RESOURCE SSM_CREATE_SYSTEM_WIDE_PROPERTY r_cmd_createswp_simstatus
     key = 0x00000031; // KPSSimStatus
     filename = "ssm.swp.policy.simstatus.dll";
     }
-
+	
+// ---------------------------------------------------------------------------
+// r_cmd_hbthemeserver
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_hbthemeserver
+    {
+    priority = 0xFFE7;
+    name = "z:\\sys\\bin\\hbthemeserver.exe";
+    execution_behaviour = ESsmDeferredWaitForSignal;
+    monitor_info = r_mon_100_restarts_reset;
+    }
+    
 // ---------------------------------------------------------------------------
 // r_cmd_idle
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_PROCESS_INFO r_cmd_idle
+RESOURCE SSM_START_APP_INFO r_cmd_idle
     {
-    priority = 0xFFE7;
-    name = "z:\\sys\\bin\\ailaunch.exe";
+    priority = 0xFFDF;
+    name = "z:\\sys\\bin\\hsapplication.exe";
     execution_behaviour = ESsmDeferredWaitForSignal;
-    monitor_info = r_mon_max_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_menu
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_menu
-    {
-    priority = 0xFFE7;
-    name = "z:\\sys\\bin\\matrixmenu.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    background = 1; // To background
+    
     }
 
 // ---------------------------------------------------------------------------
@@ -159,18 +155,6 @@ RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiwaitforever2
 RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiwaitforever3
     {
     priority = 0xFFDE;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_nitz
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_nitz
-    {
-    priority = 0xFFE3;
-    name = "z:\\sys\\bin\\clockserver.exe";
-    execution_behaviour = ESsmFireAndForget; // -- does not call Rendezvous() --
-    monitor_info = r_mon_3_restarts_ignore;
     }
 
 // ---------------------------------------------------------------------------
@@ -265,32 +249,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_startup
     retries = 2;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_touchplg
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_touchplg
-    {
-    priority = 0xFFDF;
-    severity = ECmdCriticalSeverity;
-    dllname = "tsccustcmds.dll";
-    ordinal = 1;
-    retries = 2;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    conditional_information = r_cond_firstboot_and_tscinstartup;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_touchscreen
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_touchscreen
-    {
-    priority = 0xFFDF;
-    name = "z:\\sys\\bin\\touchscreencalib.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    conditional_information = r_cond_firstboot_and_tscinstartup;
-    }
 
 // ===========================================================================
 // DLL data items in alphabetical order

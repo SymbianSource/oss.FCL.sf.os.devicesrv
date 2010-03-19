@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -12,20 +12,7 @@
 * Contributors:
 *
 * Description:
-* Name        : strtsecuritynotecontroller.h
-* Part of     : System Startup / StrtSecObs
 * Declaration of CStrtSecurityNoteController class
-* Version     : %version: 1 % << Don't touch! Updated by Synergy at check-out.
-* This material, including documentation and any related computer
-* programs, is protected by copyright controlled by Nokia.  All
-* rights are reserved.  Copying, including reproducing, storing,
-* adapting or translating, any or all of this material requires the
-* prior written consent of Nokia.  This material also contains
-* confidential information which may not be disclosed to others
-* without the prior written consent of Nokia.
-* Template version: 4.2
-* Nokia Core OS *
-* File renamed from strtsecuritynotecontroller.h to ssmsecuritynotecontroller.h as part of Core OS transfer.
 *
 */
 
@@ -42,6 +29,7 @@
  *  @publishedPartner
  *  @released
 */
+
 
 class CSsmSecurityCheckNotifier;
 class CStrtSecNoteRequestQueue;
@@ -98,9 +86,15 @@ protected:
     /**
      * From CActive.
      * Handles an active object's request completion event.
-     * Never leaves.
      */
     virtual void RunL();
+
+	/**
+     * From CActive.
+     * Handles any leaves originating from the active object's RunL().
+     */
+        
+    virtual TInt RunError(TInt aError);
 
 private:
 

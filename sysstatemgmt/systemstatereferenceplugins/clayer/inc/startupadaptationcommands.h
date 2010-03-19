@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -12,8 +12,6 @@
 * Contributors:
 *
 * Description:
-* Name        : startupadaptationcommands.h
-* Part of     : System Startup / Starter
 * Interface   : Domain, Startup Adaptation API
 * This header file defines the startup adaptation API commands
 * and their parameters.
@@ -21,16 +19,6 @@
 * - Command definitions
 * - Command parameter definitions
 * - Response parameter definitions
-* Version     : %version: ou1s60rt#12.1.4 %
-* This material, including documentation and any related computer
-* programs, is protected by copyright controlled by Nokia.  All
-* rights are reserved.  Copying, including reproducing, storing,
-* adapting or translating, any or all of this material requires the
-* prior written consent of Nokia.  This material also contains
-* confidential information which may not be disclosed to others
-* without the prior written consent of Nokia.
-* Template version: 4.0
-* Nokia Core OS *
 *
 */
 
@@ -661,52 +649,58 @@ namespace StartupAdaptation
     */
 
     enum TPreferredLanguage
-        {                         // ISO 639 GSM 0338
-        EPrefLangEnglish = 1,     // EN      1
-        EPrefLangFrench = 2,      // FR      3
-        EPrefLangGerman = 3,      // DE      0
-        EPrefLangSpanish = 4,     // ES      4
-        EPrefLangItalian = 5,     // IT      2
-        EPrefLangSwedish = 6,     // SV      6
-        EPrefLangDanish = 7,      // DA      7
-        EPrefLangNorwegian = 8,   // NO      10
-        EPrefLangFinnish = 9,     // FI      9
-        EPrefLangPortuguese = 13, // PT      8
-        EPrefLangTurkish = 14,    // TR      12
-        EPrefLangIcelandic = 15,  // IS      36
-        EPrefLangRussian = 16,    // RU      35
-        EPrefLangHungarian = 17,  // HU      13
-        EPrefLangDutch = 18,      // NL      5
-        EPrefLangCzech = 25,      // CS      32
-        EPrefLangSlovak = 26,     // SK
-        EPrefLangPolish = 27,     // PL      14
-        EPrefLangSlovenian = 28,  // SL
-        EPrefLangPrcChinese = 31, // ZH
-        EPrefLangJapanese = 32,   // JA
-        EPrefLangThai = 33,       // TH
-        EPrefLangArabic = 37,     // AR      34
-        EPrefLangTagalog = 39,    // TL
-        EPrefLangBulgarian = 42,  // BG
-        EPrefLangCatalan = 44,    // CA
-        EPrefLangCroatian = 45,   // HR
-        EPrefLangEstonian = 49,   // ET
-        EPrefLangFarsi = 50,      // FA
-        EPrefLangGreek = 54,      // EL      11
-        EPrefLangHebrew = 57,     // IW      33
-        EPrefLangHindi = 58,      // HI
-        EPrefLangIndonesian = 59, // IN
-        EPrefLangKorean = 65,     // KO
-        EPrefLangLatvian = 67,    // LV
-        EPrefLangLithuanian = 68, // LT
-        EPrefLangMalay = 70,      // MS
-        EPrefLangMarathi = 72,    // MR
-        EPrefLangRomanian = 78,   // RO
-        EPrefLangSerbian = 79,    // SR
-        EPrefLangUkrainian = 93,  // UK
-        EPrefLangUrdu = 94,       // UR
-        EPrefLangVietnamese = 96, // VI
-        EPrefLangBasque = 102,    // EU
-        EPrefLangGalician = 103   // GL
+        {									// ISO 639 GSM 0338
+        EPrefLangEnglish = 1,				// EN      1
+        EPrefLangFrench = 2,				// FR      3
+        EPrefLangGerman = 3,				// DE      0
+        EPrefLangSpanish = 4,				// ES      4
+        EPrefLangItalian = 5,				// IT      2
+        EPrefLangSwedish = 6,				// SV      6
+        EPrefLangDanish = 7,				// DA      7
+        EPrefLangNorwegian = 8,				// NO      10
+        EPrefLangFinnish = 9,				// FI      9
+        EPrefLangAmerican = 10,				// EN
+        EPrefLangPortuguese = 13,			// PT      8
+        EPrefLangTurkish = 14,				// TR      12
+        EPrefLangIcelandic = 15,			// IS      36
+        EPrefLangRussian = 16,				// RU      35
+        EPrefLangHungarian = 17,			// HU      13
+        EPrefLangDutch = 18,				// NL      5
+        EPrefLangCzech = 25,				// CS      32
+        EPrefLangSlovak = 26,				// SK
+        EPrefLangPolish = 27,				// PL      14
+        EPrefLangSlovenian = 28,			// SL
+        EPrefLangTaiwanChinese = 29,		// TC
+        EPrefLangHongKongChinese = 30,		// HK
+        EPrefLangPrcChinese = 31,			// ZH
+        EPrefLangJapanese = 32,				// JA
+        EPrefLangThai = 33,					// TH
+        EPrefLangArabic = 37,				// AR      34
+        EPrefLangTagalog = 39,				// TL
+        EPrefLangBulgarian = 42,			// BG
+        EPrefLangCatalan = 44,				// CA
+        EPrefLangCroatian = 45,				// HR
+        EPrefLangEstonian = 49,				// ET
+        EPrefLangFarsi = 50,				// FA
+        EPrefLangCanadianFrench = 51,		// CF
+        EPrefLangGreek = 54,				// EL      11
+        EPrefLangHebrew = 57,				// IW      33
+        EPrefLangHindi = 58,				// HI
+        EPrefLangIndonesian = 59,			// IN
+        EPrefLangKorean = 65,				// KO
+        EPrefLangLatvian = 67,				// LV
+        EPrefLangLithuanian = 68,			// LT
+        EPrefLangMalay = 70,				// MS
+        EPrefLangMarathi = 72,				// MR
+        EPrefLangBrazilianPortuguese = 76,	// BP
+        EPrefLangRomanian = 78,				// RO
+        EPrefLangSerbian = 79,				// SR
+        EPrefLangLatinAmericanSpanish = 83,	// LS 
+        EPrefLangUkrainian = 93,			// UK
+        EPrefLangUrdu = 94,					// UR
+        EPrefLangVietnamese = 96,			// VI
+        EPrefLangBasque = 102,				// EU
+        EPrefLangGalician = 103				// GL
         };
 
 

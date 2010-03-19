@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2002-2005 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of "Eclipse Public License v1.0"
@@ -44,4 +44,5 @@ DC_RESOURCE_FILES_DIR=\resource
 
 DC_BOOTDATA_DIR=\resource\bootdata
 DC_SKINS_DIR=\private\10207114
+DC_QT_TRANSLATIONS_DIR=\resource\qt\translations
 
