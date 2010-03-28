@@ -103,7 +103,7 @@ public:
      * @param aResponseCallback Pointer to plugin callback handler.
      */
     IMPORT_C static 
-    CHWRMHapticsPluginService* CHWRMHapticsPluginService::NewL( 
+    CHWRMHapticsPluginService* NewL( 
             TUid aImplementationUid, 
             MHWRMHapticsPluginCallback* aResponseCallback );
 

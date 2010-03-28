@@ -992,7 +992,7 @@ class CCommand : public CItem
         * @param aStatus command status
         * @return TCommandStatus None.
         */      
-        void CCommand::SetStatus( TCommandStatus aStatus );
+        void SetStatus( TCommandStatus aStatus );
         
         /**
         * Getter for command status

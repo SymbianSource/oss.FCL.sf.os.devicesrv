@@ -47,7 +47,7 @@ public:
     
 private:    // Data
     const RMessage2* iMessage;  // Kernel owns
-    void RDosSharedData::SetFreeDiskSpaceRequest( const TInt aAmount);
+    void SetFreeDiskSpaceRequest( const TInt aAmount);
 };
 
 

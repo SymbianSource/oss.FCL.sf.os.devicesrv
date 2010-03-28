@@ -520,7 +520,7 @@ private:
      * @param   aAudioBlock
      * @return  none
      */
-    void CCea861EdidParser::DetermineAudioBlockInformation( TCEA861AudioDataBlock* aAudioBlock );
+    void DetermineAudioBlockInformation( TCEA861AudioDataBlock* aAudioBlock );
     
     /**
      * Check if Latency_Fields_Preset bit is set as specified in HDMISpecification13a.pdf.

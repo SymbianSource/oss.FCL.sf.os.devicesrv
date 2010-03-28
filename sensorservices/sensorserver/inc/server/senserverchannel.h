@@ -535,14 +535,14 @@ class CSensrvChannel : public CBase
         *
         * @since S60 5.0
         */
-		void CSensrvChannel::SetChannelUnavailable( );
+		void SetChannelUnavailable( );
 
         /**
         * Handles channel availability property change to availabe
         *
         * @since S60 5.0
         */
-		void CSensrvChannel::SetChannelAvailable( );
+		void SetChannelAvailable( );
 
     private: // Member variables
 

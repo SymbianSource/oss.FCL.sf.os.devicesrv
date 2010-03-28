@@ -304,7 +304,7 @@ class RMediatorDebug
         * @param None.
         * @return None.
         */
-        void RMediatorDebug::PrintConfigurationL();
+        void PrintConfigurationL();
         
         /**
         * Handles internal error (usually leave due to buffer overflow),
