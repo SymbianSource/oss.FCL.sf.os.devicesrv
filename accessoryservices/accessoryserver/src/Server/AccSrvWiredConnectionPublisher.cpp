@@ -78,7 +78,7 @@ void CAccSrvWiredConnectionPublisher::HandleConnectL( const TAccPolGenericID& aG
     COM_TRACE_2( "[AccFW:AccServer] CAccSrvWiredConnectionPublisher::HandleConnectL: physConnCaps=0x%x, iConnectionCount=%d", 
                         physConnCaps, iConnectionCount );
     
-    if ( physConnCaps & KPCWired )
+    if ( physConnCaps & (KPCWired | KPCHDMI) )
         {
         if ( !iConnectionCount++ )
             {
@@ -102,7 +102,7 @@ void CAccSrvWiredConnectionPublisher::HandleDisconnectL( const TAccPolGenericID&
     COM_TRACE_2( "[AccFW:AccServer] CAccSrvWiredConnectionPublisher::HandleDisconnectL: physConnCaps=0x%x, iConnectionCount=%d", 
                         physConnCaps, iConnectionCount );
     
-    if ( (physConnCaps & KPCWired) && iConnectionCount )
+    if ( (physConnCaps & (KPCWired | KPCHDMI)) && iConnectionCount )
         {
         if ( !(--iConnectionCount) )
             {

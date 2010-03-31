@@ -28,3 +28,5 @@ EXPORTS
 	_ZN14CSsmUiSpecific22ValidateRTCPropertyKeyEv @ 27 NONAME
 	_ZN14CSsmUiSpecific27ValidateRTCPropertyCategoryEv @ 28 NONAME
 	_ZN14CSsmUiSpecific22PhoneMemoryRootDriveIdEv @ 29 NONAME
+	_ZN14CSsmUiSpecific23ReservePhoneMemorySpaceEv @ 30 NONAME
+	_ZN14CSsmUiSpecific28FreeReservedPhoneMemorySpaceEi @ 31 NONAME

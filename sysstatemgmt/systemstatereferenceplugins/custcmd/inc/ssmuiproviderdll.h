@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -25,6 +25,7 @@
 #include <e32def.h>
 #include <e32cmn.h>
 #include <e32base.h>
+#include <f32file.h>
 
 class CSsmUiSpecific : public CBase
     {
@@ -56,12 +57,17 @@ public:
 	IMPORT_C static TUint ValidateRTCPropertyKey();
 	IMPORT_C static TUid ValidateRTCPropertyCategory();
 	IMPORT_C static TInt PhoneMemoryRootDriveId();
+	IMPORT_C TInt ReservePhoneMemorySpace();
+	IMPORT_C TInt FreeReservedPhoneMemorySpace(const TInt aSpaceToFree);
 
 private:
 	CSsmUiSpecific();
+	void ConstructL();
 private:
 	TStrtSecurityStatus iStrtSecurityStatus;
 	TInt iReferenceCount;
+	RFs iReservedPhoneMemoryFs;
+	TInt iReservedPhoneMemory;
     };
 
 #endif // __SSMUIPROVIDERDLL_H__

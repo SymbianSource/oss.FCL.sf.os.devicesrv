@@ -359,7 +359,12 @@ void CCompositeCableStateConnected::SubStateEnabledInput(
         if ( EPDEIfCentralRepositoryWatchEventKeyChanged == aEvent )
             {
             INFO( "Event: EPDEIfCentralRepositoryWatchEventKeyChanged" );
-            iResettingInput = ETrue;
+            iCRWatchForFlickerFilter->Cancel();
+            iCRWatchForAspectRatio->Cancel();
+            iCRWatchForTvSystem->Cancel();
+            ClearAvailableTvOutConfig();
+            iTVOutConfigForComposite.Disable();
+			iResettingInput = ETrue;
             Enter();
             }
         else

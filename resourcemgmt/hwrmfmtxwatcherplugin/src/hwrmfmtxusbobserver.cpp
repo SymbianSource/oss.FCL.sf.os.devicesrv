@@ -33,7 +33,7 @@ static TBool UsbConnected( TUsbDeviceState aDeviceState )
     INFO_LOG1( "UsbConnected - %d",  aDeviceState);
 
     if ( aDeviceState == EUsbDeviceStateAttached || aDeviceState == EUsbDeviceStatePowered ||
-    		aDeviceState == EUsbDeviceStateUndefined)
+    		aDeviceState == EUsbDeviceStateUndefined || aDeviceState == EUsbDeviceStateSuspended )
     	{
     	RDebug::Print(_L("return false "));
     	return EFalse;

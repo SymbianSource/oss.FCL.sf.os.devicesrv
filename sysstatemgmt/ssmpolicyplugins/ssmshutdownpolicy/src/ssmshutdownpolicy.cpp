@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -21,6 +21,7 @@
 #include <ssm/ssmstatetransition.h>
 #include <ssm/starterclient.h>
 #include <ssm/starterdomaincrkeys.h>
+#include <ssm/ssmuiproviderdll.h>
 
 #include "ssmsubstateext.hrh"
 #include "ssmmapperutility.h"
@@ -215,6 +216,22 @@ void CSsmShutdownPolicy::StoreStartupReasonL( const TInt aReasonCode )
         CRepository::NewLC( iUtil->CrUid( KCRUidStartup ) );
     TInt errorCode = repository->Set( KStartupReason, aReasonCode );
     ERROR( errorCode, "Failed to set KStartupReason CenRep key" );
+
+	if( KErrDiskFull == errorCode )
+		{
+		//Need not to put on CleanupStack, it's not calling any leaving function and
+		//it's handled by reference count
+		CSsmUiSpecific* ssmUiSpecific = CSsmUiSpecific::InstanceL();
+		//Free complete reserve space
+		errorCode = ssmUiSpecific->FreeReservedPhoneMemorySpace( 0 );
+		if( KErrNone == errorCode )
+			{
+			errorCode = repository->Set( KStartupReason, aReasonCode );
+			ERROR( errorCode, "Failed to set KStartupReason CenRep key after freeing the memory" );
+			}
+		CSsmUiSpecific::Release();
+		}
+    
     CleanupStack::PopAndDestroy( repository );
     User::LeaveIfError( errorCode );
     }

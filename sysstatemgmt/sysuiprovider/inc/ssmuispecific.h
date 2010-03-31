@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -168,18 +168,36 @@ public:
      */
     IMPORT_C static TInt PhoneMemoryRootDriveId();
 
+	/**
+	Reserve two ClusterSize in Phone Memory Space on H/W
+	and 512 bytes for __WINS__
+	@return KErrNone if successful or systemwide error
+	*/
+	IMPORT_C TInt ReservePhoneMemorySpace();
+
+	/**
+	Free reserved bytes from Phone Memory Space. If aSpaceToFree is 0 bytes 
+	then free complete reserved memory
+	@param aSpaceToFree request to free memory
+	@return KErrNone if successful or systemwide error
+	*/
+	IMPORT_C TInt FreeReservedPhoneMemorySpace(const TInt aSpaceToFree);
+
 private:
 
     /**
      * Constructor.
      */
     CSsmUiSpecific();
+	
+	void ConstructL();
 
 private: // data
 
     TStrtSecurityStatus iStrtSecurityStatus;
     TInt iReferenceCount;
-
+	RFs iReservedPhoneMemoryFs;
+	TInt iReservedPhoneMemory;
     };
 
 #endif // SSMUISPECIFIC_H
