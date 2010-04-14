@@ -762,6 +762,13 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
 
     iServerModel->CurrentConnectionStatusL( genericIDArray );
 
+    if( (EFalse == aAudioOutputStatus) && (KErrUnknown != aDbId) ) 
+        { 
+        TInt index( TAccPolGenericIDArrayAccessor::FindWithUniqueIDL( 
+                genericIDArray, aDbId) ); 
+        TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(genericIDArray, index); 
+        }
+
     accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 
                                               aDbId, 
                                               aAudioOutputStatus, 
@@ -801,27 +808,30 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
 				  TAccPolGenericID genericID;
 				  iServerModel->GetLastConnectedAccessoryL( genericID );
 				  TUint32 num = genericID.SubblockCaps();
-				  if( num & KSBAudioSubblock )
+				  if ( genericID.PhysicalConnectionCaps() != KPCHDMI ) // No info note for HDMI
 				      {
-					    CCapValue* capValue = iServerModel->CapabilityStorage().GetCapability( genericID, KAccIntegratedAudioInput );
-					    if( iInformationNoteDefault )
-						      {
-						      noteValue = iInformationNoteDefault;
-						      showNote = ETrue;
-						      }
-					    if( !capValue && !iInformationNoteDefault )
-						      {
-						      showNote = ETrue;
-						      }
-					    }
-				    else
-					    {
-					    if( iInformationNoteDefault )
-						      {
-						      noteValue = iInformationNoteDefault;
-						      showNote = ETrue;
-						      }
-					    }
+                      if( num & KSBAudioSubblock )
+                          {
+                            CCapValue* capValue = iServerModel->CapabilityStorage().GetCapability( genericID, KAccIntegratedAudioInput );
+                            if( iInformationNoteDefault )
+                                  {
+                                  noteValue = iInformationNoteDefault;
+                                  showNote = ETrue;
+                                  }
+                            if( !capValue && !iInformationNoteDefault )
+                                  {
+                                  showNote = ETrue;
+                                  }
+                            }
+                        else
+                            {
+                            if( iInformationNoteDefault )
+                                  {
+                                  noteValue = iInformationNoteDefault;
+                                  showNote = ETrue;
+                                  }
+                            }
+				      }
 				  }
 			    break;			  
 			    default:

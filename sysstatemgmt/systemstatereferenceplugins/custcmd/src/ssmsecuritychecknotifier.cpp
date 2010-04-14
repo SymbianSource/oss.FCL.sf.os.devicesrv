@@ -202,8 +202,15 @@ TBool CSsmSecurityCheckNotifier::IsDlgCancellableL()
 	TBool isDlgCancellable;
 
 	//Is system in start up state
-	
-	iAfterStartup = (currentState.MainState() == ESsmStartup) ? EFalse : ETrue;
+	if ( currentState.MainState() == ESsmStartup )
+		{
+		//TSsmStartupSubStateExt::ESsmStateNonCritical
+		iAfterStartup = ( 0x34 == currentState.SubState() ) ? ETrue : EFalse;
+		}
+	else
+		{
+		iAfterStartup = ETrue;
+		}
 	
 	//Close the state aware session
 	ssmStateAwareSession.Close();

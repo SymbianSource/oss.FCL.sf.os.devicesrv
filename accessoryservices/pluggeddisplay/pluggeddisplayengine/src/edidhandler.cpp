@@ -1266,7 +1266,7 @@ void CEDIDHandler::CalculateOverscan( TPoint& aTLCorner,
     // No need to calculate if the screen size is zero
     if( aBRCorner.iX > 0 && aBRCorner.iY > 0 )
         {
-        // hOverscanPixels = ( ( Width * hOverscan ) + 50 ) / 20000
+        // hOverscanPixels = ( ( Width * hOverscan ) + 50 ) / 10000
         //
         //  hOverscanPixels:
         //      pixels which are needed to be added to top left X
@@ -1277,14 +1277,14 @@ void CEDIDHandler::CalculateOverscan( TPoint& aTLCorner,
         //      Horizontal overscan in percents (1% == 100)
         //  50:
         //      Used to round up possible decimals
-        //  20000:
+        //  10000:
         //      Used to get rid of percentage multiplier and to get the overscan value
         //      for one side
-        TInt hOverscanPixels = ( aBRCorner.iX * iHOverscan + 50 ) / 20000;
+        TInt hOverscanPixels = ( aBRCorner.iX * iHOverscan + 50 ) / 10000;
         aTLCorner.iX = hOverscanPixels;
         aBRCorner.iX = ( aBRCorner.iX - hOverscanPixels );
         
-        // vOverscanPixels = ( ( Height * vOverscan ) + 50 ) / 20000
+        // vOverscanPixels = ( ( Height * vOverscan ) + 50 ) / 10000
         //
         //  vOverscanPixels:
         //      pixels which are needed to be added to top left Y
@@ -1295,10 +1295,10 @@ void CEDIDHandler::CalculateOverscan( TPoint& aTLCorner,
         //      Vertical overscan in percents (1% == 100)
         //  50:
         //      Used to round up possible decimals
-        //  20000:
+        //  10000:
         //      Used to get rid of percentage multiplier and to get the overscan value
         //      for one side
-        TInt vOverscanPixels = ( aBRCorner.iY * iVOverscan + 50 ) / 20000;
+        TInt vOverscanPixels = ( aBRCorner.iY * iVOverscan + 50 ) / 10000;
         aTLCorner.iY = vOverscanPixels;
         aBRCorner.iY = ( aBRCorner.iY - vOverscanPixels );
         }

@@ -35,7 +35,7 @@
 
 // CONSTANTS
 
-const TInt KAccMaxRules = 6;
+const TInt KAccMaxRules = 7;
 
 const TInt  KAccConfigMaxCapabilityGroups = 64;
 const TInt  KAccGidIntBuf                 = 100;
@@ -295,6 +295,10 @@ EXPORT_C TAccPolAccessoryMode CAccPolAccessoryPolicy::ResolveAccessoryModeL(
                     {
                     // Audio is routed to current GID, so resolve mode because this can be accessory settings case.
                     SetAccessoryModeL( aGenericIDArray.GetGenericIDL( index ), accMode );
+                    if( accMode.iAccessoryMode == aCurrentAccessoryMode.iAccessoryMode )
+                        {
+                        accMode.iAudioOutputStatus = aCurrentAccessoryMode.iAudioOutputStatus;
+                        }
                     COM_TRACE_2( "[AccFW: ACCPOLICY] CAccPolAccessoryPolicy::ResolveAccessoryModeL - set mode according to current audio output status UniqueID, (UniqueID=%d, mode=%d) ", aCurrentAudioOutputStatusUniqueID, accMode.iAccessoryMode );
                     }
                 else
@@ -378,6 +382,7 @@ void CAccPolAccessoryPolicy::GetAccessoryModeFromRulesTableL(
     // This should allocated from heap in future
     TAccPolMultibleConnectionRules aAccPolConnRules[KAccMaxRules] =
     {
+     {KPCHDMI,      0}, 
      {KPCWired,     KAccStereoAudio},
      {KPCWired,     KAccMonoAudio},
      {KPCBluetooth, KAccStereoAudio},

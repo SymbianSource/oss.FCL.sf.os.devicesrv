@@ -72,6 +72,18 @@ class TAccPolGenericIDArrayAccessor
                     const TAccPolGenericIDArray& aSource,
                     TAccPolGenericIDArray& aTarget );
         
+       /** 
+        * Remove an index entry from Generic ID array. 
+        * 
+        * @since S60 3.1 
+        * @param aGenericIDArray Source Generic ID array. 
+        * @param aIndex Index entry to be removed from aGenericIDArray. 
+        * @return ?description 
+        */ 
+        IMPORT_C static void RemoveIndexFromGenericIDArray( 
+                    TAccPolGenericIDArray& aGenericIDArray, 
+                    TInt  aIndex );
+
         /**
         * Find Generic ID from array based on Device ID.
         *

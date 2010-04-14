@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -55,7 +55,9 @@ data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists4\cmdlists4.rsc				resour
 data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists5\cmdlists5.rsc				resource\ssmatest\cmdlists5\cmdlists5.rsc
 data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists6\cmdlists6.rsc				resource\ssmatest\cmdlists6\cmdlists6.rsc
 data=EPOCROOT##epoc32\data\Z\resource\ssmatest\bic\tcmd_cmdlist_swp_builtincmd.rsc          resource\ssmatest\bic\tcmd_cmdlist_swp_builtincmd.rsc
-
+data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists7\cmdlists7a.rsc				resource\ssmatest\cmdlists7\cmdlists7a.rsc
+data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists7\cmdlists7b.rsc				resource\ssmatest\cmdlists7\cmdlists7b.rsc
+data=EPOCROOT##epoc32\data\Z\resource\ssmatest\cmdlists7\cmdlists7c.rsc				resource\ssmatest\cmdlists7\cmdlists7c.rsc
 // policy files for reqswpchange
 data=ABI_DIR\BUILD_DIR\ssm.state.policy.createswp.dll		sys\bin\ssm.state.policy.createswp.dll
 data=ABI_DIR\BUILD_DIR\ssm.swp.policy.test.cmdreqswp.dll	sys\bin\ssm.swp.policy.test.cmdreqswp.dll

@@ -69,5 +69,5 @@ EXPORTS
 	_ZTV22CAccPolAccessoryPolicy @ 68 NONAME ; #<VT>#
 	_ZTV9CCapValue @ 69 NONAME ; #<VT>#
 	_ZTVN18CCapabilityStorage14CListContainerE @ 70 NONAME ; #<VT>#
-	
+	_ZN29TAccPolGenericIDArrayAccessor29RemoveIndexFromGenericIDArrayER21TAccPolGenericIDArrayi @ 71 NONAME
 
