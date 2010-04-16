@@ -298,7 +298,13 @@ NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
 												TAccPolGenericID& aOldGenericId,
 												const CAccSrvConnectionHandler* aCaller, 
 												TInt aError  );
-        
+		
+
+		void HandleConnectionUpdateValidationL( const TAccPolGenericID& aGenericID, 
+                                                TAccPolGenericID& aOldGenericId,
+		                                        const CAccSrvSettingsHandler* aCaller, 
+		                                        TInt aError  );
+       
         
         /**
         * From MAccSrvConnectionControllerObserver

@@ -157,27 +157,27 @@ TVerdict CUtilityPluginTest::doTestStepL()
 // OOM tests start here
 
 		__UHEAP_MARK;
-		TRAP(err, doOOMTestL(&doTest1L));
+		TRAP(err, doOOMTestL(&CUtilityPluginTest::doTest1L));
 		TEST(err == KErrNone);
 		__UHEAP_MARKEND;
 
 		__UHEAP_MARK;
-		TRAP(err, doOOMTestL(&doTest2L));
+		TRAP(err, doOOMTestL(&CUtilityPluginTest::doTest2L));
 		TEST(err == KErrNone);
 		__UHEAP_MARKEND;
 
 		__UHEAP_MARK;
-		TRAP(err, doOOMTestL(&doTest3L));
+		TRAP(err, doOOMTestL(&CUtilityPluginTest::doTest3L));
 		TEST(err == KErrNone);
 		__UHEAP_MARKEND;
 
 		__UHEAP_MARK;
-		TRAP(err, doOOMTestL(&doTest5L));
+		TRAP(err, doOOMTestL(&CUtilityPluginTest::doTest5L));
 		TEST(err == KErrNone);
 		__UHEAP_MARKEND;
 
 		__UHEAP_MARK;
-		TRAP(err, doOOMTestL(&doTest6L));
+		TRAP(err, doOOMTestL(&CUtilityPluginTest::doTest6L));
 		TEST(err == KErrNone);
 		__UHEAP_MARKEND;
 

@@ -34,7 +34,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~CAccPolObjectCon();                              
+    IMPORT_C virtual ~CAccPolObjectCon();                              
     
     /**
      * Resets the object container.

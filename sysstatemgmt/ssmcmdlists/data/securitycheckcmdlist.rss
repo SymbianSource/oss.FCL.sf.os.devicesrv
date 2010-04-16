@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -75,6 +75,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0xFFE3
         r_cmd_startup,
         r_cmd_phone,
+        r_cmd_clockserver,
         r_cmd_multiwaitforever2,
         // prio 0xFFDF
         r_cmd_idle,
@@ -93,7 +94,17 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // Command items in alphabetical order
 // ===========================================================================
 //
-
+// -----------------------------------------------------------------------------
+// r_cmd_clockserver
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_clockserver
+	{
+	priority = 0xFFE3;
+	name = "clockserver.exe";
+	execution_behaviour = ESsmDeferredWaitForSignal;
+	}
+	
 // ---------------------------------------------------------------------------
 // r_cmd_createswp_simstatus
 // ---------------------------------------------------------------------------
@@ -165,8 +176,7 @@ RESOURCE SSM_START_APP_INFO r_cmd_phone
     {
     priority = 0xFFE3;
     name = "z:\\sys\\bin\\phoneui.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmFireAndForget;
     retries = 2;
     background = 1; // To background
     monitor_info = r_mon_reset;

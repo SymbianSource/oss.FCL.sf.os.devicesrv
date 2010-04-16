@@ -49,7 +49,7 @@ public:
     /**
      * Destructor.
      */
-    virtual ~CAccPolAudioControlBase();
+    IMPORT_C virtual ~CAccPolAudioControlBase();
 
     /**
      * Assign operator for audio control base class.
@@ -112,13 +112,13 @@ protected:
     /**
      * C++ default constructor.
      */
-    CAccPolAudioControlBase( TTopologyConObjectType aObjectType,
+    IMPORT_C CAccPolAudioControlBase( TTopologyConObjectType aObjectType,
         CAccPolObjectCon* aObject = NULL );
 
     /**
      * C++ default constructor.
      */
-    CAccPolAudioControlBase( TTopologyConObjectType aObjectType,
+    IMPORT_C CAccPolAudioControlBase( TTopologyConObjectType aObjectType,
         TUint32 aChannel );
 
 private:

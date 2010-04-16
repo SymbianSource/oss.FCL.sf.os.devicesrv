@@ -30,6 +30,10 @@
 #include "sensrvclientserver.h"
 #include "sensrvthreadmonitor.h"
 #include "sensrvchanneldatareader.h"
+#include <e32std.h>
+#include <e32cmn.h>
+
+
 
 // ---------------------------------------------------------------------------
 // 2-phase constructor
@@ -251,14 +255,13 @@ void CSensrvPluginProxy::InitializePluginL()
             {
 
             buf->Des().AppendNum(iProxyManager.GenerateUniqueId());
+           
 
             err = iSsyThread.Create(*buf,
                                     SsyThreadFunction,
                                     ProxyManager().SsyStackSize(),
-                                    KSensrvSsyHeapInitialSize,
-                                    ProxyManager().SsyHeapMaxSize(),
+                                    NULL,
                                     (TAny*)this);
-
             if (err == KErrAlreadyExists)
                 {
                 COMPONENT_TRACE( ( _L( "Sensor Server - CSensrvPluginProxy::InitializePluginL - Thread name is already in use, recreating..." ) ) );

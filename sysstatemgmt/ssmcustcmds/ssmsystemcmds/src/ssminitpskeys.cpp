@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,6 +20,7 @@
 #include "ssmmapperutility.h"
 #include "ssmmapperutilityinternalpskeys.h"
 #include "ssmcustcmdsprivatepskeys.h"
+#include "ssmlocalepskeys.h"
 #include "trace.h"
 
 #include <ssm/startupdomainpskeys.h>
@@ -273,7 +274,32 @@ void CSsmInitPsKeys::InitializeKeysL()
              KReadDeviceDataPolicy,
              KWriteDeviceDataPolicy );
     SetL( KPSStarterUid, KRTCPropertyKey, 0 );
-    
+
+    //Used for observing the Collation code change in CSsmCollationObserver
+    INFO( "KPSStarterUid::KSSMCollationPSKey" );
+    DefineL( KPSStarterUid,
+             KSSMCollationPSKey,
+             KReadDeviceDataPolicy,
+             KWriteDeviceDataPolicy );
+    SetL( KPSStarterUid, KSSMCollationPSKey, 0 );
+
+    //Used for observing the Region code change in CSsmRegionObserver 
+    INFO( "KPSStarterUid::KSSMRegionPSKey" );
+    DefineL( KPSStarterUid,
+             KSSMRegionPSKey,
+             KReadDeviceDataPolicy,
+             KWriteDeviceDataPolicy );
+    SetL( KPSStarterUid, KSSMRegionPSKey, 0 );
+
+
+    INFO( "KPSStarterUid::KSSMUiLanguagePSKey " );
+    DefineL( KPSStarterUid,
+             KSSMUILanguagePSKey ,
+             KReadDeviceDataPolicy,
+             KWriteDeviceDataPolicy );
+    SetL( KPSStarterUid, KSSMUILanguagePSKey , 0 );
+
+
 // Store FirstBoot Value from cenrep
 TInt csVal( 0 );
 TInt psVal( 0 );

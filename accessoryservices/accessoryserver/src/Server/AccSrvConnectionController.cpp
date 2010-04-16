@@ -99,7 +99,7 @@ void CAccSrvConnectionController::ConstructL( CAccSrvServerModel* aServerModel )
     iConnectionStatusHandler = CAccSrvConnectionStatusHandler::NewL( this );
     iModeHandler             = CAccSrvModeHandler::NewL( this );
     iASYProxyHandler         = CAccSrvASYProxyHandler::NewL( this );
-    iSettingsHandler         = CAccSrvSettingsHandler::NewL( this, *aServerModel );
+    iSettingsHandler         = CAccSrvSettingsHandler::NewL( this, *aServerModel, iPolicy );
     iWiredConnPublisher      = CAccSrvWiredConnectionPublisher::NewL();
     TRAPD( err, iChargingContextController = CAccSrvChargingContextController::NewL() );
     if ( err != KErrNone ) // Server does not need to die on charging context fail.
@@ -457,6 +457,95 @@ void CAccSrvConnectionController::HandleConnectionUpdateValidationL(
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectionUpdateValidationL - return void" );
     }
+
+// -----------------------------------------------------------------------------
+// CAccSrvConnectionController::HandleConnectionUpdateValidationL
+// -----------------------------------------------------------------------------
+//
+void CAccSrvConnectionController::HandleConnectionUpdateValidationL( 
+    const TAccPolGenericID& aGenericID, 
+    TAccPolGenericID& aOldGenericId,
+    const CAccSrvSettingsHandler* aCaller,    
+    TInt aError )
+    {
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectionUpdateValidationL()" );
+    
+    TInt err ( KErrNone );
+    TAccSrvConnection isValidConnection(EAccSrvConnect);
+    TBool isConnected( iServerModel->IsConnected( aGenericID ) );
+
+    if( KErrNone == aError )
+        {   
+        isValidConnection = iPolicy->IsValidConnectionL( aGenericID, err );
+        }
+    else
+        {
+        err = aError;
+        isValidConnection = EAccSrvDeny;
+        }
+
+    if( iServerModel->FindAndRemoveCancelledConnectAccessory( aGenericID.UniqueID() ) )
+        {
+        //Connection of this accessory is cancelled.
+        err = KErrCancel;
+        isValidConnection = EAccSrvDeny;
+        }
+    
+    switch( isValidConnection )
+        {
+        case EAccSrvDetect:
+            {
+            }
+            break;
+
+        case EAccSrvConnect:
+            {
+            if( isConnected )
+                {
+                //update connection generic id array
+                iServerModel->UpdateConnectionL( aGenericID);
+                
+                // Complete all possible connection status related requests
+                iNotificationQueue->CompleteControlMessageL( EAccessoryConnectionStatusChanged,
+                                                             KErrNone,
+                                                             aGenericID.UniqueID() );
+                iNotificationQueue->CompleteControlMessageL( EAccessoryDisconnected,
+                                                             KErrNone,
+                                                             aOldGenericId.UniqueID() );
+                iNotificationQueue->CompleteControlMessageL( ENewAccessoryConnected,
+                                                             KErrNone,
+                                                             aGenericID.UniqueID() );
+                }
+
+            }
+            break;
+
+        case EAccSrvDeny:
+            {
+            iServerModel->RemovePhysicalConnection( aGenericID );
+            iServerModel->RemoveASYThreadID( aGenericID.UniqueID() );//Remove ThreadID GID mapping
+            iServerModel->CapabilityStorage().RemoveCapabilityList( aGenericID);
+            
+         
+            }
+            break;
+
+        default:
+            {
+            TRACE_ASSERT_ALWAYS;//unhandled enum
+            }
+            break;
+        }
+
+    iNotificationQueue->CompleteControlMessageL( EConnectAccessory,
+                                                 err,
+                                                 aGenericID.UniqueID() );
+    
+
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectionUpdateValidationL - return void" );
+    }
+
+
 
 // -----------------------------------------------------------------------------
 // CAccSrvConnectionController::ConnectionHandlingCancel

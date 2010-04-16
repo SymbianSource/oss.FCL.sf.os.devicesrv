@@ -23,7 +23,7 @@
 #include <e32base.h>
 #include "multifinitestatemachine.h"
 #include "myasynconeshottimercallback.h"
-
+#include "pdengine.h"
 
 
 // CONSTANTS

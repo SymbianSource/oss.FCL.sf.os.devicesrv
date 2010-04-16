@@ -80,7 +80,7 @@ CAccPolAccessoryPolicy::CAccPolAccessoryPolicy( CCapabilityStorage * aCapability
     }
 
 // Destructor
-CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()
+EXPORT_C CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()
     {
     API_TRACE_( "[AccFW: ACCPOLICY] CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()" );
     
@@ -1234,4 +1234,13 @@ EXPORT_C TUint32 CAccPolAccessoryPolicy::SupportedHWDevicesL()
     return supportedDevices;
     }
 
+EXPORT_C TBool CAccPolAccessoryPolicy::IsCapabilityDefinedL(
+        const TAccPolGenericID& aGenericId,
+        const TUint32& aName )
+    {
+    if(iCapabilityStorage->GetCapability(aGenericId,aName) != NULL)
+        return ETrue;
+    else
+        return EFalse;
+    }
 //  End of File

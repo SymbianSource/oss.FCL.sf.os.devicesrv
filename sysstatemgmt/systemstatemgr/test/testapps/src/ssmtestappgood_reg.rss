@@ -30,4 +30,4 @@ RESOURCE APP_REGISTRATION_INFO
 	app_file="ssmtestappgood";
 	newfile = KAppDoesNotSupportNewFile;
 	}
-	
+

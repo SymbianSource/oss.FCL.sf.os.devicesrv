@@ -124,18 +124,18 @@ class CTvOutConfig : public CBase
 
         //-- Standby Figure ---------------------------------------------------
 
-        /** Returns maximum size of TStandByFigure.iTable in bytes.
+        /** Returns maximum size of TStandByFigure.iTable in bytes. Deprecated since TB10.2.
             @param  aMaxFigureSize  Max size of standByFigure in bytes
             @return  KErrNotSupported if not supported. */
         virtual TInt StandByFigureMaxSizeInBytes(TUint& aMaxFigureSize) = 0;
 
-        /** Sets user defined figure to show on tv.
+        /** Sets user defined figure to show on tv. Deprecated since TB10.2.
             @pre SetConfig() is called without errors.
             @param  aStandByFigure  TStandByFigure object.
             @return KErrNone if all success */
         virtual TInt StandByFigure(const TStandByFigure& aStandByFigure) = 0;
 
-        /** Gets user defined figure to show on tv.
+        /** Gets user defined figure to show on tv. Deprecated since TB10.2.
             @see CTvOutConfig::StandByFigureMaxSizeInBytes for getting size of TStandByFigure.iTable.
             @pre StandByFigure() is called without errors.
             @param  aStandByFigure  TStandByFigure object.

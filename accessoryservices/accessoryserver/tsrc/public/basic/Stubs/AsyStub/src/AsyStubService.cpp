@@ -123,6 +123,10 @@ void CASYStubService::Service( TInt aTestCaseID,
             break;
 
         case ETFAsyConnOpenCable:
+            {            
+            }
+            break;
+//        case ETFAsyConnOpenCable:
         case ETFAsyConnectOpenCable3Poles:
             {
             TRequestStatus status;
@@ -140,7 +144,7 @@ void CASYStubService::Service( TInt aTestCaseID,
             TBuf<KHWModelIDMaxLength> HWModelID( _L("opencable"));
 
             //Set GenericID header
-            iGenericIDHeader.iAccessoryDeviceType = KDTAVDevice;
+            iGenericIDHeader.iAccessoryDeviceType = KDTHeadset;
             iGenericIDHeader.iPhysicalConnection = KPCWired;
             iGenericIDHeader.iApplicationProtocol = 0x0;
 
@@ -170,7 +174,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 
@@ -311,7 +315,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 
@@ -377,7 +381,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 

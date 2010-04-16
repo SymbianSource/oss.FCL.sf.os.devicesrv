@@ -172,6 +172,17 @@ NONSHARABLE_CLASS( CAccSrvServerModel ) : public CBase
         void GetLastConnectedAccessoryL( TAccPolGenericID& aGenericID ) const;
 
         /**
+        * Get last connected wired accessory.
+        *
+        * @since S60 3.1
+        * @param aGenericID On succesful return, contains the Generic ID of
+        *                   last connected wired accessory.
+        * @return TBool     On successful return will be ETrue, else EFalse
+        */
+        TBool GetLastConnectedWiredAccessory( TAccPolGenericID& aGenericID ) const;
+        
+
+        /**
         * Remove the physical connection from array of detected accessories.
         *
         * @since S60 3.1

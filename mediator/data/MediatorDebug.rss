@@ -33,3 +33,4 @@ RESOURCE DEBUG_CONFIGURATION debug_conf
     options=KLogCommands+KLogEvents+KLogParameterData;
     output_file = "mediator.txt";
     }
+

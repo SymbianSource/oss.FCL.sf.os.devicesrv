@@ -98,10 +98,10 @@ EXPORT_C TInt CConnectionEmulator::ConnectAccessoryL(
     TPckgBuf< TTFAccessoryPublishAndSubscribe > buf;
     
     // Reset the values and then order the connect
-    TTFASYReference method;
+    TTFASYReference method( ETFAsyNone );
     TInt64 param1( 0 );
     TBool wired( EFalse );
-    TUint64 btaddress;
+    TUint64 btaddress( 0 );
     RArray< TUint32 > capabilityArray;
     TUint8 deviceType;
     
@@ -192,7 +192,6 @@ EXPORT_C TInt CConnectionEmulator::ConnectAccessoryL(
         {
 #ifdef TEST_BT
         TBTDevAddr btaddr( btaddress );
-        TBool oldTest( EFalse );
         TRequestStatus status;
         RAccessoryServer server;
         server.Connect();
@@ -322,10 +321,10 @@ EXPORT_C TInt CConnectionEmulator::DisconnectAccessoryL(
     TPckgBuf< TTFAccessoryPublishAndSubscribe > buf;
     
     // Reset the values and then order the connect
-    TTFASYReference method;
+    TTFASYReference method( ETFAsyNone );
     TInt64 param1( 0 );
     TBool wired( EFalse );
-    TUint64 btaddress;
+    TUint64 btaddress( 0 );
     RArray< TUint32 > capabilityArray;
     
     switch( aAccDefintion )
@@ -444,13 +443,11 @@ EXPORT_C TInt CConnectionEmulator::DisconnectAccessoryL(
     
     if( aAccInfo->AccPhysicalConnection() == KAccMonWired )
         {
-        TInt err( KErrNone );
         TPckgBuf< TTFAccessoryPublishAndSubscribe > buf;
         
         // Reset the values and then order the connect
         TTFASYReference method;
         TInt64 param1( 0 );
-        TBool wired( EFalse );
         RArray< TUint32 > capabilityArray;
         
         method = ETFAsyDisc;
@@ -517,3 +514,4 @@ TInt CConnectionEmulator::SetPubSubL()
     }
   
 // End of file
+

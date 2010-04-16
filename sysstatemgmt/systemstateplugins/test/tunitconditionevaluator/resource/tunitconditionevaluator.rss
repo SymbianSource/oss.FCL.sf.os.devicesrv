@@ -177,3 +177,4 @@ RESOURCE SSM_CND_SWP_FLAG r_cnd_swp_flag
 	key = 0x2;
 	bitmask = 0x0010;
 	}
+

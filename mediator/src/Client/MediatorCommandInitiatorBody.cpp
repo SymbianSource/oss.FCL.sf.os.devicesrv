@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -170,6 +170,23 @@ void CMediatorCommandInitiatorBody::RunL()
                                      *iCommandData );                                  
         }
     }
+
+// -----------------------------------------------------------------------------
+// CMediatorCommandInitiatorBody::RunError
+// This will be called when there is a leave from ResetDataBufferL() or CommandResponseL() from RunL
+// 
+// -----------------------------------------------------------------------------
+//
+#ifdef _DEBUG
+TInt CMediatorCommandInitiatorBody::RunError( TInt aError )
+#else
+TInt CMediatorCommandInitiatorBody::RunError( TInt /*aError*/ )
+#endif //_DEBUG
+	{
+	ERROR_TRACE(Print(_L("[Mediator Server]\t CMediatorCommandInitiatorBody::RunError called with Error %d\n"), aError ));
+	//Ignore the error.
+	return KErrNone;
+	}
 
 // -----------------------------------------------------------------------------
 // CMediatorCommandInitiatorBody::WaitForCommandResponse

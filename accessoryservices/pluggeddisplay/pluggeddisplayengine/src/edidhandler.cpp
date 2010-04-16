@@ -1367,7 +1367,7 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 		{
 		TInt availableIndex = 0;
 		TBool found( EFalse );
-		TBool defaultCEAmode( EFalse );
+		TBool defaultCEAmode( EFalse ), ceaMode( EFalse );
 		supportedCount = supportedModes.Count();
 		INFO_1( "HDMI CONFIGS --- From HW -- Total : %d", supportedCount );
 
@@ -1383,6 +1383,7 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 					(TSupportedHdmiDviMode::ECea == supportedModes[ supportedIndex ].iStandardModeType) &&
 					(aHdmiConfigs[ availableIndex ].iCeaMode == supportedModes[ supportedIndex ].iStandardMode) )
 					{
+					ceaMode = ETrue;
 					found = ETrue;
 					if( aHdmiConfigs[ availableIndex].iCeaMode == KDefaultCEAMode )
 					    {
@@ -1441,15 +1442,20 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 		    {
 				TInt modecount = aHdmiConfigs.Count();
 				
-				INFO( "<<<<<<<<<<<<<<It is DVI connector>>>>>>>>>>>>>>" );
 				while( modecount-- )
 				  {
-					// Change it to DVI mode as it is existing in both Supported and available configurations
-					aHdmiConfigs[ modecount ].iConnector = TTvSettings::EDVI;
+
+				    if( aHdmiConfigs[ modecount ].iDmtMode && (EFalse == ceaMode) )
+				    	{
+						INFO( "<<<<<<<<<<<<<<It is DVI connector>>>>>>>>>>>>>>" );
+						
+					    // Change it to DVI mode as it is existing in both Supported and available configurations
+					    aHdmiConfigs[ modecount ].iConnector = TTvSettings::EDVI;
 					
-					// Version should be zeroed for non-HDMI
-					aHdmiConfigs[ modecount ].iTvHdmiVersion = 0;
-					aHdmiConfigs[ modecount ].iTvHdmiRevision = 0;			  
+					    // Version should be zeroed for non-HDMI
+					    aHdmiConfigs[ modecount ].iTvHdmiVersion = 0;
+					    aHdmiConfigs[ modecount ].iTvHdmiRevision = 0;
+				    	}
 				  }
 		    }
 

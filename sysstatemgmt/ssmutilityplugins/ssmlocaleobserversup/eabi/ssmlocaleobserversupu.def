@@ -1,3 +1,6 @@
 EXPORTS
 	_ZN21CSsmLocaleObserverSup4NewLEv @ 1 NONAME
+	_ZN18CSsmRegionObserver4NewLEv @ 2 NONAME
+	_ZN21CSsmCollationObserver4NewLEv @ 3 NONAME
+	_ZN22CSsmUiLanguageObserver4NewLEv @ 4 NONAME
 

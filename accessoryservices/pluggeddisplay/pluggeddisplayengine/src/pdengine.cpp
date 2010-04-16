@@ -129,7 +129,7 @@ void CPDEngine::Input(
             if( iFSMPtr[EPDEFSMIdCompositeCableStatus]->CurrentStateID() != ECompositeCableStateIdle )
                 {
                 // Forcefully transit CompositeCable FSM to Idle state
-                ((CCompositeCableStatusFSM*)iFSMPtr[EPDEFSMIdCompositeCableStatus])->Transit(ECompositeCableStateIdle);
+                ((CCompositeCableStatusFSM*)iFSMPtr[EPDEFSMIdCompositeCableStatus])->Input(EPDEIfAccessoryConnection, EPDEIfAccessoryConnectionEventCableDisconnected);
                 }
             iFSMPtr[ aFSMId ]->Input( aInterfaceId, aEvent );            
             }

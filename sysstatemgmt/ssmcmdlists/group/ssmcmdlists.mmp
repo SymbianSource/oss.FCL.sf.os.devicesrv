@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -29,7 +29,7 @@ START RESOURCE  preuiservicescmdlist.rss             // Pre-UI-Services startup 
 TARGETPATH      /private/2000d75b/startup/0          // Private directory of sysstatemgr.exe
 END
 
-START RESOURCE  uiservicescmdlist.rss                // Starting UI-Services startup state
+START RESOURCE  uiservicescmdlist.rss                // Starting UI-Services startup state for minimal bootup
 TARGETPATH      /private/2000d75b/startup/0          // Private directory of sysstatemgr.exe
 END
 
@@ -49,12 +49,20 @@ START RESOURCE  securitycheckcmdlist.rss             // Security Check startup s
 TARGETPATH      /private/2000d75b/startup/0          // Private directory of sysstatemgr.exe
 END
 
-START RESOURCE  noncriticalcmdlist.rss               // Non-critical startup state
+START RESOURCE  noncriticalcmdlist.rss               // Non-critical startup state for minimal bootup
 TARGETPATH      /private/2000d75b/startup/0          // Private directory of sysstatemgr.exe
 END
 
 START RESOURCE  emergencycallsonlycmdlist.rss        // Emergency Calls Only startup state
 TARGETPATH      /private/2000d75b/startup/0          // Private directory of sysstatemgr.exe
+END
+
+START RESOURCE  noncriticalcmdlist_ext.rss           // Non-critical startup state for extended bootup
+TARGETPATH      /private/2000d75b/startup/0_ext 	 // Private directory of sysstatemgr.exe
+END
+
+START RESOURCE  uiservicescmdlist_ext.rss            // Starting UI-Services startup state for extended bootup
+TARGETPATH      /private/2000d75b/startup/0_ext		 // Private directory of sysstatemgr.exe
 END
 
 // Command lists specific to HW

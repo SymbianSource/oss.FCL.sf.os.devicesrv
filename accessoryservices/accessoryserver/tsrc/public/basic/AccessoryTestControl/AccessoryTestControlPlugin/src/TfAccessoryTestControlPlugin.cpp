@@ -1545,6 +1545,7 @@ const TTFAccessoryTestCaseStateControl KTFSetLoopsetModeAfterConnectionStates[17
     { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10807, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
     };
 
+#if 0
 //
 // [M10808] [[AccServer] Set TTY Mode After Connection]
 //
@@ -1568,7 +1569,93 @@ const TTFAccessoryTestCaseStateControl KTFSetTTYModeAfterConnectionStates[17]=
     { ETFAccessorySettings_Close,                         0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
     { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
     };
+#endif	
 
+//
+// [M10808] [[AccServer] Set TTY Mode After Connection]
+//
+const TTFAccessoryTestCaseStateControl KTFSetTTYModeAfterConnectionStates[]=
+    {
+    { ETFAccessoryConnection_Open,                        0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Open,                              0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Open,                          0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFSetHWDeviceSettings,                             0, KASNoDevice,    1, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 100000},
+    { ETFAccessoryNotifyAccessoryModeChanged,             0, 2,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                           0, 0,              1, 0, 0, 10808, ETFAsyConnectHeadset, ReqAccRequestNone,               KErrNone, 2000000}, 
+    { ETFFindAndCheckRequest,                             0, 1,              0, 0, 0, 10808, ETFAsyNone, ReqNotifyAccessoryModeChanged,             KErrNone, 2000000}, // Headset Connected !
+    { ETFSetHWDeviceSettings,                             0, KASTTY,         1, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 3000000},
+    { ETFSetHWDeviceSettings,                             0, KASTTY,         0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFDisconnectWiredAccessory,                        0, 0,              0, 0, 0, 10808, ETFAsyDisc, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFClearStack,                                      0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Close,                             0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Close,                         0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10808, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    };
+
+//
+// [M10809] [[AccServer] Set MusicStand Mode After Connection]
+//
+const TTFAccessoryTestCaseStateControl KTFSetLoopsetModeBeforeConnectionStates[]=
+    {    
+    { ETFAccessoryConnection_Open,                        0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Open,                              0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Open,                          0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFSetHWDeviceSettings,                             0, KASNoDevice,    1, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 100000},
+    { ETFAccessoryNotifyAccessoryModeChanged,             0, 2,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                           0, 0,              1, 0, 0, 10809, ETFAsyConnectOpenCable3Poles, ReqAccRequestNone,       KErrNone, 1000000},
+    { ETFFindAndCheckRequest,                             0, 9,              0, 0, 0, 10809, ETFAsyNone, ReqNotifyAccessoryModeChanged,             KErrNone, 2000000}, // Headphone Connected !
+    { ETFSetHWDeviceSettings,                             0, KASMusicStand,  1, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 3000000},
+    { ETFSetHWDeviceSettings,                             0, KASMusicStand,  0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFDisconnectWiredAccessory,                        0, 0,              0, 0, 0, 10809, ETFAsyDisc, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFClearStack,                                      0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Close,                             0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Close,                         0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10809, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    };
+    
+//
+// [M10810] [[AccServer] Default Accessory Set To MusicStand; Connect Headphone; Change accessory settings to Headphones]
+//
+const TTFAccessoryTestCaseStateControl KTFSetTTYModeBeforeConnectionStates[]=
+    {
+    { ETFAccessoryConnection_Open,                        0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Open,                              0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Open,                          0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFSetHWDeviceSettings,                             0, KASMusicStand,  1, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 100000},
+    { ETFAccessoryNotifyAccessoryModeChanged,             0, 2,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                           0, 0,              1, 0, 0, 10810, ETFAsyConnectOpenCable3Poles, ReqAccRequestNone,       KErrNone, 1000000},
+    { ETFFindAndCheckRequest,                             0, 7,              0, 0, 0, 10810, ETFAsyNone, ReqNotifyAccessoryModeChanged,             KErrNone, 2000000}, // MusicStand Connected !
+    { ETFSetHWDeviceSettings,                             0, KASHeadphones,  1, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 3000000},
+    { ETFSetHWDeviceSettings,                             0, KASMusicStand,  0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFDisconnectWiredAccessory,                        0, 0,              0, 0, 0, 10810, ETFAsyDisc, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFClearStack,                                      0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Close,                             0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Close,                         0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10810, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    };
+
+//
+// [M10811] [[AccServer] Default Accessory Set To TTY; Connect Headset; Change accessory settings to Headset]
+//
+const TTFAccessoryTestCaseStateControl KTFGetSupportedHWDevicesStates[]=
+    {
+    { ETFAccessoryConnection_Open,                        0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Open,                              0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Open,                          0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFSetHWDeviceSettings,                             0, KASTTY,         1, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 100000},
+    { ETFAccessoryNotifyAccessoryModeChanged,             0, 2,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                           0, 0,              1, 0, 0, 10811, ETFAsyConnectHeadset, ReqAccRequestNone,               KErrNone, 2000000},
+    { ETFFindAndCheckRequest,                             0, 5,              0, 0, 0, 10811, ETFAsyNone, ReqNotifyAccessoryModeChanged,             KErrNone, 2000000}, // Headset identified as TTY!
+    { ETFSetHWDeviceSettings,                             0, KASHeadset,     1, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 3000000},
+    { ETFSetHWDeviceSettings,                             0, KASTTY,         0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFDisconnectWiredAccessory,                        0, 0,              0, 0, 0, 10811, ETFAsyDisc, ReqAccRequestNone,                         KErrNone, 2000000},
+    { ETFClearStack,                                      0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryMode_Close,                             0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessorySettings_Close,                         0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    { ETFAccessoryConnection_Close,                       0, 0,              0, 0, 0, 10811, ETFAsyNone, ReqAccRequestNone,                         KErrNone, 0},
+    };
+
+#if 0
 //
 // [M10809] [[AccServer] Set Loopset Mode Before Connection]
 //
@@ -1623,6 +1710,7 @@ const TTFAccessoryTestCaseStateControl KTFGetSupportedHWDevicesStates[3]=
     { ETFAccessorySettings_Close,      0, 0,      0,          0, 0, 10811, ETFAsyNone, ReqAccRequestNone, KErrNone, 0},
     };
 
+#endif
 //
 // [M10812] [[AccServer] Accessory Mode Settings (TInt)]
 //
@@ -2218,11 +2306,11 @@ const TTFAccessoryTestCaseStateControl KTFTestObjectBaseSerialization[]=
 //
 // [M11102] [[AccServer] Cancel connect Accessory]
 //
-const TTFAccessoryTestCaseStateControl KTFCallTClassMethods[1]=
+/*const TTFAccessoryTestCaseStateControl KTFCallTClassMethods[1]=
     {
     { ETFCallTClassMethods, 0, 0, 0, 0, 0, 11102, ETFAsyNone, ReqAccRequestNone, KErrNone, 0},
     };
-
+*/
 /************************                                            ****************************/
 /************************  CAccPolObjectBase related testcases (USB) ****************************/
 /************************                                            ****************************/
@@ -2891,6 +2979,10 @@ static void AccessorySettingsModuleTestSuiteL( CTFATestSuite* aSuite )
     TF_ADD_TEST_CASE_L( 10804, _L( "[M10804] [[AccServer] Set TTY Mode] ") );
     TF_ADD_TEST_CASE_L( 10805, _L( "[M10805] [[AccServer] Get TTY Mode] ") );
     TF_ADD_TEST_CASE_L( 10806, _L( "[M10806] [[AccServer] Set And Get TTY Mode] ") );
+    TF_ADD_TEST_CASE_L( 10808, _L( "[M10808] [[AccServer] Set TTY Mode After Connection] ") );
+    TF_ADD_TEST_CASE_L( 10809, _L( "[M10809] [[AccServer] Set MusicStand Mode After Connection] ") );
+    TF_ADD_TEST_CASE_L( 10810, _L( "[M10810] [[AccServer] Default Accessory Set To MusicStand; Connect Headphone; Change accessory settings to Headphones] ") );    
+    TF_ADD_TEST_CASE_L( 10811, _L( "[M10811] [[AccServer] Default Accessory Set To TTY; Connect Headset; Change accessory settings to Headset] ") );
     TF_ADD_TEST_CASE_L( 10812, _L( "[M10812] [[AccServer] Accessory Mode Settings (TInt)] ") );
     TF_ADD_TEST_CASE_L( 10813, _L( "[M10813] [[AccServer] Accessory Mode Settings (TBool)] ") );
     TF_ADD_TEST_CASE_L( 10814, _L( "[M10814] [[AccServer] Accessory Mode Settings (TDes)] ") );
@@ -2924,9 +3016,9 @@ static void SignatureModuleTestSuiteL( CTFATestSuite* aSuite )
 
     TF_ADD_TEST_CASE_L( 11001, _L( "[M11001] [[AccServer] Selection dialog test] "));
     TF_ADD_TEST_CASE_L( 11002, _L( "[M11002] [[AccServer] Selection dialog open/cancel] "));
-    TF_ADD_TEST_CASE_L( 11003, _L( "[M11003] [[AccServer] Connect open cable, user select tv-out]"));
+    //TF_ADD_TEST_CASE_L( 11003, _L( "[M11003] [[AccServer] Connect open cable, user select tv-out]"));
     TF_ADD_TEST_CASE_L( 11004, _L( "[M11004] [[AccServer] Connect open cable, ASY selects tv-out]"));
-    TF_ADD_TEST_CASE_L( 11005, _L( "[M11005] [[AccServer] Connect open cable, User selection device, after that ASY selects tv-out]"));
+    //TF_ADD_TEST_CASE_L( 11005, _L( "[M11005] [[AccServer] Connect open cable, User selection device, after that ASY selects tv-out]"));
     TF_ADD_TEST_CASE_L( 11006, _L( "[M11006] [[AccServer] Connect open cable, open selection dialog, disconnect]"));
     TF_ADD_TEST_CASE_L( 11007, _L( "[M11007] [[AccServer] Connect open cable, connect headset, user select headset]"));
     TF_ADD_TEST_CASE_L( 11008, _L( "[M11008] [[AccServer] Connect ECI accessory]"));

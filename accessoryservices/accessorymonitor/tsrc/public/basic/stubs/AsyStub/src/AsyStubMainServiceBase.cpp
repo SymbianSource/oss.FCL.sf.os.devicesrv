@@ -87,7 +87,6 @@ TTFCapability CASYStubMainServiceBase::GetAndRemoveCapability()
     {
     COMPONENT_TRACE( ( _L( "ASYStub - CASYStubMainServiceBase::GetAndRemoveCapability()" ) ) );
     return iService->GetAndRemoveCapability();
-    COMPONENT_TRACE( ( _L( "ASYStub - CASYStubMainServiceBase::GetAndRemoveCapability() - return" ) ) );
     }
 
 // End of file  

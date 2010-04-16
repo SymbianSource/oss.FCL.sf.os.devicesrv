@@ -134,8 +134,8 @@ const TCaseInfo CPlatformVerTest::Case (
         {
         // To add new test cases, add new items to this array
         //FUNCENTRY( PrintTest ),
-        ENTRY( "[PlatformVer] GetPlatformVersion", GetPlatformVersion ),
-        OOM_ENTRY( "[OOM_PlatformVer] GetPlatformVersion", GetPlatformVersion ,ETrue,1,5)
+        ENTRY( "[PlatformVer] GetPlatformVersion", &CPlatformVerTest::GetPlatformVersion ),
+        OOM_ENTRY( "[OOM_PlatformVer] GetPlatformVersion", &CPlatformVerTest::GetPlatformVersion ,ETrue,1,5)
 
         // Example how to use OOM functionality
         //OOM_ENTRY( "Loop test with OOM", LoopTest, ETrue, 2, 3),

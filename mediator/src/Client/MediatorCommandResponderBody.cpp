@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -162,6 +162,23 @@ void CMediatorCommandResponderBody::RunL()
     StartCommandReceiving();           
     
     }
+	
+// -----------------------------------------------------------------------------
+// CMediatorCommandResponderBody::RunError
+// This will be called when there is a leave from ResetDataBufferL()
+// 
+// -----------------------------------------------------------------------------
+//
+#ifdef _DEBUG
+TInt CMediatorCommandResponderBody::RunError( TInt aError )
+#else
+TInt CMediatorCommandResponderBody::RunError( TInt /*aError*/ )
+#endif //_DEBUG
+	{
+	ERROR_TRACE(Print(_L("[Mediator Server]\t CMediatorCommandResponderBody::RunError called with Error %d\n"), aError )); 
+	//Ignore the error
+	return KErrNone;
+	}
     
 // -----------------------------------------------------------------------------
 // CMediatorCommandResponderBody::RegisterCommandL
