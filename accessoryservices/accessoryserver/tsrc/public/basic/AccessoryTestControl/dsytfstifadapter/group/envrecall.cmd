@@ -19,41 +19,51 @@ REM
 
 @echo Cleaning stubs...
 pushd ..\..\..\stubs\group\
-call bldmake bldfiles
-call abld test reallyclean
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
 popd
 @echo Cleaning stubs... Finished
 
 
 @echo build BT Audioman Client...
 pushd \sf\mw\btservices\bluetoothengine\btaudioman\group
-call bldmake bldfiles
-call abld build
+REM call bldmake bldfiles
+REM call abld build
+call sbs
 popd
 @echo build BT Audioman Client... Finished
 
 
 @echo build accfwuinotifier...
 pushd \sf\mw\appsupport\coreapplicationuis\accfwuinotifier\group
-call bldmake bldfiles
-call abld build
+REM call bldmake bldfiles
+REM call abld build
+call sbs
 popd
 @echo build accfwuinotifier... Finished
 
 
 @echo build accessoryadaptation...
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\accessoryadaptation\group\
-call bldmake bldfiles
-call abld cleanexport
-call abld export
-call abld build accessoryadaptation
+REM call bldmake bldfiles
+REM call abld cleanexport
+call sbs -c armv5 CLEANEXPORT
+call sbs -c winscw CLEANEXPORT
+REM call abld export
+call sbs -c armv5 EXPORT
+call sbs -c winscw EXPORT
+REM call abld build accessoryadaptation
+call sbs -p accessoryadaptation
 popd
 @echo build accessoryadaptation... Finished
 
 
 @echo build Plugged Display ASY...
 pushd \sf\os\devicesrv\accessoryservices\pluggeddisplay\pluggeddisplayasy\group
-call bldmake bldfiles
-call abld build
+REM call bldmake bldfiles
+REM call abld build
+call sbs
 popd
 @echo build Plugged Display ASY... Finished

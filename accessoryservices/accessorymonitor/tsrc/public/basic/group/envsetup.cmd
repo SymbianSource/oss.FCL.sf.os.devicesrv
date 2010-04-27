@@ -19,22 +19,29 @@ REM
 
 @echo Cleaning accfwuinotifier...
 pushd \sf\mw\appsupport\coreapplicationuis\accfwuinotifier\group\
-call bldmake bldfiles
-call abld reallyclean
+REM call bldmake bldfiles
+REM call abld reallyclean
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
 popd
 @echo Cleaning accfwuinotifier... Finished
 
 @echo Cleaning accessoryadaptation...
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\group\
-call bldmake bldfiles
-call abld clean armv5 accessoryadaptation
+REM call bldmake bldfiles
+REM call abld clean armv5 accessoryadaptation
+call sbs -p accessoryadaptation -c armv5 CLEAN
 popd
 @echo Cleaning accessoryadaptation... Finished
 
 @echo Setting up stubs...
 pushd ..\stubs\group\
-call bldmake bldfiles
-call abld test reallyclean
-call abld test build
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
+REM call abld test build
+call sbs -c armv5.test
+call sbs -c winscw.test
 popd
 @echo Setting up stubs... Finished

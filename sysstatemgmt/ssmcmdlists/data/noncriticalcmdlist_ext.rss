@@ -126,7 +126,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0x7EF9
         r_cmd_activitymonitor4,
         // prio 0x7EF8
-        r_cmd_clockapp,
+        r_cmd_clock,	//ESLT-842J9W
         // prio 0x7EF7
         r_cmd_activitymonitor5,
         // prio 0x7EF6
@@ -402,13 +402,13 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_cbssrv
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_clockapp
+// r_cmd_clock
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_APP_INFO r_cmd_clockapp
+RESOURCE SSM_START_APP_INFO r_cmd_clock
     {
     priority = 0x7EF8;
-    name = "z:\\sys\\bin\\clockapp.exe";
+    name = "clock.exe";
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
     background = 1; // To background

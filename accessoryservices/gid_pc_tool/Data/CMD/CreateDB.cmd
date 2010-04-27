@@ -40,8 +40,12 @@ cd\
 cd%ACCPOL_PATH%\group
 echo export second
 xcopy \epoc32\winscw\c\System\Data\DBS_10205030_accpolicydb.db ..\data\
-call abld.bat cleanexport
-call abld.bat export
+REM call abld.bat cleanexport
+call sbs -c armv5 CLEANEXPORT
+call sbs -c winscw CLEANEXPORT
+REM call abld.bat export
+call sbs -c armv5 EXPORT
+call sbs -c winscw EXPORT
 
 goto end
 
@@ -49,9 +53,13 @@ goto end
 
 cd%ACCPOL_PATH%\group
 echo export first
-call bldmake bldfiles
-call abld cleanexport
-call abld export
+REM call bldmake bldfiles
+REM call abld cleanexport
+call sbs -c armv5 CLEANEXPORT
+call sbs -c winscw CLEANEXPORT
+REM call abld export
+call sbs -c armv5 EXPORT
+call sbs -c winscw EXPORT
 goto importer
 
 

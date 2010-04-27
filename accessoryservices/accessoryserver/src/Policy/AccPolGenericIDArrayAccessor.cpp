@@ -116,13 +116,17 @@ EXPORT_C void TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(
     COM_TRACE_( "[AccFW: ACCPOLICY] TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray()" ); 
     
     TInt iArrayCount( aGenericIDArray.Count() );    
-    TInt i(aIndex); 
-    for ( ; i < (iArrayCount-1); ++i ) 
-        { 
-        aGenericIDArray.iGenericIDArray[i] = aGenericIDArray.iGenericIDArray[i+1]; 
-        } 
-    TAccPolGenericID emptyID; 
-    aGenericIDArray.iGenericIDArray[i] = emptyID; 
+    TInt i(aIndex);
+    
+    if( (iArrayCount > 0) && (i >= 0) ) 
+    	{
+	    for ( ; i < (iArrayCount-1); ++i ) 
+	        { 
+	        aGenericIDArray.iGenericIDArray[i] = aGenericIDArray.iGenericIDArray[i+1]; 
+	        } 
+    	TAccPolGenericID emptyID; 
+    	aGenericIDArray.iGenericIDArray[i] = emptyID; 
+    	} 
 
     COM_TRACE_( "[AccFW: ACCPOLICY] TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray() - return void" ); 
     } 

@@ -19,30 +19,37 @@ REM
 
 @echo Cleaning stubs
 pushd ..\..\..\stub\group\
-call bldmake bldfiles
-call abld test reallyclean
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
 popd
 @echo Cleaning stubs done
 
 @echo build remconadaptation...
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\accessoryadaptation\group\
-call bldmake bldfiles
-call abld build remconadaptation
+REM call bldmake bldfiles
+REM call abld build remconadaptation
+call sbs -p remconadaptation
 popd
 @echo build remconadaptation... Finished
 
 @echo build phoneclient...
 pushd \sf\mw\phonesrv\phoneclientserver\phoneclient\group
-call bldmake bldfiles
-call abld build
+REM call bldmake bldfiles
+REM call abld build
+call sbs
 popd
 @echo build phoneclient... Finished
 
 @echo build phonecmdhandler
 pushd \sf\mw\phonesrv\phonecmdhandler\group\
-call bldmake bldfiles
-call abld makefile 
-call abld reallyclean
-call abld build
+REM call bldmake bldfiles
+REM call abld makefile 
+REM call abld reallyclean
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
+REM call abld build
+call sbs
 popd
 @echo build phonecmdhandler done
