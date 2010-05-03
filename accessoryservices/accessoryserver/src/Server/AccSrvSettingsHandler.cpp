@@ -258,17 +258,18 @@ TUint32 CAccSrvSettingsHandler::GetSupportedHWDevicesL() const
 
     TPtr8 ptrBuf( buf->Des() );
     User::LeaveIfError( session.Connect() );
+	CleanupClosePushL ( session );
     User::LeaveIfError( file.Open( session, KHWDevicesFile, EFileRead ) );
     file.Read( ptrBuf );
     file.Close();
-    session.Close();
 
     TLex8 l( ptrBuf );
     TInt32 temp;
     l.Val( temp );
     settings = static_cast< TUint32 >( temp );
 
-    CleanupStack::Pop( buf );
+    CleanupStack::PopAndDestroy ( &session );
+    CleanupStack::PopAndDestroy ( buf );
 
     COM_TRACE_1( "[AccFW:AccServer] CAccSrvSettingsHandler::GetSupportedHWDevicesL() - return %d", settings );
 

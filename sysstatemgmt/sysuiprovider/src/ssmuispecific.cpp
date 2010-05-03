@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -36,6 +36,8 @@ static const TUid KSecurityNotifierChannel = { 0x1000598F };
 
 // Type definitions for a buffer containing a drive id (drive letter + :).
 const TInt KDriveIdLength = 2;
+//Number of clusterSize to be reserve for phone memory space 
+const TInt KNumberOfCluster = 2;
 typedef TBuf<KDriveIdLength> TDriveId;
 
 // ======== MEMBER FUNCTIONS ========
@@ -47,6 +49,7 @@ typedef TBuf<KDriveIdLength> TDriveId;
 EXPORT_C CSsmUiSpecific::~CSsmUiSpecific()
 	{
     FUNC_LOG;
+    iReservedPhoneMemoryFs.Close();
 	}
 
 
@@ -68,6 +71,7 @@ EXPORT_C CSsmUiSpecific* CSsmUiSpecific::InstanceL()
 		{
 		self = new ( ELeave ) CSsmUiSpecific;
 		CleanupStack::PushL( self );
+		self->ConstructL();
 		User::LeaveIfError( Dll::SetTls( self ) );
 		CleanupStack::Pop( self );
 		}
@@ -431,7 +435,76 @@ EXPORT_C TInt CSsmUiSpecific::PhoneMemoryRootDriveId()
 // CSsmUiSpecific::CSsmUiSpecific
 // ---------------------------------------------------------------------------
 //
-CSsmUiSpecific::CSsmUiSpecific() : iReferenceCount( 1 )
+CSsmUiSpecific::CSsmUiSpecific() : iReferenceCount(1), iReservedPhoneMemory(0)
 	{
     FUNC_LOG;
+    }
+/**
+Leaving construction inside ConstructL
+*/
+void CSsmUiSpecific::ConstructL()
+	{
+	FUNC_LOG;
+	
+	User::LeaveIfError( iReservedPhoneMemoryFs.Connect() );
 	}
+
+/**
+ReservePhoneMemorySpace
+*/
+EXPORT_C TInt CSsmUiSpecific::ReservePhoneMemorySpace()
+    {
+	FUNC_LOG;
+	TVolumeIOParamInfo volumeParamInfo; 
+	const TInt phoneMemoryDriveID = PhoneMemoryRootDriveId();
+	TInt errorCode = iReservedPhoneMemoryFs.VolumeIOParam(phoneMemoryDriveID, volumeParamInfo); 
+	if( KErrNone == errorCode )
+		{
+#ifdef __WINS__
+		//512 bytes for __WINS__
+		const TInt reservedMemory = 512;
+#else
+		//Reserving two clusterSize Phone memory 
+		const TInt reservedMemory = KNumberOfCluster * (volumeParamInfo.iClusterSize);
+#endif //__WINS__
+		errorCode = iReservedPhoneMemoryFs.ReserveDriveSpace(phoneMemoryDriveID, reservedMemory);
+
+		if ( KErrNone == errorCode )
+			{
+			iReservedPhoneMemory = reservedMemory;
+			}
+		}
+    return errorCode;
+    }
+
+/**
+FreeReservedPhoneMemorySpace
+*/
+EXPORT_C TInt CSsmUiSpecific::FreeReservedPhoneMemorySpace(const TInt aSpaceToFree)
+    {
+	FUNC_LOG;
+    TInt errorCode(KErrGeneral);
+	INFO_2("Reserved memory is = %d bytes, Request to free memory is = %d bytes", iReservedPhoneMemory, aSpaceToFree);
+    if(0 < iReservedPhoneMemory)
+        {
+		if(0 == aSpaceToFree)
+		    {
+		   	//Free complete reserved phone memory
+			errorCode = iReservedPhoneMemoryFs.ReserveDriveSpace( PhoneMemoryRootDriveId(), 0 );
+			INFO_1("Freeing memory completed with = %d", errorCode);
+			iReservedPhoneMemory = 0; 
+		    }
+		else
+		    {
+		    TInt newReserveSize = iReservedPhoneMemory - aSpaceToFree;
+		    newReserveSize = newReserveSize >= 0 ? newReserveSize : 0;
+		    errorCode = iReservedPhoneMemoryFs.ReserveDriveSpace( PhoneMemoryRootDriveId(), newReserveSize );
+			INFO_1("Freeing partial phone memory completed with = %d", errorCode);
+		    if(KErrNone == errorCode)
+			    {
+			    iReservedPhoneMemory = newReserveSize;
+			    }
+		    }
+		}
+    return errorCode;
+    }

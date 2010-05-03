@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,7 @@
 #include <ssm/ssmstates.hrh>
 #include <ssm/ssmstatetransition.h>
 #include <ssm/ssmstatepolicy.h>
+#include <ssm/ssmuiproviderdll.h>
 
 #include "ssmserverpanic.h"
 #include "ssmserver.h"
@@ -29,6 +30,7 @@
 #include "ssmstatepolicyframe.h"
 #include "ssmswppolicyresolver.h"
 #include "ssmswprequesthandler.h"
+#include "ssmdebug.h"
 
 // ------------------- Policy Server Security Setup ----------------------
 
@@ -86,7 +88,11 @@ CSsmServer::~CSsmServer()
 		{
 		iSwpCleSession->ReleaseCle();
 		}
-
+	
+	if(iSsmUiSpecific)
+        {
+        iSsmUiSpecific->Release();
+        }
 	} //lint !e529 not subsequently referenced
 
 /**
@@ -134,6 +140,10 @@ void CSsmServer::ConstructL(TUint16 aInitialState, TValidation aSetting)
 	__ASSERT_ALWAYS( KErrNone == User::SetCritical(User::ESystemCritical), PanicNow(KPanicSysStateMgr,ESsmServerError1));
 	__ASSERT_ALWAYS( KErrNone == User::RenameThread(KSsmServerName), PanicNow(KPanicSysStateMgr,ESsmServerError2));
 
+	iSsmUiSpecific = CSsmUiSpecific::InstanceL();
+	//Reserve memory for critical operation especially when phone memory will be full
+    TInt err = iSsmUiSpecific->ReservePhoneMemorySpace();
+	DEBUGPRINT2(_L("CSsmUiSpecific::ReservePhoneMemorySpace returned with = %d"), err);
 	// --- Instantiate the "System State" handling classes ---
 	// Create a state policy resolver and load the initial policy
 	CSsmStatePolicyResolver* stateResolver = CSsmStatePolicyResolver::NewLC();

@@ -26,3 +26,5 @@ EXPORTS
 	call_vector_25 @ 25  NONAME
 	call_vector_26 @ 26  NONAME
 	call_vector_27 @ 27  NONAME
+	call_vector_28 @ 28  NONAME
+	call_vector_29 @ 29  NONAME

@@ -29,7 +29,8 @@
 #include <ssm/ssmstateawaresession.h>
 #include <e32def.h>
 #include <startupdomaindefs.h>
-#include <etelmm.h> 
+#include <etelmm.h>
+#include <ctsydomainpskeys.h>
 
 static TBool NoteTypeToEvent(
     TInt& aEventCode, const TStrtSecurityNoteType aNoteType )
@@ -202,8 +203,15 @@ TBool CSsmSecurityCheckNotifier::IsDlgCancellableL()
 	TBool isDlgCancellable;
 
 	//Is system in start up state
-	
-	iAfterStartup = (currentState.MainState() == ESsmStartup) ? EFalse : ETrue;
+	if ( currentState.MainState() == ESsmStartup )
+		{
+		//TSsmStartupSubStateExt::ESsmStateNonCritical
+		iAfterStartup = ( 0x34 == currentState.SubState() ) ? ETrue : EFalse;
+		}
+	else
+		{
+		iAfterStartup = ETrue;
+		}
 	
 	//Close the state aware session
 	ssmStateAwareSession.Close();
@@ -235,10 +243,26 @@ void CSsmSecurityCheckNotifier::RunL()
         }
     else if (iCmdState == EEmergencyCallIsActive && iStatus.Int() != KErrCancel)
         {
-        // Emergency call activated from the security note dialog has
-        // finished. Show the note again.
-        DEBUGPRINT1A("ECall Ended and restarting pin notifier");
-        StartNotifier();
+        TInt value = -1; 
+		const TInt errorcode = iSsmEmergencyCallProperty.Get( value );
+		DEBUGPRINT3A("iSsmEmergencyCallProperty.Get() has returned value %d and errorcode %d", value , errorcode);
+		if (KErrNone == errorcode)
+			{
+			// Compare the property value with EPSCTsyCallStateNone. This indicates the call has finished.
+			if (EPSCTsyCallStateNone == value)
+				{
+				// Emergency call activated from the security note dialog has
+				// finished. Show the note again.
+				DEBUGPRINT1A("ECall Ended and restarting pin notifier");
+				StartNotifier();
+				}
+			else
+				{
+				//Subscribe to the property again if the property key value is not yet set to EPSCTsyCallStateNone.
+				iSsmEmergencyCallProperty.Subscribe(iStatus);
+				SetActive();
+				}
+			}
         }
     else
         {

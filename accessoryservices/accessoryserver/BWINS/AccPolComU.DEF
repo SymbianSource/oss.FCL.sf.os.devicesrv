@@ -61,4 +61,5 @@ EXPORTS
 	?CompareCriticalValuesL@CCapabilityStorage@@QAEHABVTAccPolGenericID@@@Z @ 60 NONAME ; int CCapabilityStorage::CompareCriticalValuesL(class TAccPolGenericID const &)
 	?GetGenericID@CCapabilityStorage@@QAEHAAVTAccPolGenericID@@@Z @ 61 NONAME ; int CCapabilityStorage::GetGenericID(class TAccPolGenericID &)
 	?IsCapabilityDefinedL@CAccPolAccessoryPolicy@@QAEHABVTAccPolGenericID@@ABK@Z @ 62 NONAME ; int CAccPolAccessoryPolicy::IsCapabilityDefinedL(class TAccPolGenericID const &, unsigned long const &)
+	?RemoveIndexFromGenericIDArray@TAccPolGenericIDArrayAccessor@@SAXAAVTAccPolGenericIDArray@@H@Z @ 63 NONAME ; void TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(class TAccPolGenericIDArray &, int)
 

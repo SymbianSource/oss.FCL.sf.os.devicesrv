@@ -292,30 +292,36 @@ void CAccSrvSubAsyComms::ProcessResponseL( const RMessage2& aMessage,
     HBufC8 *asyData = NULL;    
     CBufFlat* objectBuf = NULL;    
     
-    //
-    // Allocated the buffer which is really needed!
-    // 
-    if ( EProcessResponseTDes == aResponseType && 
-         ECmdGetSupportedBTProfiles != iOutstandingProcessCmdId )
-        {
-    	asyDataSize = aMessage.GetDesLengthL( KAccServParamPosSecond );
-        asyData = HBufC8::NewL( asyDataSize );
-        CleanupStack::PushL( asyData );        
-        }
-	else if ( EProcessResponseObject == aResponseType )
-		{
-        objectBuf = CBufFlat::NewL( KAccSrvObjectBaseStreamBufGranularity );
-	    CleanupStack::PushL( objectBuf );
-	    TInt bufLength( aMessage.GetDesLength( KAccServParamPosSecond ) );
-	    objectBuf->ResizeL( bufLength );	      
-		}
-	else
-	   {
-	   COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - Buffer is not needed!" );
-	   }
-		    		    
+        		    
     if ( !aTimeOut )
         {
+       	//
+	    	// Allocated the buffer which is really needed!
+    		//     
+  	  	if ( EProcessResponseTDes == aResponseType && 
+        	ECmdGetSupportedBTProfiles != iOutstandingProcessCmdId )
+	        {
+					COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - Before RMessage with EProcessResponse" );
+	    		asyDataSize = aMessage.GetDesLengthL( KAccServParamPosSecond );
+	        asyData = HBufC8::NewL( asyDataSize );
+	        CleanupStack::PushL( asyData );        
+					COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - After RMessage with EProcessResponse" );
+	        }		
+		  	else if ( EProcessResponseObject == aResponseType )
+					{
+					COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - Before RMessage with EProcessResponseObject" );
+					TInt bufLength = ( aMessage.GetDesLengthL( KAccServParamPosSecond ) );
+			    objectBuf = CBufFlat::NewL( KAccSrvObjectBaseStreamBufGranularity );
+				  CleanupStack::PushL( objectBuf );
+				  objectBuf->ResizeL( bufLength );
+					COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - After RMessage with EProcessResponseObject" );		
+					}
+				else
+				  {
+				  COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ProcessResponseL() - Buffer is not needed!" );
+				  }
+			
+        	        	
         aMessage.ReadL( KAccServParamPosFirst, tridPckgBuf );
         if ( iOutstandingTrId != tridPckgBuf() )
             {
@@ -445,24 +451,42 @@ void CAccSrvSubAsyComms::ProcessResponseL( const RMessage2& aMessage,
                     }
                 else
                     {
-                    TPtr8 asyDataPtr = asyData->Des();		
+                    TPtr8 asyDataPtr ( NULL, 0, 0 );                    
+                    if ( NULL != asyData )
+                    	{
+                    	asyDataPtr.Set ( asyData->Des() );
+                    	}
                     iConnectionController->NotificationQueue().CompleteValueMessageL(
                                                    messageId,
                                                    asyDataPtr,
                                                    errPckgBuf(),
-                                                   iOutstandingTrId );                    
-                    CleanupStack::PopAndDestroy( asyData );                               
+                                                   iOutstandingTrId );
+                    
+                    if ( NULL != asyData )
+                    	{                            
+                    	CleanupStack::PopAndDestroy( asyData );                               
+                    	}	
                     }
                 break;
             case EProcessResponseObject :
-                {
-                TPtr8 objectBufPtr( objectBuf->Ptr(0) );
-                iConnectionController->NotificationQueue().CompleteValueMessageL( 
-                                                   messageId,
-                                                   iOutstandingTrId,
-                                                   &objectBufPtr,
-                                                   errPckgBuf() );
-                CleanupStack::PopAndDestroy( objectBuf );
+                {                
+                TPtr8 objectBufPtr ( NULL, 0, 0 ); 
+                
+                if(	NULL != objectBuf )
+                	{
+                	objectBufPtr.Set ( objectBuf->Ptr(0) );
+                	}	      
+                	          
+	                iConnectionController->NotificationQueue().CompleteValueMessageL( 
+                                   messageId,
+                                   iOutstandingTrId,
+                                   &objectBufPtr,
+                                   errPckgBuf() );                	                	
+
+                if( NULL != objectBuf )
+                	{                                   
+                	CleanupStack::PopAndDestroy( objectBuf );
+                  }
                 }                                                   
             break;
                 

@@ -108,6 +108,27 @@ EXPORT_C void TAccPolGenericIDArrayAccessor::CopyGenericIDArray(
     COM_TRACE_( "[AccFW: ACCPOLICY] TAccPolGenericIDArrayAccessor::CopyGenericIDArrayL() - return void" );
     }
     
+
+EXPORT_C void TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray( 
+    TAccPolGenericIDArray& aGenericIDArray, 
+    TInt  aIndex) 
+    { 
+    COM_TRACE_( "[AccFW: ACCPOLICY] TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray()" ); 
+    
+    TInt iArrayCount( aGenericIDArray.Count() );    
+    TInt i(aIndex); 
+    for ( ; i < (iArrayCount-1); ++i ) 
+        { 
+        aGenericIDArray.iGenericIDArray[i] = aGenericIDArray.iGenericIDArray[i+1]; 
+        } 
+    TAccPolGenericID emptyID; 
+    aGenericIDArray.iGenericIDArray[i] = emptyID; 
+
+    COM_TRACE_( "[AccFW: ACCPOLICY] TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray() - return void" ); 
+    } 
+
+
+
 // -----------------------------------------------------------------------------
 // TAccPolGenericIDArrayAccessor::FindWithHWDeviceIDL
 // Look for a Generic ID from the array with device ID.

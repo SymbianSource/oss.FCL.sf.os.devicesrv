@@ -138,7 +138,7 @@ RESOURCE SSM_START_APP_INFO r_cmd_idle
     priority = 0xFFDF;
     name = "z:\\sys\\bin\\hsapplication.exe";
     execution_behaviour = ESsmDeferredWaitForSignal;
-    
+    monitor_info = r_mon_max_restarts_ignore;
     }
 
 // ---------------------------------------------------------------------------

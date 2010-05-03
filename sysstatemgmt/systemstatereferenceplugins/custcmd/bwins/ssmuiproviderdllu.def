@@ -26,3 +26,5 @@ EXPORTS
 	?ValidateRTCPropertyKey@CSsmUiSpecific@@SAIXZ @ 25  NONAME ; unsigned int CSsmUiSpecific::ValidateRTCPropertyKey(void)
 	?ValidateRTCPropertyCategory@CSsmUiSpecific@@SA?AVTUid@@XZ @ 26  NONAME ; class TUid CSsmUiSpecific::ValidateRTCPropertyCategory(void)
 	?PhoneMemoryRootDriveId@CSsmUiSpecific@@SAHXZ @ 27  NONAME ; int CSsmUiSpecific::PhoneMemoryRootDriveId(void)
+	?ReservePhoneMemorySpace@CSsmUiSpecific@@QAEHXZ @ 28  NONAME ; int CSsmUiSpecific::ReservePhoneMemorySpace(void)
+	?FreeReservedPhoneMemorySpace@CSsmUiSpecific@@QAEHH@Z @ 29  NONAME ; int CSsmUiSpecific::FreeReservedPhoneMemorySpace(int)

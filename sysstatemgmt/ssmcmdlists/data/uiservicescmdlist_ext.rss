@@ -65,6 +65,8 @@ RESOURCE SSM_COMMAND_LIST r_cmds
     {
     commands =
         {
+		//prio 0xFFA7
+		r_cmd_splash,
         // prio 0xFF99
         r_cmd_tzsrv,
         r_cmd_mediator,
@@ -117,6 +119,15 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_mediator
     conditional_information = r_cond_feat_mediator;
     }
 
+// ---------------------------------------------------------------------------
+// r_cmd_splash
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_splash
+    {
+    priority = 0xFFA7;
+    name = "Z:\\sys\\bin\\splashscreen.exe";
+    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_tzsrv

@@ -34,6 +34,21 @@ const TInt KStartupEnumerationFirstValue = 100;
 
 static const TUid KPSUidStartup = { 0x101F8766 };
 
+
+// =============================================================================
+// SIM Utils API
+// =============================================================================
+
+// Use TUid KPSUidStartup = { 0x101F8766 };
+
+/**
+* Note: Refer simutils.h for actual definitions.
+*/
+//const TUint32 KPSSimStatus = 0x00000031;
+//const TUint32 KPSSimOwned = 0x00000032;
+//const TUint32 KPSSimChanged = 0x00000033;
+
+
 // =============================================================================
 // System State API
 // =============================================================================
@@ -256,6 +271,22 @@ enum TPSSplashShutdown
     {
     ESplashRunning = KStartupEnumerationFirstValue,
     ESplashShutdown
+    };
+
+// =============================================================================
+// Security Event SUP
+// =============================================================================
+/**
+* To be used by security event SUP to decide whether an event to be ignored or not
+*/
+
+// Use TUid KPSUidStartup = { 0x101F8766 };
+const TUint32 KIgnoreSecurityEvent = 0x00000302;
+enum TPSIgnoreSecurityEvent
+    {
+    EPSIgnoreSecurityEventUninitialized = KStartupEnumerationFirstValue,
+    EPSIgnoreSecurityEventEPin1Required,
+    EPSIgnoreSecurityEventEPhonePasswordRequired
     };
 
 // =============================================================================

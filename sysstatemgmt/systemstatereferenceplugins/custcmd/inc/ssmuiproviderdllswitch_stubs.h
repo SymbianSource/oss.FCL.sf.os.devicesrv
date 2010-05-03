@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -266,7 +266,25 @@ void call_vector_27 ()
     _asm mov eax, 27
     _asm jmp common_dispatch
     }
+
+__declspec(dllexport)
+__declspec(naked)
+void call_vector_28 ()
+    {
+    //TInt ReservePhoneMemorySpace()
+    _asm mov eax, 28
+    _asm jmp common_dispatch
+    }
+
+__declspec(dllexport)
+__declspec(naked)
+void call_vector_29 ()
+    {
+    //TInt FreeReservedPhoneMemorySpace(const TInt aSpaceToFree)
+    _asm mov eax, 29
+    _asm jmp common_dispatch
+    }
 }
 
-#define MAX_ORDINAL 27
+#define MAX_ORDINAL 29
 

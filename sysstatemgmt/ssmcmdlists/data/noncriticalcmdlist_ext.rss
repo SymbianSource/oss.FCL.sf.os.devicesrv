@@ -75,7 +75,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_watcher,
         r_cmd_dmutilsrv,
         // prio 0xFFA7
-        r_cmd_contentharvester,
         r_cmd_mdswatchdog,
         r_cmd_satsrv,
         r_cmd_cbssrv,
@@ -90,7 +89,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 #ifdef FF_LBT_ENGINE
         r_cmd_lbtsrv,
 #endif // FF_LBT_ENGINE
-        r_cmd_taskswitcher,
         //prio 0xFFA6
         r_cmd_dmfirstbootreason,
         r_cmd_fota,
@@ -141,6 +139,18 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         //prio 0x7EE5
         r_cmd_aab
 #endif
+#ifdef FF_SEARCH_SW
+       //prio 0x7EE4
+       ,r_cmd_activitymonitor13,
+       //prio 0x7EE3
+       r_cmd_searchsw 		//SLAR-832C9T
+#endif //FF_SEARCH_SW
+#ifdef FF_EMAIL_FRAMEWORK
+		//prio 0x7EE2
+       ,r_cmd_activitymonitor14,
+       //prio 0x7EE1
+       r_cmd_nmailagent 	//MBEN-83CFQE
+#endif //FF_EMAIL_FRAMEWORK
         };
     }
 
@@ -345,7 +355,40 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor12
     dll_data = r_dlldata_activitymonitor_timeout;
     }
 #endif
-	
+
+// ---------------------------------------------------------------------------
+// r_cmd_activitymonitor13
+// ---------------------------------------------------------------------------
+//
+#ifdef FF_SEARCH_SW
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor13
+    {
+    priority = 0x7EE4;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
+#endif //FF_SEARCH_SW
+
+// ---------------------------------------------------------------------------
+// r_cmd_activitymonitor14
+// ---------------------------------------------------------------------------
+//
+#ifdef FF_EMAIL_FRAMEWORK
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor14
+    {
+    priority = 0x7EE2;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
+#endif //FF_EMAIL_FRAMEWORK
 // ---------------------------------------------------------------------------
 // r_cmd_amastart
 // ---------------------------------------------------------------------------
@@ -416,21 +459,8 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_conversationserver
     {
     priority = 0x7EE9;
     name = "csserver.exe";
-    execution_behaviour = ESsmFireAndForget;
+    execution_behaviour = ESsmWaitForSignal;
     }
-    
-// ---------------------------------------------------------------------------
-// r_cmd_contentharvester
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_contentharvester
-    {
-    priority = 0xFFA7;
-    name = "z:\\sys\\bin\\contentharvester.exe";
-    execution_behaviour = ESsmFireAndForget;	//behavior changed from ESsmWaitForSignal as part of SCB CR MSOI-7XARNT
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-
 // ---------------------------------------------------------------------------
 // r_cmd_dcmo
 // ---------------------------------------------------------------------------
@@ -566,7 +596,7 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_locod
 // r_cmd_msgnotifier
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_PROCESS_INFO r_cmd_msgnotifier
+RESOURCE SSM_START_APP_INFO r_cmd_msgnotifier
     {
     priority = 0x7EE7;
     name = "msgnotifier.exe";
@@ -625,6 +655,52 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_schedsrv
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
     }
+	
+//---------------------------------------------------------------------------
+// r_cmd_searchsw
+// ---------------------------------------------------------------------------
+//
+#ifdef	FF_SEARCH_SW
+RESOURCE SSM_START_PROCESS_INFO r_cmd_searchsw
+	{
+	priority = 0x7EE3;
+	name = "z:\\sys\\bin\\cpixwatchdog.exe";
+	execution_behaviour = ESsmFireAndForget;
+	conditional_information = r_cond_feat_searchsw;
+	}
+
+// ---------------------------------------------------------------------------
+// r_cond_feat_searchsw
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_searchsw
+    {
+    feature_id = KFeatureIdFfSearchSw;
+    }
+#endif //FF_SEARCH_SW
+
+// ---------------------------------------------------------------------------
+// r_cmd_nmailagent
+// ---------------------------------------------------------------------------
+//
+#ifdef FF_EMAIL_FRAMEWORK
+RESOURCE SSM_START_PROCESS_INFO r_cmd_nmailagent
+    {
+    priority = 0x7EE1;
+    name = "z:\\sys\\bin\\nmailagent.exe";
+    execution_behaviour = ESsmFireAndForget;
+    conditional_information = r_cond_feat_emailfw;
+    }
+    
+// ---------------------------------------------------------------------------
+// r_cond_feat_emailfw
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_emailfw
+    {
+    feature_id = KFeatureIdFfEmailFramework;
+    }
+#endif //FF_EMAIL_FRAMEWORK
 
 // ---------------------------------------------------------------------------
 // r_cmd_supllistener
@@ -639,18 +715,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_supllistener
     monitor_info = r_mon_3_restarts_ignore;
     conditional_information = r_cond_feat_omasuplplugins;
     }
-
-// ---------------------------------------------------------------------------
-// r_cmd_taskswitcher
-// ---------------------------------------------------------------------------  
-RESOURCE SSM_START_APP_INFO r_cmd_taskswitcher
-     {
-     priority = 0xFFA7;
-     name = "z:\\sys\\bin\\tsapplication.exe";
-     execution_behaviour = ESsmDeferredWaitForSignal;
-     background = 1; // To background
-     monitor_info = r_mon_3_restarts_ignore;
-     }
 
 // ---------------------------------------------------------------------------
 // r_cmd_multiple_wait

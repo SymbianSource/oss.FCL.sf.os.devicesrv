@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -448,6 +448,11 @@ void CResourceReaderTest::TestGetCases()
 
 	__UHEAP_MARK;
 	TRAP(err, TestGet4L());
+	TEST(err == KErrNone);
+	__UHEAP_MARKEND;
+
+	__UHEAP_MARK;
+	TRAP(err, TestGet5L());
 	TEST(err == KErrNone);
 	__UHEAP_MARKEND;
 
@@ -2019,4 +2024,40 @@ CSsmCommandBase* CResourceReaderTest::ConstructCommandFromResourceLC(TSsmCommand
 	CSsmCommandBase* cmd = NULL;
 	CleanupStack::PushL(cmd);
 	return NULL;
+	}
+
+/*
+It tests for the scenario where first file have no commands(i.e. cmdlists7a) and second file cmdlists7b have two commands and
+third file have no commands(i.e cmdlists7c)
+
+CommandList should be created and iCommandConstructCount should be two.
+*/
+void CResourceReaderTest::TestGet5L()
+	{
+	INFO_PRINTF1(_L("*** Starting TestGet5L"));
+	_LIT(KCommandListPath, "z:\\resource\\ssmatest\\cmdlists7\\");
+	CSsmCommandListResourceReaderImpl* reader = CSsmCommandListResourceReaderImpl::NewL(iFs, KCommandListPath, *this);
+
+	// init
+	TRequestStatus status;
+	reader->Initialise(status);
+	TEST(status == KRequestPending);
+	Run();
+	User::WaitForRequest(status); // mop up the completed initialisation request
+	TEST(status == KErrNone);
+
+	// prepare
+	TSsmState state(0,23);
+	reader->PrepareCommandList(*this, ETestCommandListId1, state, status);
+	iWhichPrepare = EConditional;
+	iCommandConstructCount = 0;
+	Run();
+	User::WaitForRequest(status);
+		
+	TBool commandListReady =  reader->IsCommandListReady();
+	
+	TEST((status == KErrNone) && (commandListReady == TRUE) && (iCommandConstructCount == 2));
+		
+	iWhichPrepare = EPrepareNoCheck;
+	delete reader;
 	}

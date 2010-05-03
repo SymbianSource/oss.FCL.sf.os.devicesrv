@@ -73,4 +73,5 @@ EXPORTS
 	_ZN22CAccPolAccessoryPolicyD0Ev @ 72 NONAME
 	_ZN22CAccPolAccessoryPolicyD1Ev @ 73 NONAME
 	_ZN22CAccPolAccessoryPolicyD2Ev @ 74 NONAME
+	_ZN29TAccPolGenericIDArrayAccessor29RemoveIndexFromGenericIDArrayER21TAccPolGenericIDArrayi @ 75 NONAME
 

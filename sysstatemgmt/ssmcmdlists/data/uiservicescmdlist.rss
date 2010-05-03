@@ -78,8 +78,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0xFFC7
         r_cmd_initclkeys,
         r_cmd_initramdrive,
-        // prio 0xFFA7
-        r_cmd_splash,
         r_cmd_rtc,              // prio 0xFF97
         // prio 0xFF96 -  rtc (tzsrv, mediator & hwrmsrv have been moved to extended startuplist but uses the same multiplewait command )
         r_cmd_multiwaitforever1,
@@ -363,16 +361,6 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_selectlanguage
     dllname = "ssmlangselcmd.dll";
     ordinal = 1; // SelectLanguage
     retries = 2;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_splash
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_splash
-    {
-    priority = 0xFFA7;
-    name = "Z:\\sys\\bin\\splashscreen.exe";
     }
 
 // ---------------------------------------------------------------------------

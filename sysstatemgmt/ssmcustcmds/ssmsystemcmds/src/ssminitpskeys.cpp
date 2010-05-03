@@ -299,7 +299,15 @@ void CSsmInitPsKeys::InitializeKeysL()
              KWriteDeviceDataPolicy );
     SetL( KPSStarterUid, KSSMUILanguagePSKey , 0 );
 
-
+    INFO( "KPSUidStartup::KIgnoreSecurityEvent" );
+    DefineL( KPSUidStartup,
+             KIgnoreSecurityEvent,
+             KReadDeviceDataPolicy,
+             KWriteDeviceDataPolicy );
+    SetL( KPSUidStartup,
+          KIgnoreSecurityEvent,
+          EPSIgnoreSecurityEventUninitialized );
+    
 // Store FirstBoot Value from cenrep
 TInt csVal( 0 );
 TInt psVal( 0 );

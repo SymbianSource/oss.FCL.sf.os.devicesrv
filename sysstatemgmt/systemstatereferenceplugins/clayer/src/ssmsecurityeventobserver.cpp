@@ -15,7 +15,7 @@
 //
 
 
-
+#include <ssm/startupdomainpskeys.h>
 #include "strtsecphaseobserver.h"
 #include "ssmsecurityeventobserver.h"
 #include "ssmsecuritynotecontroller.h"
@@ -126,8 +126,24 @@ void CStrtSecurityEventObserver::ProcessSecurityEvent()
     switch (iEvent)
         {
         case RMobilePhone::EPin1Required:
-            SimCodeRequest(ESecCodePIN1);
+            {
+            TInt pSIgnorePin1RequiredEvent( EPSIgnoreSecurityEventUninitialized );
+
+            //Get the KIgnoreSecurityEvent PS value
+            TInt err = RProperty::Get( KPSUidStartup, KIgnoreSecurityEvent, pSIgnorePin1RequiredEvent );
+			DEBUGPRINT2A("Getting KIgnoreSecurityEvent completed with %d ", err);
+            //Ignore the event only when KIgnoreSecurityEvent value is EPSIgnoreSecurityEventEPin1Required 
+            if( KErrNone == err && EPSIgnoreSecurityEventEPin1Required == pSIgnorePin1RequiredEvent )
+                {
+                err = RProperty::Set( KPSUidStartup, KIgnoreSecurityEvent, EPSIgnoreSecurityEventUninitialized );
+                DEBUGPRINT2A("Setting KIgnoreSecurityEvent completed with %d ", err);
+				}
+            else
+                {
+                SimCodeRequest(ESecCodePIN1);
+                }
             break;
+            }
         case RMobilePhone::EPuk1Required:
             SimCodeRequest(ESecCodePUK1);
             break;
@@ -138,8 +154,24 @@ void CStrtSecurityEventObserver::ProcessSecurityEvent()
             SimCodeRequest(ESecCodePUK2);
             break;
         case RMobilePhone::EPhonePasswordRequired:
-            SecCodeRequest(ESecCodePasswd);
+            {
+            TInt pSIgnorePhonePasswordRequiredEvent( EPSIgnoreSecurityEventUninitialized );
+
+            //Get the KCancelSecurityNotifier PS value
+            TInt err = RProperty::Get( KPSUidStartup, KIgnoreSecurityEvent, pSIgnorePhonePasswordRequiredEvent );
+			DEBUGPRINT2A("Getting KIgnoreSecurityEvent completed with %d ", err);
+            //Ignore the event only when KIgnoreSecurityEvent value is EPSIgnoreSecurityEventEPhonePasswordRequired 
+            if( KErrNone == err && EPSIgnoreSecurityEventEPhonePasswordRequired == pSIgnorePhonePasswordRequiredEvent )
+                {
+                err = RProperty::Set( KPSUidStartup, KIgnoreSecurityEvent, EPSIgnoreSecurityEventUninitialized );
+				DEBUGPRINT2A("Setting KIgnoreSecurityEvent completed with %d ", err);
+				}
+            else
+                {
+                SecCodeRequest(ESecCodePasswd);
+                }
             break;
+            }
         case RMobilePhone::EPin1Verified:
             CodeVerifyIndication(ESecCodePIN1);
             break;
