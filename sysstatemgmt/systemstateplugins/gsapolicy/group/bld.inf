@@ -24,9 +24,9 @@ PRJ_EXPORTS
 ./sspluginsgsa.iby			/epoc32/rom/include/sspluginsgsa.iby
 
 PRJ_MMPFILES
-// darios: ssm.state.policy.000n.dll conflicting with s60 version (see bug 2620)
+// darios: ssm.state.policy.000n.dll conflicting with s60 version (see bug 2620) (n=0,2,3)
 //./gsastatepolicystartup.mmp
 //./gsastatepolicyshutdown.mmp
-//./gsastatepolicynormal.mmp
+./gsastatepolicynormal.mmp
 //./gsastatepolicyfail.mmp
 
