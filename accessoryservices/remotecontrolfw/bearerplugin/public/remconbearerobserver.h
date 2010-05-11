@@ -270,6 +270,18 @@ public:
 	*/
 	IMPORT_C void SetRemoteAddressedClient(const TUid& aBearerUid, const TRemConClientId& aId);
 	
+	/**
+	Called by the bearer to indicate it would like to be informed when the 
+	locally addressed client changes.
+	*/
+	IMPORT_C TInt RegisterLocalAddressedClientObserver(const TUid& aBearerUid);
+	
+	/**
+	Called by the bearer to indicate it would no longer like to be informed when 
+	the locally addressed client changes.
+	*/
+	IMPORT_C TInt UnregisterLocalAddressedClientObserver(const TUid& aBearerUid);
+	
 private:
 	/** 
 	@see NewResponse.
@@ -366,6 +378,16 @@ private:
 	@see SetRemoteAddressedClient
 	*/
 	virtual void MrcboDoSetRemoteAddressedClient(const TUid& aBearerUid, const TRemConClientId& aId) = 0;
+	
+	/**
+	@see RegisterLocalAddressedClientObserver
+	*/
+	virtual TInt MrcboDoRegisterLocalAddressedClientObserver(const TUid& aBearerUid) = 0;
+	
+	/**
+	@see UnregisterLocalAddressedClientObserver
+	*/
+	virtual TInt MrcboDoUnregisterLocalAddressedClientObserver(const TUid& aBearerUid) = 0;
 	};
 
 #endif // REMCONBEAREROBSERVER_H

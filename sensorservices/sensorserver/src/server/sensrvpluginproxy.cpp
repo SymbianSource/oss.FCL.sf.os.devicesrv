@@ -1342,7 +1342,7 @@ TInt CSensrvPluginProxy::SsyThreadFunction( TAny* aParameter )
         return KErrBadHandle;
         }
 
-    __UHEAP_MARK;
+   // __UHEAP_MARK;
 
 #ifdef MEMORY_TRACE_DEBUG
     // TRACE heap usage
@@ -1428,7 +1428,7 @@ TInt CSensrvPluginProxy::SsyThreadFunction( TAny* aParameter )
     MEMORY_TRACE( ( _L( "#### Sensor Server, SSY exit - HEAP: Size: %d, Available: %d, Used: %d, Change in used: %d" ), heapSize, heapAvail, newUsed, newUsed - used ) );
 #endif
 
-    __UHEAP_MARKEND;
+   // __UHEAP_MARKEND;
 
     return err;
     }

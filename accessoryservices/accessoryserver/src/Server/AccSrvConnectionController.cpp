@@ -761,22 +761,38 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
     TAccPolAccessoryMode accMode;
 
     iServerModel->CurrentConnectionStatusL( genericIDArray );
-
-    if( (EFalse == aAudioOutputStatus) && (KErrUnknown != aDbId) ) 
-        { 
-        TInt index( TAccPolGenericIDArrayAccessor::FindWithUniqueIDL( 
-                genericIDArray, aDbId) ); 
-				if(KErrNotFound != index)
-					{
-        	TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(genericIDArray, index); 
-        	}
+    
+    TUint count;
+    TBool isHDMIConnected = EFalse;
+    
+    count = genericIDArray.Count();
+    if((1 < count) && (EFalse == aAudioOutputStatus) && (KErrUnknown != aDbId))
+        {
+        for(TInt i( 0 ); i < count; ++i)
+            {
+            if(genericIDArray.GetGenericIDL(i).PhysicalConnectionCaps() & KPCHDMI)
+                {
+                isHDMIConnected = ETrue;
+                break;
+                }        
+            }
+        }
+    
+    if(isHDMIConnected)
+        {
+        accMode = iServerModel->AccessoryMode();
+        }    
+    else
+        {
+        accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 
+                                                  aDbId, 
+                                                  aAudioOutputStatus, 
+                                                  iServerModel->AccessoryMode(), 
+                                                  iServerModel->UniqueID() );
         }
 
-    accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 
-                                              aDbId, 
-                                              aAudioOutputStatus, 
-                                              iServerModel->AccessoryMode(), 
-                                              iServerModel->UniqueID() );
+
+    
 
     if( iServerModel->SetAccessoryMode( accMode, aDbId ) ) //Store accessory mode
         {

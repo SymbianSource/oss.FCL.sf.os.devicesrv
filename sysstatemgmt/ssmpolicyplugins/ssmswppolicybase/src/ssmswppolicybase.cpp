@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,7 @@
 #include <ssm/ssmswp.h>
 #include <ssm/ssmsubstates.hrh>
 #include <ssm/starterclient.h>
+#include <startupdomaindefs.h>
 
 #include "ssmswppolicybase.h"
 #include "trace.h"
@@ -135,27 +136,30 @@ EXPORT_C void CSsmSwpPolicyBase::HandleCleReturnValue(
         }
     else
         {
-        RSsmStateManager session;
-        TInt errorCode = session.Connect();
-        ERROR( errorCode, "Failed to connect to RSsmStateManager" );
-        if ( errorCode == KErrNone )
-            {
-            if ( ResetLimitReached() ) // Updates the reset count
-                {
-                INFO( "SWP transition failed -> Fail" );
-                errorCode = session.RequestStateTransition(
-                    TSsmStateTransition( ESsmFail, KSsmAnySubState, 0 ) );
-        	    }
-    	    else
-    	        {
-                INFO( "SWP transition failed -> Reset" );
-                errorCode = session.RequestStateTransition(
-                    TSsmStateTransition( ESsmShutdown, KSsmAnySubState,
-                        RStarterSession::EUnknownReset ) );
-    	        }
+		TSsmState currentState;
+		TInt errorCode = GetCurrentState(currentState);
 
-            session.Close();
-            }
+		if ( ((currentState.MainState() != ESsmShutdown) && (currentState.MainState() != ESsmFail)) || KErrNone != errorCode)
+			{
+			RSsmStateManager session;
+			errorCode = session.Connect();
+			ERROR( errorCode, "Failed to connect to RSsmStateManager" );
+			if ( KErrNone == errorCode )
+				{
+				if ( ResetLimitReached() ) // Updates the reset count
+					{
+					INFO_1( "SWP 0x%08x transition failed -> Fail", aSwp.Key() );
+					errorCode = session.RequestStateTransition(	TSsmStateTransition( ESsmFail, KSsmAnySubState, 0 ) );
+					}
+				else
+					{
+					INFO_1( "SWP 0x%08x transition failed -> Reset", aSwp.Key() );
+					errorCode = session.RequestStateTransition(
+									TSsmStateTransition( ESsmShutdown, KSsmAnySubState, RStarterSession::EUnknownReset ) );
+					}
+				session.Close();
+				}
+			}
 
         TRequestStatus* status = &aStatus;
         User::RequestComplete( status, errorCode );

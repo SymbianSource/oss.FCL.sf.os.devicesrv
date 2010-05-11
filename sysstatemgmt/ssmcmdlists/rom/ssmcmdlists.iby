@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -36,5 +36,6 @@ data=DATAZ_\private\2000D75B\fail\failcmdlist.rsc                       \private
 data=DATAZ_\private\2000D75B\shutdown\shutdowncmdlists.rsc              \private\2000D75B\shutdown\shutdowncmdlists.rsc
 data=DATAZ_\private\2000D75B\rfstatusswpcmdlist\rfswpcmdlists.rsc       \private\2000D75B\rfstatusswpcmdlist\rfswpcmdlists.rsc
 data=DATAZ_\private\2000D75B\swpui\uiswpcmdlists.rsc                    \private\2000D75B\swpui\uiswpcmdlists.rsc
+data=DATAZ_\private\2000D75B\swpnoncritical\noncriticalswpcmdlists.rsc  \private\2000D75B\swpnoncritical\noncriticalswpcmdlists.rsc
 
 #endif // SSMCMDLISTS_IBY
