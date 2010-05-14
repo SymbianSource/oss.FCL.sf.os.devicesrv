@@ -22,7 +22,6 @@ DEFAULT
 
 PRJ_EXPORTS
 
-#include "../plugins/hapticsivtgetterplugin/group/bld.inf"
 
 PRJ_MMPFILES
 hwrmhapticseffectdatagetterfw.mmp

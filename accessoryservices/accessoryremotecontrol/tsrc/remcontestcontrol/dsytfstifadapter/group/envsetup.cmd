@@ -19,17 +19,22 @@ REM
 
 @echo Cleaning remconadaptation...
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\accessoryadaptation\group\
-call bldmake bldfiles
-call abld makefile remconadaptation
-call abld reallyclean remconadaptation
+REM call bldmake bldfiles
+REM call abld makefile remconadaptation
+REM call abld reallyclean remconadaptation
+call sbs -p remconadaptation -c armv5 REALLYCLEAN
+call sbs -p remconadaptation -c winscw REALLYCLEAN
 popd
 @echo Cleaning remconadaptation... Finished
 
-
 @echo build/instr stubs
 pushd ..\..\..\stub\group\
-call bldmake bldfiles
-call abld test reallyclean
-call abld test build
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
+REM call abld test build
+call sbs -c armv5.test
+call sbs -c winscw.test
 popd
 @echo build/instr stubs done

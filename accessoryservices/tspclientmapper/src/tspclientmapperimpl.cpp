@@ -545,10 +545,14 @@ TInt CTspClientMapperImpl::GetTspTargetClients(
         if ( (TInt)buf().operator[]( i ) != 0 ) // count of registered clients is lost with TFixedArray, so rely on id being different from 0
             {
             COM_TRACE_1( "[TspClientMapperImpl] CTspClientMapperImpl::GetTspTargetClientsL() first client's Pid = %d", (TInt)buf().operator[]( i ) );
-            aPidArray.Append( buf().operator[]( i ) );
-            }
+            returnErr = aPidArray.Append( buf().operator[]( i ) );
+			if ( returnErr != KErrNone )
+				{
+				break;
+				}
+			}
         }
-	COM_TRACE_( "[TspClientMapperImpl] CTspClientMapperImpl::GetTspTargetClientsL() - return" );
+	COM_TRACE_1 ( "[TspClientMapperImpl] CTspClientMapperImpl::GetTspTargetClientsL() - returnErr: %d", returnErr );
 	return returnErr;
 	
 	}

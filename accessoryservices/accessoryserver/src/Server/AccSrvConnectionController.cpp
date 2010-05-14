@@ -855,7 +855,10 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
         { 
         TInt index( TAccPolGenericIDArrayAccessor::FindWithUniqueIDL( 
                 genericIDArray, aDbId) ); 
-        TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(genericIDArray, index); 
+				if(KErrNotFound != index)
+					{
+        	TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(genericIDArray, index); 
+        	}
         }
 
     accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 

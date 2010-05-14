@@ -14,6 +14,8 @@
       <module name="">
       		<unit unitID="sydo.devicesrv.fps_api" mrp="" bldFile="&layer_real_source_path;/devicesrv_plat/fps_api/group" name="sydo_devicesrv_fps_api" filter="dfs_build" />
       		<unit unitID="sydo.devicesrv.fpsclient" mrp="" bldFile="&layer_real_source_path;/sensorservices/fpsclient/group" name="sydo_devicesrv_fpsclient" filter="dfs_build" />
+      		<unit unitID="sydo.devicesrv.hapticsivtgetterplugin" mrp="" bldFile="&layer_real_source_path;/hwrmhaptics/hapticseffectdatagetterfw/plugins/hapticsivtgetterplugin/group" name="sydo_devicesrv_hapticsivtgetterplugin" filter="dfs_build" />
+      		<unit unitID="sydo.devicesrv.hapticsvibepacketizerplugin" mrp="" bldFile="&layer_real_source_path;/hwrmhaptics/hapticspacketizer/plugins/hapticsvibepacketizerplugin/group" name="sydo_devicesrv_hapticsvibepacketizerplugin" filter="dfs_build" />
       </module>                                                                                                                                                     
     </layer>                                                                                                                                                        
                                                                                                                                                                     

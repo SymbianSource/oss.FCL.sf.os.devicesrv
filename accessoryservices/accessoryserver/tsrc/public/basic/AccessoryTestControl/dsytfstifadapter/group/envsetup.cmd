@@ -19,43 +19,55 @@ REM
 
 @echo Cleaning BT Audioman Client...
 pushd \sf\mw\btservices\bluetoothengine\btaudioman\group
-call bldmake bldfiles
-call abld makefile btaudiomanclient
-call abld reallyclean btaudiomanclient
+REM call bldmake bldfiles
+REM call abld makefile btaudiomanclient
+REM call abld reallyclean btaudiomanclient
+call sbs -p btaudiomanclient -c armv5 REALLYCLEAN
+call sbs -p btaudiomanclient -c winscw REALLYCLEAN
 popd
 @echo Cleaning BT Audioman Client... Finished
 
 
 @echo Cleaning accfwuinotifier...
 pushd \sf\mw\appsupport\coreapplicationuis\accfwuinotifier\group
-call bldmake bldfiles
-call abld makefile 
-call abld reallyclean
+REM call bldmake bldfiles
+REM call abld makefile 
+REM call abld reallyclean
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
 popd
 @echo Cleaning accfwuinotifier... Finished
 
 
 @echo Cleaning accessoryadaptation...
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\accessoryadaptation\group\
-call bldmake bldfiles
-call abld makefile accessoryadaptation
-call abld clean accessoryadaptation
+REM call bldmake bldfiles
+REM call abld makefile accessoryadaptation
+REM call abld clean accessoryadaptation
+call sbs -p accessoryadaptation -c armv5 CLEAN
+call sbs -p accessoryadaptation -c winscw CLEAN
 popd
 @echo Cleaning accessoryadaptation... Finished
 
 
 @echo Cleaning Plugged Display ASY...
 pushd \sf\os\devicesrv\accessoryservices\pluggeddisplay\pluggeddisplayasy\group
-call bldmake bldfiles
-call abld reallyclean
+REM call bldmake bldfiles
+REM call abld reallyclean
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
 popd
 @echo Cleaning Plugged Display ASY... Finished
 
 
 @echo Setting up stubs...
 pushd ..\..\..\stubs\group\
-call bldmake bldfiles
-call abld test reallyclean
-call abld test build
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
+REM call abld test build
+call sbs -c armv5.test
+call sbs -c winscw.test
 popd
 @echo Setting up stubs... Finished
