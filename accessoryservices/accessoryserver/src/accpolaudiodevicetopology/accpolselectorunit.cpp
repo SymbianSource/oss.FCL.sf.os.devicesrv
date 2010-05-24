@@ -122,7 +122,7 @@ void CAccPolSelectorUnit::ConstructL()
 EXPORT_C CAccPolSelectorUnit::~CAccPolSelectorUnit()
     {
     API_TRACE_( "[AccFW: ACCPOLAUDIODEVICETOPOLOGY] CAccPolSelectorUnit::~CAccPolSelectorUnit() - Enter" );
-    API_TRACE_( "[AccFW: ACCPOLAUDIODEVICETOPOLOGY] CAccPolSelectorUnit::¨CAccPolSelectorUnit() - Return" );
+    API_TRACE_( "[AccFW: ACCPOLAUDIODEVICETOPOLOGY] CAccPolSelectorUnit::~CAccPolSelectorUnit() - Return" );
     }
 
 // ---------------------------------------------------------------------------
