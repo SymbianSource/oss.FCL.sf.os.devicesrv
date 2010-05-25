@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -159,10 +159,11 @@ MSsmStatePolicy::TResponse CGsaStatePolicyNormal::TransitionAllowed(const TSsmSt
 
 	//Check if the requested transition is supported from current state
 	if (TransitionSupported(aRequest.State()))
-		{
-		if((NULL == aCurrent) && (NULL == aQueued))
+		{		
+		//Transition is allowed when there is no current and queued transitions.
+		//or allow substate(ESsmNormalRfOnSubState and ESsmNormalRfOffSubState)transition only when KSsmGracefulOffline is enabled and queue is empty.
+		if (((NULL == aCurrent) && (NULL == aQueued)) || (IsSsmGracefulOffline() && (NULL == aQueued)))
 			{
-			// SsmServer is idle
 			response = EDefinitelyAllowed;
 			}
 		else if((aRequest.State().MainState() == ESsmFail) || (aRequest.State().MainState() == ESsmShutdown))

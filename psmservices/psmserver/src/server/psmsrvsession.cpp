@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -15,7 +15,8 @@
 *
 */
 
-
+#include <e32property.h>
+#include <connect/sbdefs.h>
 #include <psmsettingsprovider.h>
 #include "psmmanager.h"
 #include "psmsrvserver.h"
@@ -167,7 +168,18 @@ void CPsmSession::DispatchL( const RMessage2& aMessage )
                 {
                 User::Leave( KErrArgument );
                 }
-
+			
+            TInt keyVal = -1;
+            User::LeaveIfError( RProperty::Get( KUidSystemCategory, conn::KUidBackupRestoreKey, keyVal ) );
+			//if backup or restore is in progress, change in power save mode
+			//is not allowed as it will not be possible to do write
+			//operation in cenrep and it would leave the device in unstable power saving mode state
+            if( (( keyVal & conn::KBURPartTypeMask ) != conn::EBURNormal ) 
+				&& (( keyVal & conn::KBURPartTypeMask ) != conn::EBURUnset ))
+				{
+				User::Leave( KErrNotSupported );
+				}
+			
             iNotifyModeMessage->Initialize( aMessage );
             iPsmManager.NotifyPowerSaveModeChangeL( mode );
             break;

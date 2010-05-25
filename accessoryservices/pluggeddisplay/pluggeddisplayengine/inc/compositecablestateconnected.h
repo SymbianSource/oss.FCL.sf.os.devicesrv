@@ -308,6 +308,7 @@ private: // data
     CCentralRepositoryWatch* iCRWatchForAspectRatio;
     CCentralRepositoryWatch* iCRWatchForFlickerFilter;
     CCentralRepositoryWatch* iCRWatchForTvSystem;
+	CCentralRepositoryWatch* iCRWatchForVOverScan;
 
     /**
      * TV Out Configurer.

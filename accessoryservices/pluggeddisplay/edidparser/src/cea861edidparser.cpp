@@ -1479,6 +1479,7 @@ TInt CCea861EdidParser::ReadCeaDataBlockCollectionL( const TExtDataBlock& aData,
         {
         case 0:
             //reserved
+            ReadUnknownTagCode( aData, aIndex, L1 );
             break;
         case 1:
             ReadCea861ShortAudioDataBlockL( aData, aIndex, L1 );
@@ -1535,6 +1536,7 @@ void CCea861EdidParser::ReadCea861ShortAudioDataBlockL( const TExtDataBlock& aDa
     const TInt8 aLen )
     {
     FUNC_LOG;
+    TBool first = EFalse;
 
     iAudioDataBlockSupported = ETrue;
 
@@ -1542,6 +1544,8 @@ void CCea861EdidParser::ReadCea861ShortAudioDataBlockL( const TExtDataBlock& aDa
         {
         iParsedInfo->iShortAudioDescriptors
             = new ( ELeave ) TCEA861AudioDataBlock();
+		first = ETrue;
+		iParsedInfo->iShortAudioDescriptors->iNext = 0;
         }
     TCEA861AudioDataBlock* cur = iParsedInfo->iShortAudioDescriptors;
 
@@ -1550,8 +1554,8 @@ void CCea861EdidParser::ReadCea861ShortAudioDataBlockL( const TExtDataBlock& aDa
         cur = cur->iNext; // jump to the end
         }
 
-    TBool first = ETrue;
-    for( int i = 0; i < aLen; i++ )
+	TInt i = 0;
+	while (i < aLen)
         {
         // read aLen-amount of short video descriptors
 
@@ -1594,20 +1598,20 @@ void CCea861EdidParser::ReadCea861ShortVideoDataBlockL( const TExtDataBlock& aDa
     {
     FUNC_LOG;
 
-    TBool first = ETrue;
+    TBool first = EFalse;
     iVideoDataBlockSupported = ETrue;
     if( !iParsedInfo->iShortVideoDescriptors ) // linked list
         {
         iParsedInfo->iShortVideoDescriptors
             = new ( ELeave ) TCEA861VideoDataBlock();
         iParsedInfo->iShortVideoDescriptors->iNext = 0; // make sure there are no stray pointers
+        first = ETrue;
         }
 
     TCEA861VideoDataBlock* cur = iParsedInfo->iShortVideoDescriptors;
     while( cur->iNext != 0 )
         {
         cur = cur->iNext; // jump to the end
-        first = EFalse; // there is already some links, so set first to false
         }
 
     for( int i = 0; i < aLen; i++ )
@@ -1673,11 +1677,13 @@ void CCea861EdidParser::ReadCea861VendorSpecificDataBlockL( const TExtDataBlock&
 
     aLen -= 3; // this is needed: Vendor specific payload length = L4-3bytes
 
-    TBool first = ETrue;
+    TBool first = EFalse;
     if( iParsedInfo->iVendorSpecificData->iVendorSpecificPayloadStart == 0 )
         {
         iParsedInfo->iVendorSpecificData->iVendorSpecificPayloadStart
             = new ( ELeave ) TCEA861VendorSpecificDataBlockPayload();
+		iParsedInfo->iVendorSpecificData->iVendorSpecificPayloadStart->iNext = 0;
+		first = ETrue;
         }
     TCEA861VendorSpecificDataBlockPayload* cur =
         iParsedInfo->iVendorSpecificData->iVendorSpecificPayloadStart;
@@ -1756,6 +1762,7 @@ void CCea861EdidParser::ReadVideoCapabilityDataBlockL( const TExtDataBlock& aDat
     const TInt8 aLen )
     {
     FUNC_LOG;
+	TBool first = EFalse;
 
     aIndex++; // jump to the extended tag code (aLen is the length from extended tag to the end)
 
@@ -1763,13 +1770,12 @@ void CCea861EdidParser::ReadVideoCapabilityDataBlockL( const TExtDataBlock& aDat
         {
         iParsedInfo->iVideoCapabilityDataBlock
             = new ( ELeave ) TCEA861VideoCapabilityDataBlock();
+		first = ETrue;
         }
     TCEA861VideoCapabilityDataBlock* cur =
         iParsedInfo->iVideoCapabilityDataBlock;
-    TBool first = ETrue;
     while( cur->iNext != 0 )
         {
-        first = EFalse;
         cur = cur->iNext;
         }
 

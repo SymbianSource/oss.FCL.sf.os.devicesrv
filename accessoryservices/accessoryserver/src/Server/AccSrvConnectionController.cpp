@@ -30,7 +30,6 @@
 #include "AccPolGenericIDAccessor.h"
 #include "AccSrvSettingsHandler.h"
 #include "AccPolSubblockNameArrayAccessor.h"
-#include "AccSrvChargingContextController.h"
 #include <AccConfigFileParser.h>
 #include <s32mem.h>
 #include "AccSrvWiredConnectionPublisher.h"
@@ -101,12 +100,6 @@ void CAccSrvConnectionController::ConstructL( CAccSrvServerModel* aServerModel )
     iASYProxyHandler         = CAccSrvASYProxyHandler::NewL( this );
     iSettingsHandler         = CAccSrvSettingsHandler::NewL( this, *aServerModel );
     iWiredConnPublisher      = CAccSrvWiredConnectionPublisher::NewL();
-    TRAPD( err, iChargingContextController = CAccSrvChargingContextController::NewL() );
-    if ( err != KErrNone ) // Server does not need to die on charging context fail.
-        {
-        COM_TRACE_1( "[AccFW:AccServer] CAccSrvConnectionController::ConstructL - CAccSrvChargingContextController err %d", err );
-        iChargingContextController = NULL;
-        }
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::ConstructL - return void" );
     }
@@ -167,11 +160,6 @@ CAccSrvConnectionController::~CAccSrvConnectionController()
         delete iSettingsHandler;
         }
     
-    if( NULL != iChargingContextController )
-        {
-        delete iChargingContextController;
-        }
-
     delete iWiredConnPublisher;
 
     // Handlers must be deleted after iPolicy and iASYProxyHandler

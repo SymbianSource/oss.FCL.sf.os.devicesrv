@@ -74,7 +74,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds_charging
         {
 #ifdef RD_USB_CHARGING
         r_cmd_usbwatcher
-#endif RD_USB_CHARGING
+#endif //RD_USB_CHARGING
         };
     }
 

@@ -40,6 +40,7 @@ const TReal K4d3 = 1.333;
 
 const TInt KDefaultCEAMode = E640x480p59_94d60Hz4d3;
 const TInt KDefaultCEAModeIndex = 0;
+const TInt KDefaultDMTModeIndex = 3;
 
 // Retry Delay for EDID access
 const TInt KRetryDelay = 50 * 1000; // 50 milliseconds
@@ -551,9 +552,10 @@ void CEDIDHandler::RunL()
                     }
                 else
                     {
+                    // No EDID data available from the sink
                     iRetryCounter = KErrNone;
-                    iFSM.Input( EPDEIfEDIDHandler,
-                        EPDEIfEDIDHandlerEventEdidDataFetchFailed );
+					ResetData();
+					iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
                     }
                 }
             break;
@@ -643,8 +645,6 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
     {
     FUNC_LOG;
     
-    aTimings.iTvPhysicalImageWidthMm = iEdidParserPtr->GetHorizontalScreenSize() * 10;
-    aTimings.iTvPhysicalImageHeightMm = iEdidParserPtr->GetVerticalScreenSize() * 10;
     aTimings.iTvPhysicalImageAspectRatioNumerator = 0;
     aTimings.iTvPhysicalImageAspectRatioDenominator = 0;
     aTimings.iHorizontalBorderPixels = 0;
@@ -652,15 +652,25 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
     aTimings.iVerticalBorderLinesField2 = 0;
     aTimings.iLeftBorderPixels = 0;
     aTimings.iRightBorderPixels = 0;
-    aTimings.iUnderscanEnabled = EFalse;
     
     if( iExtensionParserPtr )
         {
+        INFO("==CEA Extension Exists");
         aTimings.iUnderscanEnabled = iExtensionParserPtr->Underscan();
         }
+	else
+		{
+        INFO("==No CEA Extension");
+		// No CEA Extension so it should be DVI
+		// Underscan supported always		
+		aTimings.iTvPhysicalImageAspectRatioNumerator = 4;
+		aTimings.iTvPhysicalImageAspectRatioDenominator = 3;
+		aTimings.iUnderscanEnabled = ETrue;
+		}
     
     if( aTimings.iUnderscanEnabled )
         {
+        INFO("==Underscan Enabled");
         // Underscan
         aTimings.iLeftTopCorner.iX = 0;
         aTimings.iLeftTopCorner.iY = 0;
@@ -669,23 +679,30 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
         }
     else
         {
+        INFO("==Underscan Disabled");
         // Calculate overscan
         CalculateOverscan( aTimings.iLeftTopCorner,
             aTimings.iRightBottomCorner );                
         }
-    aTimings.iTvPhysicalImageAspectRatioNumerator = iEdidParserPtr->GetAspectRatioLandscape();
-    aTimings.iTvPhysicalImageAspectRatioDenominator = iEdidParserPtr->GetAspectRatioPortrait();
     aTimings.iConnector = TTvSettings::EHDMI;
-    aTimings.iTvColorCoordinates.iRed.iX = iEdidParserPtr->GetColorCoordinatesRedX();
-    aTimings.iTvColorCoordinates.iRed.iY = iEdidParserPtr->GetColorCoordinatesRedY();
-    aTimings.iTvColorCoordinates.iGreen.iX = iEdidParserPtr->GetColorCoordinatesGreenX();
-    aTimings.iTvColorCoordinates.iGreen.iY = iEdidParserPtr->GetColorCoordinatesGreenY();
-    aTimings.iTvColorCoordinates.iBlue.iX = iEdidParserPtr->GetColorCoordinatesBlueX();
-    aTimings.iTvColorCoordinates.iBlue.iY = iEdidParserPtr->GetColorCoordinatesBlueY();
-    aTimings.iTvColorCoordinates.iWhite.iX = iEdidParserPtr->GetColorCoordinatesWhiteX();
-    aTimings.iTvColorCoordinates.iWhite.iY = iEdidParserPtr->GetColorCoordinatesWhiteY();
-    aTimings.iTvHdmiVersion = iEdidParserPtr->GetVersion();
-    aTimings.iTvHdmiRevision = iEdidParserPtr->GetRevision();
+
+	if( iEdidParserPtr )
+		{
+		aTimings.iTvPhysicalImageWidthMm = iEdidParserPtr->GetHorizontalScreenSize() * 10;
+		aTimings.iTvPhysicalImageHeightMm = iEdidParserPtr->GetVerticalScreenSize() * 10;
+	    aTimings.iTvPhysicalImageAspectRatioNumerator = iEdidParserPtr->GetAspectRatioLandscape();
+	    aTimings.iTvPhysicalImageAspectRatioDenominator = iEdidParserPtr->GetAspectRatioPortrait();
+	    aTimings.iTvColorCoordinates.iRed.iX = iEdidParserPtr->GetColorCoordinatesRedX();
+	    aTimings.iTvColorCoordinates.iRed.iY = iEdidParserPtr->GetColorCoordinatesRedY();
+	    aTimings.iTvColorCoordinates.iGreen.iX = iEdidParserPtr->GetColorCoordinatesGreenX();
+	    aTimings.iTvColorCoordinates.iGreen.iY = iEdidParserPtr->GetColorCoordinatesGreenY();
+	    aTimings.iTvColorCoordinates.iBlue.iX = iEdidParserPtr->GetColorCoordinatesBlueX();
+	    aTimings.iTvColorCoordinates.iBlue.iY = iEdidParserPtr->GetColorCoordinatesBlueY();
+	    aTimings.iTvColorCoordinates.iWhite.iX = iEdidParserPtr->GetColorCoordinatesWhiteX();
+	    aTimings.iTvColorCoordinates.iWhite.iY = iEdidParserPtr->GetColorCoordinatesWhiteY();
+	    aTimings.iTvHdmiVersion = iEdidParserPtr->GetVersion();
+	    aTimings.iTvHdmiRevision = iEdidParserPtr->GetRevision();
+		}
     Mem::FillZ( ( TAny* )&aTimings.iProductName, ( sizeof( TChar ) * KProductNameChars ) );
     Mem::FillZ( ( TAny* )&aTimings.iProductDescription, ( sizeof( TChar ) * KProductDescriptorsChars ) );
     aTimings.iSourceType = THdmiDviTimings::ESourceTypeUnknown;
@@ -861,21 +878,44 @@ TInt CEDIDHandler::SetDmtModes( RArray<THdmiDviTimings>& aTimings ) const
     FUNC_LOG;
     
     TInt retVal(KErrNone);
-    
-    // Check established timings 1 and 2
-    retVal = SetDmtModesFromEstablishedTimings( aTimings );
-    
-    if( KErrNone == retVal )
-        {
-        // Check standard timings
-        retVal = SetDmtModesFromStandardTimings( aTimings );
-        
-        if( KErrNone == retVal )
-            {
-            // Check timing descriptors
-            retVal = SetDmtModesFromTimingDescriptors( aTimings );        
-            }
-        }
+
+	if( iDataBlockPtr )
+		{
+	    // Check established timings 1 and 2
+	    retVal = SetDmtModesFromEstablishedTimings( aTimings );
+	    
+	    if( KErrNone == retVal )
+	        {
+	        // Check standard timings
+	        retVal = SetDmtModesFromStandardTimings( aTimings );
+	        
+	        if( KErrNone == retVal )
+	            {
+	            // Check timing descriptors
+	            retVal = SetDmtModesFromTimingDescriptors( aTimings );        
+	            }
+	        }
+		}
+	else
+		{
+		INFO( "==No EDID available from the Sink. Setting DMT 4" );
+		// No EDID data available from the sink
+		// Default VGA resolution should be selected
+		THdmiDviTimings timings;
+		const TTimingItem* item = TimingByIndex( KDefaultDMTModeIndex, ETimingModeDMT );
+		if( item )
+			{
+			Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
+			FillHdmiDviTimings( *item, timings );
+			retVal = aTimings.Append( timings );
+			ERROR_1( retVal, "Failed to append DMT timing: %S in array", item->iTimingName );
+			}
+		else
+			{
+			ERROR_1( KErrArgument, "DMT timing item not found for VIC mode: %d", KDefaultDMTModeIndex );
+			retVal = KErrNotFound;
+			}
+		}
     
     return retVal;
     }
@@ -1343,6 +1383,8 @@ void CEDIDHandler::UpdateOverscanValues()
     // Update overscan values
     iHOverscan = hOverscan;
     iVOverscan = vOverscan;
+
+	INFO_2( "Overscan Values: %d,%d", iHOverscan, iVOverscan );
     }
 
 // ----------------------------------------------------------------------------
