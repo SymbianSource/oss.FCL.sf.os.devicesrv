@@ -43,7 +43,6 @@ class CAccSrvModeHandler;
 class CAccSrvASYProxyHandler;
 class CAccSrvSettingsHandler;
 class CAccSrvWiredConnectionPublisher;
-class CAccSrvChargingContextController;
 
 // CLASS DECLARATION
 
@@ -387,7 +386,6 @@ NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
         CAccSrvModeHandler*                     iModeHandler;            //Owned
         CAccSrvASYProxyHandler*                 iASYProxyHandler;        //Owned
         CAccSrvSettingsHandler*                 iSettingsHandler;        //Owned
-        CAccSrvChargingContextController*       iChargingContextController; //Owned
         RPointerArray<CAccSrvConnectionHandler> iConnectionHandler;      //Owned
 
 	    TUint32                                 iInformationNoteUID;	  

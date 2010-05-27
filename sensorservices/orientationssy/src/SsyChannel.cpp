@@ -303,17 +303,6 @@ void CSSYChannel::RunL()
             break;
         case EChannelOpening:
             {
-            // Before completing channel opening, get max data rate from actual SSY
-            if ( !iSensorProperties->DataRateUpdated() )
-                {
-                TSensrvProperty maxdatarate;
-                RSensrvChannelList affectedChannels;
-                // Get max data rate
-                iOrientationHandler->GetMaxDataRateL( maxdatarate );
-                // Set property
-                iSensorProperties->SetProperty( maxdatarate, affectedChannels );
-                }
-
             SetChannelState( EChannelOpen );
             iCallback->ChannelOpened( iChannelInfo.iChannelId, iStatus.Int(), this, this );
             break;

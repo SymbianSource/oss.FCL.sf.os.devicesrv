@@ -36,5 +36,6 @@ data=DATAZ_\private\2000D75B\fail\failcmdlist.rsc                       \private
 data=DATAZ_\private\2000D75B\shutdown\shutdowncmdlists.rsc              \private\2000D75B\shutdown\shutdowncmdlists.rsc
 data=DATAZ_\private\2000D75B\rfstatusswpcmdlist\rfswpcmdlists.rsc       \private\2000D75B\rfstatusswpcmdlist\rfswpcmdlists.rsc
 data=DATAZ_\private\2000D75B\swpui\uiswpcmdlists.rsc                    \private\2000D75B\swpui\uiswpcmdlists.rsc
+data=DATAZ_\private\2000D75B\swpnoncritical\noncriticalswpcmdlists.rsc  \private\2000D75B\swpnoncritical\noncriticalswpcmdlists.rsc
 
 #endif // SSMCMDLISTS_IBY

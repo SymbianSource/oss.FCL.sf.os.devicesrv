@@ -99,58 +99,10 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_amastart,
         // prio 0x7F96
         r_cmd_multiple_wait,
-        // prio 0x7EFF
-        r_cmd_activitymonitor1,
-        // prio 0x7EFD
-        r_cmd_activitymonitor2,
-        // prio 0x7EFB
-        r_cmd_activitymonitor3,
-        // prio 0x7EF9
-        r_cmd_activitymonitor4,
-        // prio 0x7EF7
-        r_cmd_activitymonitor5,
-        // prio 0x7EF6
-        r_cmd_videocenter,
-        // prio 0x7EF5
-        r_cmd_activitymonitor6,
-        // prio 0x7EF4
-        r_cmd_iaupdatebg,
-        // prio 0x7EF3
-        r_cmd_activitymonitor7,
-        // prio 0x7EF2
-        r_cmd_activitymonitor8,
-        // prio 0x7EEE
-        r_cmd_autosync,
-        // prio 0x7EED
-        r_cmd_activitymonitor9,
-        // prio 0x7EEC
-        r_cmd_mylocationsengine,
-        //prio 0x7EEA
-        r_cmd_activitymonitor10,
-        //prio 0x7EE9
-        r_cmd_conversationserver,	//SBSA-7YZGCQ
-        //prio 0x7EE8
-        r_cmd_activitymonitor11,
-        //prio 0x7EE7
-        r_cmd_msgnotifier		//SBSA-82ZBMC
-#ifdef FF_ATT_ADDRESS_BK
-        //prio 0x7EE6
-        ,r_cmd_activitymonitor12,
-        //prio 0x7EE5
-        r_cmd_aab
-#endif
-#ifdef FF_SEARCH_SW
-       //prio 0x7EE4
-       ,r_cmd_activitymonitor13,
-       //prio 0x7EE3
-       r_cmd_searchsw 		//SLAR-832C9T
-#endif //FF_SEARCH_SW
-#ifdef FF_EMAIL_FRAMEWORK
-		//prio 0x7EE2
-       ,r_cmd_activitymonitor14,
-       //prio 0x7EE1
-       r_cmd_nmailagent 	//MBEN-83CFQE
-#endif //FF_EMAIL_FRAMEWORK
+        // prio 0x7F55
+        r_cmd_createswp_noncriticalphase,
+				// prio 0x7F54
+        r_cmd_setswp_noncriticalstart
         };
     }
 
@@ -159,236 +111,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // ===========================================================================
 //
 
-// -----------------------------------------------------------------------------
-// r_cmd_aab
-// -----------------------------------------------------------------------------
-//
-#ifdef FF_ATT_ADDRESS_BK 
-RESOURCE SSM_START_APP_INFO r_cmd_aab
-    {
-    priority = 0x7EE5;
-    name = "z:\\sys\\bin\\AABPhonebookapp.exe";
-    retries = 2;
-    background = 1; // To background
-    monitor_info = r_mon_3_restarts_ignore;
-    }
-#endif
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor1
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor1
-    {
-    priority = 0x7EFF;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor2
-    {
-    priority = 0x7EFD;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor3
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor3
-    {
-    priority = 0x7EFB;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor4
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor4
-    {
-    priority = 0x7EF9;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor5
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor5
-    {
-    priority = 0x7EF7;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor6
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor6
-    {
-    priority = 0x7EF5;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor7
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor7
-    {
-    priority = 0x7EF3;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor8
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor8
-    {
-    priority = 0x7EEF;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor9
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
-    {
-    priority = 0x7EED;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor10
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
-    {
-    priority = 0x7EEA;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor11
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor11
-    {
-    priority = 0x7EE8;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor12
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_ATT_ADDRESS_BK
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor12
-    {
-    priority = 0x7EE6;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-#endif
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor13
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_SEARCH_SW
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor13
-    {
-    priority = 0x7EE4;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-#endif //FF_SEARCH_SW
-
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor14
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_EMAIL_FRAMEWORK
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor14
-    {
-    priority = 0x7EE2;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-#endif //FF_EMAIL_FRAMEWORK
 // ---------------------------------------------------------------------------
 // r_cmd_amastart
 // ---------------------------------------------------------------------------
@@ -397,18 +119,6 @@ RESOURCE SSM_START_AMA_STARTER r_cmd_amastart
     {
     priority = 0x7F97;
     conditional_information = r_cond_ps_normalboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_autosync
-// ---------------------------------------------------------------------------
-//	
-RESOURCE SSM_START_PROCESS_INFO r_cmd_autosync
-    {
-    priority = 0x7EEE;
-    execution_behaviour = ESsmFireAndForget;
-    retries = 3;
-    name = "cctautosync.exe";
     }
 	
 // ---------------------------------------------------------------------------
@@ -451,16 +161,30 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_cbssrv
     monitor_info = r_mon_3_restarts_ignore;
     }
 
+
 // ---------------------------------------------------------------------------
-// r_cmd_conversationserver
+// r_cmd_createswp_noncriticalphase
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_PROCESS_INFO r_cmd_conversationserver
+RESOURCE SSM_CREATE_SYSTEM_WIDE_PROPERTY r_cmd_createswp_noncriticalphase
     {
-    priority = 0x7EE9;
-    name = "csserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
+    priority = 0x7F55;
+    severity = ECmdCriticalSeverity;
+    key = SWP_UID_SSM_NONCRITICAL_PHASE;
+    filename = "ssmnoncriticalswppolicy.dll";
     }
+
+// ---------------------------------------------------------------------------
+// r_cmd_setswp_noncriticalstart
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_REQUEST_SYSTEM_WIDE_PROPERTY r_cmd_setswp_noncriticalstart
+    {
+    priority = 0x7F54;
+    key = SWP_UID_SSM_NONCRITICAL_PHASE;
+    value = ESsmNonCriticalPhaseStarted;
+    }
+
 // ---------------------------------------------------------------------------
 // r_cmd_dcmo
 // ---------------------------------------------------------------------------
@@ -542,19 +266,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_mdswatchdog
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_iaupdatebg
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_iaupdatebg
-    {
-    priority = 0x7EF4;
-    name = "iaupdatebg.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    conditional_information = r_cond_feat_iadv2;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cmd_ippushman
 // ---------------------------------------------------------------------------
 //
@@ -592,17 +303,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_locod
     monitor_info = r_mon_3_restarts_ignore;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_msgnotifier
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_msgnotifier
-    {
-    priority = 0x7EE7;
-    name = "msgnotifier.exe";
-    execution_behaviour = ESsmFireAndForget;
-    retries = 3;
-    }	
 
 // ---------------------------------------------------------------------------
 // r_cmd_psstate
@@ -655,52 +355,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_schedsrv
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
     }
-	
-//---------------------------------------------------------------------------
-// r_cmd_searchsw
-// ---------------------------------------------------------------------------
-//
-#ifdef	FF_SEARCH_SW
-RESOURCE SSM_START_PROCESS_INFO r_cmd_searchsw
-	{
-	priority = 0x7EE3;
-	name = "z:\\sys\\bin\\cpixwatchdog.exe";
-	execution_behaviour = ESsmFireAndForget;
-	conditional_information = r_cond_feat_searchsw;
-	}
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_searchsw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_searchsw
-    {
-    feature_id = KFeatureIdFfSearchSw;
-    }
-#endif //FF_SEARCH_SW
-
-// ---------------------------------------------------------------------------
-// r_cmd_nmailagent
-// ---------------------------------------------------------------------------
-//
-#ifdef FF_EMAIL_FRAMEWORK
-RESOURCE SSM_START_PROCESS_INFO r_cmd_nmailagent
-    {
-    priority = 0x7EE1;
-    name = "z:\\sys\\bin\\nmailagent.exe";
-    execution_behaviour = ESsmFireAndForget;
-    conditional_information = r_cond_feat_emailfw;
-    }
-    
-// ---------------------------------------------------------------------------
-// r_cond_feat_emailfw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_emailfw
-    {
-    feature_id = KFeatureIdFfEmailFramework;
-    }
-#endif //FF_EMAIL_FRAMEWORK
 
 // ---------------------------------------------------------------------------
 // r_cmd_supllistener
@@ -724,18 +378,6 @@ RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiple_wait
      {
      priority = 0x7F96;     
      }
-
-// ---------------------------------------------------------------------------
-// r_cmd_videocenter
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_videocenter
-    {
-    priority = 0x7EF6;
-    name = "cseschedulerserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_waitcleanbootinfo
@@ -783,15 +425,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_javacaptain
 //
 
 // ---------------------------------------------------------------------------
-// r_dlldata_activitymonitor_timeout
-// ---------------------------------------------------------------------------
-//
-RESOURCE CMD_PARAM_TIMEOUT r_dlldata_activitymonitor_timeout
-    {
-    timeout = 2;
-    }
-
-// ---------------------------------------------------------------------------
 // r_dlldata_waitcleanbootinfo
 // ---------------------------------------------------------------------------
 //
@@ -801,17 +434,6 @@ RESOURCE CMD_PARAM_WAIT_PS_2 r_dlldata_waitcleanbootinfo
     key = 0x00000012;       // KStartupCleanBoot
     target1 = 101;          // EStartupNormalBoot
     target2 = 102;          // EStartupCleanBoot
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_mylocationsengine
-// ---------------------------------------------------------------------------
-//	
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mylocationsengine
-    {
-    priority = 0x7EEC;
-    name = "z:\\sys\\bin\\mylocationsengine.exe";
-    execution_behaviour = ESsmFireAndForget;
     }
 
 // ===========================================================================
@@ -846,15 +468,6 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_alwaysonline
 RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_cellbroadcast
     {
     feature_id = KFeatureIdCellBroadcast;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_iadv2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_iadv2
-    {
-    feature_id = KFeatureIdFfIaupdatePhase2;
     }
 
 // ---------------------------------------------------------------------------

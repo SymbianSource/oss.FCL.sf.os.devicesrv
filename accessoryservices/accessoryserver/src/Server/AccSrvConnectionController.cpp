@@ -30,7 +30,6 @@
 #include "AccPolGenericIDAccessor.h"
 #include "AccSrvSettingsHandler.h"
 #include "AccPolSubblockNameArrayAccessor.h"
-#include "AccSrvChargingContextController.h"
 #include <AccConfigFileParser.h>
 #include <s32mem.h>
 #include "AccSrvWiredConnectionPublisher.h"
@@ -101,12 +100,6 @@ void CAccSrvConnectionController::ConstructL( CAccSrvServerModel* aServerModel )
     iASYProxyHandler         = CAccSrvASYProxyHandler::NewL( this );
     iSettingsHandler         = CAccSrvSettingsHandler::NewL( this, *aServerModel, iPolicy );
     iWiredConnPublisher      = CAccSrvWiredConnectionPublisher::NewL();
-    TRAPD( err, iChargingContextController = CAccSrvChargingContextController::NewL() );
-    if ( err != KErrNone ) // Server does not need to die on charging context fail.
-        {
-        COM_TRACE_1( "[AccFW:AccServer] CAccSrvConnectionController::ConstructL - CAccSrvChargingContextController err %d", err );
-        iChargingContextController = NULL;
-        }
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::ConstructL - return void" );
     }
@@ -167,11 +160,6 @@ CAccSrvConnectionController::~CAccSrvConnectionController()
         delete iSettingsHandler;
         }
     
-    if( NULL != iChargingContextController )
-        {
-        delete iChargingContextController;
-        }
-
     delete iWiredConnPublisher;
 
     // Handlers must be deleted after iPolicy and iASYProxyHandler
@@ -850,22 +838,37 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
     TAccPolAccessoryMode accMode;
 
     iServerModel->CurrentConnectionStatusL( genericIDArray );
-
-    if( (EFalse == aAudioOutputStatus) && (KErrUnknown != aDbId) ) 
-        { 
-        TInt index( TAccPolGenericIDArrayAccessor::FindWithUniqueIDL( 
-                genericIDArray, aDbId) ); 
-				if(KErrNotFound != index)
-					{
-        	TAccPolGenericIDArrayAccessor::RemoveIndexFromGenericIDArray(genericIDArray, index); 
-        	}
+    
+    TUint count;
+    TBool isHDMIConnected = EFalse;
+    
+    count = genericIDArray.Count();
+    if((1 < count) && (EFalse == aAudioOutputStatus) && (KErrUnknown != aDbId))
+        {
+        for(TInt i( 0 ); i < count; ++i)
+            {
+            if(genericIDArray.GetGenericIDL(i).PhysicalConnectionCaps() & KPCHDMI)
+                {
+                isHDMIConnected = ETrue;
+                break;
+                }        
+            }
+        }
+    
+    if(isHDMIConnected)
+        {
+        accMode = iServerModel->AccessoryMode();
+        }    
+    else
+        {
+        accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 
+                                                  aDbId, 
+                                                  aAudioOutputStatus, 
+                                                  iServerModel->AccessoryMode(), 
+                                                  iServerModel->UniqueID() );
         }
 
-    accMode = iPolicy->ResolveAccessoryModeL( genericIDArray, 
-                                              aDbId, 
-                                              aAudioOutputStatus, 
-                                              iServerModel->AccessoryMode(), 
-                                              iServerModel->UniqueID() );
+    
 
     if( iServerModel->SetAccessoryMode( accMode, aDbId ) ) //Store accessory mode
         {
