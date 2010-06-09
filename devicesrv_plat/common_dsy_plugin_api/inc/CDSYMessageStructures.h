@@ -21,8 +21,8 @@
 
 
 // INCLUDES
-#include <psvariables.h>
-#include <dossvrservices.h>
+#include <PSVariables.h>
+#include <DosSvrServices.h>
 
 
 

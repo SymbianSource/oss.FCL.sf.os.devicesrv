@@ -19,7 +19,6 @@ REM
 
 @echo Cleaning SensorTestModuleStubs
 pushd ..\SensorTestModule\group\
-call bldmake bldfiles
-call abld test reallyclean
+call sbs REALLYCLEAN -c winscw.test -c armv5.generic.test
 popd
 @echo Cleaning SensorTestModuleStubs Finished

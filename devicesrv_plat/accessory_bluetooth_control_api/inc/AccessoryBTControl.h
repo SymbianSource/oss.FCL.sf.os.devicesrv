@@ -21,7 +21,7 @@
 #define RACCESSORYBTCONTROL_H
 
 //  INCLUDES
-#include <accessorycontrol.h>
+#include <AccessoryControl.h>
 #include <bttypes.h>//TBTDevAddr
 
 // DATA TYPES

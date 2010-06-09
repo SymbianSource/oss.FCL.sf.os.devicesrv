@@ -21,7 +21,7 @@
 #define ACCMODESETTINGARRAY_H
 
 //  INCLUDES
-#include <accmodesetting.h>
+#include <AccModeSetting.h>
 
 // CONSTANTS
 // Maximum number of settings TAccModeSettingArray can store.

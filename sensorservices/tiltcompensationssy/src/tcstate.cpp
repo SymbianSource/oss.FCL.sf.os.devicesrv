@@ -82,11 +82,14 @@ void CTCState::Unset( TUint32 aFlag )
 // CTCState::IsSet
 // ----------------------------------------------------------------------------------
 //
-TBool CTCState::IsSet( TUint32 /*aFlag*/ )
+TBool CTCState::IsSet( TUint32 aFlag )
     {
     FUNC_LOG;
     
-    return ETrue;
+    if(iFlags & aFlag)    
+        return ETrue;
+    else
+        return EFalse;
     }
 
 // ----------------------------------------------------------------------------------

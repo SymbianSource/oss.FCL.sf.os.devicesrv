@@ -99,19 +99,15 @@ RESOURCE SSM_COMMAND_LIST r_noncriticalphase_commands
         // prio 0x7EEF
         r_cmd_activitymonitor8,
         // prio 0x7EEE
-        r_cmd_autosync,
-        // prio 0x7EED
-        r_cmd_activitymonitor9,
-        // prio 0x7EEC
-        r_cmd_mylocationsengine
+        r_cmd_autosync
 #ifdef FF_ATT_ADDRESS_BK
         //prio 0x7EEA
-        ,r_cmd_activitymonitor10,
+        ,r_cmd_activitymonitor9,
         //prio 0x7EE9
         r_cmd_aab
 #endif
 		// prio 0x7EE8
-		,r_cmd_activitymonitor11,
+		,r_cmd_activitymonitor10,
 		// prio 0x7EE7
 		r_cmd_calendar //CR:MMUN-82ZHAD
     	};
@@ -256,23 +252,8 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor8
 // r_cmd_activitymonitor9
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
-    {
-    priority = 0x7EED;
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmWaitForSignal;
-    dllname = "ssmactivitycmd.dll";
-    ordinal = 1; // SsmActivityCmdNewL
-    retries = 2;
-    dll_data = r_dlldata_activitymonitor_timeout;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cmd_activitymonitor10
-// ---------------------------------------------------------------------------
-//
 #ifdef FF_ATT_ADDRESS_BK
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
     {
     priority = 0x7EEA;
     severity = ECmdCriticalSeverity;
@@ -285,10 +266,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
 #endif
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonitor11
+// r_cmd_activitymonitor10
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor11
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
     {
     priority = 0x7EE8;
     severity = ECmdCriticalSeverity;
@@ -361,17 +342,6 @@ RESOURCE SSM_START_APP_INFO r_cmd_mce
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
     background = 1; // To background
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_mylocationsengine
-// ---------------------------------------------------------------------------
-//	
-RESOURCE SSM_START_PROCESS_INFO r_cmd_mylocationsengine
-    {
-    priority = 0x7EEC;
-    name = "z:\\sys\\bin\\mylocationsengine.exe";
-    execution_behaviour = ESsmFireAndForget;
     }
 
 // ---------------------------------------------------------------------------
