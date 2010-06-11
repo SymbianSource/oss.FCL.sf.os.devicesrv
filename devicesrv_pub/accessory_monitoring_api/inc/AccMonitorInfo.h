@@ -22,7 +22,7 @@
 
 // INCLUDES
 #include <e32base.h>
-#include <accmonitorcapabilities.h>
+#include <AccMonitorCapabilities.h>
 
 // FORWARD DECLARATIONS
 class CAccMonitorInfo;
@@ -212,7 +212,7 @@ private:
     TInt iReserved2;
     };
     
-#include <accmonitorinfo.inl>    
+#include <AccMonitorInfo.inl>    
 
 #endif // ACCMONITORINFO_H
 

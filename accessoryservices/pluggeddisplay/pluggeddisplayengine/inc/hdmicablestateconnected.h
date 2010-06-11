@@ -21,6 +21,7 @@
 
 
 #include "multifinitestatemachine.h"
+#include "centralrepositorywatch.h" 
 
 
 class CEDIDHandler;
@@ -40,7 +41,7 @@ class CHDMICableStatusFSM;
  *  @lib none.
  *  @since TB 9.2
  */
-NONSHARABLE_CLASS( CHDMICableStateConnected ): public CBase, public MFSMState
+NONSHARABLE_CLASS( CHDMICableStateConnected ): public CBase, public MFSMState, public MCentralRepositoryObserver
     {
 
 
@@ -152,6 +153,41 @@ public:
     
 protected:
 
+// from base class MCentralRepositoryObserver
+
+    
+    /**
+     * Function is called by watcher every time when key value has changed
+     * in CR.
+     *
+     * @since TB 9.2
+     * @param aRepositoryId Changed repository. 
+     * @param aRepositoryId Changed key. 
+     * @return none
+     */
+    virtual void CentRepKeyChanged(
+            TUid    aRepositoryId,
+            TUint32 aId );
+
+    /**
+     * Function is called by property watcher when reading the integer property's
+     * current value fails.
+     *
+     * @since TB 9.2
+     * @param aRepositoryId Changed repository. 
+     * @param aRepositoryId Changed key. 
+     * @param aError Error code:
+     *      KErrAbort if in a transaction that has previously failed, 
+     *      KErrPermissionDenied if caller fails capability check, 
+     *      KErrNotFound if the setting does not exist, 
+     *      KErrArgument if the setting exists but is not an integer, plus other system-wide error codes. 
+     * . 
+     * @return none
+     */
+    virtual void CentRepGetKeyValueFailed( 
+            TUid    aRepositoryId,
+            TUint32 aId,
+            TInt aError );
 
 private:
 
@@ -315,6 +351,8 @@ private:
             TFSMInterfaceId aInterfaceId ,
             TFSMEventId aEvent );
 
+	void ClearAvailableTvOutConfig();
+
     /**
      * C++ default constructor.
      * @param aTVOutConfigForHDMI TV Out Configurer for cable connection listening.
@@ -399,7 +437,14 @@ private: // data
         
     // Substate
     TSubState iSubState;
-    
+
+	//CR Observer for ovescan percentage
+    //CCentralRepositoryWatch* iCRWatchForHOverScan;
+    CCentralRepositoryWatch* iCRWatchForVOverScan;
+
+	// Flag to indicate the change of overscan
+	TBool iOverScanSettingsChanged;
+	
     };
 
 #endif // C_HDMICABLESTATECONNECTED_H

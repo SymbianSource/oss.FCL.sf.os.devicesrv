@@ -23,7 +23,7 @@
 #define CREMCONPOCTARGET_H
 
 //  INCLUDES
-#include <remconextensionapi.h>
+#include <RemConExtensionApi.h>
 #include <e32base.h>
 #include <remcon/remconinterfacebase.h>
 #include <remcon/remconinterfaceif.h>

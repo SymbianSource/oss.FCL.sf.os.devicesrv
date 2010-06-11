@@ -20,8 +20,8 @@
 #define ASYCMDTYPES_H
 
 // INCLUDES
-#include <accpolnamerecord.h>
-#include <accpolgenericid.h>
+#include <AccPolNameRecord.h>
+#include <AccPolGenericID.h>
 
 // CONSTANTS
 

@@ -449,6 +449,10 @@ void CRemConServer::TargetClientAvailable(CRemConSession& aSession)
 
 	ASSERT_DEBUG(iBearerManager);
 	iBearerManager->TargetClientAvailable(aSession.Id(), aSession.PlayerType(), aSession.PlayerSubType(), aSession.Name());
+	if(iTspIf5)
+		{
+		iTspIf5->TargetClientAvailable(aSession.ClientInfo());
+		}
 
 	LOGSESSIONS;
 	}
@@ -523,7 +527,13 @@ void CRemConServer::ClientClosed(CRemConSession& aSession, TUid aUid)
 			// 1. Remove the session from our array.
 			iSessions.Remove(ii);
 
-			// 2. Tell the bearers about the session going away, if it was the 
+			// 2a. Tell the TSP if the session that has gone away is a target
+			if((aSession.Type() == ERemConClientTypeTarget) && iTspIf5)
+				{
+				iTspIf5->TargetClientUnavailable(aSession.ClientInfo());
+				}
+			
+			// 2b. Tell the bearers about the session going away, if it was the 
 			// last controller or last target.
 			// If the session hasn't already set its type, then it doesn't 
 			// count (we won't have told the bearers about it to begin with).
@@ -1998,6 +2008,10 @@ void CRemConServer::LoadTspL()
 			iTsp->GetInterface(TUid::Uid(KRemConTargetSelectorInterface4))
 		);
 	
+	iTspIf5 = reinterpret_cast<MRemConTargetSelectorPluginInterfaceV5*>(
+			iTsp->GetInterface(TUid::Uid(KRemConTargetSelectorInterface5))
+		);
+	
 	// If the TSP doesn't implement the required interface, panic server 
 	// startup.
 	ASSERT_ALWAYS(iTspIf);
@@ -3383,6 +3397,16 @@ void CRemConServer::SetRemoteAddressedClient(const TUid& aBearerUid, const TRemC
 
 	ASSERT_DEBUG(iTspIf4);
 	iTspIf4->SetRemoteAddressedClient(aBearerUid, *clientInfo);
+	}
+
+TInt CRemConServer::RegisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return iTspIf5 ? iTspIf5->RegisterLocalAddressedClientObserver(aBearerUid) : KErrNotSupported;
+	}
+
+TInt CRemConServer::UnregisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return iTspIf5 ? iTspIf5->UnregisterLocalAddressedClientObserver(aBearerUid) : KErrNotSupported;
 	}
 
 TRemConClientId CRemConServer::ClientIdByProcessId(TProcessId aProcessId)

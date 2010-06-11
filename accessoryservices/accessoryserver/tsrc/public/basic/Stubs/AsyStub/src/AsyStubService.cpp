@@ -27,6 +27,10 @@
 #include <accpolobjecttypes.h>
 #include <s32mem.h>
 #include <accpolhdmiobjectcon.h>
+#include <accessoryservicesinternalpskeys.h>
+#ifdef FF_AUTOMOTIVESTACK
+#include <autoaudiopskeys.h>
+#endif
 
 // ----------------------------------------------------------------------------------
 // CASYStubService::CASYStubService() 
@@ -850,6 +854,20 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             break;
             }
+#ifdef FF_AUTOMOTIVESTACK           
+        case ETFAsyRTPStreamingConn:
+            {
+            RProperty property;          
+            CleanupClosePushL ( property );
+            COMPONENT_TRACE( ( _L( "ASYSTUB - CTFTestControlObserver::Service - Attaching to RTP streaming key" ) ) );
+            User::LeaveIfError ( property.Attach ( KPSUidAccessoryServices, KPSAutoKeyRTPStreamingConnectionStatus ) );
+            COMPONENT_TRACE( ( _L( "ASYSTUB - CTFTestControlObserver::Service - publishing to RTP streaming key" ) ) );                        
+            User::LeaveIfError ( property.Set ( aParam1 ) );
+            CleanupStack::PopAndDestroy (); // property
+            }
+            break;
+#endif
+            
         default:
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Subscribe destination is WIRELESS ASY" ) ) );

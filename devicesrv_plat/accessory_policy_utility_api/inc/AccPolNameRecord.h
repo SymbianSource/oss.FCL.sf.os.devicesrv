@@ -22,7 +22,7 @@
 
 //  INCLUDES
 #include <e32base.h>
-#include <accpolcommonnamevaluepairs.h>
+#include <AccPolCommonNameValuePairs.h>
 
 // CONSTANTS
 

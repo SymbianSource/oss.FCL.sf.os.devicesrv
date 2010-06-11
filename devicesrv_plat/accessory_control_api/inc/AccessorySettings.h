@@ -22,11 +22,11 @@
 
 //  INCLUDES
 #include <e32std.h>
-#include <accpolaccessorymode.h>
-#include <accmodesetting.h>
-#include <accmodesettingarray.h>
-#include "accessorysubsessionbase.h"
-#include "accessoryserver.h"
+#include <AccPolAccessoryMode.h>
+#include <AccModeSetting.h>
+#include <AccModeSettingArray.h>
+#include "AccessorySubsessionBase.h"
+#include "AccessoryServer.h"
 
 // FORWARD DECLARATIONS
 

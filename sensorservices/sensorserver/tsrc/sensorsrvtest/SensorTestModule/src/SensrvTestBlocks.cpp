@@ -233,6 +233,7 @@ TInt CSensrvTest::TestChannelsL( CStifItemParser& /*aItem*/ )
         User::After(7000000);
         }
     
+    tempChannelInfoList.Reset();
     delete tempChannelFinder;
     delete tempSensorChannel1;
     delete tempSensorChannel2;
@@ -313,6 +314,7 @@ TInt CSensrvTest::TestChannelFinderL( CStifItemParser& /*aItem*/ )
     tempChannelFinder19->FindChannelsL( tempChannelInfoList, tempChannelInfo );
     tempChannelFinder20->FindChannelsL( tempChannelInfoList, tempChannelInfo );
     
+    tempChannelInfoList.Reset();
     delete tempChannelFinder1;
     delete tempChannelFinder2;
     delete tempChannelFinder3;
@@ -398,6 +400,7 @@ TInt CSensrvTest::TestOpenClose( CStifItemParser& /*aItem*/ )
             }
         }
         
+    tempChannelInfoList.Reset();    
     delete tempChannelFinder;
     delete tempSensorChannel;
     
@@ -467,7 +470,7 @@ TInt CSensrvTest::TestOpenCloseSensorL( CStifItemParser& /*aItem*/ )
             }
             
         }        
-        
+    tempChannelInfoList.Reset();    
         //Checking for Magnetometer
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdMagnetometerXYZAxisData;
 
@@ -499,6 +502,7 @@ TInt CSensrvTest::TestOpenCloseSensorL( CStifItemParser& /*aItem*/ )
             }
                     
         } 
+    tempChannelInfoList.Reset();
             
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdAmbientLightData;
 
@@ -530,7 +534,7 @@ TInt CSensrvTest::TestOpenCloseSensorL( CStifItemParser& /*aItem*/ )
             }
                             
         }
-            
+    tempChannelInfoList.Reset();        
     delete tempChannelFinder;
     delete tempSensorChannel1;
     delete tempSensorChannel2;
@@ -599,6 +603,7 @@ TInt CSensrvTest::TestOpenCloseSensorsL( CStifItemParser& aItem )
             }
             
         }        
+    tempChannelInfoList.Reset();
         
     //Checking for Magnetometer
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdMagnetometerXYZAxisData;
@@ -631,6 +636,7 @@ TInt CSensrvTest::TestOpenCloseSensorsL( CStifItemParser& aItem )
             }
                     
         } 
+    tempChannelInfoList.Reset();
             
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdAmbientLightData;
 
@@ -673,6 +679,7 @@ TInt CSensrvTest::TestOpenCloseSensorsL( CStifItemParser& aItem )
         {
         returnValue = KErrNone;
         }
+    tempChannelInfoList.Reset();    
     delete tempSensorChannel1;
     delete tempSensorChannel2;
     delete tempSensorChannel3;
@@ -729,7 +736,8 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
         //Close the channel
         tempSensorChannel1->CloseChannel();
         
-        }        
+        }
+    tempChannelInfoList.Reset();            
 
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdOrientationData;
 
@@ -763,6 +771,7 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
             
         }
     delete tempChannelFinder;
+    tempChannelInfoList.Reset();
     //Wait for sensorserver to shutdown gracefully, it will take some time..
     User::After(30000000);    
     
@@ -799,7 +808,7 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
             }
                 
         } 
- 
+    tempChannelInfoList.Reset();
     //Checking for Magnetometer
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdMagneticNorthData;
 
@@ -830,7 +839,7 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
             ssyProcess.Close();
             }
         } 
-
+		tempChannelInfoList.Reset();
     delete tempChannelFinder;
     
     //Wait for the sensorserver to shutdown
@@ -868,6 +877,7 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
             ssyProcess.Close();
             }
         }         
+    tempChannelInfoList.Reset();
         
     tempChannelInfo.iChannelType = KSensrvChannelTypeIdAmbientLightData;
 
@@ -899,7 +909,7 @@ TInt CSensrvTest::TestOpenCloseCombinationSensorsL( CStifItemParser& aItem )
             }
                         
         }
-        
+    tempChannelInfoList.Reset();    
     delete tempChannelFinder;
     
     User::After(3000000);

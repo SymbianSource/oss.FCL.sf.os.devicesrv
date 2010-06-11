@@ -40,7 +40,7 @@ USERINCLUDE     ../inc
 // System include macro
 OS_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE   ../../../AccessoryTestControl/dsytfcore/inc
-
+SYSTEMINCLUDE   ../../../../../../../../inc
 // The resource name should be same as the second UID above
 
 SOURCEPATH      ../data

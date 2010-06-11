@@ -118,7 +118,6 @@ EXPORT_C TInt MRemConBearerObserver::SupportedInterfaces(const TRemConClientId& 
 	return MrcboDoSupportedInterfaces(aId, aUids);
 	}
 
-
 EXPORT_C TInt MRemConBearerObserver::SupportedOperations(const TRemConClientId& aId, TUid aInterfaceUid, RArray<TUint>& aOperations)
 	{
 	return MrcboDoSupportedOperations(aId, aInterfaceUid, aOperations);
@@ -127,6 +126,16 @@ EXPORT_C TInt MRemConBearerObserver::SupportedOperations(const TRemConClientId& 
 EXPORT_C void MRemConBearerObserver::SetRemoteAddressedClient(const TUid& aBearerUid, const TRemConClientId& aId)
 	{
 	MrcboDoSetRemoteAddressedClient(aBearerUid, aId);
+	}
+
+EXPORT_C TInt MRemConBearerObserver::RegisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return MrcboDoRegisterLocalAddressedClientObserver(aBearerUid);
+	}
+
+EXPORT_C TInt MRemConBearerObserver::UnregisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return MrcboDoUnregisterLocalAddressedClientObserver(aBearerUid);
 	}
 
 

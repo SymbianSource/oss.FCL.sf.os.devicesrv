@@ -19,8 +19,7 @@ REM
 
 @echo Setting up SensorTestModuleStubs
 pushd ..\SensorTestModule\group\
-call bldmake bldfiles
-call abld test reallyclean
-call abld test build
+call sbs REALLYCLEAN -c winscw.test -c armv5.generic.test
+call sbs -b bld.inf -c winscw.test -c armv5.generic.test
 popd
 @echo Setting up SensorTestModuleStubs Finished

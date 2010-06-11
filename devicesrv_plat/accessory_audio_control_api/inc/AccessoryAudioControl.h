@@ -20,7 +20,7 @@
 #define RACCESSORYAUDIOCONTROL_H
 
 //  INCLUDES
-#include <accessorycontrol.h>
+#include <AccessoryControl.h>
 
 
 // CLASS DECLARATION

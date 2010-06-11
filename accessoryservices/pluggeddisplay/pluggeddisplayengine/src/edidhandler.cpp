@@ -1383,6 +1383,8 @@ void CEDIDHandler::UpdateOverscanValues()
     // Update overscan values
     iHOverscan = hOverscan;
     iVOverscan = vOverscan;
+
+	INFO_2( "Overscan Values: %d,%d", iHOverscan, iVOverscan );
     }
 
 // ----------------------------------------------------------------------------

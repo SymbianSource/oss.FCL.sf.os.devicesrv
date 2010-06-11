@@ -29,6 +29,9 @@ PRJ_MMPFILES
 #include "../headsetstatusapi/Group/bld.inf"
 #include "../tspclientmapper/group/bld.inf"
 #include "../gid_pc_tool/group/bld.inf"
+#ifdef FF_AUTOMOTIVESTACK
+#include "../autoaudioasy/group/bld.inf"
+#endif
 
 PRJ_TESTMMPFILES
 

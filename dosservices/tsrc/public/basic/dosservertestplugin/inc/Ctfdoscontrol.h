@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2004 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,7 @@
 #ifndef __CTFDOSCONTROL_H__
 #define __CTFDOSCONTROL_H__
 
-#include <dossvrservices.h>
+#include <DosSvrServices.h>
 #include "dosclishareddata.h"
 #include <ctfstub.h>
 #include "mtfdoscontrol.h"

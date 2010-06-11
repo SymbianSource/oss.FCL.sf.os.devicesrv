@@ -21,9 +21,9 @@
 #define RACCESSORYCONNECTIONBASE_H
 
 //  INCLUDES
-#include <accessorysubsessionbase.h>
-#include <accpolnamerecord.h>
-#include <accessorytypes.h>
+#include <AccessorySubsessionBase.h>
+#include <AccPolNameRecord.h>
+#include <AccessoryTypes.h>
 
 // FORWARD DECLARATIONS
 class CAccPolSubblockNameArray;

@@ -20,7 +20,7 @@
 #define RACCESSORYCONTROL_H
 
 //  INCLUDES
-#include <accessoryconnection.h>
+#include <AccessoryConnection.h>
 
 // FORWARD DECLARATIONS
 class TAccPolGenericID;
