@@ -154,7 +154,7 @@ class CASYProxyAsyLoader : public CActive
 
     public:     // Friend classes
 
-        friend void CASYProxyLoaderTimer::RunL();
+        friend class CASYProxyLoaderTimer;
 
     protected:  // Friend classes
 

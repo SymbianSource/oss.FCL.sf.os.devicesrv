@@ -180,8 +180,7 @@ class CASYProxy : public CASYProxyAPI
 
     public:     // Friend classes
 
-        friend void CASYProxyAsyLoader::DoIssueRequestL();
-        friend void CASYProxyAsyLoader::ArrangeImplementationsL();
+        friend class CASYProxyAsyLoader;
 
     protected:  // Friend classes
 
