@@ -238,6 +238,7 @@ void CAccSrvConnectionHandler::StartConnectionHandlingL(
     TBool aUpdatedConnection )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling()" );
+    #define UNMASK_LINE_OUT(selectionListBitmask)  (selectionListBitmask & (~KASLineOut))
 
     iGenericID = aGenericID;
     iConnectionUpdate = aUpdatedConnection;
@@ -309,6 +310,7 @@ void CAccSrvConnectionHandler::StartConnectionHandlingL(
     			if ( accCount > 1 )
     			    {
 	    			//if there is possible selection show UI
+	    			selectionListBitmask = UNMASK_LINE_OUT(selectionListBitmask);
 		    		SetupSelectionDialogL( selectionListBitmask );    			
     			    }
     			else

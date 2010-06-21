@@ -565,9 +565,9 @@ RESOURCE SSM_START_APP_INFO r_cmd_taskswitcher
      {
      priority = 0xFFA7;
      name = "z:\\sys\\bin\\taskswitcher.exe";
-     execution_behaviour = ESsmDeferredWaitForSignal;
+     execution_behaviour = ESsmDeferredWaitForSignal;     
      background = 1; // To background
-     monitor_info = r_mon_3_restarts_ignore;
+     monitor_info = r_mon_max_restarts_ignore;
      }
 
 // ---------------------------------------------------------------------------

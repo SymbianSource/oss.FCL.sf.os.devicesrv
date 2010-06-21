@@ -444,6 +444,10 @@ private: // data
 
 	// Flag to indicate the change of overscan
 	TBool iOverScanSettingsChanged;
+
+    // Current overscan value
+	TInt iHOverscanValue;
+	TInt iVOverscanValue;
 	
     };
 

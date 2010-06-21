@@ -125,9 +125,6 @@ TInt CEDIDHandler::SetVideoParameters()
     RArray<TTvSettings> analogConfigs;
     RArray<THdmiDviTimings> hdmiConfigs;
     
-    // Update overscan values from cenrep
-    UpdateOverscanValues();
-
     // Set video parameters
     INFO( "--------------------------------------------------------------------" );
     INFO( "SETTING CEA AND DMT TIMINGS:" );
@@ -177,6 +174,9 @@ void CEDIDHandler::ResetData()
     iEdidParserPtr = NULL;
     delete iExtensionParserPtr;
     iExtensionParserPtr = NULL;
+
+	iCurrentBlock = 0;
+	inbrOfExtensions = 0;
     }
 
 //------------------------------------------------------------------------------
@@ -519,26 +519,81 @@ void CEDIDHandler::RunL()
         {
         case EDdcReadRequest:
             {
-            if( KErrNone == iStatus.Int() )
-                {
-                TPtrC8
-                    dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
-                iEdidParserPtr = CEdidParserBase::NewL( dataBlockDes );
-                TInt nbrOfExtensions = iEdidParserPtr->GetNumberOfExtensions();
-                for( TInt i = 0; i < nbrOfExtensions; ++i )
-                    {
-                    if( ECea861Ext == iEdidParserPtr->GetExtensionType( i + 1 ) )
-                        {
-                        INFO_1( "ECea861Ext extension data block number: %d", ( i+1 ) );
-                        iExtensionParserPtr
-                            = iEdidParserPtr->CreateCea861ExtensionParserL( i + 1 );
-                        break;
-                        }
-                    }
-                INFO_1( "Data block count in nbrOfExtensions: %d", nbrOfExtensions );
-                iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
-                iRetryCounter = KErrNone;
-                }
+			if( KErrNone == iStatus.Int() )
+				{				
+				if( iCurrentBlock == 0 )
+					{
+					TPtrC8 dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
+					
+					iEdidParserPtr = CEdidParserBase::NewL( dataBlockDes );
+					inbrOfExtensions = iEdidParserPtr->GetNumberOfExtensions();
+
+					INFO_1( "No. of extensions from Block 0: %d", inbrOfExtensions );
+
+					if( inbrOfExtensions )
+						{
+						inbrOfExtensions--;
+						}
+ 					}
+				else
+					{
+					TPtrC8 dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
+
+					INFO_1( "Updating the Rawdata for the Block %d...", iCurrentBlock );
+					iEdidParserPtr->UpdateRawDataL(dataBlockDes);
+					
+					iCurrentBlock++;
+					if( inbrOfExtensions >= 2 )
+						{
+ 						inbrOfExtensions = inbrOfExtensions - 2;
+						}
+					else
+						{
+						inbrOfExtensions--;
+						}
+  					}
+
+				if( inbrOfExtensions )
+					{
+					iRetryCounter = KErrNone;
+					
+					if( ReadEDIDDataL() != KErrNone )
+						{
+						ResetData();
+						iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetchFailed );
+						}
+					}
+				else
+					{
+					TInt extensions = iEdidParserPtr->GetNumberOfExtensions();
+
+					INFO_1( "No. of extensions from Block 0: %d", extensions );
+					
+					for( TInt i = 0; i < extensions; ++i )
+						{
+						if( ECea861Ext == iEdidParserPtr->GetExtensionType( i + 1 ) )
+							{
+							INFO_1( "ECea861Ext extension data block number: %d", ( i+1 ) );
+							if( !iExtensionParserPtr )
+								{
+								INFO( "First CEA 861 extension is being read..." );
+								iExtensionParserPtr
+									= iEdidParserPtr->CreateCea861ExtensionParserL( i + 1 );
+								}
+							else
+								{
+								INFO_1( "CEA 861 extension is being read... at the index %d", i+1 );
+								iEdidParserPtr->UpdateCea861ExtensionL( i + 1, iExtensionParserPtr );
+								}
+ 							}
+						}
+					}
+
+				TRACE_EDID_DATA( *iEdidParserPtr );
+				
+				iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
+				iRetryCounter = KErrNone;
+				}
             else
                 {
                 INFO_1( "CDdcPortAccess::Read failed, error code: %d", iStatus.Int() );
@@ -625,8 +680,19 @@ TInt CEDIDHandler::ReadEDIDDataL()
         {
         iDataBlockPtr = new(ELeave) TDataBlock;
         }
+	else if( inbrOfExtensions )
+		{
+		if( iDataBlockPtr )
+			{
+			delete iDataBlockPtr;
+			iDataBlockPtr = NULL;
+			}
+		iDataBlockPtr = new(ELeave) TDataBlock;
+		}
+
+	INFO_1( "Reading EDID block %d...", iCurrentBlock );
     
-    retVal = iDdcPortAccess->Read( EMonitorPort, 0, // First block contains EDID data if that exists
+    retVal = iDdcPortAccess->Read( EMonitorPort, iCurrentBlock, // First block contains EDID data if that exists
         iDataBlockPtr->iDataBlock,
         iStatus );
         
@@ -1508,6 +1574,16 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 	return retVal;
     }
 
+void CEDIDHandler::GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan )
+	{
+	FUNC_LOG;
+	
+	aHOverscan = iHOverscan;
+	aVOverscan = iVOverscan;
+
+	INFO_2("Overscan used: %d, %d", iHOverscan, iVOverscan);
+	}
+
 //------------------------------------------------------------------------------
 // C++ constructor
 //------------------------------------------------------------------------------
@@ -1518,7 +1594,9 @@ CEDIDHandler::CEDIDHandler( MFSMForBody& aFSM,
     iFSM( aFSM ),
     iTVOutConfigForHDMI( aTVOutConfigForHDMI ),
     iRetryCounter( 0 ),
-    iRequestID( EUndefRequest )
+    iRequestID( EUndefRequest ),
+    inbrOfExtensions( 0 ),
+    iCurrentBlock( 0 )
     {
     FUNC_LOG;
     }
