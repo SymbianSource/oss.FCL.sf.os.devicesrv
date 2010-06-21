@@ -55,42 +55,42 @@ EXPORTS
 	_ZN18CDosSharedDataBase5NewLCEP29CSharedDataFileSystemNotifier @ 54 NONAME
 	_ZNK17CDosExtensionBase15CompleteRequestERK9RMessage2iPvii @ 55 NONAME
 	_ZTI10CDosServer @ 56 NONAME ; #<TI>#
-	_ZTI11CDosMtcBase @ 57 NONAME ; #<TI>#
-	_ZTI11CDosSaeBase @ 58 NONAME ; #<TI>#
-	_ZTI14CDosHelperBase @ 59 NONAME ; #<TI>#
-	_ZTI16CDosSelfTestBase @ 60 NONAME ; #<TI>#
-	_ZTI16CDosSysUtilsBase @ 61 NONAME ; #<TI>#
+	_ZTI11CDosMtcBase @ 57 NONAME ABSENT ; #<TI>#
+	_ZTI11CDosSaeBase @ 58 NONAME ABSENT ; #<TI>#
+	_ZTI14CDosHelperBase @ 59 NONAME ABSENT ; #<TI>#
+	_ZTI16CDosSelfTestBase @ 60 NONAME ABSENT ; #<TI>#
+	_ZTI16CDosSysUtilsBase @ 61 NONAME ABSENT ; #<TI>#
 	_ZTI17CDosAsyncExecBase @ 62 NONAME ; #<TI>#
 	_ZTI17CDosExtensionBase @ 63 NONAME ; #<TI>#
 	_ZTI17CEventManagerBase @ 64 NONAME ; #<TI>#
 	_ZTI18CDosSharedDataBase @ 65 NONAME ; #<TI>#
 	_ZTV10CDosServer @ 66 NONAME ; #<VT>#
-	_ZTV11CDosMtcBase @ 67 NONAME ; #<VT>#
-	_ZTV11CDosSaeBase @ 68 NONAME ; #<VT>#
-	_ZTV14CDosHelperBase @ 69 NONAME ; #<VT>#
-	_ZTV16CDosSelfTestBase @ 70 NONAME ; #<VT>#
-	_ZTV16CDosSysUtilsBase @ 71 NONAME ; #<VT>#
+	_ZTV11CDosMtcBase @ 67 NONAME ABSENT ; #<VT>#
+	_ZTV11CDosSaeBase @ 68 NONAME ABSENT ; #<VT>#
+	_ZTV14CDosHelperBase @ 69 NONAME ABSENT ; #<VT>#
+	_ZTV16CDosSelfTestBase @ 70 NONAME ABSENT ; #<VT>#
+	_ZTV16CDosSysUtilsBase @ 71 NONAME ABSENT ; #<VT>#
 	_ZTV17CDosAsyncExecBase @ 72 NONAME ; #<VT>#
 	_ZTV17CDosExtensionBase @ 73 NONAME ; #<VT>#
 	_ZTV17CEventManagerBase @ 74 NONAME ; #<VT>#
 	_ZTV18CDosSharedDataBase @ 75 NONAME ; #<VT>#
-	_ZThn32_N11CDosMtcBase13GetStateFlagLER13TDosStateFlag @ 76 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase13SetStateFlagLE13TDosStateFlag @ 77 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase14ResetGenerateLEv @ 78 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase16DosShutdownSyncLEv @ 79 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase8DosSyncLEv @ 80 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase8PowerOnLEv @ 81 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase9PowerOffLEv @ 82 NONAME ; #<thunk>#
-	_ZThn32_N11CDosMtcBase9SetStateLEi @ 83 NONAME ; #<thunk>#
-	_ZThn32_N11CDosSaeBase9StartSaeLEv @ 84 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase12HiddenResetLEv @ 85 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase13GetRTCStatusLERi @ 86 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase17GetStartupReasonLERi @ 87 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase18GenerateGripEventLEv @ 88 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase19GetSWStartupReasonLERs @ 89 NONAME ; #<thunk>#
-	_ZThn32_N14CDosHelperBase19SetSWStartupReasonLEs @ 90 NONAME ; #<thunk>#
-	_ZThn32_N16CDosSelfTestBase16PerformSelfTestLEv @ 91 NONAME ; #<thunk>#
-	_ZThn32_N16CDosSysUtilsBase12SetDosAlarmLEP5TTime @ 92 NONAME ; #<thunk>#
-	_ZThn32_N16CDosSysUtilsBase14PerformDosRfsLEj12RMessagePtr2 @ 93 NONAME ; #<thunk>#
-	_ZThn32_N16CDosSysUtilsBase15GetSimLanguageLERi @ 94 NONAME ; #<thunk>#
+	_ZThn32_N11CDosMtcBase13GetStateFlagLER13TDosStateFlag @ 76 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase13SetStateFlagLE13TDosStateFlag @ 77 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase14ResetGenerateLEv @ 78 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase16DosShutdownSyncLEv @ 79 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase8DosSyncLEv @ 80 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase8PowerOnLEv @ 81 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase9PowerOffLEv @ 82 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosMtcBase9SetStateLEi @ 83 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N11CDosSaeBase9StartSaeLEv @ 84 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase12HiddenResetLEv @ 85 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase13GetRTCStatusLERi @ 86 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase17GetStartupReasonLERi @ 87 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase18GenerateGripEventLEv @ 88 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase19GetSWStartupReasonLERs @ 89 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N14CDosHelperBase19SetSWStartupReasonLEs @ 90 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N16CDosSelfTestBase16PerformSelfTestLEv @ 91 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N16CDosSysUtilsBase12SetDosAlarmLEP5TTime @ 92 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N16CDosSysUtilsBase14PerformDosRfsLEj12RMessagePtr2 @ 93 NONAME ABSENT ; #<thunk>#
+	_ZThn32_N16CDosSysUtilsBase15GetSimLanguageLERi @ 94 NONAME ABSENT ; #<thunk>#
 

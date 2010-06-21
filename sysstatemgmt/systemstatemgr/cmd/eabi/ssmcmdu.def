@@ -71,9 +71,9 @@ EXPORTS
 	_ZNK26TSsmPublishSystemStateInfo9DirectionEv @ 70 NONAME
 	_ZNK29CSsmCommandListResourceReader18GetCommandListIdsLER6RArrayIiE @ 71 NONAME
 	_ZTI21CSsmCustomCommandInfo @ 72 NONAME
-	_ZTIN16CCmdMultipleWait18CMultipleWaitTimerE @ 73 NONAME
+	_ZTIN16CCmdMultipleWait18CMultipleWaitTimerE @ 73 NONAME ABSENT
 	_ZTV21CSsmCustomCommandInfo @ 74 NONAME
-	_ZTVN16CCmdMultipleWait18CMultipleWaitTimerE @ 75 NONAME
+	_ZTVN16CCmdMultipleWait18CMultipleWaitTimerE @ 75 NONAME ABSENT
 	_ZNK15CSsmCommandList8SeverityEi @ 76 NONAME
 	_ZN15CSsmCommandList12InternalizeLER11RReadStream @ 77 NONAME
 	_ZN17SsmCommandFactory25ConstructLoadSupCommandLCE17TCmdErrorSeverity22TSsmExecutionBehaviouriRK11TSsmSupInfot @ 78 NONAME
