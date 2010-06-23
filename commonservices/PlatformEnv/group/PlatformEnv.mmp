@@ -47,7 +47,7 @@ LIBRARY         bafl.lib
 
 LANG        SC
 
-#if defined(ARMCC)
+#if defined(EABI)
 deffile ../EABI/PlatformEnvCenRep.DEF
 #elif defined( WINSCW )
 deffile ../bwinscw/PLATFORMENVCENREP.DEF 
