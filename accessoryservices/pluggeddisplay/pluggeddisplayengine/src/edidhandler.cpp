@@ -125,9 +125,6 @@ TInt CEDIDHandler::SetVideoParameters()
     RArray<TTvSettings> analogConfigs;
     RArray<THdmiDviTimings> hdmiConfigs;
     
-    // Update overscan values from cenrep
-    UpdateOverscanValues();
-
     // Set video parameters
     INFO( "--------------------------------------------------------------------" );
     INFO( "SETTING CEA AND DMT TIMINGS:" );
@@ -1507,6 +1504,16 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 
 	return retVal;
     }
+
+void CEDIDHandler::GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan )
+	{
+	FUNC_LOG;
+	
+	aHOverscan = iHOverscan;
+	aVOverscan = iVOverscan;
+
+	INFO_2("Overscan used: %d, %d", iHOverscan, iVOverscan);
+	}
 
 //------------------------------------------------------------------------------
 // C++ constructor

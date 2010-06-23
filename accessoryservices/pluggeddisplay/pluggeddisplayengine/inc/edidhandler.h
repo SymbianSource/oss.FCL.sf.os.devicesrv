@@ -173,6 +173,16 @@ public:
      */
     TInt GetHdcpSupportStatus( TBool& aHdcpSupport ) const;
 
+    /**
+     * Update overscan values from cenrep.
+     * 
+     * @param None.
+     * @return None.
+     */
+    void UpdateOverscanValues();
+    
+	void GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan );
+
 private:
 
     /**
@@ -346,14 +356,6 @@ private:
      * @return None.
      */
     void CalculateOverscan( TPoint& aTLCorner, TPoint& aBRCorner ) const;
-    
-    /**
-     * Update overscan values from cenrep.
-     * 
-     * @param None.
-     * @return None.
-     */
-    void UpdateOverscanValues();
     
 	/**
 	 * Filter out the unsupported TV configurations.

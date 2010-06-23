@@ -356,9 +356,12 @@ EXPORT_C void TSensrvProperty::GetValue( TReal& aValue ) const
     {
     API_TRACE( ( _L( "Sensor Util - TSensrvProperty::GetValue return %e" ), iRealValue ) );
 
-    __ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
+    //__ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
 
-    aValue = iRealValue;
+    if( ESensrvRealProperty == iPropertyType )
+        aValue = iRealValue;
+    else if( ESensrvIntProperty == iPropertyType )
+        aValue = iIntValue;
     }
 
 // ---------------------------------------------------------------------------
@@ -467,9 +470,13 @@ EXPORT_C void TSensrvProperty::GetMaxValue( TReal& aMaxValue ) const
     {
     API_TRACE( ( _L( "Sensor Util - TSensrvProperty::GetMaxValue return %e" ), iRealValueMax ) );
 
-    __ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
+    //__ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
 
-    aMaxValue = iRealValueMax;
+    if( ESensrvRealProperty == iPropertyType )
+        aMaxValue = iRealValueMax;
+    else if ( ESensrvIntProperty == iPropertyType )
+        aMaxValue = iIntValueMax;
+    
     }
 
 // ---------------------------------------------------------------------------
@@ -480,9 +487,11 @@ EXPORT_C void TSensrvProperty::GetMinValue( TReal& aMinValue ) const
     {
     API_TRACE( ( _L( "Sensor Util - TSensrvProperty::GetMinValue return %e" ), iRealValueMin ) );
 
-    __ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
-
-    aMinValue = iRealValueMin;
+    //__ASSERT_ALWAYS( ESensrvRealProperty == iPropertyType, User::Panic( KSensrvPropertyPanic, 0 ));
+    if( ESensrvRealProperty == iPropertyType )
+        aMinValue = iRealValueMin;
+    else if( ESensrvIntProperty == iPropertyType )
+        aMinValue = iIntValueMin;
     }
 
 // ---------------------------------------------------------------------------

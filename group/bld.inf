@@ -33,6 +33,7 @@ PRJ_MMPFILES
 #include "../psmservices/group/bld.inf"
 #include "../resourcemgmt/group/bld.inf"
 #include "../sysstatemgmt/group/bld.inf"
+#include "../systemhealthmanagement/systemhealthmgr/group/bld.inf"
 
 
 PRJ_TESTMMPFILES
