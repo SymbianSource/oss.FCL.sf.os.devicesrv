@@ -31,6 +31,10 @@ PRJ_MMPFILES
 #include "../ssmcustcmds/group/bld.inf"
 #include "../syslangutil/group/bld.inf"
 #include "../sysrestart/group/bld.inf"
+#include "../systemstarter/group/bld.inf"
+#include "../systemstatemgr/group/bld.inf"
+#include "../systemstatereferenceplugins/group/bld.inf"
+#include "../systemstateplugins/group/bld.inf"
 #include "../sysuiprovider/group/bld.inf"
 
 

@@ -68,6 +68,10 @@ RESOURCE SSM_COMMAND_LIST r_noncriticalphase_commands
         {
         // prio 0xFFF1
         r_cmd_publishswp,
+        //prio 0x7EF9
+        r_cmd_activitymonitor_hsrunningapp,
+        //prio 0x7EF8
+        r_cmd_hsrunningappmonitor, //JJAA-85CDEA	
        // prio 0x7EF7
         r_cmd_activitymonitor1,
         // prio 0x7EF6
@@ -132,6 +136,21 @@ RESOURCE SSM_START_APP_INFO r_cmd_aab
     monitor_info = r_mon_3_restarts_ignore;
     }
 #endif
+
+// ---------------------------------------------------------------------------
+// r_cmd_activitymonitor_hsrunningapp
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor_hsrunningapp
+    {
+    priority = 0x7EF9;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_activitymonitor1
@@ -296,6 +315,18 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_conversationserver
     priority = 0x7EE9;
     name = "csserver.exe";
     execution_behaviour = ESsmWaitForSignal;
+    }
+
+// ---------------------------------------------------------------------------
+// r_cmd_hsrunningappmonitor
+// ---------------------------------------------------------------------------
+//	
+RESOURCE SSM_START_PROCESS_INFO r_cmd_hsrunningappmonitor
+    {
+    priority = 0x7EF8;
+    name = "z:\\sys\\bin\\hsrunningappmonitor.exe";
+    execution_behaviour = ESsmWaitForSignal;
+    monitor_info = r_mon_3_restarts_ignore;
     }
 
 

@@ -99,8 +99,13 @@ void CHDMICableStateConnected::CentRepKeyChanged(
     if ( KCRUidTvoutSettings == aRepositoryId )
         {
         if ( KSettingsTvoutVerticalOverscan == aId  )
-            {
-            Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventKeyChanged );
+            {            
+			INFO("Cenrep Value Changed");
+			if( iEDIDHandler.UpdateOverscanValues() )
+				{
+				INFO( "There is a real change" );
+            	Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventKeyChanged );
+				}
             }
         else
             {
@@ -111,6 +116,7 @@ void CHDMICableStateConnected::CentRepKeyChanged(
         {
         INFO_1("Unexpected Central Repository ID, aRepositoryId 0x%x", aRepositoryId);
         }
+
     }
 
 // ---------------------------------------------------------------------------
@@ -150,7 +156,11 @@ void CHDMICableStateConnected::Enter( )
     {
     FUNC_LOG;
     TInt retVal( KErrNone );
-	iOverScanSettingsChanged = EFalse;
+	
+	// Get the current overscan value
+	iEDIDHandler.UpdateOverscanValues();
+	iEDIDHandler.GetCurrentOverscanValue( iHOverscanValue, iVOverscanValue );
+	
     iCopyProtectListenFailCounter.iCount = 0;
     iTVOutConfigForCopyProtect->ResetLatestRecordedCopyProtectionStatus();
     retVal = iEDIDHandler.FetchEDIDData();
@@ -393,6 +403,9 @@ void CHDMICableStateConnected::SubStateStartListenConfigChangesInput(
                         }
                     else
                         {
+						// Update the current overscan value
+						iEDIDHandler.GetCurrentOverscanValue( iHOverscanValue, iVOverscanValue );
+						
                         TFSMEventId event = iTVOutConfigForHDMI.ListenHDMICableStatusIfNoMissedEvents();
                         if ( EIfTVOutConfigEventCableDisconnected == event )
                             {
@@ -515,18 +528,11 @@ void CHDMICableStateConnected::SubStateResettingEnableInput(
                 {
                 iSubState = ESubStateConnected;
 
-				if( !iOverScanSettingsChanged )
-					{
-	                TRAPD( err, iHDMICableStatusFSM.SettingsChangedL() );
-	                if ( KErrNone != err )
-	                    {
-	                    INFO_1( "iHDMICableStatusFSM.SettingsChangedL() failed, error code %i", err ); 
-	                    }
-					}
-				else
-					{
-					iOverScanSettingsChanged = EFalse;
-					}
+                TRAPD( err, iHDMICableStatusFSM.SettingsChangedL() );
+                if ( KErrNone != err )
+                    {
+                    INFO_1( "iHDMICableStatusFSM.SettingsChangedL() failed, error code %i", err ); 
+                    }
                 ListenCopyProtectionStatusChanges();
                 iTVOutConfigForSettingChanges->ListenSettingsChanges();
 				iCRWatchForVOverScan->Watch();
@@ -572,12 +578,14 @@ void CHDMICableStateConnected::SubStateIdlingDisableInput(
             INFO( "Event: EIfTVOutConfigEventDisabled" );
             iSubState = ESubStateIdlingDisconnectAccessory;
             iAccessoryControlIf.DisconnectAccessory();                    
+			ClearAvailableTvOutConfig();
             }
         else if ( EIfTVOutConfigEventDisableFailed == aEvent )
             {
             INFO( "Event: EIfTVOutConfigEventDisableFailed" );        
             iSubState = ESubStateIdlingDisconnectAccessory;
             iAccessoryControlIf.DisconnectAccessory();                    
+			ClearAvailableTvOutConfig();
             }
         else
             {
@@ -704,7 +712,7 @@ void CHDMICableStateConnected::SubStateConnectAccessoryInput(
                 iSubState = ESubStateConnected;
                 ListenCopyProtectionStatusChanges();
                 iTVOutConfigForSettingChanges->ListenSettingsChanges();
-				iCRWatchForVOverScan->Watch();
+				iCRWatchForVOverScan->Watch();				
                 }
             }
         else if ( EPDEIfAccessoryControlEventConnectFailed == aEvent )
@@ -952,10 +960,17 @@ void CHDMICableStateConnected::SubStateConnectedInput(
                 iTVOutConfigForHDMI.Enable();                
                 }
             }
-        else if ( EIfTVOutConfigEventSettingsChangesListenStarted )
+        else if ( EIfTVOutConfigEventSettingsChangesListenStarted == aEvent )
             {
             INFO( "Event: EIfTVOutConfigEventSettingsChangesListenStarted" );
             // Everything is OK. Stay in the same state.
+			// Should not miss the cenrep value change
+			TInt newOverScanValue = 0;
+			iCRWatchForVOverScan->GetCurrentValue(newOverScanValue);
+			if( iVOverscanValue != newOverScanValue )
+				{
+				Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventKeyChanged );
+				}
             }
         else if ( EIfTVOutConfigEventSettingsChangesListenFailed == aEvent )
             {
@@ -981,42 +996,40 @@ void CHDMICableStateConnected::SubStateConnectedInput(
         if ( EPDEIfCentralRepositoryWatchEventKeyChanged == aEvent )
             {
             INFO( "Event: EPDEIfCentralRepositoryWatchEventKeyChanged" );
-
+			
 			// Get the available config
 			THdmiDviTimings curConfig;
 			
 			iTVOutConfigForHDMI.GetTvOutConfig()->GetConfig( curConfig );
 
 			if( (TTvSettings::EHDMI == curConfig.iConnector) && (!curConfig.iUnderscanEnabled) )
-				{					
-				// Clear the available config				
-				ClearAvailableTvOutConfig();
-
+				{									
+				
 				TInt retVal = iEDIDHandler.SetVideoParameters();
 				if ( KErrNone != retVal )
 					{
 					INFO( "Going to state <Rejected> since video parameter setting failed!" );		  
 					iTVOutConfigForSettingChanges->Cancel();
 					iCRWatchForVOverScan->Cancel();
-					iHDMICableStatusFSM.Transit( EHDMICableStateRejected ); 		
+					iSubState = ESubStateIdlingDisable;
+					iTVOutConfigForHDMI.Disable();			  
 					}
 				else
 					{
+					// Update the current overscan value
+					iEDIDHandler.GetCurrentOverscanValue( iHOverscanValue, iVOverscanValue );
+					
 					TFSMEventId event = iTVOutConfigForHDMI.ListenHDMICableStatusIfNoMissedEvents();
 					if ( EIfTVOutConfigEventCableDisconnected == event )
 						{
 						INFO( "Retreating back to <Idle> since cable was disconnected while not listening!" );		  
 						iTVOutConfigForSettingChanges->Cancel();
 						iCRWatchForVOverScan->Cancel();
-						iHDMICableStatusFSM.Transit( EHDMICableStateIdle ); 		
-						}
-					else
-						{
-						iOverScanSettingsChanged = ETrue;
-						iSubState = ESubStateWaitForSettingsChanged;
+						iSubState = ESubStateIdlingDisable;
+						iTVOutConfigForHDMI.Disable();			  
 						}
 					}				
-				}
+				}			
             }
         else
             {
@@ -1053,44 +1066,68 @@ void CHDMICableStateConnected::SubStateWaitForSettingsChangedInput(
             if ( EIfTVOutConfigEventCableDisconnected == event )
                 {
                 INFO( "Retreating back to <Idle> since cable was disconnected while WF setting changes!" );        
+				
+                // Stop listening Copy Protection status
+                iTVOutConfigForCopyProtect->Cancel();
+                // Stop listen setting changes
                 iTVOutConfigForSettingChanges->Cancel();
-                iHDMICableStatusFSM.Transit( EHDMICableStateIdle );         
+				iCRWatchForVOverScan->Cancel();
+
+				if( iTVOutConfigForHDMI.GetTvOutConfig()->Enabled() )
+					{
+					iSubState = ESubStateIdlingDisable;
+					iTVOutConfigForHDMI.Disable();			  
+					}
+				else
+					{
+					iHDMICableStatusFSM.Transit( EHDMICableStateIdle ); 		
+					}
                 }            
              }
         else if ( EIfTVOutConfigEventCableDisconnected == aEvent )
             {
             INFO( "Event: EIfTVOutConfigEventCableDisconnected" );
             INFO( "Retreating back to <Idle> since cable was disconnected while WF setting changes!" );
-            iTVOutConfigForSettingChanges->Cancel();
-            iHDMICableStatusFSM.Transit( EHDMICableStateIdle );         
+			// Stop listening Copy Protection status
+			iTVOutConfigForCopyProtect->Cancel();
+			// Stop listen setting changes
+			iTVOutConfigForSettingChanges->Cancel();
+			iCRWatchForVOverScan->Cancel();
+			
+			if( iTVOutConfigForHDMI.GetTvOutConfig()->Enabled() )
+				{
+				iSubState = ESubStateIdlingDisable;
+				iTVOutConfigForHDMI.Disable();			  
+				}
+			else
+				{
+				iHDMICableStatusFSM.Transit( EHDMICableStateIdle ); 		
+				}
             }
         else if ( EIfTVOutConfigEventSettingsChanged == aEvent )
             {
             INFO( "Event: EIfTVOutConfigEventSettingsChanged" );
-			if( iOverScanSettingsChanged )
-				{
-	            if ( iTVOutConfigForHDMI.GetTvOutConfig()->Enabled() )
-	                {
-	                iSubState = ESubStateResettingDisable;
-	                iTVOutConfigForHDMI.Disable();
-	                }
-	            else
-	                {
-	                iSubState = ESubStateResettingEnable;
-	                iTVOutConfigForHDMI.Enable();                
-	                }
-				}
-			else
-				{
-	            iSubState = ESubStateEnable;
-	            iTVOutConfigForHDMI.Enable();
-				}
+            iSubState = ESubStateEnable;
+            iTVOutConfigForHDMI.Enable();
             }
         else if ( EIfTVOutConfigEventSettingsChangesListenFailed == aEvent )
             {
             INFO( "Event: EIfTVOutConfigEventSettingsChangesListenFailed" );
             INFO( "Going to state <Rejected> since setting changes listening failed!" );        
-            iHDMICableStatusFSM.Transit( EHDMICableStateRejected );         
+			// Stop listening Copy Protection status
+			iTVOutConfigForCopyProtect->Cancel();
+			// Stop listen setting changes
+			iCRWatchForVOverScan->Cancel();
+			
+			if( iTVOutConfigForHDMI.GetTvOutConfig()->Enabled() )
+				{
+				iSubState = ESubStateIdlingDisable;
+				iTVOutConfigForHDMI.Disable();			  
+				}
+			else
+				{
+				iHDMICableStatusFSM.Transit( EHDMICableStateRejected ); 		
+				}
             }
         else
             {

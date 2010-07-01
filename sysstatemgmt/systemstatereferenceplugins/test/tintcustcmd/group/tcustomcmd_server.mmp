@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -46,6 +46,15 @@ SOURCE			tcustcmd_step_activateemergencycall.cpp
 SOURCE			tcustcmd_step_deactivateemergencycall.cpp
 SOURCE			tcustcmd_step_devicesecuritypincheck.cpp
 SOURCE			tcustcmd_step_int_execute.cpp
+
+USERINCLUDE 	../../../custcmd/inc
+SOURCEPATH		../../../custcmd/src
+SOURCE			ssmsecuritychecknotifier.cpp
+
+#ifndef TEST_CUSTCMD
+#define TEST_CUSTCMD
+MACRO TEST_CUSTCMD_MACRO
+#endif
 
 LIBRARY			euser.lib
 LIBRARY			efsrv.lib

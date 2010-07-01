@@ -2644,14 +2644,14 @@ const TTFAccessoryTestCaseStateControl KTFConnectRTPStreamingDeviceStates[]=
     {
     { ETFAccessorySingleConnection_Open,        0, 0, 0,     0,                         0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFAccessoryNotifyNewAccessoryConnected,  0, 0, 0,     0,                         0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 1000000},
-    { ETFConnectWiredAccessory,                 0, EUnidirectional, 0,     0,           0, 11401, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                 0, EAudioConnectionStatusUnidirectional, 0,     0,           0, 11401, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11401, ETFAsyNone,     ReqNotifyNewAccessoryConnected, KErrNone, 0},
     { ETFCheckCapability,                       0, 0, ETrue, KAccAudioOutputType,       0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFCheckCapability,                       0, 0, ETrue, KAccStereoAudio,           0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFCheckCapability,                       0, 0, ETrue, KAccIntegratedAudioOutput, 0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFCheckCapability,                       0, 0, ETrue, KAccRTPStreaming,          0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFAccessoryNotifyAccessoryDisconnected,  0, 0, 0,     0,                         0, 11401, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 2000000},
-    { ETFDisconnectWiredAccessory,              0, ENone, 0,     0,                     0, 11401, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFDisconnectWiredAccessory,              0, EAudioConnectionStatusNone, 0,     0,                     0, 11401, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11401, ETFAsyNone,     ReqNotifyAccessoryDisconnected, KErrNone, 0},
 
     { ETFClearStack,                            0, 0, 0,     0,                         0, 11401, ETFAsyNone,             ReqAccRequestNone,              KErrNone, 0},
@@ -2666,10 +2666,10 @@ const TTFAccessoryTestCaseStateControl KTFRTPStreamingAccessoryModeStates[]=
     {
     { ETFAccessoryMode_Open,                 0, 0,         0, 0,          0, 11402, ETFAsyNone,          ReqAccRequestNone,             KErrNone, 1000000},
     { ETFAccessoryNotifyAccessoryModeChanged,0, 0,         0, 0,          0, 11402, ETFAsyNone,          ReqAccRequestNone,             KErrNone, 1000000},
-    { ETFConnectWiredAccessory,              0, EUnidirectional, 0, 0,    0, 11402, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFConnectWiredAccessory,              0, EAudioConnectionStatusUnidirectional, 0, 0,    0, 11402, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
     { ETFFindAndCheckRequest,                0, 3,         0, 0,          0, 11402, ETFAsyNone,          ReqNotifyAccessoryModeChanged, KErrNone, 1000000},
     { ETFClearStack,                         0, 0,         0, 0,          0, 11402, ETFAsyNone,          ReqAccRequestNone,             KErrNone, 1000000},
-    { ETFDisconnectWiredAccessory,           0, ENone, 0,     0,          0, 11402, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFDisconnectWiredAccessory,           0, EAudioConnectionStatusNone, 0,     0,          0, 11402, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
     { ETFAccessoryMode_Close,                0, 0,         0, 0,          0, 11402, ETFAsyNone,          ReqAccRequestNone,             KErrNone, 1000000},
     };
 
@@ -2680,9 +2680,9 @@ const TTFAccessoryTestCaseStateControl KTFConnectRTPStreamingDeviceStates1[]=
     {
     { ETFAccessorySingleConnection_Open,        0, 0, 0,     0,                         0, 11403, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFAccessoryNotifyNewAccessoryConnected,  0, 0, 0,     0,                         0, 11403, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 1000000},
-    { ETFConnectWiredAccessory,                 0, ENone, 0,     0,           0, 11403, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFConnectWiredAccessory,                 0, EAudioConnectionStatusNone, 0,     0,           0, 11403, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11403, ETFAsyNone,     ReqNotifyNewAccessoryConnected, KErrNone, 0},        
-    { ETFConnectWiredAccessory,                 0, EBidirectional, 0,     0,           0, 11403, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},            
+    { ETFConnectWiredAccessory,                 0, EAudioConnectionStatusBidirectional, 0,     0,           0, 11403, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},            
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11403, ETFAsyNone,     ReqNotifyNewAccessoryConnected, KErrNone, 0},
     { ETFCancelNotifyNewAccessoryConnected,     0, 0, 0,     0,                         0, 11403, ETFAsyNone,          ReqAccRequestNone,              KErrNone, 0},
 
@@ -2698,11 +2698,11 @@ const TTFAccessoryTestCaseStateControl KTFConnectRTPStreamingDeviceStates2[]=
     {
     { ETFAccessorySingleConnection_Open,        0, 0, 0,     0,                         0, 11404, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 0},
     { ETFAccessoryNotifyNewAccessoryConnected,  0, 0, 0,     0,                         0, 11404, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 1000000},
-    { ETFConnectWiredAccessory,                 0, EBidirectional, 0,     0,           0, 11404, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},            
-    { ETFConnectWiredAccessory,                 0, EUnidirectional, 0,     0,           0, 11404, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 3000000},        
+    { ETFConnectWiredAccessory,                 0, EAudioConnectionStatusBidirectional, 0,     0,           0, 11404, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 2000000},            
+    { ETFConnectWiredAccessory,                 0, EAudioConnectionStatusUnidirectional, 0,     0,           0, 11404, ETFAsyRTPStreamingConn, ReqAccRequestNone,              KErrNone, 3000000},        
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11404, ETFAsyNone,     ReqNotifyNewAccessoryConnected, KErrNone, 0},
     { ETFAccessoryNotifyAccessoryDisconnected,  0, 0, 0,     0,                         0, 11404, ETFAsyNone,     ReqAccRequestNone,              KErrNone, 2000000},
-    { ETFDisconnectWiredAccessory,              0, ENone, 0,     0,                     0, 11404, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
+    { ETFDisconnectWiredAccessory,              0, EAudioConnectionStatusNone, 0,     0,                     0, 11404, ETFAsyRTPStreamingConn,     ReqAccRequestNone,              KErrNone, 2000000},
     { ETFFindAndCheckRequest,                   0, 0, 0,     0,                         0, 11404, ETFAsyNone,     ReqNotifyAccessoryDisconnected, KErrNone, 0},
 
     { ETFClearStack,                            0, 0, 0,     0,                         0, 11404, ETFAsyNone,             ReqAccRequestNone,              KErrNone, 0},

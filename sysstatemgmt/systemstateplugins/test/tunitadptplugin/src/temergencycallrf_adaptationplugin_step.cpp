@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,7 +22,11 @@
 
 
 #include <s32mem.h>
+#include <e32property.h>
 #include "temergencycallrf_adaptationplugin_step.h"
+
+const TUint32 KEmergencyCallRfAdaptationPluginPropertyKey = 0x2000E657;
+const TUid KPropertyCategory={0x2000D75B};
 
 //
 // Run the tests
@@ -73,9 +77,12 @@ void CTestEmergencyCallRfAdaptationPlugin::TestCancel()
 //from CAdaptationTestBase
 TVerdict CTestEmergencyCallRfAdaptationPlugin::doTestStepL()
 	{
-	TInt err = KErrNone;
-
 	__UHEAP_MARK;
+	
+	TInt err = RProperty::Define(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, RProperty::EInt);
+	TEST((KErrNone == err) || (KErrAlreadyExists == err));
+	err = RProperty::Set(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, 1);
+	TEST(KErrNone == err);
 	
 	TRAP(err, TestActivateRfForEmergencyCall());
 	TEST(iStatus.Int() == KErrDisconnected);
@@ -97,6 +104,8 @@ TVerdict CTestEmergencyCallRfAdaptationPlugin::doTestStepL()
 	TestCancel();
 	//TestRelease();			// have to test this part too ...
 
+	err = RProperty::Delete(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey);
+	TEST(KErrNone == err);
 	__UHEAP_MARKEND;
 
 	return TestStepResult();

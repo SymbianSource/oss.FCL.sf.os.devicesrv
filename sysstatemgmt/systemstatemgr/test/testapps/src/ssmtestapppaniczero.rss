@@ -21,8 +21,8 @@
 
 NAME STAZ
 
-#include <techview/eikon.rh>
-#include <techview/eikon.rsg>
+#include <eikon.rh>
+#include <eikon.rsg>
 
 RESOURCE RSS_SIGNATURE { }
 

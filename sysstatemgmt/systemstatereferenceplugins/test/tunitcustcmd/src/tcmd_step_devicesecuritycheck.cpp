@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -23,6 +23,11 @@
 #include "ssmsecuritychecknotifier.h"
 #include "ssmuiproviderdll.h"
 #include "ssmcustomcmdfactory.h"
+#include <w32std.h>
+#include <s32file.h>
+
+const TUid KPropertyCategory={0x2000D75B}; 
+const TUint32 KMiscPluginPropertyKey = 0x2000E658;
 
 CCustomCmdTestDeviceSecurityCheck::~CCustomCmdTestDeviceSecurityCheck()
 	{
@@ -44,6 +49,10 @@ TVerdict CCustomCmdTestDeviceSecurityCheck::doTestStepPreambleL()
 	iActiveScheduler = new(ELeave) CActiveScheduler;
 	CActiveScheduler::Install (iActiveScheduler);
 	iActiveSchedulerWait = new(ELeave) CActiveSchedulerWait;
+	TInt err = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
+	TEST(KErrNone == err || KErrAlreadyExists == err);
+	err = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
+	TEST(KErrNone == err);
 
 	//Needed for calling calback for stopping active scheduler
 	iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
@@ -52,12 +61,20 @@ TVerdict CCustomCmdTestDeviceSecurityCheck::doTestStepPreambleL()
 
 TVerdict CCustomCmdTestDeviceSecurityCheck::doTestStepPostambleL()
 	{
+	TInt err = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
+	TEST(KErrNone == err);
 	return CTestStep::doTestStepPostambleL();
 	}
 
 void CCustomCmdTestDeviceSecurityCheck::SimulatePasswordEntry()
 	{
-	//Simulate the key press ,(comma) in to pin notifier dialogue
+    RWsSession wsSession;
+    TInt err = wsSession.Connect();
+    TEST(KErrNone == err);
+    
+    const TInt okButtonPos1 = 60; //the position of ok button
+    const TInt okButtonPos2 = 600; //the position of ok button
+    //Simulate the key press ,(comma) in to pin notifier dialogue
 	TRawEvent eventDown;
 	TRawEvent eventUp;
 
@@ -80,11 +97,14 @@ void CCustomCmdTestDeviceSecurityCheck::SimulatePasswordEntry()
 		iWrongPwd = EFalse;
 		}
 
-	eventDown.Set(TRawEvent::EKeyDown, EStdKeyEnter);
-	UserSvr::AddEvent(eventDown);
-	eventUp.Set(TRawEvent::EKeyUp, EStdKeyEnter);
-	UserSvr::AddEvent(eventUp);
-	User::After(100000);
+    eventDown.Set(TRawEvent::EButton1Down, okButtonPos1,okButtonPos2);
+    UserSvr::AddEvent(eventDown);
+    eventUp.Set(TRawEvent::EButton1Up, okButtonPos1,okButtonPos2);
+    UserSvr::AddEvent(eventUp);
+    User::After(100000);
+    
+    wsSession.Flush();
+    wsSession.Close();
 	}
 
 static TInt CallBackL(TAny* aCCustomCmdTestSimSecurityCheck)
@@ -145,13 +165,9 @@ void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneDeviceRespReceived1L()
 
 	TestLockPhoneDeviceRespReceivedHelperL();
 
-#ifdef __WINS__
 	INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
 	TEST(KErrNone == iRequest.Int());
-#else
-	INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
-	TEST(KErrNotSupported == iRequest.Int());
-#endif
+
 	}
 
 void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneDeviceRespReceived2L()
@@ -160,14 +176,16 @@ void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneDeviceRespReceived2L()
 	iCustomCmdDevSecurityCheck->iLockInfo.iStatus = RMobilePhone::EStatusLockUnknown;
 
 	TestLockPhoneDeviceRespReceivedHelperL();
-	INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
-	TEST(KErrNotSupported == iRequest.Int());
 
-/*#ifdef __WINS__
-	TEST(KErrNone == iRequest.Int());
+
+#ifdef __WINS__
+	INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
+	TEST(KErrNotFound == iRequest.Int());
 #else
-	TEST(KErrNotSupported == iRequest.Int());
-#endif*/
+    INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
+	TEST(KErrNone == iRequest.Int());
+#endif
+    INFO_PRINTF1(_L("TestLockPhoneDeviceRespReceived2L"));
 	}
 
 void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneDeviceRespReceived3L()
@@ -224,8 +242,13 @@ void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneDeviceRespReceived5L()
 	iAsyncStopScheduler->CallBack();
 	iActiveSchedulerWait->Start();
 
-	INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
-	TEST(KErrNotSupported == iRequest.Int());
+#ifdef __WINS__
+    INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());
+	TEST(KErrNotFound == iRequest.Int());
+#else
+    INFO_PRINTF3(_L("Result at line %d is %d "),__LINE__ + 1, iRequest.Int());	
+    TEST(KErrNone == iRequest.Int());
+#endif
 	}
 
 void CCustomCmdTestDeviceSecurityCheck::TestLockPhoneToIccRespReceivedHelperL()

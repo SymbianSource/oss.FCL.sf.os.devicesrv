@@ -15,7 +15,7 @@
 // 
 //
 
-TARGET          t_shutdownserver.exe
+TARGET          t_shutdownserver.exe //RTEST
 CAPABILITY      ProtServ PowerMgmt DiskAdmin 
 TARGETTYPE      EXE
 

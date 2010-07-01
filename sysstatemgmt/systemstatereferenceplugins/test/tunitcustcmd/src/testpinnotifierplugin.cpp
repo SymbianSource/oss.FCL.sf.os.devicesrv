@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -21,13 +21,13 @@
 
 #include "testpinnotifierplugin.h"
 #include <ssm/ssmuiproviderdll.h>
-#include <techview/eikdialg.h>
+#include <eikdialg.h>
 #include <testpinnotifier.rsg>
 #include <bautils.h>
 #include <eikenv.h>
 #include <uikon.hrh>
 #include <ecom/implementationproxy.h>
-#include <techview/eikseced.h>
+#include <eikseced.h>
 #include <e32property.h>
 
 const TUint KCustomcmdServerPropertyKey = 0x0012AC;
@@ -36,8 +36,6 @@ const TUid KCustomcmdServerSID={0x2000D75B};				// tcustomcmd_server SID = KSsmS
 _LIT(KPinNotifierResFileNameAndPath,"\\resource\\apps\\testpinnotifier.rsc");
 _LIT(KPinNotifierTitle,"Security Check");
 
-//Hardcoding security pin code.
-_LIT(KPinCode,","); 
 
 CArrayPtr<MEikSrvNotifierBase2>* NotifierArrayL()
 	{
@@ -69,8 +67,12 @@ void CSecurityPinNotifier::Release()
 
 CSecurityPinNotifier::TNotifierInfo CSecurityPinNotifier::RegisterL()
 	{
-	iInfo.iUid = CSsmUiSpecific::SecurityPinNotifierUid();
-	iInfo.iChannel = CSsmUiSpecific::ScreenOutputChannelUid();
+	const TUid KSecurityPinNotifierUid = {0x2000E667};
+	iInfo.iUid = KSecurityPinNotifierUid;
+
+	const TUid KScreenOutputChannel = {0x10009D48};	
+	iInfo.iChannel = KScreenOutputChannel;
+
 	iInfo.iPriority = ENotifierPriorityVHigh;
 	return iInfo;
 	}
@@ -160,19 +162,7 @@ TBool CSecurityPinNotifier::OkToExitL(TInt /*aButtonId*/)
 	securityResultBuffer = KErrGeneral; 
 	if (iMessage != RMessagePtr2())
 		{
-   		TBuf<5> newPINValueVerify;
-
-   		//Get pinter for the secret editor control
-   		CEikSecretEditor* pinEditor = static_cast<CEikSecretEditor*>(Control(0));
-   		pinEditor->GetText(newPINValueVerify);
-
-		//Verify the entered pin number
-		if(0 == newPINValueVerify.Compare(KPinCode))
-			{
-			securityResultBuffer = KErrNone;
-			}
-
-		pinEditor->Reset();	
+   		securityResultBuffer = KErrNone;
 		iMessage.Write(iReplySlot,securityResultBuffer);
 		iMessage.Complete(KErrNone);	
 		// Set this swp to indicate to stop the active schaduler

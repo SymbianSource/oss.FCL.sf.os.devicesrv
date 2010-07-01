@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -101,6 +101,7 @@ LIBRARY			sysmoncli.lib
 LIBRARY			centralrepository.lib
 LIBRARY			ssmuiproviderdll.lib
 LIBRARY			ssmadaptationcli.lib
+LIBRARY			ws32.lib
 
 LIBRARY		etelmm.lib //Device security check
 LIBRARY		etel.lib //Device security check

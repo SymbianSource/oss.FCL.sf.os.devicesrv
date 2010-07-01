@@ -427,20 +427,11 @@ TInt CHWRMHapticsImpl::SetDeviceProperty( TInt aDevicePropertyType,
 
         // send command to haptics server
         if ( KErrNone == err )
-            {
-            if( aDevicePropertyType == EHWRMHapticsLicensekey )
-                {
-                err = iClient.ExecuteOperation( 
+            {            
+            err = iClient.ExecuteOperation( 
                        EHWRMHapticsSetLicenseProp, 
-                       TIpcArgs( &iReqData, aDevicePropertyValue.Length() ) );
-                }
-            else
-                {
-                err = iClient.ExecuteOperation( EHWRMHaptics,  
-                                                TIpcArgs( &iReqData ) );
-                }
-            }
-         
+                       TIpcArgs( &iReqData, aDevicePropertyValue.Length() ) );                     
+	         }
         }
     
     API_TRACE( ( _L( "CHWRMHapticsImpl::SetDeviceProperty() - const TDesC8 overloaded - return %d" ), err ) );

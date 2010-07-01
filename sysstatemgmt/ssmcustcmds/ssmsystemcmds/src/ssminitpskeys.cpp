@@ -299,7 +299,7 @@ void CSsmInitPsKeys::InitializeKeysL()
              KWriteDeviceDataPolicy );
     SetL( KPSStarterUid, KSSMUILanguagePSKey , 0 );
 
-    INFO( "KPSUidStartup::KIgnoreSecurityEvent" );
+    INFO( "KPSUidStartup::KIgnoreSecurityEvent" );
     DefineL( KPSUidStartup,
              KIgnoreSecurityEvent,
              KReadDeviceDataPolicy,

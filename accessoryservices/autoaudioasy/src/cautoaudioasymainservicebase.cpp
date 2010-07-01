@@ -95,7 +95,7 @@ void CAutoAudioAsyMainServiceBase::InitPSAutoAudioL ()
         User::Leave ( ret );
 		}
 	
-	ret = RProperty::Set ( KPSUidAccessoryServices, KPSAutoKeyRTPStreamingConnectionStatus, ENone );
+	ret = RProperty::Set ( KPSUidAccessoryServices, KPSAutoKeyRTPStreamingConnectionStatus, EAudioConnectionStatusNone );
 	if ( ret != KErrNone )
 	    {
         COM_TRACE_1 ( "[AccFW:AutoAudioAsy] CAutoAudioAsyMainServiceBase::InitPSAutoAudioL RTP Streaming key init failed with %d", ret );

@@ -26,6 +26,9 @@ PRJ_EXPORTS
 ../data/InternalHWRMFmTxPolicy.ini             z:/private/101f7a02/customerhwrmfmtxpolicy.ini
 
 
+#include "../hwresourcesmgr/group/bld.inf"
+#include "../hwresourcesmgrconfig/bld.inf"
+#include "../powerandmemorynotificationservice/group/bld.inf"
 #include "../hwrmfmtxwatcherplugin/group/bld.inf"
 
 #if  defined(WINSCW) && !defined(__HWRM_TARGET_MODIFIER_PLUGIN)

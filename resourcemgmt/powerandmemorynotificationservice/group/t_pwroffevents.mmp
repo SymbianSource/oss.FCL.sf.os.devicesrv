@@ -16,7 +16,7 @@
 // 
 //
 
-TARGET          t_pwroffevents.exe
+TARGET          t_pwroffevents.exe //RTEST
 // requires PowerMgmt because it is a unit test of the server code that will call the Power API which requires it
 // requires DiskAdmin because the test will make the server call RFs::FinaliseDrives() as part of power-off sequence
 CAPABILITY      PowerMgmt DiskAdmin 

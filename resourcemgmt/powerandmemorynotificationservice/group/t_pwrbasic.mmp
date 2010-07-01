@@ -15,7 +15,7 @@
 // 
 //
 
-TARGET          t_pwrbasic.exe
+TARGET          t_pwrbasic.exe  //RTEST
 CAPABILITY      PowerMgmt
 TARGETTYPE      EXE
 

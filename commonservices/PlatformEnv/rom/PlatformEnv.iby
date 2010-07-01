@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -22,9 +22,11 @@
 file=ABI_DIR\BUILD_DIR\PlatformEnv.dll       SHARED_LIB_DIR\PlatformEnv.dll
 
 #ifdef FF_USE_MASS_STORAGE_CONFIG
-patchdata PlatformEnv.dll@KDriveInfoDefaultRemovableMassStorage 5 // EDriveF
-patchdata PlatformEnv.dll@KDriveInfoLogicallyRemovableDrive1 4 // EDriveE
+patchdata PlatformEnv.dll@KDriveInfoDefaultRemovableMassStorage FF_DEFAULT_REMOVABLE_MASS_STORAGE
+patchdata PlatformEnv.dll@KDriveInfoLogicallyRemovableDrive1 FF_LOGICALLY_REMOVABLE_DRIVE1
 #endif // FF_USE_MASS_STORAGE_CONFIG
+
+patchdata PlatformEnv.dll@KDriveInfoUsbDrivesStart FF_USB_DRIVE_START
 
 file=ABI_DIR\BUILD_DIR\disknotifyhandler.dll SHARED_LIB_DIR\disknotifyhandler.dll
 file=ABI_DIR\BUILD_DIR\sysversioninfo.dll    SHARED_LIB_DIR\sysversioninfo.dll
