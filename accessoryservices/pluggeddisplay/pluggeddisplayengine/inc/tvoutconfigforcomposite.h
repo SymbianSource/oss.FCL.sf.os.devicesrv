@@ -123,6 +123,8 @@ public: // New methods
      */
     void Disable();
 
+	TBool UpdateOverscanValues();
+	
 private:
 
     /**
@@ -262,6 +264,12 @@ private:
     // Time out reason and next opt after timer has 
     // elapsed
     TOpt iTimeOutReason;
+	
+    // Horizontal overscan in pixels (1% == 100)
+    TInt iHOverscan;
+
+    // Vertical overscan in pixels (1% == 100)
+    TInt iVOverscan;
     };
 
 #endif // TVOUTCONFIGFORCOMPOSITE_H

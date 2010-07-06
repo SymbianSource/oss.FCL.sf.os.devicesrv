@@ -74,7 +74,10 @@ void CTCSendEventTimer::ConstructL( TInt aSetTimerToHzLevel )
 	ret = iTimer.CreateLocal();
 	User::LeaveIfError( ret );
 	iTimerToHzLevel = aSetTimerToHzLevel;
-	TTimeIntervalMicroSeconds32 interval( KOneSecondInMicroSeconds / aSetTimerToHzLevel );
+	}
+void CTCSendEventTimer::Start()
+	{
+	TTimeIntervalMicroSeconds32 interval( KOneSecondInMicroSeconds / iTimerToHzLevel );
 		
 	if( !IsActive() )
 		{

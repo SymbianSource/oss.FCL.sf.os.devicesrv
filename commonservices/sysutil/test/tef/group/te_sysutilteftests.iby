@@ -42,10 +42,10 @@ data = EPOCROOT##epoc32\data\z\testdata\inifiles\te_sysutildata.ini								\test
 
 #ifndef SYSUTIL_Z_DRIVE_FILES_PRESENT
 #define SYSUTIL_Z_DRIVE_FILES_PRESENT
-data = EPOCROOT##epoc32\data\z\resource\versions\lang.txt										\resource\versions\lang.txt
-data = EPOCROOT##epoc32\data\z\resource\versions\langsw.txt										\resource\versions\langsw.txt
-data = EPOCROOT##epoc32\data\z\resource\versions\sw.txt											\resource\versions\sw.txt
-data = EPOCROOT##epoc32\data\z\resource\versions\purpose.txt									\resource\versions\purpose.txt
+//data = EPOCROOT##epoc32\data\z\resource\versions\lang.txt										\resource\versions\lang.txt
+//data = EPOCROOT##epoc32\data\z\resource\versions\langsw.txt										\resource\versions\langsw.txt
+//data = EPOCROOT##epoc32\data\z\resource\versions\sw.txt											\resource\versions\sw.txt
+//data = EPOCROOT##epoc32\data\z\resource\versions\purpose.txt									\resource\versions\purpose.txt
 #endif
 
 data = EPOCROOT##epoc32\data\z\resource\versions\nocontent\lang.txt								\resource\versions\nocontent\lang.txt

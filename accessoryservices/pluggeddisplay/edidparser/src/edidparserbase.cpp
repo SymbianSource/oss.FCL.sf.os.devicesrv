@@ -52,8 +52,10 @@ void CEdidParserBase::ConstructL( const TDesC8& aBinaryData )
 
     // Make a copy of base EDID data
     Mem::Copy( &iBaseEdidData, rawPtr.Ptr(), KEdidParserSizeOfEdidBlock );
-    
-    TRACE_EDID_DATA( *this );
+
+	iRawdataLength = aBinaryData.Length();
+	
+    //TRACE_EDID_DATA( *this );
     }
 
 // ---------------------------------------------------------------------------
@@ -760,6 +762,51 @@ EXPORT_C CCea861EdidParser* CEdidParserBase::CreateCea861ExtensionParserL( TInt 
     // Extension is not supported. Return NULL
     return parser;
     }
+
+EXPORT_C void CEdidParserBase::UpdateRawDataL( const TDesC8& aBinaryData )
+	{
+	FUNC_LOG;
+
+	if ( iRawData )
+		{
+		iRawData = iRawData->ReAllocL( iRawdataLength + aBinaryData.Length() );
+		
+		TPtr8 rawPtr = iRawData->Des();
+		rawPtr.Append( aBinaryData );		
+		}
+	else
+		{
+	    iRawData = HBufC8::NewL( aBinaryData.Length() );
+	    TPtr8 rawPtr = iRawData->Des();
+	    rawPtr.Copy( aBinaryData );
+		}	
+
+	iRawdataLength = iRawdataLength + aBinaryData.Length();
+	}
+
+EXPORT_C void CEdidParserBase::UpdateCea861ExtensionL( TInt aNumber, CCea861EdidParser* aParser )
+	{
+	FUNC_LOG;
+
+    TInt ext = GetExtensionType( aNumber );
+    switch( ext )
+        {
+        case ECea861Ext:
+            {
+            // CEA 861 extension
+			if( aParser )
+				{
+				aParser->ParseExtensionBlockL( iExtensionData );
+				}
+            break;
+            }
+        default:
+            {
+            // Not supported
+            break;
+            }
+        }
+	}
 
 // ---------------------------------------------------------------------------
 // CEdidParserBase::GetChecksum

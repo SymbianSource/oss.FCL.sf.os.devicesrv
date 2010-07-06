@@ -179,7 +179,7 @@ public:
      * @param None.
      * @return None.
      */
-    void UpdateOverscanValues();
+    TBool UpdateOverscanValues();
     
 	void GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan );
 
@@ -413,6 +413,12 @@ private: // Data
     
     // Request ID
     TRequestTypeID iRequestID;
+
+	// Number of extensions to read
+	TInt inbrOfExtensions;
+
+	// Current EDID block
+	TInt iCurrentBlock;
     };
 
 #endif // C_EDIDHANDLER_H

@@ -100,7 +100,8 @@ CCompositeCableStateConnected::~CCompositeCableStateConnected()
 void CCompositeCableStateConnected::Enter( )
     {
     FUNC_LOG;    
-    
+
+	iTVOutConfigForComposite.UpdateOverscanValues();
     ClearAvailableTvOutConfig();
     
     iTVOutConfigForSettingChanges->ListenSettingsChanges();
@@ -192,16 +193,24 @@ void CCompositeCableStateConnected::CentRepKeyChanged(
         TUint32 aId )
     {
     FUNC_LOG;
+	INFO("Cenrep Value Changed");
     if ( KCRUidTvoutSettings == aRepositoryId )
         {
         if (    ( KSettingsTvAspectRatio == aId ) ||
                 ( KSettingsTvoutFlickerFilter == aId  ) ||
-                ( KSettingsTvSystemInfo == aId ) ||
-                ( KSettingsTvoutVerticalOverscan == aId) )
+                ( KSettingsTvSystemInfo == aId ) )
             {
             Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventKeyChanged );
             }
-        else
+        else if( KSettingsTvoutVerticalOverscan == aId )
+			{
+			if( iTVOutConfigForComposite.UpdateOverscanValues() )
+				{
+				INFO( "There is a real overscan change" );
+				Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventOverscanKeyChanged );
+				}
+			}
+		else
             {
             INFO_1("Unexpected CR key ID, aId 0x%x", aId );            
             }       
@@ -375,12 +384,38 @@ void CCompositeCableStateConnected::SubStateEnabledInput(
 			iResettingInput = ETrue;
             Enter();
             }
+		else if ( EPDEIfCentralRepositoryWatchEventOverscanKeyChanged == aEvent )
+			{
+			INFO( "Event: EPDEIfCentralRepositoryWatchEventOverscanKeyChanged" );
+			iTVOutConfigForComposite.SetConfig( ETrue );
+			}
         else
             {
             INFO_1( "Unknown Event Id: %i", aEvent );        
             }
         break;
         }       
+    case EPDEIfTVOutConfig:
+        {       
+        INFO( "Interface: EPDEIfTVOutConfig" );       
+		if ( EIfTVOutConfigEventSet == aEvent )
+			{
+			INFO( "Event: EIfTVOutConfigEventSet" );
+			// Stay on the same state
+			}
+		else if ( EIfTVOutConfigEventSetFailed == aEvent )
+			{
+			INFO( "Event: EIfTVOutConfigEventSetFailed" );
+            iCRWatchForFlickerFilter->Cancel();
+            iCRWatchForAspectRatio->Cancel();
+            iCRWatchForTvSystem->Cancel();
+			iCRWatchForVOverScan->Cancel();
+            ClearAvailableTvOutConfig();
+            iTVOutConfigForComposite.Disable();
+            iSubState = ESubStateDisabling;
+			}
+		break;
+		}
     default:
         {
         INFO_2( "Event from unexpected interface. if Id, event id: %i", aInterfaceId, aEvent );        

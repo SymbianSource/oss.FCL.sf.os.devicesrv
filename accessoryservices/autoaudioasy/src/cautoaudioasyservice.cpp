@@ -102,7 +102,7 @@ void CAutoAudioAsyService::PropertyChange ( RProperty& aProperty, TUid aUid, TUi
         // Check if audio accessory has been connected
         if ( ( status == KErrNone ) && ( aStatus == KErrNone ) )
             {
-			if ( propValue == EUnidirectional ) // Current release supports only UniDirectional, so other key values ignored.
+			if ( propValue == EAudioConnectionStatusUnidirectional ) // Current release supports only UniDirectional, so other key values ignored.
 				{
 				TInt err;
 				switch ( iState )

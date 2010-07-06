@@ -13,7 +13,7 @@
 // Description:
 //
 
-TARGET          hwrmtests.exe
+TARGET          hwrmtests.exe //RTEST
 TARGETTYPE	    exe
 UID             0x102857BB 0x102857BB // 0
 VENDORID        0x70000001

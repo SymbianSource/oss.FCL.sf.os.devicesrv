@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,12 +27,24 @@
 #include <ssm/ssmcommandlist.h>
 #include <ssm/ssmcmd.hrh>
 #include <ssm/ssmcommand.h>
+#include <ssmsubstateext.hrh> 
 
 #include "tgsa_step_shutdown.h"
 
-TSsmCommandType ArrCriticalShutdown[] = { ESsmCmdPublishSystemState};
-TSsmCommandType ArrNonCriticalShutdown[] = { ESsmCmdPublishSystemState, ESsmCmdPersistHalAttributes, ESsmCmdFinaliseDrives};
-TSsmCommandType ArrPowerOffShutdown[] = { ESsmCmdPublishSystemState, ESsmCmdPowerOff };
+TSsmCommandType ArrCriticalShutdown[] = {   ESsmCmdCustomCommand,       //r_cmd_sastate
+                                            ESsmCmdPublishSystemState,  //r_cmd_publishstate
+                                            ESsmCmdSetPAndSKey,         //r_cmd_psstate
+                                            ESsmCmdCustomCommand,       //r_cmd_cancelmonitoring
+                                            ESsmCmdCustomCommand        //r_cmd_shutdownapps
+                                            };
+TSsmCommandType ArrNonCriticalShutdown[] = {ESsmCmdPublishSystemState,  //r_cmd_publishstate 
+                                            ESsmCmdSetPAndSKey,         //r_cmd_killsplash
+                                            ESsmCmdCustomCommand,       //r_cmd_sashutdown
+                                            ESsmCmdFinaliseDrives       //r_cmd_finalisedrives
+                                            };
+TSsmCommandType ArrPowerOffShutdown[] = {   ESsmCmdPublishSystemState,  //r_cmd_publishstate
+                                            ESsmCmdPowerOff             //r_cmd_poweroff 
+                                            };
 
 const TUint16 KUnknownState = 100;
 
@@ -132,11 +144,11 @@ void CGsaShutdownTest::doTestCommandListL()
 	{
 	INFO_PRINTF1(_L("> CGsaShutdownTest::doTestCommandListL"));
 
-	TestCommandListL(ESsmShutdown, ESsmShutdownSubStateCritical, 1);
+	TestCommandListL(ESsmShutdown, ESsmShutdownSubStateCritical, (sizeof(ArrCriticalShutdown)/sizeof(ArrCriticalShutdown[0])));
 	// KSsmAnySubState
-	TestCommandListL(ESsmShutdown, KSsmAnySubState, 1);
-	TestCommandListL(ESsmShutdown, ESsmShutdownSubStateNonCritical, 3);
-	TestCommandListL(ESsmShutdown, ESsmShutdownSubStatePowerOff, 2);
+	TestCommandListL(ESsmShutdown, KSsmAnySubState, (sizeof(ArrCriticalShutdown)/sizeof(ArrCriticalShutdown[0])));
+	TestCommandListL(ESsmShutdown, ESsmShutdownSubStateNonCritical, (sizeof(ArrNonCriticalShutdown)/sizeof(ArrNonCriticalShutdown[0])));
+	TestCommandListL(ESsmShutdown, ESsmShutdownSubStatePowerOff, (sizeof(ArrPowerOffShutdown)/sizeof(ArrPowerOffShutdown[0])));
 	}
 
 /**

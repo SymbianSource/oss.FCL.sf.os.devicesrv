@@ -442,9 +442,6 @@ private: // data
     //CCentralRepositoryWatch* iCRWatchForHOverScan;
     CCentralRepositoryWatch* iCRWatchForVOverScan;
 
-	// Flag to indicate the change of overscan
-	TBool iOverScanSettingsChanged;
-
     // Current overscan value
 	TInt iHOverscanValue;
 	TInt iVOverscanValue;

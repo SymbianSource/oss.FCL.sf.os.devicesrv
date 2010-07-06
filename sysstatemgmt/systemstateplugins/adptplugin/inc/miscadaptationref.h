@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -59,16 +59,20 @@ public:
 	void GetSimLanguagesL(CBufBase* aBuf, TInt aCount);
 	void GetHiddenReset(TDes8& aHiddenResetPckg, TRequestStatus& aStatus);
 	void Cancel();
-
+	
 private:
 	CMiscAdaptationRef();
 	void ConstructL();	
 	~CMiscAdaptationRef();
+	//Helper function to check for P&S Key
+    TBool IsTestPsKeyDefined();
 
 private:
 	TInt iTestCaseNum;
 	RFs iFs;
 	RFileReadStream iFile;
+	MMiscAdaptation* iSaaMiscAdaptationDll;
+	RLibrary iSaaMiscAdaptationLib;
 	};
 
 #endif // __MISCADAPTATION_H__

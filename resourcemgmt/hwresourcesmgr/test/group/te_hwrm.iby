@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,6 +20,10 @@
 #include <hwresourcemanager.iby>
 //for test purposes, include symbian's FmTx and UI plugin
 #include <fmtx_hwrm.iby>
+// if the feature flag for FF_FMTX is undefined, include the dll here
+#ifndef FF_FMTX
+file=ABI_DIR\DEBUG_DIR\HWRMFmTxClient.dll 	 SYSTEM_BINDIR\HWRMFmTxClient.dll
+#endif //FF_FMTX
 #include <hwrmuiplugin.iby>
 
 #include <hwrmdefaultlighttargetmodifierplugin.iby>
@@ -53,10 +57,10 @@ data=/epoc32/data/z/testdata/scripts/te_hwrm_power_ext_charging_info.script     
 #endif
 
 // cenrep registration files
-#ifdef TEXT_ONLY_ROM
+//#ifdef TEXT_ONLY_ROM
 // This is required because the cenrep files are now being included only via techview_base.iby
 data=DATAZ_\private\10202BE9\10205043.txt   private\10202be9\10205043.txt
-#endif
+//#endif
 data=DATAZ_\private\10202BE9\10200C8B.txt 	private\10202be9\10200C8B.txt
 data=DATAZ_\private\10202BE9\10200C8C.txt 	private\10202be9\10200C8C.txt
 data=DATAZ_\private\10202BE9\10200C8D.txt 	private\10202be9\10200C8D.txt

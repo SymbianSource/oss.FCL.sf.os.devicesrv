@@ -355,6 +355,7 @@ void CTCStateTiltListenData::HandleStateEntryL()
     if( !iTimerToSend )
         {
         iTimerToSend = CTCSendEventTimer::NewL( iHzSamplingRate, *this );
+		iTimerToSend->Start();
         }
     else if( iHasChanged )
         {
@@ -363,6 +364,10 @@ void CTCStateTiltListenData::HandleStateEntryL()
         iTimerToSend = CTCSendEventTimer::NewL( iHzSamplingRate, *this );
         iHasChanged = EFalse;
         }
+	else
+		{
+		iTimerToSend->Start();
+		}
     }
 
 // ----------------------------------------------------------------------------------
@@ -375,8 +380,7 @@ void CTCStateTiltListenData::HandleStateExitL()
     
     if( iTimerToSend )
         {
-        delete iTimerToSend;
-        iTimerToSend = NULL;
+		iTimerToSend->Cancel();
         }
     }
 

@@ -13,7 +13,7 @@
 // Description:
 //
 
-TARGET			mctest_f.exe
+TARGET			mctest_f.exe //RTEST
 TARGETTYPE		exe
 UID				0x102857BB	0x102857BB
 VENDORID        0x70000001

@@ -378,6 +378,9 @@ public:
      */
     IMPORT_C TUint8 GetChecksum();
 
+	IMPORT_C void UpdateRawDataL( const TDesC8& aBinaryData );
+	IMPORT_C void UpdateCea861ExtensionL( TInt aNumber, CCea861EdidParser* aParser );
+
 private:
 
     /**
@@ -558,6 +561,7 @@ private: // data
      HBufC8*         iRawData;                  // Raw data that contains all EDID data
      TUint           iNumberOfExtensionBlocks;  // Number of extensionblocks for this base edid block
      TExtDataBlock   iExtensionData;            // Extension data
+     TInt            iRawdataLength;            // Raw data length
     };
 
 #endif // C_CEDIDPARSERBASE_H

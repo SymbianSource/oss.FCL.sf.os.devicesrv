@@ -68,6 +68,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
     {
     commands =
         {
+        r_cmd_waitidle, //CR:ETIN-86JCY2
         // prio 0xFFB7
 #ifdef __JAVA        
         r_cmd_javacaptain,
@@ -392,6 +393,33 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitcleanbootinfo
     dll_data = r_dlldata_waitcleanbootinfo;
     retries = 2;
     execution_behaviour = ESsmWaitForSignal;
+    }
+
+// ---------------------------------------------------------------------------
+// r_cmd_waitidle
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_waitidle
+    {
+    priority = 0xFFC5;
+    severity = ECmdCriticalSeverity;
+    dllname = "ssmsystemcmds.dll";
+    ordinal = 5; // WaitPsKeyExact
+    dll_data = r_dlldata_waitidle;
+    unload_on_finish = ENeverUnload;
+    retries = 2;
+    execution_behaviour = ESsmWaitForSignal;
+    }
+
+// ---------------------------------------------------------------------------
+// r_dlldata_waitidle
+// ---------------------------------------------------------------------------
+//
+RESOURCE CMD_PARAM_WAIT_PS r_dlldata_waitidle
+    {
+    category = 0x101F8766;  // KPSUidStartup
+    key = 0x00000043;       // KPSIdlePhase1Ok
+    target = 101;           // EIdlePhase1Ok
     }
 
 // ---------------------------------------------------------------------------
