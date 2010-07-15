@@ -1414,7 +1414,7 @@ void CEDIDHandler::CalculateOverscan( TPoint& aTLCorner,
 // CalculateOverscan
 //------------------------------------------------------------------------------
 //
-void CEDIDHandler::UpdateOverscanValues()
+TBool CEDIDHandler::UpdateOverscanValues()
     {
     FUNC_LOG;
 
@@ -1423,6 +1423,7 @@ void CEDIDHandler::UpdateOverscanValues()
     TInt vOverscan = 0;
     CRepository* cenRep = NULL;
     TInt err = KErrNone;
+	TBool valChanged = EFalse;
     
     TRAP( err, cenRep = CRepository::NewL( KCRUidTvoutSettings ) );
     if( err == KErrNone )
@@ -1445,12 +1446,19 @@ void CEDIDHandler::UpdateOverscanValues()
         // Cleanup
         delete cenRep;
         }
+
+	if( (iHOverscan != hOverscan) || (iVOverscan != vOverscan) )
+		{
+		valChanged = ETrue;
+		}
     
     // Update overscan values
     iHOverscan = hOverscan;
     iVOverscan = vOverscan;
 
-	INFO_2( "Overscan Values: %d,%d", iHOverscan, iVOverscan );
+	INFO_3( "Overscan Values: %d,%d Changed:%d", iHOverscan, iVOverscan, valChanged );
+
+	return valChanged;
     }
 
 // ----------------------------------------------------------------------------

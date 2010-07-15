@@ -189,6 +189,48 @@ void CTVOutConfigForComposite::Disable()
     }
 
 // -----------------------------------------------------------------------------
+// CTVOutConfigForComposite::UpdateOverscanValues
+// -----------------------------------------------------------------------------
+//
+TBool CTVOutConfigForComposite::UpdateOverscanValues()
+    {
+    FUNC_LOG;
+
+    // Overscan from cenrep
+    TInt hOverscan = 0;
+    TInt vOverscan = 0;
+    TInt err = KErrNone;
+	TBool valChanged = EFalse;
+    
+    // Horizontal
+    err = iRepository->Get( KSettingsTvoutHorizontalOverscan, hOverscan );
+    if( err != KErrNone )
+        {
+        hOverscan = 0;
+        }
+    
+    // Vertical
+    err = iRepository->Get( KSettingsTvoutVerticalOverscan, vOverscan );
+    if( err != KErrNone )
+        {
+        vOverscan = 0;
+        }
+
+	if( (iHOverscan != hOverscan) || (iVOverscan != vOverscan) )
+		{
+		valChanged = ETrue;
+		}
+    
+    // Update overscan values
+    iHOverscan = hOverscan;
+    iVOverscan = vOverscan;
+
+	INFO_3( "Overscan Values: %d,%d Changed:%d", iHOverscan, iVOverscan, valChanged );
+
+	return valChanged;
+    }
+
+// -----------------------------------------------------------------------------
 // CTVOutConfigForComposite::InitializeDriverL
 // -----------------------------------------------------------------------------
 //
@@ -216,20 +258,9 @@ TInt CTVOutConfigForComposite::InitializeDriverL()
     ConvertFlickerFilter( value );
     settings.iFlickerFilter = ( TTvSettings::TFlickerFilterType ) value;
 
-    TInt hOverscan = 0;
-    TInt vOverscan = 0;
-    err = iRepository->Get( KSettingsTvoutHorizontalOverscan, hOverscan );
-    if( err != KErrNone )
-        {
-        hOverscan = 0;
-        }
-    err = iRepository->Get( KSettingsTvoutVerticalOverscan, vOverscan );
-    if( err != KErrNone )
-        {
-        vOverscan = 0;
-        }
-    settings.iHorizontalOverScan = hOverscan;
-    settings.iVerticalOverScan = vOverscan;
+	// Update overscan
+    settings.iHorizontalOverScan = iHOverscan;
+    settings.iVerticalOverScan = iVOverscan;
     
     // Update the PAR
     UpdatePixelAspectRatio( settings );

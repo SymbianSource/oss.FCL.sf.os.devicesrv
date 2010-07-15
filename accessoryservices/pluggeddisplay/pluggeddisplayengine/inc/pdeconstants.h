@@ -92,6 +92,7 @@ enum TPDEInterface
     // Central Repository interface's event ids    
     EPDEIfCentralRepositoryWatchEventUndefined = 0x50,
     EPDEIfCentralRepositoryWatchEventKeyChanged,
+	EPDEIfCentralRepositoryWatchEventOverscanKeyChanged,
     
     // ASY command Handler interface's event ids
     EPDEIfAsyCommandHandlerEventUndefined = 0x60,

@@ -179,7 +179,7 @@ public:
      * @param None.
      * @return None.
      */
-    void UpdateOverscanValues();
+    TBool UpdateOverscanValues();
     
 	void GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan );
 
