@@ -542,7 +542,6 @@ void CEDIDHandler::RunL()
 					INFO_1( "Updating the Rawdata for the Block %d...", iCurrentBlock );
 					iEdidParserPtr->UpdateRawDataL(dataBlockDes);
 					
-					iCurrentBlock++;
 					if( inbrOfExtensions >= 2 )
 						{
  						inbrOfExtensions = inbrOfExtensions - 2;
@@ -555,6 +554,7 @@ void CEDIDHandler::RunL()
 
 				if( inbrOfExtensions )
 					{
+					iCurrentBlock++;
 					iRetryCounter = KErrNone;
 					
 					if( ReadEDIDDataL() != KErrNone )
@@ -587,12 +587,11 @@ void CEDIDHandler::RunL()
 								}
  							}
 						}
+					TRACE_EDID_DATA( *iEdidParserPtr );
+					
+					iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
+					iRetryCounter = KErrNone;
 					}
-
-				TRACE_EDID_DATA( *iEdidParserPtr );
-				
-				iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
-				iRetryCounter = KErrNone;
 				}
             else
                 {
@@ -637,7 +636,7 @@ void CEDIDHandler::RunL()
 // RunL
 //------------------------------------------------------------------------------
 //
-TInt CEDIDHandler::RunError( TInt aError )
+TInt CEDIDHandler::RunError( TInt /*aError*/ )
     {
     FUNC_LOG;
     

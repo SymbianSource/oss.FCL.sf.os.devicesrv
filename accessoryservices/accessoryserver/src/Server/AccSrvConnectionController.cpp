@@ -453,7 +453,7 @@ void CAccSrvConnectionController::HandleConnectionUpdateValidationL(
 void CAccSrvConnectionController::HandleConnectionUpdateValidationL( 
     const TAccPolGenericID& aGenericID, 
     TAccPolGenericID& aOldGenericId,
-    const CAccSrvSettingsHandler* aCaller,    
+    const CAccSrvSettingsHandler* /*aCaller*/,    
     TInt aError )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectionUpdateValidationL()" );

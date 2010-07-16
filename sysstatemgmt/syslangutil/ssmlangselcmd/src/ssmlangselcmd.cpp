@@ -401,7 +401,8 @@ TBool CSsmLangSelCmd::ValidateAndGetSettings( const TInt aLastSelectedLang, TInt
     {
     TBool isValid( EFalse );
     //Validate and get the selected settings
-    TRAPD( errorCode, isValid = ValidateAndGetSettingsL( aLastSelectedLang, aLastSelectedRegion, aLastSelectedCollation ) );
+	TInt errorCode = KErrNone;
+    TRAP( errorCode, isValid = ValidateAndGetSettingsL( aLastSelectedLang, aLastSelectedRegion, aLastSelectedCollation ) );
     ERROR_1( errorCode, "Validation failed for the selected Language, region and Collation with error %d", errorCode );
     return isValid;
     }

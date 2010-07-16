@@ -645,7 +645,7 @@ void CTVOutConfigForHDMI::RunL()
 //
 // ----------------------------------------------------------------------------
 //
-TInt CTVOutConfigForHDMI::RunError( TInt aError )
+TInt CTVOutConfigForHDMI::RunError( TInt /*aError*/ )
     {
     FUNC_LOG;
 
