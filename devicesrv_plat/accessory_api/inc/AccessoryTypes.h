@@ -20,10 +20,10 @@
 #define ACCESSORYTYPES_H
 
 //  INCLUDES
-#include <accpolgenericid.h>
-#include <accpolgenericidarray.h>
-#include <accpolaccessorymode.h>
-#include <accpolnamerecord.h>
+#include <AccPolGenericID.h>
+#include <AccPolGenericIDArray.h>
+#include <AccPolAccessoryMode.h>
+#include <AccPolNameRecord.h>
 
 // CONSTANTS
 

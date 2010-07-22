@@ -80,6 +80,11 @@ CCompositeCableStateConnected::~CCompositeCableStateConnected()
         iCRWatchForTvSystem->Cancel();
         delete iCRWatchForTvSystem;        
         }
+    if ( iCRWatchForVOverScan )
+        {
+        iCRWatchForVOverScan->Cancel();
+        delete iCRWatchForVOverScan;        
+        }
     if ( iTVOutConfigForSettingChanges ) 
         {
         iTVOutConfigForSettingChanges->Cancel();
@@ -95,7 +100,8 @@ CCompositeCableStateConnected::~CCompositeCableStateConnected()
 void CCompositeCableStateConnected::Enter( )
     {
     FUNC_LOG;    
-    
+
+	iTVOutConfigForComposite.UpdateOverscanValues();
     ClearAvailableTvOutConfig();
     
     iTVOutConfigForSettingChanges->ListenSettingsChanges();
@@ -187,6 +193,7 @@ void CCompositeCableStateConnected::CentRepKeyChanged(
         TUint32 aId )
     {
     FUNC_LOG;
+	INFO("Cenrep Value Changed");
     if ( KCRUidTvoutSettings == aRepositoryId )
         {
         if (    ( KSettingsTvAspectRatio == aId ) ||
@@ -195,7 +202,15 @@ void CCompositeCableStateConnected::CentRepKeyChanged(
             {
             Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventKeyChanged );
             }
-        else
+        else if( KSettingsTvoutVerticalOverscan == aId )
+			{
+			if( iTVOutConfigForComposite.UpdateOverscanValues() )
+				{
+				INFO( "There is a real overscan change" );
+				Input( EPDEIfCentralRepositoryWatch, EPDEIfCentralRepositoryWatchEventOverscanKeyChanged );
+				}
+			}
+		else
             {
             INFO_1("Unexpected CR key ID, aId 0x%x", aId );            
             }       
@@ -286,6 +301,7 @@ void CCompositeCableStateConnected::SubStateEnablingInput(
                 iCRWatchForFlickerFilter->Watch();
                 iCRWatchForAspectRatio->Watch();
                 iCRWatchForTvSystem->Watch();
+				iCRWatchForVOverScan->Watch();
                 iSubState = ESubStateEnabled;
                 }
             else
@@ -343,6 +359,7 @@ void CCompositeCableStateConnected::SubStateEnabledInput(
             iCRWatchForFlickerFilter->Cancel();
             iCRWatchForAspectRatio->Cancel();
             iCRWatchForTvSystem->Cancel();
+			iCRWatchForVOverScan->Cancel();
             ClearAvailableTvOutConfig();
             iTVOutConfigForComposite.Disable();
             iSubState = ESubStateDisabling;
@@ -362,17 +379,43 @@ void CCompositeCableStateConnected::SubStateEnabledInput(
             iCRWatchForFlickerFilter->Cancel();
             iCRWatchForAspectRatio->Cancel();
             iCRWatchForTvSystem->Cancel();
+			iCRWatchForVOverScan->Cancel();
             ClearAvailableTvOutConfig();
-            iTVOutConfigForComposite.Disable();
 			iResettingInput = ETrue;
             Enter();
             }
+		else if ( EPDEIfCentralRepositoryWatchEventOverscanKeyChanged == aEvent )
+			{
+			INFO( "Event: EPDEIfCentralRepositoryWatchEventOverscanKeyChanged" );
+			iTVOutConfigForComposite.SetConfig( ETrue );
+			}
         else
             {
             INFO_1( "Unknown Event Id: %i", aEvent );        
             }
         break;
         }       
+    case EPDEIfTVOutConfig:
+        {       
+        INFO( "Interface: EPDEIfTVOutConfig" );       
+		if ( EIfTVOutConfigEventSet == aEvent )
+			{
+			INFO( "Event: EIfTVOutConfigEventSet" );
+			// Stay on the same state
+			}
+		else if ( EIfTVOutConfigEventSetFailed == aEvent )
+			{
+			INFO( "Event: EIfTVOutConfigEventSetFailed" );
+            iCRWatchForFlickerFilter->Cancel();
+            iCRWatchForAspectRatio->Cancel();
+            iCRWatchForTvSystem->Cancel();
+			iCRWatchForVOverScan->Cancel();
+            ClearAvailableTvOutConfig();
+            iTVOutConfigForComposite.Disable();
+            iSubState = ESubStateDisabling;
+			}
+		break;
+		}
     default:
         {
         INFO_2( "Event from unexpected interface. if Id, event id: %i", aInterfaceId, aEvent );        
@@ -582,6 +625,7 @@ void CCompositeCableStateConnected::SubStateStartListenConfigChangesInput(
                         iCRWatchForFlickerFilter->Cancel();
                         iCRWatchForAspectRatio->Cancel();
                         iCRWatchForTvSystem->Cancel();
+						iCRWatchForVOverScan->Cancel();
                         iResettingInput = EFalse;
                         }
                     
@@ -599,6 +643,7 @@ void CCompositeCableStateConnected::SubStateStartListenConfigChangesInput(
                     iCRWatchForFlickerFilter->Cancel();
                     iCRWatchForAspectRatio->Cancel();
                     iCRWatchForTvSystem->Cancel();
+					iCRWatchForVOverScan->Cancel();
                     iResettingInput = EFalse;
                     }
                 
@@ -765,6 +810,7 @@ void CCompositeCableStateConnected::SubStateResettingInput(
             iCRWatchForFlickerFilter->Cancel();
             iCRWatchForAspectRatio->Cancel();
             iCRWatchForTvSystem->Cancel();            
+			iCRWatchForVOverScan->Cancel();
             }
         else if ( EIfTVOutConfigEventSetFailed == aEvent )
             {
@@ -848,6 +894,7 @@ void CCompositeCableStateConnected::ConstructL()
     iCRWatchForAspectRatio = CCentralRepositoryWatch::NewL(*this, KCRUidTvoutSettings, KSettingsTvAspectRatio );
     iCRWatchForFlickerFilter = CCentralRepositoryWatch::NewL(*this, KCRUidTvoutSettings, KSettingsTvoutFlickerFilter );
     iCRWatchForTvSystem = CCentralRepositoryWatch::NewL(*this, KCRUidTvoutSettings, KSettingsTvSystemInfo );    
+    iCRWatchForVOverScan = CCentralRepositoryWatch::NewL(*this, KCRUidTvoutSettings, KSettingsTvoutVerticalOverscan );
     iTVOutConfigForSettingChanges = CTVOutConfigForComposite::NewL(iCompositeCableStatusFSM);
     iResettingInput = EFalse;
     }

@@ -23,7 +23,7 @@
 //  INCLUDES
 #include <e32std.h>
 #include <e32base.h>
-#include <accpolgidheader.h> 
+#include <AccPolGIDHeader.h> 
 
 // CONSTANTS
 

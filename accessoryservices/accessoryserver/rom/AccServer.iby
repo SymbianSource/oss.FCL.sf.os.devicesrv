@@ -32,7 +32,6 @@ file=ABI_DIR\BUILD_DIR\AccServer.exe                    PROGRAMS_DIR\AccServer.e
 file=ABI_DIR\BUILD_DIR\AsyComms.dll                     SHARED_LIB_DIR\AsyComms.dll
 file=ABI_DIR\BUILD_DIR\AsyProxy.dll                     SHARED_LIB_DIR\AsyProxy.dll
 file=ABI_DIR\BUILD_DIR\accsrvutil.dll                   SHARED_LIB_DIR\accsrvutil.dll
-file=ABI_DIR\BUILD_DIR\AccChargerContext.dll            SHARED_LIB_DIR\AccChargerContext.dll
 file=ABI_DIR\BUILD_DIR\accpolaudiodevicetopology.dll	SHARED_LIB_DIR\accpolaudiodevicetopology.dll
 
 data=ZPRIVATE\100012A5\policy\10205030.spd              \private\100012A5\policy\10205030.spd

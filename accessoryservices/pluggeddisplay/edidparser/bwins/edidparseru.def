@@ -55,4 +55,6 @@ EXPORTS
 	?GetInterlacedVideoLatency@CCea861EdidParser@@QAEEXZ @ 54 NONAME ; unsigned char CCea861EdidParser::GetInterlacedVideoLatency(void)
 	?GetStandardTimings@CEdidParserBase@@QAEEH@Z @ 55 NONAME ; unsigned char CEdidParserBase::GetStandardTimings(int)
 	?HasIEEERegistration@CCea861EdidParser@@QAEHXZ @ 56 NONAME ; int CCea861EdidParser::HasIEEERegistration(void)
+	?UpdateCea861ExtensionL@CEdidParserBase@@QAEXHPAVCCea861EdidParser@@@Z @ 57 NONAME ; void CEdidParserBase::UpdateCea861ExtensionL(int, class CCea861EdidParser *)
+	?UpdateRawDataL@CEdidParserBase@@QAEXABVTDesC8@@@Z @ 58 NONAME ; void CEdidParserBase::UpdateRawDataL(class TDesC8 const &)
 

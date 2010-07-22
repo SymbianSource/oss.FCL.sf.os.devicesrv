@@ -37,4 +37,6 @@ EXPORTS
 	_ZN25MRemConBearerBulkObserver18SetAddressedClientERK14TRemConAddressRKj @ 36 NONAME
 	_ZN25MRemConBearerBulkObserver10NewCommandERK14TRemConAddressRKj @ 37 NONAME
 	_ZN25MRemConBearerBulkObserver16RemoveAddressingERK14TRemConAddress @ 38 NONAME
+	_ZN21MRemConBearerObserver36RegisterLocalAddressedClientObserverERK4TUid @ 39 NONAME
+	_ZN21MRemConBearerObserver38UnregisterLocalAddressedClientObserverERK4TUid @ 40 NONAME
 

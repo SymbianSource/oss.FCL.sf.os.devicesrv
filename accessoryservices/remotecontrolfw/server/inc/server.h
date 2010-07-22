@@ -254,6 +254,9 @@ public: // called by the bearer manager
 	TInt ControllerSupportedInterfaces(RArray<TUid>& aSupportedInterfaces);
 	
 	void SetRemoteAddressedClient(const TUid& aBearerUid, const TRemConClientId& aId);
+	
+	TInt RegisterLocalAddressedClientObserver(const TUid& aBearerUid);
+	TInt UnregisterLocalAddressedClientObserver(const TUid& aBearerUid);
 
 public: // called by bulk server
 	TRemConClientId ClientIdByProcessId(TProcessId aProcessId);
@@ -520,6 +523,11 @@ private: // owned
 	// implementing default behaviour, so it is guaranteed to exist once the TSP
 	// has been loaded.
 	MRemConTargetSelectorPluginInterfaceV4* iTspIf4;
+	
+	// This is the object supplied by the TSP which implements the TSP V5 API.
+	// The TSP may not support this interface, so RemCon must handle this 
+	// value being NULL
+	MRemConTargetSelectorPluginInterfaceV5* iTspIf5;
 	
 	// Collections we pass to the TSP for it to indicate addressing 
 	// information back to us.

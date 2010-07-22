@@ -19,15 +19,13 @@ REM
 
 echo Cleaning up sensor data compensator stub...
 pushd ..\sensordatacompensatorpluginstub\group
-call bldmake bldfiles
-call abld test reallyclean
+call sbs REALLYCLEAN -c winscw.test -c armv5.generic.test
 popd
 @echo Cleaning up sensor data compensator... Finished
 
 @echo Cleaning sensor data compensator stub part2...
 pushd ..\..\..\..\..\..\..\mw\appsupport\coreapplicationuis\sensordatacompensatorplugin\group
-call bldmake bldfiles
-call abld reallyclean
-call abld build
+call sbs REALLYCLEAN -c winscw -c armv5.generic
+call sbs -b bld.inf -c winscw -c armv5.generic
 popd
 @echo Cleaning for sensor data compensator part2... Finished

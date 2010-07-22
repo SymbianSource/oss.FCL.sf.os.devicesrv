@@ -687,8 +687,11 @@ void CTCChannelTilt::ProcessTransactionL( TTCTransactionId aId,
             
             // Complete transaction
             iStatus = KRequestPending;
-            SetActive();
-            CompleteTransaction( err );
+						if( !IsActive() )
+							{
+							SetActive();	
+							}
+						CompleteTransaction( err );
             break;
             }
         case ETCTransactionIdCloseChannel:
@@ -698,7 +701,10 @@ void CTCChannelTilt::ProcessTransactionL( TTCTransactionId aId,
 
             // Complete transaction
             iStatus = KRequestPending;
-            SetActive();
+						if( !IsActive() )
+							{
+							SetActive();
+							}
             CompleteTransaction( KErrNone );
             break;
             }
@@ -709,7 +715,10 @@ void CTCChannelTilt::ProcessTransactionL( TTCTransactionId aId,
 
             // Complete transaction
             iStatus = KRequestPending;
-            SetActive();
+						if( !IsActive() )
+							{
+							SetActive();	
+							}
             CompleteTransaction( KErrNone );
             break;
             }
@@ -720,7 +729,10 @@ void CTCChannelTilt::ProcessTransactionL( TTCTransactionId aId,
 
             // Complete transaction
             iStatus = KRequestPending;
-            SetActive();
+						if( !IsActive() )
+							{
+							SetActive();	
+							}
             CompleteTransaction( KErrNone );
             break;
             }
@@ -741,7 +753,10 @@ void CTCChannelTilt::ProcessTransactionL( TTCTransactionId aId,
             
             // Complete transaction
             iStatus = KRequestPending;
-            SetActive();
+						if( !IsActive() )
+							{
+							SetActive();	
+							}
             CompleteTransaction( KErrNone );
             break;
             }

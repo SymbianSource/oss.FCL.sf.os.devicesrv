@@ -26,6 +26,7 @@
 #include "ssmsecuritychecknotifier.h"
 #include "ssmdebug.h"
 #include "ssmuiproviderdll.h"
+#include "ssmrefcustomcmdcommon.h"
 #include <ssm/ssmstateawaresession.h>
 #include <e32def.h>
 #include <startupdomaindefs.h>
@@ -200,21 +201,27 @@ TBool CSsmSecurityCheckNotifier::IsDlgCancellableL()
 	//Get the current state of the system
 	TSsmState currentState = ssmStateAwareSession.State();
 
+	//Close the state aware session
+	ssmStateAwareSession.Close();
+
 	TBool isDlgCancellable;
 
 	//Is system in start up state
 	if ( currentState.MainState() == ESsmStartup )
 		{
+		TInt securityPhaseVal = EStarterSecurityPhaseUninitialized;
+		TInt errorCode = RProperty::Get(CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, securityPhaseVal);
+		DEBUGPRINT3A("Getting the KStarterSecurityPhase completed with errorcode %d and its value is %d", errorCode, securityPhaseVal);
+		User::LeaveIfError(errorCode);
+
 		//TSsmStartupSubStateExt::ESsmStateNonCritical
-		iAfterStartup = ( 0x34 == currentState.SubState() ) ? ETrue : EFalse;
+		iAfterStartup = ( 0x34 == currentState.SubState() && securityPhaseVal > EStarterSecurityPhaseSimNok ) ? ETrue : EFalse;
 		}
 	else
 		{
 		iAfterStartup = ETrue;
 		}
-	
-	//Close the state aware session
-	ssmStateAwareSession.Close();
+	DEBUGPRINT2A("iAfterStartup is %d", iAfterStartup);
 
 	//Notifier dialogue is not cancellable if system is in startup state and
 	//requested for PUK1 or PUK2 or UPUK code

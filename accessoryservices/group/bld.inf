@@ -26,9 +26,13 @@ PRJ_MMPFILES
 #include "../accessoryremotecontrol/group/bld.inf"
 #include "../accessoryserver/group/bld.inf"
 #include "../pluggeddisplay/group/bld.inf"
+#include "../remotecontrolfw/group/bld.inf"
 #include "../headsetstatusapi/Group/bld.inf"
 #include "../tspclientmapper/group/bld.inf"
 #include "../gid_pc_tool/group/bld.inf"
+#ifdef FF_AUTOMOTIVESTACK
+#include "../autoaudioasy/group/bld.inf"
+#endif
 
 PRJ_TESTMMPFILES
 

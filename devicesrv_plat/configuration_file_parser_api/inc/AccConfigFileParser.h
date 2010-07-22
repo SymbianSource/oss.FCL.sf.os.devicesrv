@@ -22,8 +22,8 @@
 
 // INCLUDES
 #include <e32base.h>
-#include <accpolgenericid.h>
-#include <accpolnamevaluerecord.h>
+#include <AccPolGenericID.h>
+#include <AccPolNameValueRecord.h>
 
 // CONSTANTS
 

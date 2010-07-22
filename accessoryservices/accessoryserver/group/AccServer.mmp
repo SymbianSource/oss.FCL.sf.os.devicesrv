@@ -59,7 +59,6 @@ SOURCE              AccSrvWiredConnectionPublisher.cpp
 
 USERINCLUDE         ../inc/Common
 USERINCLUDE         ../inc/Server
-USERINCLUDE         ../inc/ChargerContext
 
 // System include macro Starter P&S keys
 OS_LAYER_SYSTEMINCLUDE
@@ -77,7 +76,6 @@ LIBRARY	            acccontrol.lib  // Used access accessory settings related T 
 LIBRARY	            hwrmlightclient.lib // Used by accessory settings.
 LIBRARY	            efsrv.lib	// Used by accessory settings 
 LIBRARY             accpolicydb.lib
-LIBRARY             accchargercontext.lib
 #ifdef RD_TSP_CLIENT_MAPPER
 LIBRARY             tspclientmapper.lib
 #endif // RD_TSP_CLIENT_MAPPER

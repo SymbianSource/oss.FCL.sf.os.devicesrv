@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,6 +20,7 @@
 #include <s32file.h>
 
 const TInt KNumOfTestCases = 8;
+const TUint32 KMiscPluginPropertyKey = 0x2000E658;
 
 static TInt CustomCmdTestSecurityCheckCallBackL(TAny* aCustomCmdTestSecurityPinCheck)
 	{
@@ -35,6 +36,8 @@ Call back function to enter a PIN
 */
 void CCustomCmdTestSecurityPinCheck::CallBackForEnterPin()
 	{
+	const TInt okButtonPos1 = 60; //the position of ok button
+	const TInt okButtonPos2 = 600; //the position of ok button
 	iAsyncStopScheduler->CallBack();
 	
 	RWsSession wsSession;
@@ -52,9 +55,9 @@ void CCustomCmdTestSecurityPinCheck::CallBackForEnterPin()
 		User::After(100000);
 		}
 	
-	eventDown.Set(TRawEvent::EKeyDown, EStdKeyEnter);
+	eventDown.Set(TRawEvent::EButton1Down, okButtonPos1,okButtonPos2);
 	UserSvr::AddEvent(eventDown);
-	eventUp.Set(TRawEvent::EKeyUp, EStdKeyEnter);
+	eventUp.Set(TRawEvent::EButton1Up, okButtonPos1,okButtonPos2);
 	UserSvr::AddEvent(eventUp);
 	User::After(100000);
 		
@@ -91,6 +94,11 @@ TVerdict CCustomCmdTestSecurityPinCheck::doTestStepPreambleL()
 
 	iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
 	
+	TInt err = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
+	TEST ((KErrNone == err) || (KErrAlreadyExists == err));
+	err = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
+	TEST (KErrNone == err);
+	
 	//Start the test exe which defines startup related property keys
 	RProcess processHandle;
 	CleanupClosePushL(processHandle);
@@ -108,23 +116,36 @@ TVerdict CCustomCmdTestSecurityPinCheck::doTestStepPreambleL()
 	User::LeaveIfError(retVal);
 	CleanupStack::PopAndDestroy();
 	
+	//Start the test exe which defines startup state related property keys
 	RProcess processHandle1;
-	TInt err1 = processHandle1.Create(KExeToDefineStartUpStatePS, KNullDesC);
-	INFO_PRINTF2(_L("KExeToDefineStartUpStatePS ret is %d"), err1);
+	CleanupClosePushL(processHandle1);
+	err = processHandle1.Create(KExeToDefineStartUpStatePS, KNullDesC);
+	INFO_PRINTF2(_L("KExeToDefineStartUpStatePS ret is %d"), err);
+	User::LeaveIfError(err);
 	processHandle1.Resume();
-	processHandle1.Close();
+	
+	// wait for the newly created process to rendezvous
+	processHandle1.Rendezvous(status);
+	User::WaitForRequest(status);
+	retVal = status.Int();
+	//leave if the process has not started properly
+	INFO_PRINTF2(_L("KExeToDefineStartUpStatePS rendezvous returns %d"), retVal);
+    User::LeaveIfError(retVal);
+    CleanupStack::PopAndDestroy();
 
 	//there are 8 different scenarios to test the custom command. Check the test spec for the scenarios.
  	//CMiscAdaptationRef::SecurityStateChange() has been changed to simulate the scenarios.
 	//CMiscAdaptationRef::SecurityStateChange() uses KTestCmdSecurityCheckTestFile to get the scenario number
 	//connect to file server
+
     User::LeaveIfError(iFs.Connect());
-	TInt err = iFs.MkDirAll(KDirNameOfTestCasesNumFile);
+	err = iFs.MkDirAll(KDirNameOfTestCasesNumFile);
 	if (KErrAlreadyExists != err && KErrNone != err)
 		{
 		User::Leave(err);
 		}
 	err = iFile.Replace(iFs, KTestCmdSecurityCheckTestFile, EFileWrite | EFileStream);
+	TEST(KErrNone == err);
 	iFile.Close();
 	
 	//For stopping the key simulation when execution behaviour is deferredwaitforsignal and fireandforget
@@ -135,7 +156,8 @@ TVerdict CCustomCmdTestSecurityPinCheck::doTestStepPreambleL()
 	TEST(KErrNone == connect);
 	
 	//RProperty property;
-	iProperty.Define(KCustomcmdServerSID, iSwp.Key(), RProperty::EInt);
+	err = iProperty.Define(KCustomcmdServerSID, iSwp.Key(), RProperty::EInt);
+	TEST ((KErrNone == err) || (KErrAlreadyExists == err));
 	
 	// Register mapping between keys and swp policy DLL (done once per ssmserver)
 	INFO_PRINTF1(_L("Registering swp..."));
@@ -455,6 +477,8 @@ void CCustomCmdTestSecurityPinCheck::WritePinCheckTestCaseNumToFileL(TInt aTestN
 TVerdict CCustomCmdTestSecurityPinCheck::doTestStepPostambleL()
 	{
 	TEST(KErrNone == iProperty.Delete(KCustomcmdServerSID, iSwp.Key()));
+	TInt err = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
+	TEST (KErrNone == err);
 	iProperty.Close();
 	iClient.Close();
 	//delete the file		

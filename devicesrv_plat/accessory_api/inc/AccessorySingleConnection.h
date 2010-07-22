@@ -21,7 +21,7 @@
 #define RACCESSORYSINGLECONNECTION_H
 
 //  INCLUDES
-#include "accessoryconnectionbase.h"
+#include "AccessoryConnectionBase.h"
 
 
 // FORWARD DECLARATIONS

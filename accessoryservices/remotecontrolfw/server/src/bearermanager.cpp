@@ -1111,6 +1111,16 @@ TInt CBearerManager::MrcboDoSupportedOperations(const TRemConClientId& aId, TUid
 	return iServer.SupportedOperations(aId, aInterfaceUid, aOperations);
 	}
 
+TInt CBearerManager::MrcboDoRegisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return iServer.RegisterLocalAddressedClientObserver(aBearerUid);
+	}
+
+TInt CBearerManager::MrcboDoUnregisterLocalAddressedClientObserver(const TUid& aBearerUid)
+	{
+	return iServer.UnregisterLocalAddressedClientObserver(aBearerUid);
+	}
+
 TInt CBearerManager::SetLocalAddressedClient(const TUid& aBearerUid, TRemConClientId aClientId)
 	{
 	LOG_FUNC;

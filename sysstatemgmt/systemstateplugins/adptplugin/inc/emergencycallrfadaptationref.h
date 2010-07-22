@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -37,10 +37,17 @@ public:
 	void ActivateRfForEmergencyCall(TRequestStatus& aStatus);
 	void DeactivateRfForEmergencyCall(TRequestStatus& aStatus);
 	void Cancel();
-
+	
 private:
 	CEmergencyCallRfAdaptationRef();
 	~CEmergencyCallRfAdaptationRef();
+	void ConstructL();
+	//Helper function to check for P&S Key
+    TBool IsTestPsKeyDefined();
+	
+private:    
+	MEmergencyCallRfAdaptation* iSaaEmergencyCallRfAdaptationDll;
+	RLibrary iSaaEmergencyCallRfAdaptationLib;
 	};
 
 #endif // __EMERGENCYCALLRFADAPTATION_H__

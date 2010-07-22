@@ -107,6 +107,10 @@ START RESOURCE  uiswpcmdlists.rss                    // UI phase SWP
 TARGETPATH      /private/2000d75b/swpui              // Private directory of sysstatemgr.exe
 END
 
+START RESOURCE  noncriticalswpcmdlists.rss            // noncritical phase SWP
+TARGETPATH      /private/2000d75b/swpnoncritical      // Private directory of sysstatemgr.exe
+END
+
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
 

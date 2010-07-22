@@ -173,6 +173,16 @@ public:
      */
     TInt GetHdcpSupportStatus( TBool& aHdcpSupport ) const;
 
+    /**
+     * Update overscan values from cenrep.
+     * 
+     * @param None.
+     * @return None.
+     */
+    TBool UpdateOverscanValues();
+    
+	void GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan );
+
 private:
 
     /**
@@ -347,14 +357,6 @@ private:
      */
     void CalculateOverscan( TPoint& aTLCorner, TPoint& aBRCorner ) const;
     
-    /**
-     * Update overscan values from cenrep.
-     * 
-     * @param None.
-     * @return None.
-     */
-    void UpdateOverscanValues();
-    
 	/**
 	 * Filter out the unsupported TV configurations.
 	 * 
@@ -411,6 +413,12 @@ private: // Data
     
     // Request ID
     TRequestTypeID iRequestID;
+
+	// Number of extensions to read
+	TInt inbrOfExtensions;
+
+	// Current EDID block
+	TInt iCurrentBlock;
     };
 
 #endif // C_EDIDHANDLER_H

@@ -31,4 +31,6 @@ EXPORTS
 	?NewTransactionId@MRemConBearerBulkObserver@@QAEIXZ @ 30 NONAME ; unsigned int MRemConBearerBulkObserver::NewTransactionId(void)
 	?NewCommand@MRemConBearerBulkObserver@@QAEHABVTRemConAddress@@ABI@Z @ 31 NONAME ; int MRemConBearerBulkObserver::NewCommand(class TRemConAddress const &, unsigned int const &)
 	?RemoveAddressing@MRemConBearerBulkObserver@@QAEHABVTRemConAddress@@@Z @ 32 NONAME ; int MRemConBearerBulkObserver::RemoveAddressing(class TRemConAddress const &)
+	?UnregisterLocalAddressedClientObserver@MRemConBearerObserver@@QAEHABVTUid@@@Z @ 33 NONAME ; int MRemConBearerObserver::UnregisterLocalAddressedClientObserver(class TUid const &)
+	?RegisterLocalAddressedClientObserver@MRemConBearerObserver@@QAEHABVTUid@@@Z @ 34 NONAME ; int MRemConBearerObserver::RegisterLocalAddressedClientObserver(class TUid const &)
 

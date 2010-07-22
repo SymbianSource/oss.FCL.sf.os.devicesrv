@@ -21,9 +21,9 @@
 #define RACCESSORYMODE_H
 
 //  INCLUDES
-#include <accessorysubsessionbase.h>
-#include <accpolaccessorymode.h>
-#include <accessorytypes.h>
+#include <AccessorySubsessionBase.h>
+#include <AccPolAccessoryMode.h>
+#include <AccessoryTypes.h>
 
 // FORWARD DECLARATIONS
 class RAccessoryServer;

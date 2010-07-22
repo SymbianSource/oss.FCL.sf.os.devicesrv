@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -84,17 +84,6 @@ TVerdict CCustomCmdTestDeviceSecurityPinCheck::doTestStepPreambleL()
 
 	iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
 	
-	//Start the test exe which defines startup related property keys
-	RProcess processHandle;
-	
-	TInt temp = processHandle.Create(KExeToDefineStartUpPS, KNullDesC);
-	processHandle.Resume();
-	processHandle.Close();
-		
-	processHandle.Create(KExeToDefineStartUpStatePS, KNullDesC);
-	processHandle.Resume();
-	processHandle.Close();
-
 	//For stopping the key simulation
 	iStopSimulatekey = CStopSimulateDevicekey::NewL(this);
  	

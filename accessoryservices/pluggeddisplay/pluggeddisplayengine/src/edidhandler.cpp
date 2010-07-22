@@ -40,6 +40,7 @@ const TReal K4d3 = 1.333;
 
 const TInt KDefaultCEAMode = E640x480p59_94d60Hz4d3;
 const TInt KDefaultCEAModeIndex = 0;
+const TInt KDefaultDMTModeIndex = 3;
 
 // Retry Delay for EDID access
 const TInt KRetryDelay = 50 * 1000; // 50 milliseconds
@@ -124,9 +125,6 @@ TInt CEDIDHandler::SetVideoParameters()
     RArray<TTvSettings> analogConfigs;
     RArray<THdmiDviTimings> hdmiConfigs;
     
-    // Update overscan values from cenrep
-    UpdateOverscanValues();
-
     // Set video parameters
     INFO( "--------------------------------------------------------------------" );
     INFO( "SETTING CEA AND DMT TIMINGS:" );
@@ -176,6 +174,9 @@ void CEDIDHandler::ResetData()
     iEdidParserPtr = NULL;
     delete iExtensionParserPtr;
     iExtensionParserPtr = NULL;
+
+	iCurrentBlock = 0;
+	inbrOfExtensions = 0;
     }
 
 //------------------------------------------------------------------------------
@@ -518,26 +519,81 @@ void CEDIDHandler::RunL()
         {
         case EDdcReadRequest:
             {
-            if( KErrNone == iStatus.Int() )
-                {
-                TPtrC8
-                    dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
-                iEdidParserPtr = CEdidParserBase::NewL( dataBlockDes );
-                TInt nbrOfExtensions = iEdidParserPtr->GetNumberOfExtensions();
-                for( TInt i = 0; i < nbrOfExtensions; ++i )
-                    {
-                    if( ECea861Ext == iEdidParserPtr->GetExtensionType( i + 1 ) )
-                        {
-                        INFO_1( "ECea861Ext extension data block number: %d", ( i+1 ) );
-                        iExtensionParserPtr
-                            = iEdidParserPtr->CreateCea861ExtensionParserL( i + 1 );
-                        break;
-                        }
-                    }
-                INFO_1( "Data block count in nbrOfExtensions: %d", nbrOfExtensions );
-                iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
-                iRetryCounter = KErrNone;
-                }
+			if( KErrNone == iStatus.Int() )
+				{				
+				if( iCurrentBlock == 0 )
+					{
+					TPtrC8 dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
+					
+					iEdidParserPtr = CEdidParserBase::NewL( dataBlockDes );
+					inbrOfExtensions = iEdidParserPtr->GetNumberOfExtensions();
+
+					INFO_1( "No. of extensions from Block 0: %d", inbrOfExtensions );
+
+					if( inbrOfExtensions )
+						{
+						inbrOfExtensions--;
+						}
+ 					}
+				else
+					{
+					TPtrC8 dataBlockDes( iDataBlockPtr->iDataBlock, sizeof( *iDataBlockPtr ) );
+
+					INFO_1( "Updating the Rawdata for the Block %d...", iCurrentBlock );
+					iEdidParserPtr->UpdateRawDataL(dataBlockDes);
+					
+					iCurrentBlock++;
+					if( inbrOfExtensions >= 2 )
+						{
+ 						inbrOfExtensions = inbrOfExtensions - 2;
+						}
+					else
+						{
+						inbrOfExtensions--;
+						}
+  					}
+
+				if( inbrOfExtensions )
+					{
+					iRetryCounter = KErrNone;
+					
+					if( ReadEDIDDataL() != KErrNone )
+						{
+						ResetData();
+						iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetchFailed );
+						}
+					}
+				else
+					{
+					TInt extensions = iEdidParserPtr->GetNumberOfExtensions();
+
+					INFO_1( "No. of extensions from Block 0: %d", extensions );
+					
+					for( TInt i = 0; i < extensions; ++i )
+						{
+						if( ECea861Ext == iEdidParserPtr->GetExtensionType( i + 1 ) )
+							{
+							INFO_1( "ECea861Ext extension data block number: %d", ( i+1 ) );
+							if( !iExtensionParserPtr )
+								{
+								INFO( "First CEA 861 extension is being read..." );
+								iExtensionParserPtr
+									= iEdidParserPtr->CreateCea861ExtensionParserL( i + 1 );
+								}
+							else
+								{
+								INFO_1( "CEA 861 extension is being read... at the index %d", i+1 );
+								iEdidParserPtr->UpdateCea861ExtensionL( i + 1, iExtensionParserPtr );
+								}
+ 							}
+						}
+					}
+
+				TRACE_EDID_DATA( *iEdidParserPtr );
+				
+				iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
+				iRetryCounter = KErrNone;
+				}
             else
                 {
                 INFO_1( "CDdcPortAccess::Read failed, error code: %d", iStatus.Int() );
@@ -551,9 +607,10 @@ void CEDIDHandler::RunL()
                     }
                 else
                     {
+                    // No EDID data available from the sink
                     iRetryCounter = KErrNone;
-                    iFSM.Input( EPDEIfEDIDHandler,
-                        EPDEIfEDIDHandlerEventEdidDataFetchFailed );
+					ResetData();
+					iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
                     }
                 }
             break;
@@ -623,8 +680,19 @@ TInt CEDIDHandler::ReadEDIDDataL()
         {
         iDataBlockPtr = new(ELeave) TDataBlock;
         }
+	else if( inbrOfExtensions )
+		{
+		if( iDataBlockPtr )
+			{
+			delete iDataBlockPtr;
+			iDataBlockPtr = NULL;
+			}
+		iDataBlockPtr = new(ELeave) TDataBlock;
+		}
+
+	INFO_1( "Reading EDID block %d...", iCurrentBlock );
     
-    retVal = iDdcPortAccess->Read( EMonitorPort, 0, // First block contains EDID data if that exists
+    retVal = iDdcPortAccess->Read( EMonitorPort, iCurrentBlock, // First block contains EDID data if that exists
         iDataBlockPtr->iDataBlock,
         iStatus );
         
@@ -643,8 +711,6 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
     {
     FUNC_LOG;
     
-    aTimings.iTvPhysicalImageWidthMm = iEdidParserPtr->GetHorizontalScreenSize() * 10;
-    aTimings.iTvPhysicalImageHeightMm = iEdidParserPtr->GetVerticalScreenSize() * 10;
     aTimings.iTvPhysicalImageAspectRatioNumerator = 0;
     aTimings.iTvPhysicalImageAspectRatioDenominator = 0;
     aTimings.iHorizontalBorderPixels = 0;
@@ -652,15 +718,25 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
     aTimings.iVerticalBorderLinesField2 = 0;
     aTimings.iLeftBorderPixels = 0;
     aTimings.iRightBorderPixels = 0;
-    aTimings.iUnderscanEnabled = EFalse;
     
     if( iExtensionParserPtr )
         {
+        INFO("==CEA Extension Exists");
         aTimings.iUnderscanEnabled = iExtensionParserPtr->Underscan();
         }
+	else
+		{
+        INFO("==No CEA Extension");
+		// No CEA Extension so it should be DVI
+		// Underscan supported always		
+		aTimings.iTvPhysicalImageAspectRatioNumerator = 4;
+		aTimings.iTvPhysicalImageAspectRatioDenominator = 3;
+		aTimings.iUnderscanEnabled = ETrue;
+		}
     
     if( aTimings.iUnderscanEnabled )
         {
+        INFO("==Underscan Enabled");
         // Underscan
         aTimings.iLeftTopCorner.iX = 0;
         aTimings.iLeftTopCorner.iY = 0;
@@ -669,23 +745,30 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
         }
     else
         {
+        INFO("==Underscan Disabled");
         // Calculate overscan
         CalculateOverscan( aTimings.iLeftTopCorner,
             aTimings.iRightBottomCorner );                
         }
-    aTimings.iTvPhysicalImageAspectRatioNumerator = iEdidParserPtr->GetAspectRatioLandscape();
-    aTimings.iTvPhysicalImageAspectRatioDenominator = iEdidParserPtr->GetAspectRatioPortrait();
     aTimings.iConnector = TTvSettings::EHDMI;
-    aTimings.iTvColorCoordinates.iRed.iX = iEdidParserPtr->GetColorCoordinatesRedX();
-    aTimings.iTvColorCoordinates.iRed.iY = iEdidParserPtr->GetColorCoordinatesRedY();
-    aTimings.iTvColorCoordinates.iGreen.iX = iEdidParserPtr->GetColorCoordinatesGreenX();
-    aTimings.iTvColorCoordinates.iGreen.iY = iEdidParserPtr->GetColorCoordinatesGreenY();
-    aTimings.iTvColorCoordinates.iBlue.iX = iEdidParserPtr->GetColorCoordinatesBlueX();
-    aTimings.iTvColorCoordinates.iBlue.iY = iEdidParserPtr->GetColorCoordinatesBlueY();
-    aTimings.iTvColorCoordinates.iWhite.iX = iEdidParserPtr->GetColorCoordinatesWhiteX();
-    aTimings.iTvColorCoordinates.iWhite.iY = iEdidParserPtr->GetColorCoordinatesWhiteY();
-    aTimings.iTvHdmiVersion = iEdidParserPtr->GetVersion();
-    aTimings.iTvHdmiRevision = iEdidParserPtr->GetRevision();
+
+	if( iEdidParserPtr )
+		{
+		aTimings.iTvPhysicalImageWidthMm = iEdidParserPtr->GetHorizontalScreenSize() * 10;
+		aTimings.iTvPhysicalImageHeightMm = iEdidParserPtr->GetVerticalScreenSize() * 10;
+	    aTimings.iTvPhysicalImageAspectRatioNumerator = iEdidParserPtr->GetAspectRatioLandscape();
+	    aTimings.iTvPhysicalImageAspectRatioDenominator = iEdidParserPtr->GetAspectRatioPortrait();
+	    aTimings.iTvColorCoordinates.iRed.iX = iEdidParserPtr->GetColorCoordinatesRedX();
+	    aTimings.iTvColorCoordinates.iRed.iY = iEdidParserPtr->GetColorCoordinatesRedY();
+	    aTimings.iTvColorCoordinates.iGreen.iX = iEdidParserPtr->GetColorCoordinatesGreenX();
+	    aTimings.iTvColorCoordinates.iGreen.iY = iEdidParserPtr->GetColorCoordinatesGreenY();
+	    aTimings.iTvColorCoordinates.iBlue.iX = iEdidParserPtr->GetColorCoordinatesBlueX();
+	    aTimings.iTvColorCoordinates.iBlue.iY = iEdidParserPtr->GetColorCoordinatesBlueY();
+	    aTimings.iTvColorCoordinates.iWhite.iX = iEdidParserPtr->GetColorCoordinatesWhiteX();
+	    aTimings.iTvColorCoordinates.iWhite.iY = iEdidParserPtr->GetColorCoordinatesWhiteY();
+	    aTimings.iTvHdmiVersion = iEdidParserPtr->GetVersion();
+	    aTimings.iTvHdmiRevision = iEdidParserPtr->GetRevision();
+		}
     Mem::FillZ( ( TAny* )&aTimings.iProductName, ( sizeof( TChar ) * KProductNameChars ) );
     Mem::FillZ( ( TAny* )&aTimings.iProductDescription, ( sizeof( TChar ) * KProductDescriptorsChars ) );
     aTimings.iSourceType = THdmiDviTimings::ESourceTypeUnknown;
@@ -861,21 +944,44 @@ TInt CEDIDHandler::SetDmtModes( RArray<THdmiDviTimings>& aTimings ) const
     FUNC_LOG;
     
     TInt retVal(KErrNone);
-    
-    // Check established timings 1 and 2
-    retVal = SetDmtModesFromEstablishedTimings( aTimings );
-    
-    if( KErrNone == retVal )
-        {
-        // Check standard timings
-        retVal = SetDmtModesFromStandardTimings( aTimings );
-        
-        if( KErrNone == retVal )
-            {
-            // Check timing descriptors
-            retVal = SetDmtModesFromTimingDescriptors( aTimings );        
-            }
-        }
+
+	if( iDataBlockPtr )
+		{
+	    // Check established timings 1 and 2
+	    retVal = SetDmtModesFromEstablishedTimings( aTimings );
+	    
+	    if( KErrNone == retVal )
+	        {
+	        // Check standard timings
+	        retVal = SetDmtModesFromStandardTimings( aTimings );
+	        
+	        if( KErrNone == retVal )
+	            {
+	            // Check timing descriptors
+	            retVal = SetDmtModesFromTimingDescriptors( aTimings );        
+	            }
+	        }
+		}
+	else
+		{
+		INFO( "==No EDID available from the Sink. Setting DMT 4" );
+		// No EDID data available from the sink
+		// Default VGA resolution should be selected
+		THdmiDviTimings timings;
+		const TTimingItem* item = TimingByIndex( KDefaultDMTModeIndex, ETimingModeDMT );
+		if( item )
+			{
+			Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
+			FillHdmiDviTimings( *item, timings );
+			retVal = aTimings.Append( timings );
+			ERROR_1( retVal, "Failed to append DMT timing: %S in array", item->iTimingName );
+			}
+		else
+			{
+			ERROR_1( KErrArgument, "DMT timing item not found for VIC mode: %d", KDefaultDMTModeIndex );
+			retVal = KErrNotFound;
+			}
+		}
     
     return retVal;
     }
@@ -1308,7 +1414,7 @@ void CEDIDHandler::CalculateOverscan( TPoint& aTLCorner,
 // CalculateOverscan
 //------------------------------------------------------------------------------
 //
-void CEDIDHandler::UpdateOverscanValues()
+TBool CEDIDHandler::UpdateOverscanValues()
     {
     FUNC_LOG;
 
@@ -1317,6 +1423,7 @@ void CEDIDHandler::UpdateOverscanValues()
     TInt vOverscan = 0;
     CRepository* cenRep = NULL;
     TInt err = KErrNone;
+	TBool valChanged = EFalse;
     
     TRAP( err, cenRep = CRepository::NewL( KCRUidTvoutSettings ) );
     if( err == KErrNone )
@@ -1339,10 +1446,19 @@ void CEDIDHandler::UpdateOverscanValues()
         // Cleanup
         delete cenRep;
         }
+
+	if( (iHOverscan != hOverscan) || (iVOverscan != vOverscan) )
+		{
+		valChanged = ETrue;
+		}
     
     // Update overscan values
     iHOverscan = hOverscan;
     iVOverscan = vOverscan;
+
+	INFO_3( "Overscan Values: %d,%d Changed:%d", iHOverscan, iVOverscan, valChanged );
+
+	return valChanged;
     }
 
 // ----------------------------------------------------------------------------
@@ -1466,6 +1582,16 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 	return retVal;
     }
 
+void CEDIDHandler::GetCurrentOverscanValue( TInt& aHOverscan, TInt& aVOverscan )
+	{
+	FUNC_LOG;
+	
+	aHOverscan = iHOverscan;
+	aVOverscan = iVOverscan;
+
+	INFO_2("Overscan used: %d, %d", iHOverscan, iVOverscan);
+	}
+
 //------------------------------------------------------------------------------
 // C++ constructor
 //------------------------------------------------------------------------------
@@ -1476,7 +1602,9 @@ CEDIDHandler::CEDIDHandler( MFSMForBody& aFSM,
     iFSM( aFSM ),
     iTVOutConfigForHDMI( aTVOutConfigForHDMI ),
     iRetryCounter( 0 ),
-    iRequestID( EUndefRequest )
+    iRequestID( EUndefRequest ),
+    inbrOfExtensions( 0 ),
+    iCurrentBlock( 0 )
     {
     FUNC_LOG;
     }

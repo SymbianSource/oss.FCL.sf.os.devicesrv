@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,12 +27,19 @@
 #include <ssm/ssmcommandlist.h>
 #include <ssm/ssmcmd.hrh>
 #include <ssm/ssmcommand.h>
+#include "ssmsubstateext.hrh"
 
 #include "tgsa_step_fail.h"
 
-TSsmCommandType ArrFail[] = { ESsmCmdPublishSystemState, ESsmCmdPersistHalAttributes, 
-							ESsmCmdFinaliseDrives, ESsmCmdPowerOff };
-
+TSsmCommandType ArrFail[] = {   ESsmCmdCustomCommand,       //r_cmd_sastate
+                                ESsmCmdPublishSystemState,  //r_cmd_publishstate
+                                ESsmCmdSetPAndSKey,         //r_cmd_psstate
+                                ESsmCmdCustomCommand,       //r_cmd_cancelmonitoring
+                                ESsmCmdSetPAndSKey,         //r_cmd_killsplash
+                                ESsmCmdCustomCommand,       //r_cmd_contactservice
+                                ESsmCmdStartApp,            //r_cmd_sysap
+                                ESsmCmdMultipleWait         //r_cmd_multiwaitforever
+                                };
 CGsaFailTest::~CGsaFailTest()
 	{
 	}
@@ -112,8 +119,10 @@ New Test CaseID 		DEVSRVS-SSPLUGINS-GSA-0025
  void CGsaFailTest::doTestPrepareCommandListL()
 	{
 	INFO_PRINTF1(_L("> CGsaFailTest::doTestPrepareCommandListL"));
-	TestPrepareCommandListL(ESsmFail ,KSsmAnySubState, KErrNone);
-	TestPrepareCommandListL(ESsmFail ,KSsmAnySubState, KErrNone);
+	//The default substate in the actual (fail policy) is mapped to 
+	//ESsmStateFail = 0x30
+	//Hence testing for the same.
+	TestPrepareCommandListL(ESsmFail ,ESsmStateFail , KErrNone);
 	TestPrepareCommandListL(ESsmFail ,100, KErrNotFound);
 	}
 
@@ -125,7 +134,7 @@ void CGsaFailTest::doTestCommandListL()
 	{
 	INFO_PRINTF1(_L("> CGsaFailTest::doTestCommandListL"));
 
-	TestCommandListL(ESsmFail, KSsmAnySubState, (sizeof(ArrFail)/sizeof(ArrFail[0])));
+	TestCommandListL(ESsmFail, ESsmStateFail, (sizeof(ArrFail)/sizeof(ArrFail[0])));
 	}
 
 /**
@@ -137,11 +146,11 @@ void CGsaFailTest::doTestGetNextStateL()
 	{
 	CGsaStatePolicyFail* policy = CreateAndInitializeFailPolicyLC();
 
-	TSsmState state(ESsmFail, KSsmAnySubState);
+	TSsmState state(ESsmFail, ESsmStateFail);
 	TSsmState result(0, 0);
 	TestGetNextState(policy, state, KErrNone, result);
 
-	TSsmState firstState(ESsmFail, KSsmAnySubState);
+	TSsmState firstState(ESsmFail, ESsmStateFail);
 	TestGetNextState(policy, firstState, KErrNone, result);
 
 	TSsmState unknownState(ESsmFail, 100);
@@ -266,7 +275,7 @@ void CGsaFailTest::TestCommandListL(TUint16 aMainState, TUint16 aSubState, TInt 
 void CGsaFailTest::TestGetNextState(CGsaStatePolicyFail* aPolicy, TSsmState aCurrentTransition, TInt aError, TSsmState aResult)
 	{
 	TRequestStatus trs;
-	TSsmState state(ESsmFail, KSsmAnySubState);
+	TSsmState state(ESsmFail, ESsmStateFail);
 	aPolicy->PrepareCommandList(state, KErrNone, trs);
 	StartScheduler();
 	User::WaitForRequest(trs);

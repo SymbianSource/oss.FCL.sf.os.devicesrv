@@ -340,5 +340,46 @@ public:
 			const TClientInfo& aClient) = 0;
 	};
 
+/**
+The UID of this version of the Target Selector Plugin interface.
+*/
+const TInt KRemConTargetSelectorInterface5 = 0x2002e6e1;
+
+class MRemConTargetSelectorPluginInterfaceV5
+	{
+public:
+	/** Called by RemCon when a new target client has connected.
+	 
+	 @aClientInfo The information about the new client.
+	 */
+	virtual void TargetClientAvailable(const TClientInfo& aClientInfo) = 0;
+	
+	/** Called by RemCon when a target client has disconnected. 
+	 
+	 @aClientInfo The information about the client that has disconnected.
+	 */
+	virtual void TargetClientUnavailable(const TClientInfo& aClientInfo) = 0;
+	
+	/** Called by RemCon when a bearer wishes to begin being informed when
+	the locally addressed player changes.  Once this function has been called
+	the TSP should inform RemCon via SetLocalAddressedPlayer each time the
+	player to which incoming commands from aBearer would be routed changes.
+	This might occur for example if a new application is launched, or if the
+	foreground application changes, depending on what the TSP's rules are
+	for deciding the target of the incoming message.  These updates should
+	occur until UnregisterLocalAddressedClientObserver is called.
+	
+	@param aBearerUid The bearer that wishes to be informed of updates
+	*/
+	virtual TInt RegisterLocalAddressedClientObserver(const TUid& aBearerUid) = 0;
+
+	/** Called by RemCon when a bearer wishes to stop being informed of 
+	changes to the local addresse client.
+	
+	@param aBearerUid The bearer that no longer wishes to be informed of updates
+	*/
+	virtual TInt UnregisterLocalAddressedClientObserver(const TUid& aBearerUid) = 0;
+	};
+
 
 #endif // TARGETSELECTORPLUGININTERFACE_H

@@ -193,6 +193,9 @@ private: // from MRemConBearerObserver
 	TInt MrcboDoSupportedInterfaces(const TRemConClientId& aId, RArray<TUid>& aUids);
 	TInt MrcboDoSupportedOperations(const TRemConClientId& aId, TUid aInterfaceUid, RArray<TUint>& aOperations);
 	
+	TInt MrcboDoRegisterLocalAddressedClientObserver(const TUid& aBearerUid);
+	TInt MrcboDoUnregisterLocalAddressedClientObserver(const TUid& aBearerUid);
+	
 private: // utility
 	/** Called during (2-phase) construction to instantiate all the bearer 
 	plugins, from ROM only. */

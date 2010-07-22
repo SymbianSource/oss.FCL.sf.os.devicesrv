@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -337,31 +337,54 @@ EXPORT_C void RStarterSession::Shutdown()
 
 EXPORT_C TInt RStarterSession::ResetNetwork()
 	{
+	TInt requestResult;
 	RSsmStateManager session;
 	// Set session to use the handle stored in this
 	session.SetHandle(Handle());
-
-	// Make request and return success.
-	TUint rfStatusPropertyKey = CSsmUiSpecific::RFStatusPropertyKey();
-	TSsmSwp swpRFStatus(rfStatusPropertyKey, ESsmRfOff);
-
-	RSsmSystemWideProperty swp;
-	swp.Connect(rfStatusPropertyKey);
-
-	TRequestStatus status;
-	//Subscribe for SwP changes
-	swp.Subscribe(status);
-
-	TInt requestResult= session.RequestSwpChange(swpRFStatus);
-	if(KErrNone == requestResult)
+	
+	//Perform state transition instead of SwP transition if KSsmGracefulOffline is enabled
+	if (IsSsmGracefulOffline())
 		{
-		// Wait for SwP Change
-	    User::WaitForRequest(status);
-		swpRFStatus.Set(rfStatusPropertyKey, ESsmRfOn);
-		requestResult = session.RequestSwpChange(swpRFStatus);
+		DEBUGPRINT1A( "KSsmGracefulOffline is enabled perform state transition" );
+		TSsmStateTransition stateinfo(ESsmNormal, ESsmNormalRfOffSubState, KSsmCLayerNullReason);
+		// Make request for substate transition to offline
+		requestResult = session.RequestStateTransition(stateinfo);
+		DEBUGPRINT2A( "State transition to ESsmNormalRfOffSubState returned : %d", requestResult);
+		if (KErrNone == requestResult)
+			{
+			TSsmStateTransition stateinfo(ESsmNormal, ESsmNormalRfOnSubState, KSsmCLayerNullReason);
+			// Make request for substate transition to online
+			requestResult = session.RequestStateTransition(stateinfo);
+			DEBUGPRINT2A( "State transition to ESsmNormalRfOnSubState returned : %d", requestResult);
+			}
 		}
-	swp.Close();
+	else
+		{
+		// Make request and return success.
+		TUint rfStatusPropertyKey = CSsmUiSpecific::RFStatusPropertyKey();
+		TSsmSwp swpRFStatus(rfStatusPropertyKey, ESsmRfOff);
+
+		RSsmSystemWideProperty swp;
+		swp.Connect(rfStatusPropertyKey);
+
+		TRequestStatus status;
+		//Subscribe for SwP changes
+		swp.Subscribe(status);
+
+		requestResult = session.RequestSwpChange(swpRFStatus);
+		DEBUGPRINT2A( "RF SwP transition to ESsmRfOff returned : %d", requestResult);
+		if (KErrNone == requestResult)
+			{
+			// Wait for SwP Change
+			User::WaitForRequest(status);
+			swpRFStatus.Set(rfStatusPropertyKey, ESsmRfOn);
+			requestResult = session.RequestSwpChange(swpRFStatus);
+			DEBUGPRINT2A( "RF SwP transition to ESsmRfOn returned : %d", requestResult);
+			}
+		swp.Close();
+		}
 	// Session is not closed before returning as this owns the handle
+	DEBUGPRINT2A( "ResetNetwork() is returning requestResult as: %d", requestResult);
 	return requestResult;
 	}
 
