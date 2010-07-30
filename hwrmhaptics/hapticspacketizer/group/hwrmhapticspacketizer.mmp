@@ -36,3 +36,5 @@ OS_LAYER_SYSTEMINCLUDE
 LIBRARY         euser.lib
 LIBRARY         ecom.lib
 LIBRARY         centralrepository.lib
+
+SMPSAFE

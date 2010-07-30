@@ -59,3 +59,4 @@ LIBRARY         centralrepository.lib
 
 LANG            SC
 
+SMPSAFE

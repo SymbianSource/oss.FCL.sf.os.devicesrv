@@ -600,7 +600,8 @@ TInt CCea861EdidParser::ReadCeaVersion1L( const TExtDataBlock& aData,
         
     TCEA861TEdidDescriptorBlockList* lastnode = iParsedInfo->iDescriptorBlocks;
 
-    for( TInt index = aIndex; index < KEdidParserSizeOfEdidBlock; index++ )
+    TInt index = aIndex;
+    while( index < KEdidParserSizeOfEdidBlock )
         {
         // Offset. If this is a newer version of CEA-861,
         // then this is skipped (we are already past the offset)
@@ -635,6 +636,7 @@ TInt CCea861EdidParser::ReadCeaVersion1L( const TExtDataBlock& aData,
         else
             {
             // this is only padding, no need to do anything
+            index++;
             }
 
         // after the descriptors there is padding to fill Extension block to 128 bytes.

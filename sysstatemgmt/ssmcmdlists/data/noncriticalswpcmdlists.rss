@@ -114,6 +114,10 @@ RESOURCE SSM_COMMAND_LIST r_noncriticalphase_commands
        //prio 0x7EE1
        r_cmd_nmailagent 	//MBEN-83CFQE
 #endif //FF_EMAIL_FRAMEWORK
+			//prio 0x7EE0
+			 ,r_cmd_activitymonmediamgr,	//FMAO-867HYW
+			 //prio 0x7EDF
+			 r_cmd_mediamgr			//FMAO-867HYW
     	 };
     }
 
@@ -293,6 +297,20 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
     }
 #endif //FF_EMAIL_FRAMEWORK
 
+// ---------------------------------------------------------------------------
+// r_cmd_activitymonmediamgr
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonmediamgr
+    {
+    priority = 0x7EE0;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_autosync
@@ -329,6 +347,17 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_hsrunningappmonitor
     monitor_info = r_mon_3_restarts_ignore;
     }
 
+// ---------------------------------------------------------------------------
+// r_cmd_mediamgr
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_APP_INFO r_cmd_mediamgr
+    {
+    priority = 0x7EDF;
+    name = "z:\\sys\\bin\\MediaManager.exe";
+    execution_behaviour = ESsmFireAndForget;
+    background = 1; // To background
+    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_msgnotifier
