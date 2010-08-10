@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -79,7 +79,14 @@ TVerdict CSysUtilsOOMTestStep::doTestStepL()
 	TBuf16<KSysUtilVersionTextLength> version;
 	version.Insert(0,kDummy);
 	
-	TInt err = DeletePSProperties();
+	TInt err = SetTestPath(EFalse);
+	if(err != KErrNone)
+	    {
+	    WARN_PRINTF2(_L("Could not set test path to EFalse. Error = %d"), err);
+	    SetTestStepResult(EAbort);
+	    return TestStepResult();
+	    }
+	err = DeletePSProperties();
 	if(err != KErrNone)
 		{
 		WARN_PRINTF2(_L("Could not delete P&S properties. Error = %d"), err);

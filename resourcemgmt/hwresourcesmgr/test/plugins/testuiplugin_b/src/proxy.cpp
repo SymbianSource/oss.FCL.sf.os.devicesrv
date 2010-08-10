@@ -14,7 +14,7 @@
 //
 
 #include <e32std.h>
-#include <implementationproxy.h>
+#include <ecom/implementationproxy.h>
 #include "hwrmtestuiplugin_b.h"
 
 // Map the interface implementation UIDs to implementation factory functions

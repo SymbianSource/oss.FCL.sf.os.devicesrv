@@ -328,11 +328,11 @@ void CHWRMPluginHandler::EventL( const TUint32 aIndId, TDesC8& aData )
 // Registers a handler for receiving HWRM plug-in indications
 // -----------------------------------------------------------------------------
 //
-void CHWRMPluginHandler::RegisterForIndications(MHWRMIndicationHandler* aCallback)
+void CHWRMPluginHandler::RegisterForIndicationsL(MHWRMIndicationHandler* aCallback)
 	{
-    COMPONENT_TRACE2( _L( "HWRM Server - CHWRMPluginHandler::RegisterForIndications(), Count() = %d" ), iIndicationCallbacks.Count() );
+    COMPONENT_TRACE2( _L( "HWRM Server - CHWRMPluginHandler::RegisterForIndicationsL(), Count() = %d" ), iIndicationCallbacks.Count() );
 
-	iIndicationCallbacks.Append(aCallback);
+	iIndicationCallbacks.AppendL(aCallback);
 	}
 
 // -----------------------------------------------------------------------------

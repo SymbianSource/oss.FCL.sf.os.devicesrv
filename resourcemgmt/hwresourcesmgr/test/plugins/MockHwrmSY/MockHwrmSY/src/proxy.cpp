@@ -14,7 +14,7 @@
 //
 
 #include <e32std.h>
-#include <implementationproxy.h>
+#include <ecom/implementationproxy.h>
 #include "cmocklightsy.h"
 #include "cmockvibrasy.h"
 #include "cmockfmtxsy.h"

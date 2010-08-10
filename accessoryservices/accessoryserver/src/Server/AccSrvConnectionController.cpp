@@ -40,8 +40,6 @@
 
 // CONSTANTS
 
-const TUid KAccFwUiNoteNotifierUid = { 0x10205061 };
-
 // MACROS
 
 // LOCAL CONSTANTS AND MACROS
@@ -63,20 +61,15 @@ const TUid KAccFwUiNoteNotifierUid = { 0x10205061 };
 // -----------------------------------------------------------------------------
 //
 CAccSrvConnectionController::CAccSrvConnectionController()
-    : CActive( EPriorityStandard ),
-      iPolicy( NULL ),
+    : iPolicy( NULL ),
       iServerModel( NULL ),
       iNotificationQueue( NULL ),
       iConnectionStatusHandler( NULL ),
       iModeHandler( NULL ),
       iASYProxyHandler( NULL ),
-      iShowNotes( EFalse ),
-      iWiredConnPublisher( NULL ),
-      iReplyPck( iReplyValue)
+      iWiredConnPublisher( NULL )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::CAccSrvConnectionController()" );
-
-    CActiveScheduler::Add( this );//Add the active object to the active scheduler
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::CAccSrvConnectionController - return" );
     }
@@ -166,12 +159,6 @@ CAccSrvConnectionController::~CAccSrvConnectionController()
     // (used from handlers).
     iConnectionHandler.ResetAndDestroy();
     
-    if ( iNotifier.Handle() )
-        {
-        iNotifier.Close();
-        }
-    Cancel();
-
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::~CAccSrvConnectionController - return" );
     }
 
@@ -277,7 +264,7 @@ void CAccSrvConnectionController::HandleConnectL( TAccPolGenericID& aGenericID,
 	    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectL() New connection" );
 
 	    // Store ThreadId for ASY handling
-	    iServerModel->StoreASYThreadID( aCallerThreadID, aGenericID.UniqueID() );
+	    iServerModel->StoreASYThreadIDL( aCallerThreadID, aGenericID.UniqueID() );
 
 	    iServerModel->AddPhysicalConnectionL( aGenericID );		
 
@@ -817,8 +804,6 @@ void CAccSrvConnectionController::HandleConnectionStatusChangedL()
                                                  KErrNotFound );
     iSettingsHandler->ConnectionStatusChangedL( genericIDArray );
 
-    // Able to show notes
-    iShowNotes = ETrue;
     iModeHandler->IssueRequest();
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectionStatusChangedL - return void" );
@@ -884,96 +869,6 @@ void CAccSrvConnectionController::HandleAccessoryModeChangedL(
                                                          KErrNone,
                                                          KErrNotFound );
             }
-	
-		    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleAccessoryModeChangedL - Show information note!" );			
-
-		    TBool showNote( EFalse );
-		    TInt noteValue( 0 );
-			
-		    switch ( accMode.iAccessoryMode )
-		      {
-			    case EAccModeWiredHeadset:
-			    case EAccModeWiredCarKit:
-			    case EAccModeTextDevice:
-			    case EAccModeLoopset:
-			    case EAccModeMusicStand:
-			    case EAccModeTVOut:
-			    case EAccModeHeadphones:
-			    {
-				  TAccPolGenericID genericID;
-				  iServerModel->GetLastConnectedAccessoryL( genericID );
-				  TUint32 num = genericID.SubblockCaps();
-				  if ( genericID.PhysicalConnectionCaps() != KPCHDMI ) // No info note for HDMI
-				      {
-                      if( num & KSBAudioSubblock )
-                          {
-                            CCapValue* capValue = iServerModel->CapabilityStorage().GetCapability( genericID, KAccIntegratedAudioInput );
-                            if( iInformationNoteDefault )
-                                  {
-                                  noteValue = iInformationNoteDefault;
-                                  showNote = ETrue;
-                                  }
-                            if( !capValue && !iInformationNoteDefault )
-                                  {
-                                  showNote = ETrue;
-                                  }
-                            }
-                        else
-                            {
-                            if( iInformationNoteDefault )
-                                  {
-                                  noteValue = iInformationNoteDefault;
-                                  showNote = ETrue;
-                                  }
-                            }
-				      }
-				  }
-			    break;			  
-			    default:
-			    {
-				  showNote = EFalse;				
-			    }
-			    break;
-		    }
-
-		    if ( showNote && iShowNotes )
-		        {		    	
-		        if( iServerModel->IdleDetected() )
-		            {
-                    if ( iNotifier.Handle() )
-                        {
-                        iNotifier.Close();
-                        }
-			        if( IsActive() )
-			            {
-    		            Cancel();
-    		            }
-
-			        //connect to notifier
-		            COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleAccessoryModeChangedL - notifier.Connect" );
-		            TInt err = iNotifier.Connect();
-		            if(err != KErrNone)
-		                {
-		                //ok if cannot show note, this is possible during boot
-		                COM_TRACE_1( "[AccFW:AccServer] CAccSrvConnectionController::HandleAccessoryModeChangedL - Couldn't connect to notifier: err = %d", err);	
-		                }
-		            else
-		                {
-		                TPckg<TInt> valuePckg( noteValue );
-		                iStatus = KRequestPending;
-                        iNotifier.StartNotifierAndGetResponse( 
-                                        iStatus, 
-                                        KAccFwUiNoteNotifierUid, 
-                                        valuePckg, 
-                                        iReplyPck);
-                        SetActive();
-    		            }
-    		        }
-		        //reset values
-	            iShowNotes = EFalse;
-			    iInformationNoteUID = 0;
-			    iInformationNoteDefault = 0;			      
-    		    }
         }        
     else
         {
@@ -996,28 +891,6 @@ void CAccSrvConnectionController::SetDefaultAccessoryInformation(
 	COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::SetDefaultAccessoryInformation()" );
 	iInformationNoteUID = aGenericID.UniqueID();
 	iInformationNoteDefault = aDefaultValue;
-    }
-
-// -----------------------------------------------------------------------------
-// CAccSrvConnectionController::RunL
-// -----------------------------------------------------------------------------
-//
-void CAccSrvConnectionController::RunL()
-    {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::RunL()" );
-    
-    iNotifier.Close();
-    }
-
-// -----------------------------------------------------------------------------
-// CAccSrvConnectionController::DoCancel
-// -----------------------------------------------------------------------------
-//
-void CAccSrvConnectionController::DoCancel()
-    {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::DoCancel()" );
-
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::DoCancel - return void" );
     }
 
 // -----------------------------------------------------------------------------

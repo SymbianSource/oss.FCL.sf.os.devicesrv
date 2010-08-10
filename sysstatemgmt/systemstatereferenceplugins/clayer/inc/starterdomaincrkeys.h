@@ -54,6 +54,16 @@ enum TStartupFirstBoot
     EStartupNotFirstBoot
     };
 
+/**
+* Used by Starter to store the device lock status
+*/
+const TUint32 KStartupDevLockStatus = 0x00000004;
+enum TStartupDevLockSuccess
+    {
+    EStartupDevLockNotSucess = 100,
+    EStartupDevLockSucess
+    };
+
 #endif // STARTERDOMAINCRKEYS_H
 
 // End of File

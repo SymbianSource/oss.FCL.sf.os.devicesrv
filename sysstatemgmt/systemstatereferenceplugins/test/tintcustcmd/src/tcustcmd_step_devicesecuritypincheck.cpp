@@ -84,6 +84,23 @@ TVerdict CCustomCmdTestDeviceSecurityPinCheck::doTestStepPreambleL()
 
 	iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
 	
+	//Start the test exe which defines startup related property keys
+	RProcess processHandle;
+	
+	TInt temp = processHandle.Create(KExeToDefineStartUpPS, KNullDesC);
+	TRequestStatus status1;
+	processHandle.Rendezvous(status1);
+	processHandle.Resume();
+	User::WaitForRequest(status1);
+	processHandle.Close();
+		
+	processHandle.Create(KExeToDefineStartUpStatePS, KNullDesC);
+    TRequestStatus status2;
+    processHandle.Rendezvous(status2);
+    processHandle.Resume();
+    User::WaitForRequest(status2);
+	processHandle.Close();
+
 	//For stopping the key simulation
 	iStopSimulatekey = CStopSimulateDevicekey::NewL(this);
  	

@@ -306,6 +306,15 @@ const TUint32 KAccAudioControl = 0x0012;
 const TUint32 KAccRTPStreaming = 0x0013;
 // REQ-417-64804: In-Car optimized Device
 
+// Name:          FM Antenna Support
+// Value:         N/A
+// Dynamic Type:  Static
+// I/O:           From accessory to terminal, input.
+// Description:   indicates that accessory has FM antenna support for audio data.
+// Bitmask:       000000 00000 10100
+const TUint32 KAccFMAntennaSupport = 0x0014;
+
+
 // CAR KIT SB NAME-VALUE PAIRS:
 
 

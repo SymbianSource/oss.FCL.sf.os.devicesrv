@@ -35,10 +35,7 @@ SOURCE			t_rpropertydata.cpp
 USERINCLUDE		../inc
 USERINCLUDE		../../common/inc 
 
-SYSTEMINCLUDE	/epoc32/include
-SYSTEMINCLUDE	/epoc32/include/oem
-SYSTEMINCLUDE	/epoc32/include/test
-SYSTEMINCLUDE	/epoc32/include/kernel
+OS_LAYER_SYSTEMINCLUDE
 
 LIBRARY			euser.lib
 LIBRARY			efsrv.lib

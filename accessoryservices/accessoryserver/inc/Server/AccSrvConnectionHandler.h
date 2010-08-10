@@ -275,7 +275,7 @@ NONSHARABLE_CLASS( CAccSrvConnectionHandler ) : public CAccSrvHandlerBase,
         * During response handling name in question can be retrieved from here
         * according to the transaction Id with FindRequestData() method.
         */
-        void StoreRequestData( TAccPolNameRecord aName, 
+        void StoreRequestDataL( TAccPolNameRecord aName, 
                                TInt aTrId, 
                                TBool aUpdateConnectionNotification );
 

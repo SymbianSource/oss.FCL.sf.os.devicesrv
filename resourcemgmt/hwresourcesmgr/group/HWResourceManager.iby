@@ -21,13 +21,13 @@
 
 #include <featreg.iby> // Feature Registry (featreg.dll)
 
-file=ABI_DIR\DEBUG_DIR\HWRMCommon.dll        SYSTEM_BINDIR\HWRMCommon.dll
-file=ABI_DIR\DEBUG_DIR\HWRMServer.exe        SYSTEM_BINDIR\HWRMServer.exe
-file=ABI_DIR\DEBUG_DIR\HWRMClient.dll        SYSTEM_BINDIR\HWRMClient.dll
-file=ABI_DIR\DEBUG_DIR\HWRMVibraClient.dll   SYSTEM_BINDIR\HWRMVibraClient.dll
-file=ABI_DIR\DEBUG_DIR\HWRMLightClient.dll   SYSTEM_BINDIR\HWRMLightClient.dll
-file=ABI_DIR\DEBUG_DIR\HWRMExtendedLightClient.dll   SYSTEM_BINDIR\HWRMExtendedLightClient.dll
-file=ABI_DIR\DEBUG_DIR\HWRMPowerClient.dll   SYSTEM_BINDIR\HWRMPowerClient.dll
+file=ABI_DIR\DEBUG_DIR\hwrmcommon.dll        SYSTEM_BINDIR\hwrmcommon.dll
+file=ABI_DIR\DEBUG_DIR\hwrmserver.exe        SYSTEM_BINDIR\hwrmserver.exe
+file=ABI_DIR\DEBUG_DIR\hwrmclient.dll        SYSTEM_BINDIR\hwrmclient.dll
+file=ABI_DIR\DEBUG_DIR\hwrmvibraclient.dll   SYSTEM_BINDIR\hwrmvibraclient.dll
+file=ABI_DIR\DEBUG_DIR\hwrmlightclient.dll   SYSTEM_BINDIR\hwrmlightclient.dll
+file=ABI_DIR\DEBUG_DIR\hwrmextendedlightclient.dll   SYSTEM_BINDIR\hwrmextendedlightclient.dll
+file=ABI_DIR\DEBUG_DIR\hwrmpowerclient.dll   SYSTEM_BINDIR\hwrmpowerclient.dll
 
 // Backup and Restore
 data=DATAZ_\private\101f7a02\backup_registration.xml	private\101f7a02\backup_registration.xml
@@ -37,17 +37,17 @@ data=DATAZ_\private\101f7a02\backup_registration.xml	private\101f7a02\backup_reg
 
 //Product specific policy files, customized on a per product basis, depending on the device requirements.
 //Product specific policy overrides customer specific policy, if same SID is defined in both policies.
-data=DATAZ_\private\101f7a02\ProductHWRMLightsPolicy.ini   private\101f7a02\ProductHWRMLightsPolicy.ini
-data=DATAZ_\private\101f7a02\ProductHWRMVibraPolicy.ini    private\101f7a02\ProductHWRMVibraPolicy.ini
-data=DATAZ_\private\101f7a02\ProductHWRMFmTxPolicy.ini     private\101f7a02\ProductHWRMFmTxPolicy.ini
+data=DATAZ_\private\101f7a02\producthwrmlightspolicy.ini   private\101f7a02\producthwrmlightspolicy.ini
+data=DATAZ_\private\101f7a02\producthwrmvibrapolicy.ini    private\101f7a02\producthwrmvibrapolicy.ini
+data=DATAZ_\private\101f7a02\producthwrmfmtxpolicy.ini     private\101f7a02\producthwrmfmtxpolicy.ini
 
 //Platform internal policies (customer specific), customized by licensees to control policy at a platform level. 
-data=DATAZ_\private\101f7a02\CustomerHWRMLightsPolicy.ini  private\101f7a02\CustomerHWRMLightsPolicy.ini
-data=DATAZ_\private\101f7a02\CustomerHWRMVibraPolicy.ini   private\101f7a02\CustomerHWRMVibraPolicy.ini
-data=DATAZ_\private\101f7a02\CustomerHWRMFmTxPolicy.ini    private\101f7a02\CustomerHWRMFmTxPolicy.ini
+data=DATAZ_\private\101f7a02\customerhwrmlightspolicy.ini  private\101f7a02\customerhwrmlightspolicy.ini
+data=DATAZ_\private\101f7a02\customerhwrmvibrapolicy.ini   private\101f7a02\customerhwrmvibrapolicy.ini
+data=DATAZ_\private\101f7a02\customerhwrmfmtxpolicy.ini    private\101f7a02\customerhwrmfmtxpolicy.ini
 
 // FM Tx RDS text conversion
-data=DATAZ_\private\101f7a02\ConvertFromUnicode.dat     private\101f7a02\ConvertFromUnicode.dat
+data=DATAZ_\private\101f7a02\convertfromunicode.dat     private\101f7a02\convertfromunicode.dat
 
 #endif // __HWRESOURCEMANAGER_IBY__
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -150,6 +150,12 @@ void CCustomCmdPublishStartupMode::PublishHiddenResetL()
                 DEBUGPRINT1A("Hidden reset detected");
                 startupReason = EUnknownReset;
                 }
+			else
+				{
+				err = iRepository->Set(KStartupDevLockStatus, EStartupDevLockNotSucess);
+				DEBUGPRINT1A("Normal Device Startup");
+				DEBUGPRINT2A("Setting KStartupDevLockStatus to EStartupDevLockNotSucess completed with error %d", err);
+				}
             
             // Publish startup reason
             err = RProperty::Set(CSsmUiSpecific::StartupPSUid(), KPSStartupReason, startupReason);

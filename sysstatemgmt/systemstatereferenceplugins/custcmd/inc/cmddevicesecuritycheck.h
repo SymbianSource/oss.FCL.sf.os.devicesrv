@@ -33,6 +33,8 @@
 #include <etel.h> 
 #include <etelmm.h>
 
+class CRepository;
+
 NONSHARABLE_CLASS (CCustomCmdDeviceSecurityCheck) : public CActive , public MSsmCustomCommand
 	{
 public:
@@ -94,6 +96,7 @@ private:
     HBufC* iTsyModuleName;
 	TRequestStatus* iExecuteRequest;
 	CSsmSecurityCheckNotifier* iSsmSecurityCheckNotifier;
+	CRepository* iStartupRepository;
 
 #ifdef TEST_CUSTCMD_MACRO
 	friend class CCustomCmdTestDeviceSecurityCheck;

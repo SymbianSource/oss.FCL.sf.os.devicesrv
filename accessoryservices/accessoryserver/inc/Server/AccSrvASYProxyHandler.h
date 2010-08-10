@@ -123,7 +123,7 @@ NONSHARABLE_CLASS( CAccSrvASYProxyHandler )
         * @return Transaction ID assigned to this operation.
         * @see RemoveTransactionID
         */
-        TInt StoreTransactionID( TProcessCmdId aCmdId,
+        TInt StoreTransactionIDL( TProcessCmdId aCmdId,
                                  TASYCommandParamRecord& aASYCommand,
                                  TPtr8* aPtrBuf );
 

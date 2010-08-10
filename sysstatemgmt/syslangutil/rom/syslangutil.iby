@@ -32,9 +32,9 @@ file=ABI_DIR\BUILD_DIR\elocl_lan.001                SHARED_LIB_DIR\elocl_lan.001
 file=ABI_DIR\BUILD_DIR\elocl_reg.826                SHARED_LIB_DIR\elocl_reg.826
 file=ABI_DIR\BUILD_DIR\elocl_col.001                SHARED_LIB_DIR\elocl_col.001
 #else
-file=\epoc32\release\armi\DEBUG_DIR\elocl_lan.001   System\libs\elocl_lan.001
-file=\epoc32\release\armi\DEBUG_DIR\elocl_reg.826   System\libs\elocl_reg.826
-file=\epoc32\release\armi\DEBUG_DIR\elocl_col.001   System\libs\elocl_col.001
+file=EPOCROOT##epoc32\release\armi\DEBUG_DIR\elocl_lan.001   System\libs\elocl_lan.001
+file=EPOCROOT##epoc32\release\armi\DEBUG_DIR\elocl_reg.826   System\libs\elocl_reg.826
+file=EPOCROOT##epoc32\release\armi\DEBUG_DIR\elocl_col.001   System\libs\elocl_col.001
 #endif	//EKA2
 //
 

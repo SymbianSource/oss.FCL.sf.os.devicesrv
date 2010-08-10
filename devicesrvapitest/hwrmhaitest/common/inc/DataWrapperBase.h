@@ -20,7 +20,7 @@
 #define DATA_WRAPPER_BASE_H
 
 //	EPOC includes
-#include <datawrapper.h>
+#include <test/datawrapper.h>
 #define SECS_TO_MS(x)  (x*1000000)
 
 _LIT(KConsname,				"Test Console");

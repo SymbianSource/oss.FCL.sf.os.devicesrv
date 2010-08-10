@@ -159,4 +159,21 @@ CTFATestEnvironment* CTFAStifEntryPoint::CreateEnvironmentL( void )
     COMPONENT_TRACE( ( _L( "    DSYTESTTOOL - CTFAStifEntryPoint::CreateEnvironmentL - return 0x%x" ), env ) );
     return env;
     }
+
+
+EXPORT_C TInt SetRequirements( CTestModuleParam*& aTestModuleParam, 
+                               TUint32& aParameterValid )
+
+    {
+    aParameterValid = KStifTestModuleParameterChanged;
+    CTestModuleParamVer01* param = CTestModuleParamVer01::NewL();
+
+    // Stack size
+    param->iTestThreadStackSize= 65536; // 64KB stack
+    // Heap sizes
+    param->iTestThreadMinHeap = 4096;   // 4K heap min
+    param->iTestThreadMaxHeap = 1260480;// 1.2M heap max
+    aTestModuleParam = param;
+    return KErrNone;
+    } 
     

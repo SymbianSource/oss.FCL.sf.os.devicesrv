@@ -382,7 +382,7 @@ void CASYProxyAsyLoader::ArrangeImplementationsL()
 
         if ( found == EFalse )
             {
-            onlyServicesIndexArray.Append( i );
+            onlyServicesIndexArray.AppendL( i );
             }
         }
 
@@ -397,7 +397,7 @@ void CASYProxyAsyLoader::ArrangeImplementationsL()
             iServiceImplInfoArray.operator[]( onlyServicesIndexArray.operator[]( k ) );
 
         iServiceImplInfoArray.Remove( onlyServicesIndexArray.operator[]( k ) );
-        iServiceImplInfoArray.Append( implementationInformation );
+        iServiceImplInfoArray.AppendL( implementationInformation );
         }
 
     // Find Service / Handler pairs
@@ -423,7 +423,7 @@ void CASYProxyAsyLoader::ArrangeImplementationsL()
     zeroUid.iUid = ZEROHANDLERUID;
     while ( iImplUidsHandlerArray.Count() < iServiceImplInfoArray.Count() )
         {
-        iImplUidsHandlerArray.Append( zeroUid );
+        iImplUidsHandlerArray.AppendL( zeroUid );
         }
 
     User::RequestComplete( ptrStat, KErrNone );

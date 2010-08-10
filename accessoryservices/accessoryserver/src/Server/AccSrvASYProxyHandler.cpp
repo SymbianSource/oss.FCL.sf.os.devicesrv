@@ -127,7 +127,7 @@ TInt CAccSrvASYProxyHandler::HandleASYCommsL(
         }
     else
         {
-        trID = StoreTransactionID( aCmdId, aASYCommand, aPtrBuf );
+        trID = StoreTransactionIDL( aCmdId, aASYCommand, aPtrBuf );
         }
 
     COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::HandleASYCommsL - return TrID=%d", trID );
@@ -135,22 +135,22 @@ TInt CAccSrvASYProxyHandler::HandleASYCommsL(
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvASYProxyHandler::StoreTransactionID
+// CAccSrvASYProxyHandler::StoreTransactionIDL
 // -----------------------------------------------------------------------------
 //
-TInt CAccSrvASYProxyHandler::StoreTransactionID(
+TInt CAccSrvASYProxyHandler::StoreTransactionIDL(
     TProcessCmdId aCmdId,
     TASYCommandParamRecord& aASYCommand,
     TPtr8* aPtrBuf )
     {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionID()" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionIDL()" );
 
     TInt trID( KErrNotFound );
     TInt count( iOngoingTransactions.Count() );
     TUint32 nameFromOngoingTransactions;
     TUint32 nameFromRequest;
 
-    COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionID - current count = %d", count );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionIDL - current count = %d", count );
 
     for ( TInt i( 0 ); i < count; ++i )
         {
@@ -163,7 +163,7 @@ TInt CAccSrvASYProxyHandler::StoreTransactionID(
             {
             //Same command is under processing in ASY -> use existing trid
             trID = iOngoingTransactions.operator[](i).iTransactionID;
-            COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionID - found trid = %d", trID );
+            COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionIDL - found trid = %d", trID );
             break;
             }
         else
@@ -180,7 +180,7 @@ TInt CAccSrvASYProxyHandler::StoreTransactionID(
         trIDRecord.iNameRecord    = aASYCommand.iNameRecord;
         trIDRecord.iCommand       = aASYCommand.iCmdValue;
         trIDRecord.iTransactionID = trID;
-        iOngoingTransactions.Append( trIDRecord );
+        iOngoingTransactions.AppendL( trIDRecord );
         
         //Complete outstanding NotifyProcessCommand()
         TRAP_IGNORE( iConnectionController->NotificationQueue().CompleteASYCmdL( 
@@ -196,7 +196,7 @@ TInt CAccSrvASYProxyHandler::StoreTransactionID(
         //This means also that ASY is not informed about this command.
         }
 
-    COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionID - return %d", trID );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionIDL - return %d", trID );
     return trID;
     }
 
@@ -217,7 +217,7 @@ void CAccSrvASYProxyHandler::RemoveTransactionID( TInt aTransactionID )
         if ( iOngoingTransactions.operator[]( i ).iTransactionID == aTransactionID )
             {
             iOngoingTransactions.Remove( i );
-            COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionID - removed index = %d",i );
+            COM_TRACE_1( "[AccFW:AccServer] CAccSrvASYProxyHandler::StoreTransactionIDL - removed index = %d",i );
             break;
             }
         else

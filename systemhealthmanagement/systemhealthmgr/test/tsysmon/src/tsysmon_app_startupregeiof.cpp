@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,9 +20,14 @@
 */
 
 #include "sysmontesthelper.h"
+#include <e32property.h>
+
+const TUint32 KRestartExeCount = 43;
 
 void MainL()
 	{
+    TInt err = RProperty::Define(KTestSysMon, KRestartExeCount, RProperty::EInt);
+    RDebug::Printf("Defining P&S key with key %d returns with err %d", err, KRestartExeCount);
 	RProcess::Rendezvous(KErrNone);
 	User::After(500000); // 0.5 seconds
 	CSysMonTestHelper* helper = CSysMonTestHelper::NewLC();	

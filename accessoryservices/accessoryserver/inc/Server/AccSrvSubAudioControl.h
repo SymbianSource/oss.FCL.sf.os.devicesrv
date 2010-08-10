@@ -112,24 +112,24 @@ NONSHARABLE_CLASS( CAccSrvSubAudioControl ) : public CAccSrvSubControl
     private: // New functions
 
         /**
-        * Handles NotifyAccessoryAudioLinkOpened() client request.
+        * Handles NotifyAccessoryAudioLinkOpenedL() client request.
         * If leave occurs, the client request is completed with that error code.
         *
         * @since S60 3.1
         * @param aMessage Client request.
         * @return void
         */
-        void NotifyAccessoryAudioLinkOpened( const RMessage2& aMessage );
+        void NotifyAccessoryAudioLinkOpenedL( const RMessage2& aMessage );
 
         /**
-        * Handles NotifyAccessoryAudioLinkClosed() client request.
+        * Handles NotifyAccessoryAudioLinkClosedL() client request.
         * If leave occurs, the client request is completed with that error code.
         *
         * @since S60 3.1
         * @param aMessage Client request.
         * @return void
         */
-        void NotifyAccessoryAudioLinkClosed( const RMessage2& aMessage );
+        void NotifyAccessoryAudioLinkClosedL( const RMessage2& aMessage );
 
         /**
         * Handles AccessoryAudioLinkOpen() client request.
@@ -182,7 +182,7 @@ NONSHARABLE_CLASS( CAccSrvSubAudioControl ) : public CAccSrvSubControl
         void CancelAccessoryAudioLinkClose( const RMessage2& aMessage );
 
         /**
-        * Handles NotifyAccessoryAudioLinkOpened() client request.
+        * Handles NotifyAccessoryAudioLinkOpenedL() client request.
         * If leave occurs, the client request is completed with that error code.
         *
         * @since S60 3.1
@@ -192,7 +192,7 @@ NONSHARABLE_CLASS( CAccSrvSubAudioControl ) : public CAccSrvSubControl
         void CancelNotifyAccessoryAudioLinkOpened( const RMessage2& aMessage );
 
         /**
-        * Handles NotifyAccessoryAudioLinkClosed() client request.
+        * Handles NotifyAccessoryAudioLinkClosedL() client request.
         * If leave occurs, the client request is completed with that error code.
         *
         * @since S60 3.1
@@ -213,10 +213,10 @@ NONSHARABLE_CLASS( CAccSrvSubAudioControl ) : public CAccSrvSubControl
         //Stored AccessoryAudioLinkClose() client request for later completion.
         RMessage2 iAccessoryAudioLinkCloseMsg;
 
-        //Stored NotifyAccessoryAudioLinkOpened() client request for later completion.
+        //Stored NotifyAccessoryAudioLinkOpenedL() client request for later completion.
         RMessage2 iNotifyAccessoryAudioLinkOpenedMsg;
 
-        //Stored NotifyAccessoryAudioLinkClosed() client request for later completion.
+        //Stored NotifyAccessoryAudioLinkClosedL() client request for later completion.
         RMessage2 iNotifyAccessoryAudioLinkClosedMsg;
 
         //Thread id of the client-side caller for this subsession

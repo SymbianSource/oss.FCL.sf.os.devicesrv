@@ -3141,8 +3141,7 @@ static void UsbObjectModuleTestSuiteL( CTFATestSuite* aSuite )
 {
     TF_INIT_TEST_SUITE_FUNCTION( aSuite );
 
-    TF_ADD_TEST_CASE_L( 11201, _L( "[M11201] [[AccServer] Connect USB headset] "));
-    TF_ADD_TEST_CASE_L( 11202, _L( "[M11202] [[AccServer] Get and Set USB headset audio streams format parameter] "));   
+    
     TF_ADD_TEST_CASE_L( 11203, _L( "[M11203] [[AccServer] Get USB audio units (Audio Topology) ] "));   
     TF_ADD_TEST_CASE_L( 11204, _L( "[M11204] [[AccServer] Set/Get volume control] "));   
     TF_ADD_TEST_CASE_L( 11205, _L( "[M11205] [[AccServer] Set/Get mute control] "));   
@@ -3150,6 +3149,8 @@ static void UsbObjectModuleTestSuiteL( CTFATestSuite* aSuite )
     TF_ADD_TEST_CASE_L( 11207, _L( "[M11207] [[AccServer] Cancel accessory object value changed notify]"));
     TF_ADD_TEST_CASE_L( 11208, _L( "[M11208] [[AccServer] Accessory object value changed notify]"));
     TF_ADD_TEST_CASE_L( 11209, _L( "[M11209] [[AccServer] Accessory object value changed notify and cancel]"));
+	TF_ADD_TEST_CASE_L( 11201, _L( "[M11201] [[AccServer] Connect USB headset] "));
+    TF_ADD_TEST_CASE_L( 11202, _L( "[M11202] [[AccServer] Get and Set USB headset audio streams format parameter] "));   
 }
 
 static void HdmiObjectModuleTestSuiteL( CTFATestSuite* aSuite )

@@ -121,7 +121,7 @@ RESOURCE SSM_CREATE_SYSTEM_WIDE_PROPERTY r_cmd_createswp_simstatus
 RESOURCE SSM_START_APP_INFO r_cmd_idle
     {
     priority = 0xFFE7;
-    name = "z:\\sys\\bin\\hsapplication.exe";
+    name = "z:\\sys\\bin\\hsapplicationlauncher.exe";
     execution_behaviour = ESsmDeferredWaitForSignal;
     monitor_info = r_mon_max_restarts_ignore;
     }

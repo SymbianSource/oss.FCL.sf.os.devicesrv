@@ -28,6 +28,11 @@
 #include "ssmuiproviderdll.h"
 #include "ssmrefcustomcmdcommon.h"
 #include "ssmdebug.h"
+#include "starterdomaincrkeys.h"
+#include "startupdomainpskeys.h"
+
+#include <centralrepository.h>
+
 
 CCustomCmdDeviceSecurityCheck* CCustomCmdDeviceSecurityCheck::NewL()
 	{
@@ -69,6 +74,8 @@ void CCustomCmdDeviceSecurityCheck::ConstructL()
     	User::Leave(errorCode);	
     	}
 
+	iStartupRepository = CRepository::NewL(KCRUidStartup);
+
 	//Add active object to active scheduler
 	CActiveScheduler::Add(this);
 	}
@@ -92,6 +99,7 @@ CCustomCmdDeviceSecurityCheck::~CCustomCmdDeviceSecurityCheck()
         iServer.Close();
         }
     delete iTsyModuleName;
+	delete iStartupRepository;
 	}
 
 TInt CCustomCmdDeviceSecurityCheck::Initialize(CSsmCustomCommandEnv* /*aCmdEnv*/)
@@ -113,7 +121,8 @@ void CCustomCmdDeviceSecurityCheck::Execute(const TDesC8& /*aParams*/, TRequestS
 	//Set the user request to pending
 	aStatus = KRequestPending;
 	iExecuteRequest = &aStatus;
-
+	
+	TInt errorCode = KErrNone;
 #ifdef __WINS__
 #ifdef TEST_CUSTCMD_MACRO
 	TRequestStatus* status = &iStatus;
@@ -122,19 +131,35 @@ void CCustomCmdDeviceSecurityCheck::Execute(const TDesC8& /*aParams*/, TRequestS
 #else
     // The device lock status can not be read in the emulator.
     // Just pretend the lock is not enabled.
-	TInt errorCode = RProperty::Set(CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, EStarterSecurityPhaseSimOk);
+	errorCode = RProperty::Set(CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, EStarterSecurityPhaseSimOk);
     CompleteClientRequest(errorCode);
 #endif //TEST_CUSTCMD_MACRO
 
 #else
-    if (CSsmUiSpecific::IsNormalBoot() || CSsmUiSpecific::IsSimChangedReset())
+
+	TInt val(EStartupDevLockNotSucess);
+
+	errorCode = iStartupRepository->Get(KStartupDevLockStatus, val);
+	DEBUGPRINT3A("Getting KStartupDevLockStatus : %d completed with %d", val, errorCode);
+
+	TInt startupReason = 0;
+	if (EStartupDevLockNotSucess != val)
+		{
+		errorCode = iStartupRepository->Set(KStartupDevLockStatus, EStartupDevLockNotSucess);
+		DEBUGPRINT2A("Setting KStartupDevLockStatus to EStartupDevLockNotSucess completed with %d", errorCode);
+		}
+
+	errorCode = RProperty::Get(CSsmUiSpecific::StartupPSUid(), KPSStartupReason, startupReason);
+	DEBUGPRINT3A("Getting KPSStartupReason : %d completed with : %d", startupReason, errorCode);
+	
+	if (CSsmUiSpecific::IsNormalBoot() || CSsmUiSpecific::IsSimChangedReset() || (EStartupDevLockNotSucess ==  val && EUnknownReset == startupReason))
         {
         iPhone.GetLockInfo( iStatus, RMobilePhone::ELockPhoneDevice, iLockInfoPckg );
         SetActive();
         }
     else
         {
-        TInt errorCode = RProperty::Set(
+		errorCode = RProperty::Set(
         		CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, EStarterSecurityPhaseSecOk );
         CompleteClientRequest( errorCode );
         }
@@ -285,10 +310,14 @@ TInt CCustomCmdDeviceSecurityCheck::RunError(TInt aError)
 
 void CCustomCmdDeviceSecurityCheck::CompleteClientRequest(TInt aReason)
 	{
+	DEBUGPRINT2A("Device Security Check completed with %d", aReason);
+
+	TInt err = iStartupRepository->Set(KStartupDevLockStatus, (aReason == KErrNone ? EStartupDevLockSucess : EStartupDevLockNotSucess));
+    DEBUGPRINT2A("Setting KStartupDevLockStatus completed with error %d", err);
 	//Complete client request with reason code
 	if (iExecuteRequest)
         {
-    	TInt errorCode = RProperty::Set(CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, 
+    	err = RProperty::Set(CSsmUiSpecific::StarterPSUid(), KStarterSecurityPhase, 
     			aReason == KErrNone ? EStarterSecurityPhaseSecOk : EStarterSecurityPhaseSecNok );
         User::RequestComplete(iExecuteRequest, aReason);
         }

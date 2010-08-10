@@ -1,4 +1,4 @@
-// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -34,6 +34,7 @@
 
 const TUint KRFStatusPropertyKey = 0x2001D2A9;
 const TUid KRFStatusPropertyCategory = {0x2000D75B};
+const TUint32 KMiscPluginPropertyKey = 0x2000E658;
 
 _LIT(KPolicyFilename,                   "rfstatusswppolicy.dll");
 
@@ -89,6 +90,18 @@ TBool CCLayerTestWrapperWithSsm::DoCommandL(const TTEFFunction& aCommand, const 
     {
     __UHEAP_MARK;
     
+    TInt error = RProperty::Define(KRFStatusPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
+    if((KErrNone != error) && (KErrAlreadyExists != error))
+        {
+        ERR_PRINTF2(_L("Defining KMiscPluginPropertyKey failed with error %d"), error);
+        User::Leave(error);
+        }
+    error = RProperty::Set(KRFStatusPropertyCategory, KMiscPluginPropertyKey, 1);
+    if(KErrNone != error)
+        {
+        ERR_PRINTF2(_L("Setting KMiscPluginPropertyKey with value 1 failed with error %d"), error);
+        User::Leave(error);
+        }
     TBool ret = ETrue;
     // Print out the parameters for debugging
     INFO_PRINTF2( _L("<font size=3 color=990000><b>aCommand = %S</b></font>"), &aCommand );
@@ -99,7 +112,12 @@ TBool CCLayerTestWrapperWithSsm::DoCommandL(const TTEFFunction& aCommand, const 
         SetError(err);
         ret = EFalse;
         }
-    
+    error = RProperty::Delete(KRFStatusPropertyCategory, KMiscPluginPropertyKey);
+    if(KErrNone != error)
+        {
+        ERR_PRINTF2(_L("Deleting KMiscPluginPropertyKey failed with error %d"), error);
+        User::Leave(error);
+        }
     __UHEAP_MARKEND;
     return ret;
     }

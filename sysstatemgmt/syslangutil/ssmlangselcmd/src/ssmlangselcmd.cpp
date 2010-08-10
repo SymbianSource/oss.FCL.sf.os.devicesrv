@@ -22,10 +22,8 @@
 #include "ssmlanguageloader.h"
 #include "syslangutilprivatecrkeys.h"
 #include "trace.h"
-#include "ssmlocalepskeys.h"
 #include "ssmmapperutilityinternalpskeys.h"
 
-#include <e32property.h>
 #include <syslangutil.h>
 #include <CommonEngineDomainCRKeys.h>
 #include <centralrepository.h>
@@ -328,15 +326,7 @@ TInt CSsmLangSelCmd::GetLastSelectedLang()
     TInt errorCode = iMapperUtility->CrValue( KCRUidCommonEngineKeys, 
                                               KGSDisplayTxtLang,
                                               value );
-    if( KErrNone == errorCode )
-        {
-        errorCode = RProperty::Set( KPSStarterUid, KSSMUILanguagePSKey, value );
-        ERROR_1( errorCode, "Failed to set read KSSMUILanguagePSKey PS key %d", errorCode );
-        }
-    else
-        {
-        INFO_1( "Failed read KGSDisplayTxtLang CenRep key with error= %d", errorCode );
-        }
+    ERROR( errorCode, "Failed read KGSDisplayTxtLang CenRep key with error= %d"  );       
     
     INFO_1( "Last selected language is %d", value );
     return value;
@@ -357,16 +347,7 @@ TInt CSsmLangSelCmd::SetIndividualSettingsToCentRep( const TInt aRegion, const T
         {
         //Set the Region CR with the given value
         errorCode = cenrep->Set( KGSRegion, aRegion );
-        if ( KErrNone == errorCode )
-            {
-            //Set the Region PS key which is used in Region SUP  
-             TInt err = RProperty::Set( KPSStarterUid, KSSMRegionPSKey, aRegion );
-             ERROR( err, "Failed to Set Region PS key");
-            }
-        else
-            {
-            INFO_1( "Failed to Set Region code to CentRep, %d", errorCode );            
-            }
+        ERROR( errorCode, "Failed to Set Region code to CentRep, %d"  );                
         }
     else
         {
@@ -377,16 +358,7 @@ TInt CSsmLangSelCmd::SetIndividualSettingsToCentRep( const TInt aRegion, const T
         {
         //Set the Collation CR with the given value
         errorCode = cenrep->Set( KGSCollation, aCollation );
-        if ( KErrNone == errorCode )
-            {
-            //Set the Collation PS key which is used in Collation SUP  
-            errorCode = RProperty::Set( KPSStarterUid, KSSMCollationPSKey, aCollation );
-            ERROR( errorCode, "Failed to Set Collation  PS key " );
-            }
-        else
-            {
-            INFO_1( "Failed to Set Collation code to CentRep, %d", errorCode );            
-            }
+        ERROR( errorCode, "Failed to Set Collation code to CentRep, %d"  );               
         }
     delete cenrep;
     return errorCode;
@@ -542,17 +514,11 @@ void CSsmLangSelCmd::GetIndividualSettingsFromCentRepL( TInt& aRegion, TInt& aCo
     CleanupStack::PushL( cenrep );
     
     //Get the last selected Region from central repository
-    User::LeaveIfError(cenrep->Get( KGSRegion, aRegion));
-    
-    //Set the Region PS key which is used in Region SUP
-    User::LeaveIfError(RProperty::Set( KPSStarterUid, KSSMRegionPSKey, aRegion ));
-    
+    User::LeaveIfError(cenrep->Get( KGSRegion, aRegion));   
+        
     //Get the last selected Collation from central repository
-    User::LeaveIfError(cenrep->Get( KGSCollation, aCollation));
+    User::LeaveIfError(cenrep->Get( KGSCollation, aCollation));    
     
-    //Set the Collation PS key which is used in Collation SUP
-    User::LeaveIfError(RProperty::Set( KPSStarterUid, KSSMCollationPSKey, aCollation ));
-
     INFO_2( "Last selected region %d and collation %d", aRegion, aCollation );
     CleanupStack::PopAndDestroy( cenrep );
     }

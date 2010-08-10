@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,7 +27,7 @@ LOAD_SERVER tsysmon_server
 //! @SYMREQ			REQ6595 REQ6603 REQ9457
 //! @SYMTestType		CIT
 //! @SYMTestPriority		Critical
-//! @SYMTestCaseDependencies	appfwk-sysmon-0033_<emulator|hardware>0.rsc must be used in place of SSCForStartupMode0.rsc
+//! @SYMTestCaseDependencies	appfwk-sysmon-0033_<emulator|hardware>0.rsc is merged with noncriticalcmdlist.rsc
 //! @SYMTestCaseDesc		Register a process for monitoring, with retry count = 0, 'EIgnoreOnFailure' policy, fail the process
 //! @SYMTestActions		A process is registered with the 'EIgnoreOnFailure' policy. 
 //! Fail the process.

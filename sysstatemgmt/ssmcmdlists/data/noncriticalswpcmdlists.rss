@@ -114,10 +114,20 @@ RESOURCE SSM_COMMAND_LIST r_noncriticalphase_commands
        //prio 0x7EE1
        r_cmd_nmailagent 	//MBEN-83CFQE
 #endif //FF_EMAIL_FRAMEWORK
-			//prio 0x7EE0
-			 ,r_cmd_activitymonmediamgr,	//FMAO-867HYW
-			 //prio 0x7EDF
-			 r_cmd_mediamgr			//FMAO-867HYW
+	//prio 0x7EE0
+	,r_cmd_activitymonmediamgr,		//FMAO-867HYW
+	//prio 0x7EDF
+	 r_cmd_mediamgr,			//FMAO-867HYW
+	 //prio 0x7EDE
+	 r_cmd_activitywrtserinstaller,	 	//SSEM-877P5J
+	 //prio 0x7EDD
+	 r_cmd_wrtserviceinstaller		//SSEM-877P5J
+#ifndef SYMBIAN_EXCLUDE_LOCATION 	 
+	 //prio 0x7EDC
+	 ,r_cmd_activitylbsroot,	 	//BSER-87REDT
+	 //prio 0x7EDB
+	 r_cmd_lbsroot		//BSER-87REDT
+#endif	//SYMBIAN_EXCLUDE_LOCATION
     	 };
     }
 
@@ -313,6 +323,38 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonmediamgr
     }
 
 // ---------------------------------------------------------------------------
+// r_cmd_activitywrtserinstaller
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitywrtserinstaller
+    {
+    priority = 0x7EDE;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
+
+// ---------------------------------------------------------------------------
+// r_cmd_activitylbsroot
+// ---------------------------------------------------------------------------
+//
+#ifndef SYMBIAN_EXCLUDE_LOCATION 
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitylbsroot
+    {
+    priority = 0x7EDC;
+    severity = ECmdCriticalSeverity;
+    execution_behaviour = ESsmWaitForSignal;
+    dllname = "ssmactivitycmd.dll";
+    ordinal = 1; // SsmActivityCmdNewL
+    retries = 2;
+    dll_data = r_dlldata_activitymonitor_timeout;
+    }
+#endif	//SYMBIAN_EXCLUDE_LOCATION 	
+
+// ---------------------------------------------------------------------------
 // r_cmd_autosync
 // ---------------------------------------------------------------------------
 //	
@@ -346,6 +388,20 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_hsrunningappmonitor
     execution_behaviour = ESsmWaitForSignal;
     monitor_info = r_mon_3_restarts_ignore;
     }
+
+// ---------------------------------------------------------------------------
+// r_cmd_lbsroot
+// ---------------------------------------------------------------------------
+//	
+#ifndef SYMBIAN_EXCLUDE_LOCATION
+RESOURCE SSM_START_PROCESS_INFO r_cmd_lbsroot
+    {
+    priority = 0x7EDB;
+    name = "lbsroot.exe";
+    execution_behaviour = ESsmFireAndForget;
+    retries = 2;
+    }
+#endif	//SYMBIAN_EXCLUDE_LOCATION 
 
 // ---------------------------------------------------------------------------
 // r_cmd_mediamgr
@@ -461,6 +517,17 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_videocenter
     name = "cseschedulerserver.exe";
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
+    }
+
+// ---------------------------------------------------------------------------
+// r_cmd_wrtserviceinstaller
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_APP_INFO r_cmd_wrtserviceinstaller
+    {
+    priority = 0x7EDD;
+    name = "z:\\sys\\bin\\wrtserviceinstaller.exe";
+    execution_behaviour = ESsmFireAndForget;
     }
 
 // ===========================================================================

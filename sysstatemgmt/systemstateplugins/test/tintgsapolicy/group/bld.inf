@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,8 +24,6 @@ PRJ_MMPFILES
 
 PRJ_TESTMMPFILES
 tgsastatetranfromnormal.mmp
-tgsastatetranfromshutdown.mmp
-tgsastatetrantoshutdown.mmp
 tgsastatetranfromstartup.mmp
 tgsa_i_server.mmp
 
@@ -54,13 +52,8 @@ PRJ_TESTEXPORTS
 ../scripts/sspluginstest_tgsa_i_checkepocwind_1.bat /epoc32/release/winscw/urel/z/sspluginstest/sspluginstest_tgsa_i_checkepocwind.bat
 
 #endif //SYMBIAN_SSM_FLEXIBLE_MERGE
-
-
-../scripts/sspluginstest_statetrantoshutdown.script		z:/sspluginstest/sspluginstest_statetrantoshutdown.script
-../scripts/sspluginstest_statetranfromshutdown.script	z:/sspluginstest/sspluginstest_statetranfromshutdown.script
 ../scripts/sspluginstest_statetranfromnormal.script		z:/sspluginstest/sspluginstest_statetranfromnormal.script
 ../scripts/sspluginstest_statetranfromstartup.script		z:/sspluginstest/sspluginstest_statetranfromstartup.script
-../scripts/sspluginstest_statetranfromstartuptoshutdown.script		z:/sspluginstest/sspluginstest_statetranfromstartuptoshutdown.script
 ../scripts/sspluginstest_duplicatesubstate.script		z:/sspluginstest/sspluginstest_duplicatesubstate.script
 #ifdef SYMBIAN_SSM_FLEXIBLE_MERGE
 ../scripts/sspluginstest_fleximergediffsubstate.script		z:/sspluginstest/sspluginstest_fleximergediffsubstate.script
@@ -71,8 +64,9 @@ PRJ_TESTEXPORTS
 
 //iby files
 fleximergediffsubstate.iby			/epoc32/rom/include/fleximergediffsubstate.iby
-fleximergemanyfiles.iby			/epoc32/rom/include/fleximergemanyfiles.iby
+fleximergemanyfiles.iby				/epoc32/rom/include/fleximergemanyfiles.iby
 fleximergesamesubstate.iby			/epoc32/rom/include/fleximergesamesubstate.iby
 fleximergesortdifffile.iby			/epoc32/rom/include/fleximergesortdifffile.iby
 fleximergesortsamefile.iby			/epoc32/rom/include/fleximergesortsamefile.iby
+teststatetransition.iby				/epoc32/rom/include/teststatetransition.iby
 #endif

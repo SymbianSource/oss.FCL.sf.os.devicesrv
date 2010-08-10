@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,12 +20,16 @@
 */
 
 #include "sysmontesthelper.h"
+#include <e32property.h>
 
+const TUint32 KRestartExeCount = 38;
 
 TInt MainL()
 	{
 	RDebug::Print(_L("appfwk-sysmon-0038: MainL"));
-
+	
+	TInt err = RProperty::Define(KTestSysMon, KRestartExeCount, RProperty::EInt);
+    RDebug::Printf("Defining P&S key with key %d returns with err %d", err, KRestartExeCount);
 	TInt runCount = 0;
     CCommandLineArguments* args = CCommandLineArguments::NewLC();
     runCount = CSysMonTestHelper::ReadRunCountL(args->Arg(0));
@@ -43,7 +47,7 @@ TInt MainL()
 			CleanupClosePushL(sysmon);
 			TTime time1();
 
-			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_failcount2failwait_slave.exe"), _L("APPFWK-SYSMON-0038"));
+			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_failcount2failwait_slave.exe"), _L("38"));
 			props->SetMonitored(ETrue);
 			props->SetStartupType(EStartProcess);
 			props->SetStartMethod(EWaitForStart);
@@ -54,7 +58,10 @@ TInt MainL()
 			RProcess slave1;
 			slave1.Create(_L("tsysmon_app_failcount2failwait_slave.exe"), _L("APPFWK-SYSMON-0038"));
 			CleanupClosePushL(slave1);
-			slave1.Resume();
+            TRequestStatus status;
+            slave1.Rendezvous(status);
+            slave1.Resume();
+            User::WaitForRequest(status);
 
 			// Register with SysMon
 			sysmon.MonitorL(*props, slave1);

@@ -87,10 +87,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0xFF86 - accsrv, seleclanguage (dbrecovery has been moved to extended startup list but uses the same multiplewait command))
         r_cmd_multiwaitforever2,
         // prio 0xFF85
-        r_cmd_loadlocalesup,    // Observes changes in locale data
-        r_cmd_loadcollation,	// Observes changes in Collation setting
-        r_cmd_loadregion,	// Observes changes in Region setting
-        r_cmd_loaduilanguage,	// Observes changes in UI Language setting
+        r_cmd_loadlocalesup,    // Observes changes in locale data        
         // prio 0xFF79
         r_cmd_aknstart,         // UI Framework
         r_cmd_hbthemeserver,	//CR:KJLN-7WBEGU
@@ -207,38 +204,7 @@ RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_cmd_loadlocalesup
     ordinal = 1;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_loadcollation
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_cmd_loadcollation
-    {
-    priority = 0xFF85;
-    filename = "ssmlocaleobserversup.dll";
-    ordinal = 2;
-    }
 
-// ---------------------------------------------------------------------------
-// r_cmd_loadregion
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_cmd_loadregion
-    {
-    priority = 0xFF85;
-    filename = "ssmlocaleobserversup.dll";
-    ordinal = 3;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_loaduilanguage
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_cmd_loaduilanguage
-    {
-    priority = 0xFF85;
-    filename = "ssmlocaleobserversup.dll";
-    ordinal = 4;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_loadpowersup

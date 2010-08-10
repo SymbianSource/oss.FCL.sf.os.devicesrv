@@ -82,7 +82,7 @@ void CAccSrvSubAsyComms::ConstructL()
     COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ConstructL()" );
 
     iInitCommandTimer = CAccSrvProcessCommandTimer::NewL( this, KInitCmdTimeOut );
-    iServerModel->AddASYThreadId( iASYThreadID );
+    iServerModel->AddASYThreadIdL( iASYThreadID );
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAsyComms::ConstructL - return void" );
     }

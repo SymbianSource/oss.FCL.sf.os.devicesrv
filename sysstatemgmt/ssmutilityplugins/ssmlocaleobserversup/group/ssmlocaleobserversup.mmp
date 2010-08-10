@@ -28,9 +28,6 @@ VENDORID        VID_DEFAULT
 
 SOURCEPATH      ../src
 SOURCE          ssmlocaleobserversup.cpp
-SOURCE          ssmcollationobserversup.cpp
-SOURCE          ssmregionobserversup.cpp 
-SOURCE          ssmuilanguageobserversup.cpp
 
 USERINCLUDE     ../inc
 USERINCLUDE     ../../inc
@@ -44,8 +41,6 @@ LIBRARY         estor.lib // Stream store for locale storing
 LIBRARY         euser.lib
 LIBRARY         ssmcmn.lib
 LIBRARY         ssmmapperutility.lib
-LIBRARY         centralrepository.lib
-
 
 // >>> uncomment to enable function-level tracing
 // MACRO        __SSM_FUNC_TRACE__

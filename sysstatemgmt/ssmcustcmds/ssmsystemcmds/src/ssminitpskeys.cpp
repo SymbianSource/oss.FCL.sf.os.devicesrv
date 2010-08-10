@@ -20,7 +20,6 @@
 #include "ssmmapperutility.h"
 #include "ssmmapperutilityinternalpskeys.h"
 #include "ssmcustcmdsprivatepskeys.h"
-#include "ssmlocalepskeys.h"
 #include "trace.h"
 
 #include <ssm/startupdomainpskeys.h>
@@ -274,30 +273,7 @@ void CSsmInitPsKeys::InitializeKeysL()
              KReadDeviceDataPolicy,
              KWriteDeviceDataPolicy );
     SetL( KPSStarterUid, KRTCPropertyKey, 0 );
-
-    //Used for observing the Collation code change in CSsmCollationObserver
-    INFO( "KPSStarterUid::KSSMCollationPSKey" );
-    DefineL( KPSStarterUid,
-             KSSMCollationPSKey,
-             KReadDeviceDataPolicy,
-             KWriteDeviceDataPolicy );
-    SetL( KPSStarterUid, KSSMCollationPSKey, 0 );
-
-    //Used for observing the Region code change in CSsmRegionObserver 
-    INFO( "KPSStarterUid::KSSMRegionPSKey" );
-    DefineL( KPSStarterUid,
-             KSSMRegionPSKey,
-             KReadDeviceDataPolicy,
-             KWriteDeviceDataPolicy );
-    SetL( KPSStarterUid, KSSMRegionPSKey, 0 );
-
-
-    INFO( "KPSStarterUid::KSSMUiLanguagePSKey " );
-    DefineL( KPSStarterUid,
-             KSSMUILanguagePSKey ,
-             KReadDeviceDataPolicy,
-             KWriteDeviceDataPolicy );
-    SetL( KPSStarterUid, KSSMUILanguagePSKey , 0 );
+    
 
     INFO( "KPSUidStartup::KIgnoreSecurityEvent" );
     DefineL( KPSUidStartup,

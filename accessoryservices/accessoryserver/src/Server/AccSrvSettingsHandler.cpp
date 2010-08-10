@@ -551,7 +551,7 @@ void CAccSrvSettingsHandler::GetAccessoryModeSettingsL(
         	
 	RArray< TUint32 > array;
 	CleanupClosePushL( array );
-    GetStaticKeys( aAccMode, array );
+    GetStaticKeysL( aAccMode, array );
   	TAccModeSetting setting;
     
     // get mode related static settings for client
@@ -997,45 +997,45 @@ TBool CAccSrvSettingsHandler::StaticKey( const TInt id ) const
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvSettingsHandler::GetStaticKeys
+// CAccSrvSettingsHandler::GetStaticKeysL
 //
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CAccSrvSettingsHandler::GetStaticKeys(
+void CAccSrvSettingsHandler::GetStaticKeysL(
                     const TAccMode aAccMode,
                     RArray< TUint32 >& aArray ) const
     {
-    COM_TRACE_1( "[AccFW:AccServer] CAccSrvSettingsHandler::GetStaticKeys(%d)", aAccMode );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvSettingsHandler::GetStaticKeysL(%d)", aAccMode );
 
     switch( aAccMode )
         {
         case EAccModeWiredHeadset:
-            aArray.Append( KAccServerWiredHSLights );
+            aArray.AppendL( KAccServerWiredHSLights );
             break;
         case EAccModeWirelessHeadset:
-            aArray.Append( KAccServerWirelessHSLights );
+            aArray.AppendL( KAccServerWirelessHSLights );
             break;
         case EAccModeWiredCarKit:
-            aArray.Append( KAccServerWiredCarKitLights );
+            aArray.AppendL( KAccServerWiredCarKitLights );
             break;
         case EAccModeWirelessCarKit:
-            aArray.Append( KAccServerWirelessCarKitLights );
+            aArray.AppendL( KAccServerWirelessCarKitLights );
             break;
         case EAccModeTextDevice:
-            aArray.Append( KAccServerTextDeviceLights );
+            aArray.AppendL( KAccServerTextDeviceLights );
             break;
         case EAccModeLoopset:
-            aArray.Append( KAccServerLoopsetLights );
+            aArray.AppendL( KAccServerLoopsetLights );
             break;
         case EAccModeMusicStand:
-            aArray.Append( KAccServerMusicStandLights );
+            aArray.AppendL( KAccServerMusicStandLights );
             break;
         default:  // mode is not supported
             break;
         }
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvSettingsHandler::GetStaticKeys() returns" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvSettingsHandler::GetStaticKeysL() returns" );
     }
 
 // ========================== OTHER EXPORTED FUNCTIONS =========================
