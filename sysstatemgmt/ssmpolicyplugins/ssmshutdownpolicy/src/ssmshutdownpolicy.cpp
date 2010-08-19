@@ -217,6 +217,16 @@ void CSsmShutdownPolicy::StoreStartupReasonL( const TInt aReasonCode )
     TInt errorCode = repository->Set( KStartupReason, aReasonCode );
     ERROR( errorCode, "Failed to set KStartupReason CenRep key" );
 
+	// In case of disk full, we will not try to set the device lock query status cenrep key here.
+	// Rather it is set after disk space is recovered.
+	if ((EUnknownReset !=  aReasonCode) && (KErrDiskFull != errorCode))
+		{
+		// Set the lock code query success as EStartupDevLockNotSucess in case the shutdown is not due to the the unknown reset.  
+		// This is because if the device crashes before resetting the key during boot time.
+		errorCode = repository->Set(KStartupDevLockStatus, EStartupDevLockNotSucess);
+		INFO_1("Setting KStartupDevLockStatus CenRep key with EStartupDevLockNotSucess completed with %d", errorCode);
+		}
+
 	if( KErrDiskFull == errorCode )
 		{
 		//Need not to put on CleanupStack, it's not calling any leaving function and
@@ -228,6 +238,14 @@ void CSsmShutdownPolicy::StoreStartupReasonL( const TInt aReasonCode )
 			{
 			errorCode = repository->Set( KStartupReason, aReasonCode );
 			ERROR( errorCode, "Failed to set KStartupReason CenRep key after freeing the memory" );
+
+			if (EUnknownReset !=  aReasonCode)
+				{
+				// Set the lock code query success as EStartupDevLockNotSucess in case the shutdown is not due to the the unknown reset.  
+				// This is because if the device crashes before resetting the key during boot time.
+				errorCode = repository->Set(KStartupDevLockStatus, EStartupDevLockNotSucess);
+				ERROR( errorCode, "Failed to set KStartupDevLockStatus CenRep key after freeing the memory" );
+				}
 			}
 		CSsmUiSpecific::Release();
 		}

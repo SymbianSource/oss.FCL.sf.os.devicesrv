@@ -113,7 +113,7 @@ void CHWRMPowerCommonData::ConstructL(CHWRMPluginHandler* aPluginHandler)
     COMPONENT_TRACE2(_L( "HWRM Server - CHWRMPowerCommonData::ConstructL - iMaximumReportingPeriod: %d" ), iMaximumReportingPeriod );
 
     // Register for indications from HWRM plugin.
-    aPluginHandler->RegisterForIndications(this);
+    aPluginHandler->RegisterForIndicationsL(this);
     
     iPowerService = CHWRMPowerService::NewL(aPluginHandler, *this);
 

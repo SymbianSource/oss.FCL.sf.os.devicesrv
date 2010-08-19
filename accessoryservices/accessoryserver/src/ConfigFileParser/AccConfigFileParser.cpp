@@ -50,15 +50,15 @@ const TInt  KAccConfigMaxCapabilityGroups = 64;
 // ============================ MEMBER FUNCTIONS ===============================
 
 // -----------------------------------------------------------------------------
-// CAccConfigFileParser::ParseSubblocks
+// CAccConfigFileParser::ParseSubblocksL
 // Detecting subblocks and store them to destination array
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CAccConfigFileParser::ParseSubblocks( const TUint64& aVal,
+void CAccConfigFileParser::ParseSubblocksL( const TUint64& aVal,
                                            RArray<TUint64>& aCaps )
     {
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocks()" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocksL()" );
 
     TUint64 sum( 0 );
     TUint64 curVal( 1 );
@@ -72,7 +72,7 @@ void CAccConfigFileParser::ParseSubblocks( const TUint64& aVal,
         if ( ( curVal & aVal ) == curVal )
             {
             COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::(Cap) MATCH! HI:0x%x LO:0x%x", I64HIGH( curVal ), I64LOW( curVal ) );
-            aCaps.Append( curVal ); // Append to found caps array
+            aCaps.AppendL( curVal ); // Append to found caps array
             sum += curVal;
             }        
         curBit++;
@@ -80,32 +80,32 @@ void CAccConfigFileParser::ParseSubblocks( const TUint64& aVal,
         }
     while ( sum < aVal && curBit < KAccConfigMaxCapabilityGroups );
 
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocks - return void" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocksL - return void" );
     }
 
 // -----------------------------------------------------------------------------
-// CAccConfigFileParser::ParseNames
+// CAccConfigFileParser::ParseNamesL
 // Detect all subblock names and append them to the gicen array.
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CAccConfigFileParser::ParseNames( const TUint32& aVal,
+void CAccConfigFileParser::ParseNamesL( const TUint32& aVal,
                                        RArray<TUint32>& aNames )
     {
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames()" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL()" );
     TUint32 sum( 0 );
     TUint32 curVal( 1 );
     TInt curBit( 0 );
 
     do {
-        COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames Binary for this roundtrip is 0x%x, total sum is 0x%x", curVal, sum );
-        COM_TRACE_1( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames & 0x%x", curVal & aVal );
+        COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL Binary for this roundtrip is 0x%x, total sum is 0x%x", curVal, sum );
+        COM_TRACE_1( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL & 0x%x", curVal & aVal );
         // Check if this subblock is defined in SB-def block
 
         if ( ( curVal & aVal ) == curVal )
             {
             COM_TRACE_1( "[AccFW:SrvUtil] (Name) MATCH! 0x%x",curVal );
-            aNames.Append( curVal ); // Append to found caps array
+            aNames.AppendL( curVal ); // Append to found caps array
             sum += curVal;
             }
         curBit++;
@@ -113,7 +113,7 @@ void CAccConfigFileParser::ParseNames( const TUint32& aVal,
         }
     while ( sum < aVal && curBit < KAccConfigMaxCapabilityGroups );
 
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames - return void" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL - return void" );
     }
 
 // -----------------------------------------------------------------------------

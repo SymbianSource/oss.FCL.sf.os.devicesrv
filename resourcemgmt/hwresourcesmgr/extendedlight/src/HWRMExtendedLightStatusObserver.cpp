@@ -81,7 +81,10 @@ CHWRMExtendedLightStatusObserver::~CHWRMExtendedLightStatusObserver()
 
     // Cancel property separately, as the following Cancel() call doesn't seem to 
     // cause DoCancel to fire.
-    iProperty.Cancel();
+    if( iProperty.Handle() )
+      {
+      iProperty.Cancel();
+      }
     
     Cancel();
     

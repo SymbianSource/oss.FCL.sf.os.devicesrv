@@ -277,7 +277,7 @@ void CAccSrvConnectionController::HandleConnectL( TAccPolGenericID& aGenericID,
 	    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::HandleConnectL() New connection" );
 
 	    // Store ThreadId for ASY handling
-	    iServerModel->StoreASYThreadID( aCallerThreadID, aGenericID.UniqueID() );
+	    iServerModel->StoreASYThreadIDL( aCallerThreadID, aGenericID.UniqueID() );
 
 	    iServerModel->AddPhysicalConnectionL( aGenericID );		
 

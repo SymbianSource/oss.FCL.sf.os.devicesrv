@@ -154,7 +154,7 @@ RESOURCE SSM_START_APP_INFO r_cmd_autolock
     priority = 0xFFA7;
     name = "z:\\sys\\bin\\lockapp.exe";
     execution_behaviour = ESsmWaitForSignal;
-    timeout = 10000;
+    timeout = 100000;		//  FCOA-87UBXX
     background = 1; // To background
     monitor_info = r_mon_3_restarts_ignore;
     }

@@ -542,7 +542,6 @@ void CEDIDHandler::RunL()
 					INFO_1( "Updating the Rawdata for the Block %d...", iCurrentBlock );
 					iEdidParserPtr->UpdateRawDataL(dataBlockDes);
 					
-					iCurrentBlock++;
 					if( inbrOfExtensions >= 2 )
 						{
  						inbrOfExtensions = inbrOfExtensions - 2;
@@ -555,6 +554,7 @@ void CEDIDHandler::RunL()
 
 				if( inbrOfExtensions )
 					{
+					iCurrentBlock++;
 					iRetryCounter = KErrNone;
 					
 					if( ReadEDIDDataL() != KErrNone )
@@ -587,12 +587,11 @@ void CEDIDHandler::RunL()
 								}
  							}
 						}
+					TRACE_EDID_DATA( *iEdidParserPtr );
+					
+					iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
+					iRetryCounter = KErrNone;
 					}
-
-				TRACE_EDID_DATA( *iEdidParserPtr );
-				
-				iFSM.Input( EPDEIfEDIDHandler, EPDEIfEDIDHandlerEventEdidDataFetched );
-				iRetryCounter = KErrNone;
 				}
             else
                 {
@@ -1557,6 +1556,30 @@ TInt CEDIDHandler::FilterAvailableTvConfigList( RArray<THdmiDviTimings>& aHdmiCo
 		    else // It is DVI connector
 		    {
 				TInt modecount = aHdmiConfigs.Count();
+
+				if( !modecount )
+					{
+					THdmiDviTimings timings;
+					
+					INFO( "==No EDID available from the Sink. Setting DMT 4" );
+					// No EDID data available from the sink
+					// Default VGA resolution should be selected
+					const TTimingItem* item = TimingByIndex( KDefaultDMTModeIndex, ETimingModeDMT );
+					if( item )
+						{
+						Mem::FillZ( ( TAny* )&timings, sizeof( timings ) );
+						FillHdmiDviTimings( *item, timings );
+						timings.iTvPhysicalImageAspectRatioNumerator = 4;
+						timings.iTvPhysicalImageAspectRatioDenominator = 3;
+						retVal = aHdmiConfigs.Append( timings );
+						ERROR_1( retVal, "Failed to append DMT timing: %S in array", item->iTimingName );
+						if( retVal == KErrNone )
+							{
+							modecount = 1;
+							ceaMode = EFalse;
+							}
+						}
+					}
 				
 				while( modecount-- )
 				  {

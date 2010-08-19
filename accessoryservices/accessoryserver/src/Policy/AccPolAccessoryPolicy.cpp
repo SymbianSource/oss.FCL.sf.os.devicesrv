@@ -819,7 +819,7 @@ EXPORT_C void CAccPolAccessoryPolicy::ParseGenericIDContentL(
         TAccPolGenericIDAccessor::SetFeatureAttributeL( 
             genericID, KAccPolSBCapabilities, valU64 );
 
-        ParseSubblocks( valU64, foundCapabilityGroups );
+        ParseSubblocksL( valU64, foundCapabilityGroups );
 
         //set "values" to point to firts value
         TLex8 values;
@@ -871,7 +871,7 @@ EXPORT_C void CAccPolAccessoryPolicy::ParseGenericIDContentL(
                 TUint32 capabilityGroupValue(0);
                 lVal.Val( capabilityGroupValue, EDecimal );
 
-                ParseNames( capabilityGroupValue, foundCapability );
+                ParseNamesL( capabilityGroupValue, foundCapability );
 
                 TInt capabilityIter(0);
                 TInt foundCapabilityCount( foundCapability.Count() );
@@ -970,7 +970,7 @@ EXPORT_C void CAccPolAccessoryPolicy::ParseGenericIDContentL(
                                                                 value,
                                                               ( TAccPolValueType )type,
                                                               ( TAccPolValueLocation )location );
-                        nameValueArray.Append( nameValueRecord );
+                        nameValueArray.AppendL( nameValueRecord );
                         }
                     ++capabilityIter;
                     }
@@ -1004,14 +1004,14 @@ EXPORT_C void CAccPolAccessoryPolicy::ParseGenericIDContentL(
     }
 
 // -----------------------------------------------------------------------------
-// CAccPolAccessoryPolicy::ParseSubblocks
+// CAccPolAccessoryPolicy::ParseSubblocksL
 // Detecting subblocks and store them to destination array
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CAccPolAccessoryPolicy::ParseSubblocks( const TUint64& aVal, RArray<TUint64>& aCaps )
+void CAccPolAccessoryPolicy::ParseSubblocksL( const TUint64& aVal, RArray<TUint64>& aCaps )
     {
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocks()" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocksL()" );
 
     TUint64 sum( 0 );
     TUint64 curVal( 1 );
@@ -1025,7 +1025,7 @@ void CAccPolAccessoryPolicy::ParseSubblocks( const TUint64& aVal, RArray<TUint64
         if ( ( curVal & aVal ) == curVal )
             {
             COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::(Cap) MATCH! HI:0x%x LO:0x%x", I64HIGH( curVal ), I64LOW( curVal ) );
-            aCaps.Append( curVal ); // Append to found caps array
+            aCaps.AppendL( curVal ); // Append to found caps array
             sum += curVal;
             }
         curBit++;
@@ -1033,31 +1033,31 @@ void CAccPolAccessoryPolicy::ParseSubblocks( const TUint64& aVal, RArray<TUint64
         }
     while ( sum < aVal && curBit < KAccConfigMaxCapabilityGroups );
 
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocks - return void" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseSubblocksL - return void" );
     }
 
 // -----------------------------------------------------------------------------
-// CAccPolAccessoryPolicy::ParseNames
+// CAccPolAccessoryPolicy::ParseNamesL
 // Detect all subblock names and append them to the gicen array.
 // (other items were commented in a header).
 // -----------------------------------------------------------------------------
 //
-void CAccPolAccessoryPolicy::ParseNames( const TUint32& aVal, RArray<TUint32>& aNames )
+void CAccPolAccessoryPolicy::ParseNamesL( const TUint32& aVal, RArray<TUint32>& aNames )
     {
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames()" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL()" );
     TUint32 sum( 0 );
     TUint32 curVal( 1 );
     TInt curBit( 0 );
 
     do {
-        COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames Binary for this roundtrip is 0x%x, total sum is 0x%x", curVal, sum );
-        COM_TRACE_1( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames & 0x%x", curVal & aVal );
+        COM_TRACE_2( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL Binary for this roundtrip is 0x%x, total sum is 0x%x", curVal, sum );
+        COM_TRACE_1( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL & 0x%x", curVal & aVal );
         // Check if this subblock is defined in SB-def block
 
         if ( ( curVal & aVal ) == curVal )
             {
             COM_TRACE_1( "[AccFW:SrvUtil] (Name) MATCH! 0x%x",curVal );
-            aNames.Append( curVal ); // Append to found caps array
+            aNames.AppendL( curVal ); // Append to found caps array
             sum += curVal;
             }
         curBit++;
@@ -1065,7 +1065,7 @@ void CAccPolAccessoryPolicy::ParseNames( const TUint32& aVal, RArray<TUint32>& a
         }
     while ( sum < aVal && curBit < KAccConfigMaxCapabilityGroups );
 
-    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNames - return void" );
+    COM_TRACE_( "[AccFW:SrvUtil] CAccConfigFileParser::ParseNamesL - return void" );
     }
 
 // -----------------------------------------------------------------------------

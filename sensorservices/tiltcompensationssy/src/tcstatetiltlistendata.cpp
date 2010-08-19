@@ -471,6 +471,11 @@ void CTCStateTiltListenData::CompleteEventL()
         // Reset state
         ResetState( ETrue );
         }
+    else
+    	{
+    	if( iTimerToSend )
+    		iTimerToSend->Start();
+    	}
     }
 
 // ----------------------------------------------------------------------------------

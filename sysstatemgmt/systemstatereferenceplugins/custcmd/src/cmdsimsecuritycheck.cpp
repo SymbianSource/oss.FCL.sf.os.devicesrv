@@ -155,6 +155,8 @@ void CCustomCmdSimSecurityCheck::StartStateChange(const TSecurityState aState, c
 	__ASSERT_ALWAYS(!IsActive(), PanicNow(KPanicCustomCmdSimSecurityCheck, EInternalStateError));
 	__ASSERT_ALWAYS(!iStateChangePending, PanicNow(KPanicCustomCmdSimSecurityCheck, EInternalStateError));
 
+	DEBUGPRINT2A("CCustomCmdSimSecurityCheck StartStateChange with State - %d ", aState);
+
 	iSubState = ESecuritySubStateNone;
 	iStateChangePending = ETrue;
 	iNoteType = aNoteType;
@@ -262,6 +264,8 @@ void CCustomCmdSimSecurityCheck::SecurityCheckL()
 
 	TInt errorCode = KErrNone;
     //Handle the state transition
+	
+	DEBUGPRINT2A("CCustomCmdSimSecurityCheck SecurityCheckL with State - %d ", iState);
     switch (iState)
         {
         case StartupAdaptation::ESIMPresent:
@@ -332,6 +336,7 @@ void CCustomCmdSimSecurityCheck::SecurityCheckL()
 
 void CCustomCmdSimSecurityCheck::DoSecurityCheck()
     {
+	DEBUGPRINT2A("CCustomCmdSimSecurityCheck DoSecurityCheck with State - %d ", iState);
     //Handle pending state transition
     switch (iState)
         {

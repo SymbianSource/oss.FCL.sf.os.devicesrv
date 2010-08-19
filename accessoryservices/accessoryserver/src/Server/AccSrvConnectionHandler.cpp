@@ -148,7 +148,7 @@ void CAccSrvConnectionHandler::RunL()
 
 	    		//Stored request data is used when response is received from ASY
 		    	//(i.e. HandleValueMessageL)
-    			StoreRequestData( asyCommandParamRecord.iNameRecord, trId, ETrue );
+    			StoreRequestDataL( asyCommandParamRecord.iNameRecord, trId, ETrue );
 
 	    		//Store this object to queue to be able to receive response from ASY
     			iCallback->RegisterControlMessageL( ESetValue, this );
@@ -613,30 +613,30 @@ void CAccSrvConnectionHandler::StartASYCommandHandlingL(
 
     //Stored request data is used when response is received from ASY
     //(i.e. HandleValueMessageL)
-    StoreRequestData( aASYCommandParam.iNameRecord, trId, EFalse );
+    StoreRequestDataL( aASYCommandParam.iNameRecord, trId, EFalse );
 
     //Store this object to queue to be able to receive response from ASY
     iCallback-> RegisterControlMessageL( EGetValue, this );
 
     }
 // -----------------------------------------------------------------------------
-// CAccSrvConnectionHandler::StoreRequestData
+// CAccSrvConnectionHandler::StoreRequestDataL
 // -----------------------------------------------------------------------------
 //
-void CAccSrvConnectionHandler::StoreRequestData( TAccPolNameRecord aName,
+void CAccSrvConnectionHandler::StoreRequestDataL( TAccPolNameRecord aName,
                                                  TInt aTrId,
                                                  TBool aUpdateConnectionNotification )
     {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StoreRequestData()" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StoreRequestDataL()" );
 
     TAccSrvRequestData requestData;
     requestData.iName = aName;
     requestData.iTrId = aTrId;
     requestData.iUpdateNotification = aUpdateConnectionNotification;
 
-    iRequestDataArray.Append( requestData );
+    iRequestDataArray.AppendL( requestData );
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StoreRequestData - return void" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StoreRequestDataL - return void" );
     }
 
 // -----------------------------------------------------------------------------
