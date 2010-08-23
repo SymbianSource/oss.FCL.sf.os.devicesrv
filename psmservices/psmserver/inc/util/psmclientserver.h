@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -65,6 +65,16 @@ enum TPsmServerRequest
      * Cancels notification request of power save mode change
      */
     EPsmServerCancelModeChangeNotificationRequest,
+
+    /**
+     * Used only for testing purpose and in debug builds only. 
+     * Not declared under _DEBUG because command ids will be 
+     * different in udeb and urel version, will lead to confusion
+     */
+    EDebugHeapMark,
+    EDebugHeapMarkEnd,
+    EDebugSetHeapFailure,
+    EDebugHeapReset,   
 
 // ---------------------------------------------------------------
 // End of enum

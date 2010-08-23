@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -61,6 +61,11 @@ class CPsmSession : public CSession2
          * Service requests
          */
         void ServiceL( const RMessage2& aMessage );
+		
+		/**
+         * ServiceError handling
+         */
+		void ServiceError(const RMessage2 &aMessage, TInt aError);
 
     private:
 
@@ -74,10 +79,6 @@ class CPsmSession : public CSession2
          */
         void ConstructL();
 
-        /**
-         * Handles client requests
-         */
-        void DispatchL( const RMessage2& aMessage );
 
         /**
          * Handles settings related requests
@@ -105,11 +106,6 @@ class CPsmSession : public CSession2
          * Pointer to NotifyModeChange async message
          */
         CPsmMessage* iNotifyModeMessage;
-
-        /**
-         * Config array for Settings handling
-         */
-        RConfigInfoArray iConfigArray;
 
     };
 

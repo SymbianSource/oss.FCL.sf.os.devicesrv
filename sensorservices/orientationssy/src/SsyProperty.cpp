@@ -52,7 +52,11 @@ CSSYProperty::CSSYProperty( const TInt /*aSensorNumber*/,
 
     for ( TInt index = 0; index < aNumberOfProperties ; index++ )
         {
-        iChannelProperties.Append( aProperties[ index ] );
+        if(iChannelProperties.Append( aProperties[ index ])!= KErrNone )
+        {
+         iChannelProperties.Reset();
+         break;
+        }
         }
 
     SSY_TRACE_OUT();

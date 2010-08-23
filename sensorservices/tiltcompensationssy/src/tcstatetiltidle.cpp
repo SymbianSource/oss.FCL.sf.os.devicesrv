@@ -75,6 +75,7 @@ void CTCStateTiltIdle::HandleEventL( TTCEventId aId, TTCEvent* /*aEvent */)
         case EEventIdHandleOpenChannel:
             {
             iTransactionHandler.ProcessTransactionL( ETCTransactionIdOpenChannel );
+            break;
             }
         default:
             {

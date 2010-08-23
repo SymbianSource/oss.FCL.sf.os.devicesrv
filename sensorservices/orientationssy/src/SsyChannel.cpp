@@ -208,7 +208,12 @@ void CSSYChannel::DoCancel()
 // CSSYChannel::RunError()
 // ----------------------------------------------------------------------------------
 // 
+#ifdef _DEBUG
 TInt CSSYChannel::RunError( TInt aError )
+#else
+// not used in UREL builds
+TInt CSSYChannel::RunError( TInt /*aError*/ )
+#endif
     {
     SSY_TRACE( EMust, "ORIENTATIONSSY:RunError %d", aError );
     

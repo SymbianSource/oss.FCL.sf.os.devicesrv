@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -72,7 +72,7 @@ class CPsmManager : public CActive
         /**
          * Register new PSM observer. Adds observer to the list of registered observers
          */
-        void RegisterObserver( MPsmModeChangeObserver* aObserver );
+        void RegisterObserverL( MPsmModeChangeObserver* aObserver );
 
         /**
          * Unreqister observer. Removes observer from the list of registered observers
@@ -88,6 +88,19 @@ class CPsmManager : public CActive
          * Makes NotifyPowerSaveModeChangeL to asynchronous
          */
         void IssueRequest();
+
+#ifdef _DEBUG        
+        /**
+         * Delete plugin loader. Used only for testing purpose
+         */         
+        void ClosePluginLoader();
+
+        /**
+         * Compress ModeObservers Array. Used only for testing purpose
+         */        
+        void CompressModeObserversArray();
+
+#endif //_DEBUG     
 
     protected: // From CActive
 

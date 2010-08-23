@@ -193,7 +193,7 @@ CAccPolHdmiSink* CEDIDHandler::CreateHdmiSinkL()
         {
         hdmiSink = CAccPolHdmiSink::NewL(
             iExtensionParserPtr->BasicAudio(),
-            iTVOutConfigForHDMI.GetTvOutConfig()->CopyProtectionStatus() );
+            ETrue );
         }
     else
         {

@@ -235,12 +235,18 @@ void CAccSrvSubControl::ConnectAccessory2L( const RMessage2& aMessage )
             }
         else
             {
-            err = notifier.StartNotifier( KAccFwUiNoteNotifierUid, KNullDesC8 );
-            if ( err != KErrNone )
-                {
-                COM_TRACE_1( "[AccFW:AccServer] CAccSrvSubControl::ConnectAccessoryL - Couldn't start notifier: err = %d", err);	
-                }
-            notifier.Close();
+            TPckg<TInt>iReplyPck(0);
+			TRequestStatus iStatus =KRequestPending;
+			notifier.StartNotifierAndGetResponse(iStatus,
+						KAccFwUiNoteNotifierUid,
+						KNullDesC8,iReplyPck);
+			User::WaitForRequest(iStatus);
+			err = iStatus.Int();
+			if(KErrNone != err) 
+				{
+				COM_TRACE_1( "[AccFW:AccServer] CAccSrvSubControl::ConnectAccessoryL - Couldn't start notifier: err = %d", err);				
+				}
+			notifier.Close();
             }
 	    }
     else

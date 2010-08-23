@@ -567,7 +567,7 @@ CResourceFile* CSsmCommandListResourceReaderImpl::CInitialiser::OpenResourceFile
 	User::LeaveIfError(file.Open(iFs, aFileName, EFileRead | EFileShareReadersOnly));
 
 	// read entire resource file into a buffer
-	TInt fileSize;
+	TInt fileSize(0);
 	User::LeaveIfError(file.Size(fileSize));
 	RBuf8 buf;
 	buf.CreateL(fileSize);

@@ -187,9 +187,9 @@ NONSHARABLE_CLASS( CAccSrvServerModel ) : public CBase
         *
         * @since S60 3.1
         * @param aGenericID Generic ID of the detected accessory.
-        * @return void
+        * @return index in the array
         */
-        void RemovePhysicalConnection( const TAccPolGenericID& aGenericID );
+        TInt RemovePhysicalConnection( const TAccPolGenericID& aGenericID );
 
         /**
         * Get current connection status, ie. all active connections.

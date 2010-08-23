@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -79,7 +79,7 @@ void CSsmSession::ServiceL(const RMessage2& aMessage)
 			const TUint swpKey = {aMessage.Int0()};
 			const TInt deslen = aMessage.GetDesLengthL(1);
 			RBuf filename;
-			filename.Create(deslen);
+			filename.CreateL(deslen);
 			filename.CleanupClosePushL();
 			aMessage.ReadL(1, filename);
 			SsmServer()->RequestRegisterSwpMappingL(swpKey, filename);
@@ -150,7 +150,7 @@ void CSsmSession::ServiceL(const RMessage2& aMessage)
 			const TUint swpKey = {aMessage.Int0()};
 			const TInt length = aMessage.GetDesLengthL(1);
 			RBuf filename;
-			filename.Create(length);
+			filename.CreateL(length);
 			filename.CleanupClosePushL();
 			aMessage.ReadL(1, filename);
 			SsmServer()->RequestDeRegisterSwpMappingL(swpKey, filename);

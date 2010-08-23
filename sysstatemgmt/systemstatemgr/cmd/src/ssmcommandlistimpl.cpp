@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -430,7 +430,7 @@ void CSsmCommandListImpl::InitialiseResourceFileL()
 		User::LeaveIfError(file.Open(rfs, iResourceFileName, EFileRead | EFileShareReadersOnly));
 		CleanupClosePushL(file);
 		// read entire resource file into a buffer
-		TInt fileSize;
+		TInt fileSize(0);
 		User::LeaveIfError(file.Size(fileSize));
 		RBuf8 buf;
 		buf.CreateL(fileSize);
