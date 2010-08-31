@@ -61,6 +61,7 @@ void RHWRMHapticsSession::Connect( TRequestStatus& aStatus )
     // server components
     if ( err == KErrNone )
         {
+		aStatus = KRequestPending;
         SendReceive( EHWRMHapticsService, aStatus );
         }
     else
@@ -115,7 +116,9 @@ void RHWRMHapticsSession::ExecuteAsyncOperation(
                                             TRequestStatus& aStatus ) const
     {
     COMPONENT_TRACE( ( _L( "RHWRMHapticsSession::ExecuteAsyncOperation - commandId(%d), aStatus(%d)" ), aCommand, aStatus.Int() ) );
-    
+
+    aStatus = KRequestPending;
+
     SendReceive( aCommand, aArgs, aStatus );
     
     COMPONENT_TRACE( ( _L( "RHWRMHapticsSession::ExecuteAsyncOperation - return" ) ) );

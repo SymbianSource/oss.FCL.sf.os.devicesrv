@@ -45,7 +45,7 @@ USERINCLUDE     ../../inc
 USERINCLUDE     ../../hapticsserver/inc
 
 OS_LAYER_SYSTEMINCLUDE
-SYSTEMINCLUDE /epoc32/include/stdapis
+OS_LAYER_LIBC_SYSTEMINCLUDE
 
 LIBRARY         efsrv.lib
 LIBRARY         estor.lib
@@ -59,3 +59,4 @@ LIBRARY         centralrepository.lib
 
 LANG            SC
 
+SMPSAFE

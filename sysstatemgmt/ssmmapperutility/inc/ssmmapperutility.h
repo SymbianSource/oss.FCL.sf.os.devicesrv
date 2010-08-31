@@ -105,7 +105,7 @@ public:
      * @aMessage Client message
      * @return ETrue if capabilities ok, otherwise EFalse
      */
-    virtual TBool CheckCaps( const RMessagePtr2& aMessage );
+    IMPORT_C virtual TBool CheckCaps( const RMessagePtr2& aMessage );
     
     /**
     * First phase constructor. Exported for 

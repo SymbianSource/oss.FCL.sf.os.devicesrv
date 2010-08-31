@@ -87,7 +87,7 @@ NONSHARABLE_CLASS( CSsyOrientationCRListener ): public CActive
 class MCenRepCallBack
     {
 public:
-    virtual void CreateConfigurations() = 0;
+    virtual TInt CreateConfigurations() = 0;
     };
 
 #endif // ORIENTATIONCRLISTENER_H

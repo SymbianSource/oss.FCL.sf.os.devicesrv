@@ -1,4 +1,4 @@
-// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
  @internalComponent
 */
 
+#include "ssmdebug.h"
 #include "cndsystemwideproperty.h"
 #include <ssm/ssmsystemwideproperty.h>
 
@@ -48,8 +49,9 @@ TBool CCndSwp::EvaluateL() const
   
     RSsmSystemWideProperty property;
 	User::LeaveIfError(property.Connect(iKey));
-	User::LeaveIfError(property.GetValue(value));
-	property.Close();
+	CleanupClosePushL(property);
+
+	SSMLOGLEAVEIFERROR(property.GetValue(value));
 	
     TBool retVal = EFalse;
     if (iConditionCheckType == ECompareValue)
@@ -60,5 +62,7 @@ TBool CCndSwp::EvaluateL() const
         {
         retVal = ((value & iCndValue) == iCndValue);
         }
+
+	CleanupStack::PopAndDestroy(&property);
     return retVal;
     }

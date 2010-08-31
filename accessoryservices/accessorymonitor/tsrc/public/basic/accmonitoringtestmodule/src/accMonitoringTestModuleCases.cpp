@@ -37,9 +37,9 @@
 //extern ?external_function( ?arg_type,?arg_type );
 
 // CONSTANTS
-_LIT( KEnter, "Enter" );
-_LIT( KOnGoing, "On-going" );
-_LIT( KExit, "Exit" );
+//_LIT( KEnter, "Enter" );
+//_LIT( KOnGoing, "On-going" );
+//_LIT( KExit, "Exit" );
 
 // MACROS
 //#define ?macro ?macro_def
@@ -139,21 +139,21 @@ const TCaseInfo CAccMonitoringTestModule::Case (
     static TCaseInfoInternal const KCases[] =
         {
         // To add new test cases, add new items to this array
-        ENTRY( "Get connected accessories (no accessories connected)", 	AccMonitorTestNoL ),
-        ENTRY( "Get connected accessories test(one accessory)", 	    AccMonitorTestOneL ),
-        ENTRY( "Get connected accessories test(multiple accessories)", 	AccMonitorTestMultiL ),
-        ENTRY( "Test has accessory capa", 								TestHasAccessoryCapaL ),
-        ENTRY( "Test has accessory different capas", 					TestHasAccessoryDifferentCapasL ),
-        ENTRY( "Start Observer test(all connections)",      			StartObservingL ),
-        ENTRY( "Start Observer test(defined type)",   					StartObserving1L ),
-        ENTRY( "Start Observer test(defined accessory)",   				StartObserving2L ),
-        ENTRY( "Start Observer test(wrong accessory)",   				StartObserving3L ),
-        ENTRY( "Start Observer test(monitor non-existing accessory)",   StartObserving4L ),
-        ENTRY( "StopObserving test",    								StopObservingL ),
-        ENTRY( "Compare Infos test",    								CompareInfosL ),
-        ENTRY( "Get value test",    									GetValueTestL ),
-        ENTRY( "Run error test",    									RunErrTestL ),
-        ENTRY( "Start observing all capas test",						StartObserverAllCapasL )        
+        ENTRY( "Get connected accessories (no accessories connected)", 	&CAccMonitoringTestModule::AccMonitorTestNoL ),
+        ENTRY( "Get connected accessories test(one accessory)", 	    &CAccMonitoringTestModule::AccMonitorTestOneL ),
+        ENTRY( "Get connected accessories test(multiple accessories)", 	&CAccMonitoringTestModule::AccMonitorTestMultiL ),
+        ENTRY( "Test has accessory capa", 								&CAccMonitoringTestModule::TestHasAccessoryCapaL ),
+        ENTRY( "Test has accessory different capas", 					&CAccMonitoringTestModule::TestHasAccessoryDifferentCapasL ),
+        ENTRY( "Start Observer test(all connections)",      			&CAccMonitoringTestModule::StartObservingL ),
+        ENTRY( "Start Observer test(defined type)",   					&CAccMonitoringTestModule::StartObserving1L ),
+        ENTRY( "Start Observer test(defined accessory)",   				&CAccMonitoringTestModule::StartObserving2L ),
+        ENTRY( "Start Observer test(wrong accessory)",   				&CAccMonitoringTestModule::StartObserving3L ),
+        ENTRY( "Start Observer test(monitor non-existing accessory)",   &CAccMonitoringTestModule::StartObserving4L ),
+        ENTRY( "StopObserving test",    								&CAccMonitoringTestModule::StopObservingL ),
+        ENTRY( "Compare Infos test",    								&CAccMonitoringTestModule::CompareInfosL ),
+        ENTRY( "Get value test",    									&CAccMonitoringTestModule::GetValueTestL ),
+        ENTRY( "Run error test",    									&CAccMonitoringTestModule::RunErrTestL ),
+        ENTRY( "Start observing all capas test",						&CAccMonitoringTestModule::StartObserverAllCapasL )        
         };
 
     // Verify that case number is valid
@@ -747,8 +747,7 @@ TInt CAccMonitoringTestModule::StartObserving1L(
     TTestResult& aResult )
     {
     __UHEAP_MARK;
-    _LIT( KStatusTest, "StartObservingTest" );
-	
+    
 	iConnectedAccessory->Reset();
 	// Enter
     CAccMonitor* api = CAccMonitor::NewL();
@@ -963,7 +962,7 @@ TInt CAccMonitoringTestModule::StartObserving3L(
     	}
     
     result = iConnectedAccessory->Exists( array );
-    if( ( err = KErrNone ) && result )
+    if( ( err == KErrNone ) && result )
     	{
     	_LIT( KDescription, "Observer set without errors");
     	aResult.SetResult( err, KDescription );
@@ -1014,7 +1013,6 @@ TInt CAccMonitoringTestModule::StartObserving4L(
     TTestResult& aResult )
     {
     __UHEAP_MARK;
-    _LIT( KStatusTest, "StartObservingTest" );
     iConnectedAccessory->Reset();
     
     // Enter
@@ -1303,8 +1301,8 @@ TInt CAccMonitoringTestModule::ConnectHeadsetL(
     CleanupStack::Pop( api );
     delete api;
     someArray.Close();
-    __UHEAP_MARKEND;
-    return err;*/
+    __UHEAP_MARKEND;*/
+    return err;
     }
 
 TInt CAccMonitoringTestModule::ConnectBTHeadsetL( 

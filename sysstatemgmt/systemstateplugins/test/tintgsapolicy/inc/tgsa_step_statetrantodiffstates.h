@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,11 +26,8 @@
 #include <test/testexecutestepbase.h>
 #include <s32file.h>
 
-_LIT(KTGsaStateTranToShutdownStep,"GsaStateTranToShutdownStep");
-_LIT(KTGsaStateTranFromShutdownStep,"GsaStateTranFromShutdownStep");
 _LIT(KTGsaStateTranFromNormalStep,"GsaStateTranFromNormalStep");
 _LIT(KTGsaStateTranFromStartupStep,"GsaStateTranFromStartupStep");
-_LIT(KTGsaStateTranFromStartuptoShutdownStep,"GsaStateTranFromStartuptoShutdownStep");
 
 class CGsaStateTranToDiffStatesTest : public CTestStep
 	{

@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -33,6 +33,11 @@ EXPORT_C void GetDeviceAttributesAsArraysL( RArray<TInt32>& aKeys, CDesC16Array&
 	value.Set(KModelNameValue);
 	aKeys.Append(KModelNameUid.iUid);
 	aValues.AppendL(value);
+
+    _LIT16(KModelCodeValue, "Symbian");
+    value.Set(KModelCodeValue);
+    aKeys.Append(KModelCodeUid.iUid);
+    aValues.AppendL(value);	
 	
 	_LIT16(KRevisionIDValue, "001.234");
 	value.Set(KRevisionIDValue);

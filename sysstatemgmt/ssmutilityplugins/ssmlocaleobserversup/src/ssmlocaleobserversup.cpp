@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
 #include <bautils.h>
 #include <connect/sbdefs.h>
 #include <s32file.h>
+#include <e32reg.h>
 
 #include "ssmmapperutilitystatic.h"
 #include "ssmlocaleobserversup.h"
@@ -30,9 +31,8 @@
 */
 _LIT( KLocaleDataDir, "\\private\\2000d766\\localedata\\" );
 
-/** Name is LocaleData.Dnn or CommonData.D00 */
-_LIT( KFileName, "LocaleData.D" );
-_LIT( KCommonFileName, "CommonData.D" );
+/** Name is RegionData.Dnn */
+_LIT( KFileName, "RegionData.D" );
 
 /**
 * Version number from 1..255 to indicate data
@@ -40,6 +40,9 @@ _LIT( KCommonFileName, "CommonData.D" );
 * version ID.
 */
 const TInt KCurrentVersionNumber = 2; // For fixing TChar r/w
+
+/** The maximum number of regions to be appended to the hash set. */
+const TInt KMaxNumberOfRegions = 56;
 
 // ======== LOCAL FUNCTIONS ========
 
@@ -64,7 +67,7 @@ static TInt EnvChangeNotifierCallback( TAny* aThis )
 static HBufC* MakeFileNameL( const TDesC& aPath, const TDesC& aName, const TInt aCode )
     {
     FUNC_LOG;
-    INFO_3( "Locale data dir: %S, file name base: %S, lang code: %d", &aPath, &aName, aCode );
+    INFO_3( "Region data dir: %S, file name base: %S, region code: %d", &aPath, &aName, aCode );
 
     TInt length = aPath.Length();
 
@@ -84,11 +87,21 @@ static HBufC* MakeFileNameL( const TDesC& aPath, const TDesC& aName, const TInt 
         }
     ptr.AppendNum( aCode );
 
-    INFO_1( "Locale data file: %S", buffer );
+    INFO_1( "Region data file: %S", buffer );
 
     return buffer;
     }
 
+inline TUint32 HashLangRegionMappingFunction(const TLanguageRegion& aMapping)
+    {
+    return aMapping.iLanguage;
+    }
+
+inline TBool HashLangRegionMappingIdentityRelation(const TLanguageRegion& aMapping1,
+    const TLanguageRegion& aMapping2)
+    {
+    return (aMapping1.iLanguage == aMapping2.iLanguage);
+    }
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -112,6 +125,7 @@ CSsmLocaleObserverSup::~CSsmLocaleObserverSup()
     FUNC_LOG;
 
     Cancel();
+    iLangRegionMappingHashSet.Close();
     delete iEnvChangeNotifier;
     iFs.Close();
     iProperty.Close();
@@ -133,7 +147,7 @@ void CSsmLocaleObserverSup::EnvChangeOccurredL()
     if ( !iRestoreActive && ( changes & EChangesLocale ) )
         {
         TParsePtrC parse( KLocaleDataDir );
-        SaveLocaleL( parse.FullName() );
+        SaveRegionL( parse.FullName() );
         }
 
     if( changes & EChangesSystemTime )
@@ -185,9 +199,9 @@ void CSsmLocaleObserverSup::RunL()
                 iRestoreActive = EFalse;
 
                 TParsePtrC parse( KLocaleDataDir );
-                TRAP( err, LoadLocaleL( parse.FullName() ) );
+                TRAP( err, LoadRegionL( parse.FullName() ) );
                 ERROR( err, "Failed to load locale" );
-                // Can not do anything about the error - just continue.
+                // Cannot do anything about the error - just continue.
                 }
             }
         }
@@ -218,6 +232,8 @@ void CSsmLocaleObserverSup::InitializeL()
     ERROR( err, "Failed to connect to file server" );
     User::LeaveIfError( err );
 
+    InitializeRegionMappingL();
+    
     TRAP( err, iEnvChangeNotifier = CEnvironmentChangeNotifier::NewL(
         CActive::EPriorityStandard,
         TCallBack( EnvChangeNotifierCallback, this ) ) );
@@ -235,8 +251,8 @@ void CSsmLocaleObserverSup::StartL()
     FUNC_LOG;
 
     TParsePtrC parse( KLocaleDataDir );
-    TRAPD_ERR( err, LoadLocaleL( parse.FullName() ) );
-    ERROR( err, "Failed to load locale data the first time" );
+    TRAPD_ERR( err, LoadRegionL( parse.FullName() ) );
+    ERROR( err, "Failed to load region data the first time" );
 
     if ( iEnvChangeNotifier )
         {
@@ -268,7 +284,8 @@ void CSsmLocaleObserverSup::Release()
 //
 CSsmLocaleObserverSup::CSsmLocaleObserverSup()
   : CActive( EPriorityNormal ),
-    iRestoreActive( EFalse )
+    iRestoreActive( EFalse ),
+    iLangRegionMappingHashSet( &::HashLangRegionMappingFunction, &::HashLangRegionMappingIdentityRelation )
     {
     FUNC_LOG;
 
@@ -291,15 +308,16 @@ void CSsmLocaleObserverSup::Activate()
 
 
 // ---------------------------------------------------------------------------
-// CSsmLocaleObserverSup::SaveLocaleL
+// CSsmLocaleObserverSup::SaveRegionL
 // ---------------------------------------------------------------------------
 //
-void CSsmLocaleObserverSup::SaveLocaleL( const TDesC& aPath )
+void CSsmLocaleObserverSup::SaveRegionL( const TDesC& aPath )
     {
     FUNC_LOG;
-    INFO( "Saving locale data" );
-
-    HBufC* fName = MakeFileNameL( aPath, KFileName, User::Language() );
+    INFO( "Saving region data" );
+    
+    TInt region = MappedRegionL(User::Language());
+    HBufC* fName = MakeFileNameL( aPath, KFileName, region);
     CleanupStack::PushL( fName );
 
     RFileWriteStream fStream;
@@ -365,9 +383,6 @@ void CSsmLocaleObserverSup::SaveLocaleL( const TDesC& aPath )
     fStream.WriteInt8L( locale.NegativeCurrencySymbolOpposite() );
     fStream.WriteInt16L( locale.DigitType() );
 
-    // Then save display language independent data
-    SaveIndependentDataL( locale, aPath );
-
     // If CommitL leaves it means probably full disk.
     // It is here assumed that data has not been changed if this leaves.
     fStream.CommitL();
@@ -378,15 +393,16 @@ void CSsmLocaleObserverSup::SaveLocaleL( const TDesC& aPath )
 
 
 // ---------------------------------------------------------------------------
-// CSsmLocaleObserverSup::LoadLocaleL
+// CSsmLocaleObserverSup::LoadRegionL
 // ---------------------------------------------------------------------------
 //
-void CSsmLocaleObserverSup::LoadLocaleL( const TDesC& aPath )
+void CSsmLocaleObserverSup::LoadRegionL( const TDesC& aPath )
     {
     FUNC_LOG;
-    INFO( "Loading locale data" );
+    INFO( "Loading region data" );
 
-    HBufC* fName = MakeFileNameL( aPath, KFileName, User::Language() );
+    TInt region = MappedRegionL(User::Language());
+    HBufC* fName = MakeFileNameL( aPath, KFileName, region);
     CleanupStack::PushL( fName );
 
     TLocale locale; // copy current values
@@ -404,7 +420,7 @@ void CSsmLocaleObserverSup::LoadLocaleL( const TDesC& aPath )
     if ( err == KErrNone  )
         {
         TInt version = fStream.ReadInt8L();
-        INFO_1( "Locale file version: %d", version );
+        INFO_1( "Region file version: %d", version );
 
         locale.SetCountryCode( fStream.ReadInt16L() );
         fStream.ReadInt16L(); // obsolete
@@ -450,10 +466,6 @@ void CSsmLocaleObserverSup::LoadLocaleL( const TDesC& aPath )
         locale.SetDigitType( static_cast< TDigitType >( fStream.ReadInt16L() ) );
         }
 
-    // Then patch data with locale independent data (code 00)
-    // No changes to locale if no independent data can be found (the very first boot)
-    LoadIndependentDataL( locale, aPath );
-
     // Save changes to the system.
     locale.Set();
 
@@ -461,93 +473,83 @@ void CSsmLocaleObserverSup::LoadLocaleL( const TDesC& aPath )
     CleanupStack::PopAndDestroy( fName );
     }
 
-
-// ---------------------------------------------------------------------------
-// CSsmLocaleObserverSup::SaveIndependentDataL
-// ---------------------------------------------------------------------------
-//
-void CSsmLocaleObserverSup::SaveIndependentDataL(
-    const TLocale& aLocale,
-    const TDesC& aPath )
+void CSsmLocaleObserverSup::InitializeRegionMappingL()
     {
-    FUNC_LOG;
-
-    // Get old independent data, if any.
-    TLocale savedLoc;
-    TRAPD( err, LoadIndependentDataL( savedLoc, aPath ) );
-    ERROR( err, "Failed to load locale independent data" );
-
-    HBufC* fName = MakeFileNameL( aPath, KCommonFileName, 0 );
-    CleanupStack::PushL( fName );
-    RFileWriteStream fStream;
-    CleanupClosePushL( fStream );
-
-    err = iFs.MkDirAll( *fName ); // Ignore errors
-    err = fStream.Create( iFs, *fName, EFileWrite );
-    if ( err == KErrAlreadyExists )
-        {
-        // Override
-        err = fStream.Open( iFs, *fName, EFileWrite );
-        ERROR_1( err, "Failed to create stream %S", fName );
-        }
-    User::LeaveIfError( err );
-
-    // Write first the version number to enable support for file format changes.
-    fStream.WriteInt8L( KCurrentVersionNumber );
-    fStream.WriteInt32L( 0 ); // Universal time offset is not part of TLocale
-                              // any more. Write zero here to keep file structure.
-    // Clock format is also common.
-    fStream.WriteUint32L( aLocale.ClockFormat() );
-    fStream.WriteUint32L( 0 );  // reserved 2
-    fStream.WriteUint32L( 0 );  // reserved 3
-
-    fStream.CommitL();
-
-    CleanupStack::PopAndDestroy( &fStream );
-    CleanupStack::PopAndDestroy( fName );
+    //Reserve the memory for the number of mappings to be appended
+    iLangRegionMappingHashSet.ReserveL( KMaxNumberOfRegions );
+    
+    //Insert the Language - Region mapping
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish,             ERegGBR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangFrench,              ERegFRA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangGerman,              ERegDEU ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangSpanish,             ERegESP ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangItalian,             ERegITA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangSwedish,             ERegSWE ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangDanish,              ERegDNK ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangNorwegian,           ERegNOR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangFinnish,             ERegFIN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangAmerican,            ERegUSA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangPortuguese,          ERegPRT ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangTurkish,             ERegTUR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangIcelandic,           ERegISL ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangRussian,             ERegRUS ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHungarian,           ERegHUN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangDutch,               ERegNLD ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangBelgianFlemish,      ERegBEL ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangCzech,               ERegCZE ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangSlovak,              ERegSVK ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangPolish,              ERegPOL ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangSlovenian,           ERegSVN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangTaiwanChinese,       ERegTWN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHongKongChinese,     ERegHKG ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangPrcChinese,          ERegCHN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangJapanese,            ERegJPN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangThai,                ERegTHA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangArabic,              ERegARE ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangTagalog,             ERegPHL ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangBulgarian,           ERegBGR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangCatalan,             ERegESP ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangCroatian,            ERegHRV ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEstonian,            ERegEST ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangFarsi,               ERegIRN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangCanadianFrench,      ERegCAN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangGreek,               ERegGRC ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHebrew,              ERegISR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHindi,               ERegIND ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangIndonesian,          ERegIDN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangLatvian,             ERegLVA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangLithuanian,          ERegLTU ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangMalay,               ERegMYS ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangBrazilianPortuguese, ERegBRA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangRomanian,            ERegROU ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangSerbian,             ERegSCG ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangLatinAmericanSpanish, ERegMEX ));
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangUkrainian,           ERegUKR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangUrdu,                ERegPAK ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangVietnamese,          ERegVNM ) );
+#ifdef __E32LANG_H__
+    // 5.0
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangBasque,              ERegESP ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangGalician,            ERegESP ) );
+#endif //__E32LANG_H__
+#if !defined(__SERIES60_31__)
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_Apac,        ERegGBR ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_Taiwan,      ERegTWN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_HongKong,    ERegHKG ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_Prc,         ERegCHN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_Japan,       ERegJPN ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangEnglish_Thailand,    ERegTHA ) );
+    iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangMalay_Apac,          ERegMYS ) );
+#endif //!defined(__SERIES60_31__)
     }
 
-
 // ---------------------------------------------------------------------------
-// CSsmLocaleObserverSup::LoadIndependentDataL
+// CSsmLocaleObserverSup::MappedRegionL
 // ---------------------------------------------------------------------------
 //
-void CSsmLocaleObserverSup::LoadIndependentDataL(
-    TLocale& aLocale,
-    const TDesC& aPath )
+TInt CSsmLocaleObserverSup::MappedRegionL(const TInt aLanguage)
     {
     FUNC_LOG;
-
-    HBufC* fName = MakeFileNameL( aPath, KCommonFileName, 0 );
-    CleanupStack::PushL( fName );
-
-    RFileReadStream fStream;
-    CleanupClosePushL( fStream );
-    TInt err = fStream.Open( iFs, *fName, EFileRead );
-    if ( err != KErrNotFound && err != KErrPathNotFound )
-        {
-        ERROR_1( err, "Failed to open stream %S", fName );
-        // Data file is missing upon the first boot or when switching into a
-        // language for the first time
-        }
-
-    if ( err == KErrNotFound || err == KErrPathNotFound )
-        {
-        // File not found --> Not an error because
-        // this is a new file and older builds do not have this file.
-        INFO( "No locale data found" );
-        }
-    else
-        {
-        User::LeaveIfError( err );
-
-        fStream.ReadInt8L();    // Version.
-        fStream.ReadInt32L();   // Universal time offset was stored here.
-        aLocale.SetClockFormat( ( TClockFormat ) fStream.ReadUint32L() );
-        fStream.ReadUint32L(); // reserved 2
-        fStream.ReadUint32L(); // reserved 3
-        }
-
-    CleanupStack::PopAndDestroy( &fStream );
-    CleanupStack::PopAndDestroy( fName );
-    }
+    TLanguageRegion langRegion = iLangRegionMappingHashSet.FindL(TLanguageRegion(aLanguage));
+    return langRegion.iRegion;
+    }    

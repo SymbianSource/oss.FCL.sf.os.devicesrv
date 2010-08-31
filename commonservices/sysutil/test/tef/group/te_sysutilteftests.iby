@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -44,9 +44,13 @@ data = EPOCROOT##epoc32\data\z\testdata\inifiles\te_sysutildata.ini								\test
 #define SYSUTIL_Z_DRIVE_FILES_PRESENT
 data = EPOCROOT##epoc32\data\z\resource\versions\lang.txt										\resource\versions\lang.txt
 data = EPOCROOT##epoc32\data\z\resource\versions\langsw.txt										\resource\versions\langsw.txt
-data = EPOCROOT##epoc32\data\z\resource\versions\sw.txt											\resource\versions\sw.txt
 data = EPOCROOT##epoc32\data\z\resource\versions\purpose.txt									\resource\versions\purpose.txt
 #endif
+
+data = EPOCROOT##epoc32\data\z\resource\versions\test\lang.txt									\resource\versions\test\lang.txt
+data = EPOCROOT##epoc32\data\z\resource\versions\test\langsw.txt								\resource\versions\test\langsw.txt
+data = EPOCROOT##epoc32\data\z\resource\versions\test\sw.txt									\resource\versions\test\sw.txt
+data = EPOCROOT##epoc32\data\z\resource\versions\test\purpose.txt								\resource\versions\test\purpose.txt
 
 data = EPOCROOT##epoc32\data\z\resource\versions\nocontent\lang.txt								\resource\versions\nocontent\lang.txt
 data = EPOCROOT##epoc32\data\z\resource\versions\nocontent\langsw.txt							\resource\versions\nocontent\langsw.txt

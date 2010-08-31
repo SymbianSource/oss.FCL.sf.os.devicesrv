@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -71,28 +71,16 @@ RESOURCE SSM_COMMAND_LIST r_started_commands
         r_cmd_devlockcheck,         // prio 0xFFD7 - Security code query, if needed
         r_cmd_startanim,            // prio 0xFFC7 - Startup animation(s)
         r_cmd_waitanim,             // prio 0xFFB7 - Wait for the animations to finish
-		r_cmd_adtupdater,			// prio 0xFFAA - Location, date & time queries //CR:ESAH-84JFCU
         r_cmd_enableappskey,        // prio 0xFFA7 - Enable applications key
         r_cmd_enableglobalnotes,    // prio 0xFFA7 - Enable global notes
         r_cmd_swidaemon             // prio 0xFF97 - Initializes pre-installed applications from memory card
-		};
+        };
     }
 
 // ===========================================================================
 // Command items in alphabetical order
 // ===========================================================================
 //
-
-// ---------------------------------------------------------------------------
-// r_cmd_adtupdater
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_adtupdater
-    {
-    priority = 0xFFAA;
-    name = "adtupdater.exe";
-    execution_behaviour = ESsmFireAndForget;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_devlockcheck

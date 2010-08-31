@@ -156,8 +156,7 @@ const TSSyChannelProperties KSSySensorProperties[] =
             KNoRealValue,
             0,                                  // iMinValue
             KNoRealValue,
-            ETrue,                             // iReadOnly. Default value is not readonly, it is set
-                                                // to read only when updated.
+            ETrue,                             // iReadOnly. 
             ESensrvIntProperty                  // iPropertyType
         }
     };

@@ -109,7 +109,7 @@ EXPORT_C TInt RSsmSusCli::RequestLoadSup(const TSsmSupInfo& aUtilityPluginDetail
  Usage pattern:
  @code
 	RSsmSusCli session;
-	session.Connect();
+	User::LeaveIfError(fs.Connect());
 	CleanupStackClosePushL(session);
 	TPckgC<TSsmSupInfo>* infoBuf = new (ELeave) TPckgC<TSsmSupInfo>(info);
 	session.RequestLoadSup(*infoBuf, status);

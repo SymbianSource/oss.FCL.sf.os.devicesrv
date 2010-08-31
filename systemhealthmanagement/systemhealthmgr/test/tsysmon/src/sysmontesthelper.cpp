@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,7 @@
 #include "sysmontesthelper.h"
 #include <f32file.h>
 #include <s32file.h>
+#include <e32property.h>
 
 _LIT(KEIgnoreOnFailure, "EIgnoreOnFailure");
 _LIT(KERestartOS, "ERestartOS");
@@ -135,6 +136,7 @@ EXPORT_C void CSysMonTestHelper::GetResultIntL(const TDesC& aTestId, TInt& aResu
 	fileName.Append(KResultsRoot);
 	fileName.Append(aTestId);
 	
+	RDebug::Print(_L("Checking in file: %S"), &fileName);
 	RFs fs;
 	User::LeaveIfError(fs.Connect());
 	CleanupClosePushL(fs);
@@ -180,6 +182,7 @@ EXPORT_C TInt CSysMonTestHelper::ReadRunCountL(const TDesC& aProcessFilename)
 	fileName.Append(KRunCountsRoot);
 	fileName.Append(parse.NameAndExt());
 	fileName.Append(KTxtExtension);
+	RDebug::Print(_L("Checking in file: %S"), &fileName);
 
 	RFileReadStream file;
 	TInt err = 0;
@@ -264,32 +267,11 @@ EXPORT_C TInt CSysMonTestHelper::GetRestartCountL()
 	return result;
 	}
 
-EXPORT_C TInt CSysMonTestHelper::GetRegisterCountL()
+EXPORT_C TInt CSysMonTestHelper::GetRegisterCount(TInt aKey)
 	{
-	RFs fs;
-	User::LeaveIfError(fs.Connect());
-	CleanupClosePushL(fs);
-	
-	RFile file;
-	TInt err = 0;
-	err = file.Open(fs, KRegisterCountFile, EFileRead);
 	TInt result = 0;
-	if (err == KErrNotFound || err == KErrPathNotFound)
-		{
-		CleanupStack::PopAndDestroy(&fs);
-		}
-	else
-		{
-		CleanupClosePushL(file);
-		User::LeaveIfError(err);
-		TBuf8<11> content;
-		file.Read(content);
-		content.Delete(0,9);
-		TLex8 myLex(content);
-		User::LeaveIfError(myLex.Val(result));
-		file.Close();
-		CleanupStack::PopAndDestroy(2, &fs);
-		}
+	TInt error = RProperty::Get(KTestSysMon, aKey, result);
+	RDebug::Printf("RProperty::Get() with key %d returned with %d", aKey, error);
 	return result;
 	}
 	

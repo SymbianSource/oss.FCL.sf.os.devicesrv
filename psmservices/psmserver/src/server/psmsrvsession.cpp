@@ -14,7 +14,8 @@
 * Description:  PSM Server session
 *
 */
-
+#include <centralrepository.h>
+#include <psmsrvdomaincrkeys.h>
 #include <e32property.h>
 #include <connect/sbdefs.h>
 #include <psmsettingsprovider.h>
@@ -111,9 +112,6 @@ CPsmSession::~CPsmSession()
         COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::~CPsmSession - No pending requests") ) );
         }
 
-    // Reset and close config array
-    iConfigArray.Reset();
-    iConfigArray.Close();
 
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::~CPsmSession - return") ) );
     }
@@ -125,41 +123,28 @@ CPsmSession::~CPsmSession()
 void CPsmSession::ServiceL( const RMessage2& aMessage )
     {
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceL()" ) ) );
-
-    TRAPD( error, DispatchL( aMessage ) );
-
-    // Complete message with error code if there were errors
-    if ( KErrNone != error )
-        {
-        COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceL() - Error: %i" ), error ) );
-        aMessage.Complete( error );
-        }
-
-    COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceL - return" ) ) );
-    }
-
-// -----------------------------------------------------------------------------
-// CPsmSession::DispatchL
-// -----------------------------------------------------------------------------
-//
-void CPsmSession::DispatchL( const RMessage2& aMessage )
-    {
-    COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::DispatchL()" ) ) );
-
     switch ( aMessage.Function() )
         {
         case EPsmServerNotifyModeChange: // For power save mode change
             {
             TInt mode = aMessage.Int0();
-            if ( !iNotifyModeMessage )
-                {
-                // Create message wrapper if not yet created
-                iNotifyModeMessage = CPsmMessage::NewL( iPsmManager );
-                iPsmManager.RegisterObserver( iNotifyModeMessage );
-                }
-
-            // Check that mode to be set is valid, otherwise error code.
-            if( mode == iPsmManager.SettingsProvider().Mode() )
+			if ( !iNotifyModeMessage )
+				{
+				// Create message wrapper if not yet created
+				CPsmMessage* notifyModeMessage = CPsmMessage::NewL( iPsmManager );
+				CleanupStack::PushL(notifyModeMessage);
+				iPsmManager.RegisterObserverL( notifyModeMessage );
+				CleanupStack::Pop(notifyModeMessage);
+				iNotifyModeMessage = notifyModeMessage;
+				}
+				
+			//Check whether the mode is already set .
+			TInt cenrepMode( 0 );
+			CRepository* cenrep = CRepository::NewLC( KCRUidPowerSaveMode );
+			User::LeaveIfError(cenrep->Get( KPsmCurrentMode, cenrepMode ));
+			CleanupStack::PopAndDestroy( cenrep );
+			// Check that mode to be set is valid, otherwise error code.
+            if( mode == cenrepMode )
                 {
                 User::Leave( KErrAlreadyExists );
                 }
@@ -188,12 +173,6 @@ void CPsmSession::DispatchL( const RMessage2& aMessage )
         case EPsmServerGetSettings: // For PSM settings
         case EPsmServerBackupSettings: // For PSM settings
             {
-            // Check previous config
-            if ( iConfigArray.Count() > 0 )
-                {
-                iConfigArray.Reset();
-                }
-
             // Handle settings requests in different function
             HandleSettingsRequestL( aMessage );
             break;
@@ -224,8 +203,11 @@ void CPsmSession::DispatchL( const RMessage2& aMessage )
             if ( !iNotifyModeMessage )
                 {
                 // Create message wrapper if not yet created
-                iNotifyModeMessage = CPsmMessage::NewL( iPsmManager );
-                iPsmManager.RegisterObserver( iNotifyModeMessage );
+                CPsmMessage* notifyModeMessage = CPsmMessage::NewL( iPsmManager );
+				CleanupStack::PushL(notifyModeMessage);
+				iPsmManager.RegisterObserverL( notifyModeMessage );
+				CleanupStack::Pop(notifyModeMessage);
+				iNotifyModeMessage = notifyModeMessage;
                 }
             iNotifyModeMessage->Initialize( aMessage );
             break;
@@ -247,15 +229,77 @@ void CPsmSession::DispatchL( const RMessage2& aMessage )
             aMessage.Complete( KErrNone );
             break;
             }
+#ifdef _DEBUG    
+        case EDebugHeapMark:
+            {        
+            COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession - EDebugMarkHeap: Alloc Cells: %d."), User::CountAllocCells()));            
+            __UHEAP_MARK;
+            aMessage.Complete(KErrNone);
+            break;
+            }
+            
+        case EDebugHeapMarkEnd:
+            {
+            COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession - EDebugMarkHeapEnd: Alloc Cells: %d."), User::CountAllocCells()));
+            if ( iNotifyModeMessage )
+                {
+                // Unregister observer from manager
+                iPsmManager.UnregisterObserver( iNotifyModeMessage );
+                // Compress the observer array
+                iPsmManager.CompressModeObserversArray();
+                // Finally delete message
+                delete iNotifyModeMessage;
+                iNotifyModeMessage = NULL;
+                }
+            iPsmManager.ClosePluginLoader();
+            __UHEAP_MARKEND;
+            aMessage.Complete(KErrNone);
+            break;
+            }
+            
+        case EDebugSetHeapFailure:
+            {
+            COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession - EDebugSetHeapFailure: Value of Failure Rate: %d."), aMessage.Int0()));            
+            __UHEAP_SETFAIL(RAllocator::EFailNext,aMessage.Int0());
+            aMessage.Complete(KErrNone);
+            break;
+            }
+            
+        case EDebugHeapReset:
+            {
+            COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession - EDebugHeapReset ")));            
+            __UHEAP_RESET;
+            aMessage.Complete(KErrNone);
+            break;
+            }            
+#endif
         default:
             {
             COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceL() - unknown request: %i - ERROR" ), aMessage.Function() ) );
             User::Leave( KErrUnknown );
             }
         }
-
-    COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::DispatchL - return" ) ) );
+    COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceL - return" ) ) );
     }
+
+// -----------------------------------------------------------------------------
+// CPsmSession::ServiceError
+// -----------------------------------------------------------------------------
+//
+void CPsmSession::ServiceError(const RMessage2 &aMessage, TInt aError)
+    {
+    // Complete message with error code if there were errors
+    COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::ServiceError() - Error: %i" ), aError ) );
+    if (iNotifyModeMessage && (aMessage.Handle() == iNotifyModeMessage->MessageHandle()) )
+        {
+        iNotifyModeMessage->Complete( aError );           
+        }
+    else
+        {
+        aMessage.Complete( aError );
+        }
+    }
+
 
 // -----------------------------------------------------------------------------
 // CPsmSession::HandleSettingsRequestL
@@ -265,37 +309,62 @@ void CPsmSession::HandleSettingsRequestL( const RMessage2& aMessage )
     {
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL()" ) ) );
 
+    RConfigInfoArray configArray;
+    CleanupClosePushL(configArray);
     // read config array from message
-    ReadConfigArrayL( iConfigArray, aMessage );
+    ReadConfigArrayL( configArray, aMessage );
     // Get storage UID
     TUint32 storage = aMessage.Int2();
 
     TInt err( KErrNone );
 
-    if ( aMessage.Function() == EPsmServerBackupSettings )
+    switch ( aMessage.Function() )
         {
-        iPsmManager.SettingsProvider().BackupSettingsL( iConfigArray, storage );
-        }
-    else 
-        {
-        if ( aMessage.Function() == EPsmServerGetSettings )
+        case EPsmServerBackupSettings: // For server backup settings
             {
-            iPsmManager.SettingsProvider().GetSettingsL( iConfigArray, storage );
+            iPsmManager.SettingsProvider().BackupSettingsL( configArray, storage );
+            break;
             }
-        else
+        case EPsmServerGetSettings: // For getting server settingspower save mode change
             {
-            // EPsmServerChangeSettings
-            iPsmManager.SettingsProvider().BackupAndGetSettingsL( iConfigArray, storage );
+            iPsmManager.SettingsProvider().GetSettingsL( configArray, storage );
+            // check whether the configArray is empty before writing the value back to message.
+            if(configArray.Count() > 0)
+                {
+                // write changed values back to message
+                TInt arraySize( configArray.Count() * sizeof( TPsmsrvConfigInfo ) );
+                TPtr8 arrayPtr( reinterpret_cast<TUint8*>(&configArray[0]), arraySize, arraySize );
+                err = aMessage.Write( 0, arrayPtr );
+                COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL - New data wrote to message: %i" ), err ) );
+                }
+            else
+                {
+                ERROR_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL - Config Array is Empty" )) );
+                }
+            break;
             }
-
-        // We have to write changed values back to message
-        TInt arraySize( iConfigArray.Count() * sizeof( TPsmsrvConfigInfo ) );
-        TPtr8 arrayPtr( reinterpret_cast<TUint8*>(&iConfigArray[0]), arraySize, arraySize );
-        err = aMessage.Write( 0, arrayPtr );
-        ERROR_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL - New data wrote to message: %i" ), err ) );
+        case EPsmServerChangeSettings: // For changing the settings
+            {
+            // We have to write changed values back to message
+            iPsmManager.SettingsProvider().BackupAndGetSettingsL( configArray, storage );
+            // We have to write changed values back to message
+            TInt arraySize( configArray.Count() * sizeof( TPsmsrvConfigInfo ) );
+            TPtr8 arrayPtr( reinterpret_cast<TUint8*>(&configArray[0]), arraySize, arraySize );
+            err = aMessage.Write( 0, arrayPtr );
+            ERROR_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL - New data wrote to message: %i" ), err ) );
+            break;
+            }
+        default:
+            {
+            COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL() - unknown request: %i - ERROR" ), aMessage.Function() ) );
+            User::Leave( KErrUnknown );
+            }
         }
     // Complete message before destroying local config array
     aMessage.Complete( err );
+			
+    CleanupStack::PopAndDestroy(&configArray);
+
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSession::HandleSettingsRequestL - return" ) ) );
     }
 
@@ -310,10 +379,8 @@ void CPsmSession::ReadConfigArrayL( RConfigInfoArray& aArray, const RMessage2& a
     const TInt configCount( aMessage.Int1() );
     TInt arrayLength( configCount * sizeof( TPsmsrvConfigInfo ) );
 
-    // There is no ResizeL() for RArray
-    // ReserveL() does not change iCount, which will
-    // result array[0] failure (access beyond array index)
-    // That is why we fill the array with dummy items
+    aArray.ReserveL(configCount);    
+    //Fill the array with dummy items
     for(TInt x = 0; x < configCount; ++x )
     	{
         // Append empty config infos to array

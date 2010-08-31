@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -71,6 +71,16 @@ TVerdict CStepRestartThrottle::doTestStepL()
 
 void CStepRestartThrottle::DoTestMonitor()
 	{
+    TInt millisecs1 =0;
+    TDateTime datetime;
+    TTime time;
+    time.HomeTime();
+    datetime = time.DateTime();
+    millisecs1 = (datetime.MicroSecond() / 1000) + 
+                (datetime.Second() * 1000) + 
+                (datetime.Minute() * 60 * 1000) +
+                (datetime.Hour() * 60 * 60 * 1000);
+                
 	//Sleep 14 seconds and then assert that the server is not yet restarted
 	INFO_PRINTF1(_L("Going to sleep for 14 seconds."));		
 	User::After(KThrottleTime - 1000000);
@@ -91,11 +101,22 @@ void CStepRestartThrottle::DoTestMonitor()
 	INFO_PRINTF1(_L("Waiting till the process is restarted using semaphore."));		
 	//Wait for the process to be restarted 
 	iProcStartSignalSem.Wait();
+	
+    time.HomeTime();
+    datetime = time.DateTime();
+    TInt millisecs2 = 0;
+    millisecs2 = (datetime.MicroSecond() / 1000) + 
+                (datetime.Second() * 1000) + 
+                (datetime.Minute() * 60 * 1000) +
+                (datetime.Hour() * 60 * 60 * 1000);
 		
 	//Assert that the server is running
 	INFO_PRINTF1(_L("Woke up, now the server should be restarted (sysmon KWaitTime is 15s)."));		
 	err = server.Connect();
 	TESTE(KErrNone == err, err);
+	INFO_PRINTF2(_L("Server restarted after %d ms"), (millisecs2 - millisecs1));
+	//Testing whether the server restarted after the throttle time, which is 15s
+	TEST((millisecs2 - millisecs1) >= 15000);
 	if(KErrNone == err)
 		{
 		INFO_PRINTF1(_L("Yes, asserted that server is running, going to cancel monitoring shutdown server"));		

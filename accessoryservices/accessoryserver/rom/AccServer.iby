@@ -21,20 +21,20 @@
 
 #ifdef __ACCESSORY_FW
 
-file=ABI_DIR\BUILD_DIR\AccAudioControl.dll              SHARED_LIB_DIR\AccAudioControl.dll
-file=ABI_DIR\BUILD_DIR\AccBTControl.dll                 SHARED_LIB_DIR\AccBTControl.dll
-file=ABI_DIR\BUILD_DIR\AccClient.dll                    SHARED_LIB_DIR\AccClient.dll
-file=ABI_DIR\BUILD_DIR\AccControl.dll                   SHARED_LIB_DIR\AccControl.dll
-file=ABI_DIR\BUILD_DIR\AccPolicy.dll                    SHARED_LIB_DIR\AccPolicy.dll
-file=ABI_DIR\BUILD_DIR\AccPolCom.dll                    SHARED_LIB_DIR\AccPolCom.dll
-file=ABI_DIR\BUILD_DIR\AccPolicyDB.dll                  SHARED_LIB_DIR\AccPolicyDB.dll
-file=ABI_DIR\BUILD_DIR\AccServer.exe                    PROGRAMS_DIR\AccServer.exe
-file=ABI_DIR\BUILD_DIR\AsyComms.dll                     SHARED_LIB_DIR\AsyComms.dll
-file=ABI_DIR\BUILD_DIR\AsyProxy.dll                     SHARED_LIB_DIR\AsyProxy.dll
+file=ABI_DIR\BUILD_DIR\accaudiocontrol.dll              SHARED_LIB_DIR\AccAudioControl.dll
+file=ABI_DIR\BUILD_DIR\accbtcontrol.dll                 SHARED_LIB_DIR\AccBTControl.dll
+file=ABI_DIR\BUILD_DIR\accclient.dll                    SHARED_LIB_DIR\AccClient.dll
+file=ABI_DIR\BUILD_DIR\acccontrol.dll                   SHARED_LIB_DIR\AccControl.dll
+file=ABI_DIR\BUILD_DIR\accpolicy.dll                    SHARED_LIB_DIR\AccPolicy.dll
+file=ABI_DIR\BUILD_DIR\accpolcom.dll                    SHARED_LIB_DIR\AccPolCom.dll
+file=ABI_DIR\BUILD_DIR\accpolicydb.dll                  SHARED_LIB_DIR\AccPolicyDB.dll
+file=ABI_DIR\BUILD_DIR\accserver.exe                    PROGRAMS_DIR\AccServer.exe
+file=ABI_DIR\BUILD_DIR\asycomms.dll                     SHARED_LIB_DIR\AsyComms.dll
+file=ABI_DIR\BUILD_DIR\asyproxy.dll                     SHARED_LIB_DIR\AsyProxy.dll
 file=ABI_DIR\BUILD_DIR\accsrvutil.dll                   SHARED_LIB_DIR\accsrvutil.dll
 file=ABI_DIR\BUILD_DIR\accpolaudiodevicetopology.dll	SHARED_LIB_DIR\accpolaudiodevicetopology.dll
 
-data=ZPRIVATE\100012A5\policy\10205030.spd              \private\100012A5\policy\10205030.spd
+data=ZPRIVATE\100012a5\policy\10205030.spd              \private\100012A5\policy\10205030.spd
 
 #endif // __ACCESSORY_FW
 

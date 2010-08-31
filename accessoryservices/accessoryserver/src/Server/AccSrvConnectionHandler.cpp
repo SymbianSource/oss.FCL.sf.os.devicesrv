@@ -238,7 +238,6 @@ void CAccSrvConnectionHandler::StartConnectionHandlingL(
     TBool aUpdatedConnection )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling()" );
-    #define UNMASK_LINE_OUT(selectionListBitmask)  (selectionListBitmask & (~KASLineOut))
 
     iGenericID = aGenericID;
     iConnectionUpdate = aUpdatedConnection;
@@ -247,95 +246,81 @@ void CAccSrvConnectionHandler::StartConnectionHandlingL(
     if ( aEvaluateConnectionRules )
         {
   		COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling() - Evaluate connection rules" );
- 
-    	//check rules
-    	TUint32 selectionListBitmask( 0 );	
-    	iPolicy->EvaluateConnectionRulesL( iGenericID, selectionListBitmask );
-    	
-    	if ( selectionListBitmask )
-    	    {
-	  		COM_TRACE_1( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling() - Selection bitmask: 0x%bb", selectionListBitmask);
-    		
-    		//remove not supported items...
-    		selectionListBitmask = selectionListBitmask & iModel->SupportedDevicesL();
-    			
-    		//Check default selection
-    		TInt defaultSelection( iModel->DeviceType() );
-    		
-    		if ( selectionListBitmask == ( KASTTY | KASHeadset ) )
-    		    {
-    			if ( defaultSelection != KASTTY )
-    			    {
-    				defaultSelection = KASHeadset;
-    			    }
-    			else
-    			    {
-    				defaultSelection = KASTTY;
-    			    }
-    		    }
-    		else
-    		    {
-    			if ( defaultSelection == KASHeadset )
-    			    {
-    				defaultSelection = 0;
-    			    }
-    			
-    			defaultSelection = selectionListBitmask & defaultSelection;	
-    		    }
-    		
-    		if ( defaultSelection )
-    		    {
-    			iReplyValue = defaultSelection;
-    			iCallback->SetDefaultAccessoryInformation( iGenericID, defaultSelection );
-    			CAccSrvHandlerBase::IssueRequest();
-    		    }
-    		else
-    		    {
-    			//check that more than one accessories in the selection list
-    			TUint32 bitmask( 1 );
-    			TInt accCount( 0 ); 
-    			for ( TInt i( 0 ); i < 32; i++  )
-    			    {
-    				if ( selectionListBitmask & bitmask )
-    				    {
-    					if ( ++accCount > 1 )
-    					    {
-    						//more than one accessories, stop the loop
-    						break;
-    					    }
-    				    }
-    				bitmask <<= 1;
-    			    }
-    		
-    			if ( accCount > 1 )
-    			    {
-	    			//if there is possible selection show UI
-	    			selectionListBitmask = UNMASK_LINE_OUT(selectionListBitmask);
-		    		SetupSelectionDialogL( selectionListBitmask );    			
-    			    }
-    			else
-    			    {
-    				//only one selection, don't show selection dialog
-    				iState = EGetSelectionFromUser;	
-    				iReplyValue = selectionListBitmask;
-    				iCallback->SetDefaultAccessoryInformation( iGenericID, selectionListBitmask );
-    				CAccSrvHandlerBase::IssueRequest();
-    			    }
-    		    }
-    		
-    	    }
-    	else
-    	    {
-    		iState = EInitializeConnection;	
-        	}
-    	
+
         }
     else
         {
   		COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling() - No connection rules" );
-    	iState = EInitializeConnection;
-        }
+  		
+        //Check default selection
+        TInt defaultSelection( iModel->DeviceType() );
+        
+        // Device Type Supplied
+        if( (iGenericID.PhysicalConnectionCaps() & KPCWired) && 
+            (iGenericID.DeviceTypeCaps(KDTHeadset)) && 
+            (iPolicy->IsCapabilityDefinedL(iGenericID,KAccIntegratedAudioInput)) )		
+            {
+            // This is a Headset
+            if(KASTTY == defaultSelection)
+                {
+                iReplyValue = defaultSelection;
+                }
+            else
+                {
+                iReplyValue = KASHeadset;
+                }
+            
+            if(KASHeadset != iReplyValue)
+                {
+                COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling- TTY Case" );
+                //only one selection, don't show selection dialog
+                iState = EGetSelectionFromUser; 
+                iCallback->SetDefaultAccessoryInformation( iGenericID, iReplyValue );
+                CAccSrvHandlerBase::IssueRequest();
+                }
+            else
+                {
+                COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling- Headset Case" );
+                iState = EInitializeConnection;    
+                }
+            }
+        else if( (iGenericID.PhysicalConnectionCaps() & KPCWired) && 
+                 (iGenericID.DeviceTypeCaps(KDTHeadset)) && 
+                 !(iPolicy->IsCapabilityDefinedL(iGenericID,KAccIntegratedAudioInput)) )                    
+            {
+            // This is a Headphone
+            if((KASLineOut == defaultSelection) || 
+               (KASMusicStand == defaultSelection) ||
+               (KASHeadphones == defaultSelection))
+                {
+                iReplyValue = defaultSelection;
+                }
+            else
+                {
+                iReplyValue = KASHeadphones;                
+                }
+            
+            if(KASHeadphones != iReplyValue)
+                {
+                COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling- LineOut/MusicStand Case" );
+                //only one selection, don't show selection dialog
+                iState = EGetSelectionFromUser; 
+                iCallback->SetDefaultAccessoryInformation( iGenericID, iReplyValue );
+                CAccSrvHandlerBase::IssueRequest();
+                
+                }
+            else
+                {
+                COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::StartConnectionHandling- Headphone Case" );
+                iState = EInitializeConnection;
+                }
+            }
 
+        else
+            {
+            iState = EInitializeConnection;
+            }
+        }
 
     // Atleas one Asynchronous request is made for ourselves,
     // clients ConnectAccessory asynchronous request will be completed

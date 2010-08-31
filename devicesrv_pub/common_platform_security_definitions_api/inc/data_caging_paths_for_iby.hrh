@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -57,7 +57,7 @@ define  UNTRUSTED_FONT_DIR      private/10003a16/import/fonts
 define  WINDOW_SERVER_INI_DIR   private/10003b20
 define  SKINS_DIR               private/10207114
 define  BOOTDATA_DIR            resource/bootdata
-
+define  QT_TRANSLATIONS_DIR     resource/qt/translations
 
 #endif
 

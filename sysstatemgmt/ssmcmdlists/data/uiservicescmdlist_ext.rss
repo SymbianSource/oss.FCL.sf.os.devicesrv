@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -65,9 +65,10 @@ RESOURCE SSM_COMMAND_LIST r_cmds
     {
     commands =
         {
-        // prio 0xFFA3
+		//prio 0xFFA7
+		r_cmd_splash,
+        // prio 0xFF99
         r_cmd_tzsrv,
-        r_cmd_cntsrv,
         r_cmd_mediator,
         r_cmd_hwrmsrv,
         // prio 0xFF89
@@ -79,20 +80,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // Command items in alphabetical order
 // ===========================================================================
 //
-
-
-// ---------------------------------------------------------------------------
-// r_cmd_cntsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_cntsrv
-    {
-    priority = 0xFFA3;
-    name = "Z:\\sys\\bin\\cntsrv.exe";
-    args = "-nontransient";
-    severity = ECmdCriticalSeverity;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_dbrecovery
@@ -111,7 +98,7 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_dbrecovery
 //
 RESOURCE SSM_START_PROCESS_INFO r_cmd_hwrmsrv
     {
-    priority = 0xFFA3;
+    priority = 0xFF99;
     name = "Z:\\sys\\bin\\hwrmserver.exe";
     severity = ECmdCriticalSeverity;
     execution_behaviour = ESsmDeferredWaitForSignal;
@@ -124,7 +111,7 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_hwrmsrv
 //
 RESOURCE SSM_START_PROCESS_INFO r_cmd_mediator
     {
-    priority = 0xFFA3;
+    priority = 0xFF99;
     name = "Z:\\sys\\bin\\mediatorserver.exe";
     severity = ECmdCriticalSeverity;
     execution_behaviour = ESsmDeferredWaitForSignal;
@@ -133,12 +120,22 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_mediator
     }
 
 // ---------------------------------------------------------------------------
+// r_cmd_splash
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_splash
+    {
+    priority = 0xFFA7;
+    name = "Z:\\sys\\bin\\splashscreen.exe";
+    }
+
+// ---------------------------------------------------------------------------
 // r_cmd_tzsrv
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_START_PROCESS_INFO r_cmd_tzsrv
     {
-    priority = 0xFFA3;
+    priority = 0xFF99;
     name = "Z:\\sys\\bin\\tzserver.exe";
     severity = ECmdCriticalSeverity;
     execution_behaviour = ESsmDeferredWaitForSignal;

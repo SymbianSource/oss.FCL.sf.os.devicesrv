@@ -28,6 +28,7 @@ PRJ_TESTEXPORTS
 PRJ_TESTMMPFILES
 ../remcon/group/remconstub.mmp
 ../phone/group/phoneclient.mmp
-../audio/group/audioclientstub.mmp
+//../audio/group/audioclientstub.mmp
+../audiostuborbit/audiostuborbit.mmp
 
 // End of file

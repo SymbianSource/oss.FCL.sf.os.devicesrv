@@ -274,7 +274,10 @@ void CPsmBackupStorage::UpdateBackupL( const RConfigInfoArray& aConfigArray, TIn
         // reset error value
         trapErr = KErrNone;
         }
-
+    else if ( KErrNoMemory == trapErr )
+        {
+        User::Leave(trapErr);
+        }    
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmBackupStorage::UpdateBackupL() - Config count: %i" ), aConfigArray.Count() ) );
 
     // Loop config array and update storage
@@ -287,9 +290,19 @@ void CPsmBackupStorage::UpdateBackupL( const RConfigInfoArray& aConfigArray, TIn
         // Search set element from config and create new if not found
         TXmlEngElement setItem;
         TRAP( trapErr, setItem = FindSetItemL( settings, configInfo.iConfigId ) );
-
-        // If not found, create new
-        if ( KErrNotFound == trapErr && setItem.IsNull() )
+        
+        COMPONENT_TRACE( ( _L( "PSM Server - FindSetItemL() TRAP error -  %d" ), trapErr ) );
+        
+        if ( KErrNoMemory == trapErr && setItem.IsNull() )
+            {
+            User::Leave(trapErr);
+            }
+        else if (KErrNoMemory == trapErr)
+            {
+            setItem.RemoveAttributeL( KPsmSetItemValue );
+            User::Leave(trapErr);
+            }
+        else if ( KErrNotFound == trapErr && setItem.IsNull() )
             {
             // First param indicates that cannot have childs, 
             // second is the owner document and last is tag

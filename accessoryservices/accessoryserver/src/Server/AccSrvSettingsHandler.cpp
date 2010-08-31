@@ -73,10 +73,12 @@ _LIT( KHWDevicesFile, "c:\\private\\1020504A\\hwdevices.ini" );
 // -----------------------------------------------------------------------------
 //
 CAccSrvSettingsHandler::CAccSrvSettingsHandler( CAccSrvConnectionController* aConCtrl,
-                                                CAccSrvServerModel& aModel )
+                                                CAccSrvServerModel& aModel,
+                                                CAccPolAccessoryPolicy* aPolicy )
     : iConCtrl( aConCtrl ),
       iModel( aModel ),
-      iLightsOn( EAccSettingsLightsNotSet )
+      iLightsOn( EAccSettingsLightsNotSet ),
+      iPolicy( aPolicy )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvSettingsHandler::CAccSrvSettingsHandler()" );
 
@@ -122,13 +124,15 @@ void CAccSrvSettingsHandler::ConstructL()
 //
 CAccSrvSettingsHandler* CAccSrvSettingsHandler::NewL(
                                            CAccSrvConnectionController* aConCtrl,
-                                           CAccSrvServerModel& aModel )
+                                           CAccSrvServerModel& aModel,
+                                           CAccPolAccessoryPolicy* aPolicy )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvSettingsHandler::NewL()" );
 
     CAccSrvSettingsHandler* self = new( ELeave ) CAccSrvSettingsHandler(
                                                     aConCtrl,
-                                                    aModel );
+                                                    aModel,
+                                                    aPolicy );
     CleanupStack::PushL( self );
     self->ConstructL();
     CleanupStack::Pop( self );
@@ -264,7 +268,7 @@ TUint32 CAccSrvSettingsHandler::GetSupportedHWDevicesL() const
     l.Val( temp );
     settings = static_cast< TUint32 >( temp );
 
-	CleanupStack::PopAndDestroy ( &session );
+    CleanupStack::PopAndDestroy ( &session );
     CleanupStack::PopAndDestroy ( buf );
 
     COM_TRACE_1( "[AccFW:AccServer] CAccSrvSettingsHandler::GetSupportedHWDevicesL() - return %d", settings );
@@ -286,7 +290,8 @@ void CAccSrvSettingsHandler::SetHWDeviceSettingsL( TUint32 aSettings,
 
     // Valid settings
     TUint32 settings = ResolveNewSettingsL( aSettings, aEnable, aForce );
-
+    TUint32 iOldDeviceType = iModel.DeviceType();
+    
     // Update model
     iModel.SetDeviceType( settings );
 
@@ -297,6 +302,99 @@ void CAccSrvSettingsHandler::SetHWDeviceSettingsL( TUint32 aSettings,
     delete repository;
     repository = NULL;
 
+        //Check default selection. The newly set device-type after the model update.
+        TInt defaultSelection( iModel.DeviceType() );
+        TInt iReplyValue = KASNoDevice;
+        TAccPolGenericID iGenericID;
+       
+        // get the last connected wired accessory
+        if(iModel.GetLastConnectedWiredAccessory(iGenericID))
+            {
+            // Device Type Supplied
+            if( iGenericID.DeviceTypeCaps(KDTHeadset) )
+                {       
+                // This is a Headset
+                if( iPolicy->IsCapabilityDefinedL(iGenericID, KAccIntegratedAudioInput) ) 
+                    {
+                    if(KASTTY == defaultSelection)
+                        {
+                        iReplyValue = defaultSelection;
+                        }
+                    else
+                        {
+                        iReplyValue = KASHeadset;
+                        }             
+                    }
+                // This is a Headphone
+                else 
+                    {
+                    if(KASMusicStand == defaultSelection) 
+                        {
+                        iReplyValue = defaultSelection;
+                        }
+                    else
+                        {
+                        iReplyValue = KASHeadphones;
+                        }
+                    }
+                }
+            else if( iGenericID.DeviceTypeCaps(KDTTTY) )
+                {
+                if( iPolicy->IsCapabilityDefinedL(iGenericID, KAccIntegratedAudioInput) )
+                    {
+                    if(KASHeadset == defaultSelection)
+                        {
+                        iReplyValue = defaultSelection;
+                        }
+                    else
+                        {
+                        iReplyValue = KASTTY;
+                        }
+                    }
+                }
+            else if( iGenericID.DeviceTypeCaps(KDTOffice) )
+                {
+                if(KASHeadphones == defaultSelection)
+                    {
+                    iReplyValue = defaultSelection;
+                    }
+                else
+                    {
+                    iReplyValue = KASMusicStand;
+                    }
+                }
+            // Device Type Not Supplied
+            else if( iGenericID.DeviceTypeCaps() == KASNoDevice )
+                {
+                iReplyValue = defaultSelection;
+                }
+
+            if( (KASNoDevice != iReplyValue) && (iReplyValue != iOldDeviceType) )
+                {
+                //update generic id
+                iPolicy->UpdateGenericIDL( iGenericID, iReplyValue);
+                // Update the "iConnectionArray" of CAccSrvServerModel, 
+                // to reflect the update on generic-id done earlier.
+                TAccPolGenericID oldGenericId; 
+                iModel.FindWithUniqueIDL( iGenericID.UniqueID(), oldGenericId );
+                
+                iConCtrl->HandleConnectionUpdateValidationL( 
+                            iGenericID, oldGenericId, this, KErrNone );
+        
+                TASYCommandParamRecord asyCommandParamRecord;
+                asyCommandParamRecord.iCmdValue   = 0;//Not used in update command
+                asyCommandParamRecord.iGenericID  = iGenericID;     
+
+                //Send request to ASY Proxy Handler
+                COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionHandler::RunL() - Send update request");
+                TInt trId = iConCtrl->HandleASYCommsL( ECmdAccessoryUpdated,
+                                                    asyCommandParamRecord );
+                
+                iConCtrl->HandleAccessoryModeChangedL();
+          
+                }            
+            }
+       
     COM_TRACE_( "[AccFW:AccServer] CAccSrvSettingsHandler::SetHWDeviceSettingsL() - return" );
     }
 

@@ -72,7 +72,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_selftest,
         r_cmd_cfserver,
         r_cmd_sysap,
-        r_cmd_calsrv,
         r_cmd_profmon,
         // prio 0xFFE6
         r_cmd_multiwaitforever
@@ -84,17 +83,6 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // ===========================================================================
 //
 
-// ---------------------------------------------------------------------------
-// r_cmd_calsrv
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_calsrv
-    {
-    priority = 0xFFE7;
-    name = "calensvr.exe";
-    execution_behaviour = ESsmFireAndForget;
-    monitor_info = r_mon_100_restarts_reset;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_cfserver

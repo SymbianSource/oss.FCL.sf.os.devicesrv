@@ -16,10 +16,10 @@
 #include "hwrmtest.h"
 #include "hwrmtestmacros.h"
 
-#include <hwrmvibracommands.h>
-#include <hwrmlightcommands.h>
-#include <hwrmpowercommands.h>
-#include <hwrmfmtxcommands.h>
+#include <hwrm/hwrmvibracommands.h>
+#include <hwrm/hwrmlightcommands.h>
+#include <hwrm/hwrmpowercommands.h>
+#include <hwrm/hwrmfmtxcommands.h>
 
 #include <rmocklight.h>
 #include <rmockvibra.h>

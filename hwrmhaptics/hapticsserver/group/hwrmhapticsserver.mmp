@@ -46,3 +46,5 @@ LIBRARY         estor.lib
 LIBRARY         euser.lib
 LIBRARY         ecom.lib
 LIBRARY         hwrmhapticspluginmanager.lib
+
+SMPSAFE

@@ -347,4 +347,4 @@ RESOURCE SSM_POWER_OFF r_command_power_off
 	severity = ECmdMediumSeverity;
 	power_state = 1;
 	}
-	
+

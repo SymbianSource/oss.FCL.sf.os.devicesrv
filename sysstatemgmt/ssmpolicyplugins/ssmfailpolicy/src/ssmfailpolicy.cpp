@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -60,7 +60,7 @@ CSsmFailPolicy::~CSsmFailPolicy()
 // ---------------------------------------------------------------------------
 //
 TBool CSsmFailPolicy::GetNextState(
-    TSsmState aCurrentTransition,
+    TSsmState INFO_PARAM( aCurrentTransition ),
     TInt /*aReason*/,
     TInt ERROR_PARAM( aError ),
     TInt ERROR_PARAM( aSeverity ),

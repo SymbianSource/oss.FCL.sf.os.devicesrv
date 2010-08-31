@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -69,21 +69,14 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_publishstate, // prio 0xFFF1
         r_cmd_psstate,      // prio 0xFFF0
         // prio 0xFFE7
-		r_cmd_menu,
         r_cmd_idle,
-        // prio 0xFFE6
+	    // prio 0xFFE6
         r_cmd_multiwaitforever1,
         // prio 0xFFE3
         r_cmd_startup,
         r_cmd_phone,
-        r_cmd_nitz,
-        // prio 0xFFE2
+        r_cmd_clockserver,
         r_cmd_multiwaitforever2,
-        // prio 0xFFDF
-        r_cmd_touchscreen,
-        r_cmd_touchplg,
-        // prio 0xFFDE
-        r_cmd_multiwaitforever3,
         // prio 0xFFD8
         r_cmd_createswp_simstatus,
         // prio 0xFFD7
@@ -97,7 +90,17 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 // Command items in alphabetical order
 // ===========================================================================
 //
-
+// -----------------------------------------------------------------------------
+// r_cmd_clockserver
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_clockserver
+	{
+	priority = 0xFFE3;
+	name = "clockserver.exe";
+	execution_behaviour = ESsmDeferredWaitForSignal;
+	}
+	
 // ---------------------------------------------------------------------------
 // r_cmd_createswp_simstatus
 // ---------------------------------------------------------------------------
@@ -110,28 +113,17 @@ RESOURCE SSM_CREATE_SYSTEM_WIDE_PROPERTY r_cmd_createswp_simstatus
     filename = "ssm.swp.policy.simstatus.dll";
     }
 
+    
 // ---------------------------------------------------------------------------
 // r_cmd_idle
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_PROCESS_INFO r_cmd_idle
+RESOURCE SSM_START_APP_INFO r_cmd_idle
     {
     priority = 0xFFE7;
-    name = "z:\\sys\\bin\\ailaunch.exe";
+    name = "z:\\sys\\bin\\hsapplicationlauncher.exe";
     execution_behaviour = ESsmDeferredWaitForSignal;
     monitor_info = r_mon_max_restarts_ignore;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_menu
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_APP_INFO r_cmd_menu
-    {
-    priority = 0xFFE7;
-    name = "z:\\sys\\bin\\matrixmenu.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    background = 1; // To background
     }
 
 // ---------------------------------------------------------------------------
@@ -152,26 +144,6 @@ RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiwaitforever2
     priority = 0xFFE2;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_multiwaitforever3
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_MULTIPLE_WAIT r_cmd_multiwaitforever3
-    {
-    priority = 0xFFDE;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_nitz
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_nitz
-    {
-    priority = 0xFFE3;
-    name = "z:\\sys\\bin\\clockserver.exe";
-    execution_behaviour = ESsmFireAndForget; // -- does not call Rendezvous() --
-    monitor_info = r_mon_3_restarts_ignore;
-    }
 
 // ---------------------------------------------------------------------------
 // r_cmd_phone
@@ -264,32 +236,6 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_startup
     retries = 2;
     }
 
-// ---------------------------------------------------------------------------
-// r_cmd_touchplg
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_touchplg
-    {
-    priority = 0xFFDF;
-    severity = ECmdCriticalSeverity;
-    dllname = "tsccustcmds.dll";
-    ordinal = 1;
-    retries = 2;
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    conditional_information = r_cond_firstboot_and_tscinstartup;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cmd_touchscreen
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_touchscreen
-    {
-    priority = 0xFFDF;
-    name = "z:\\sys\\bin\\touchscreencalib.exe";
-    execution_behaviour = ESsmDeferredWaitForSignal;
-    conditional_information = r_cond_firstboot_and_tscinstartup;
-    }
 
 // ===========================================================================
 // DLL data items in alphabetical order

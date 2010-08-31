@@ -166,10 +166,13 @@ CHWRMPowerCommonData::~CHWRMPowerCommonData()
     delete iPowerService;
     iPowerService = NULL;
     
-    iMaxReportingPeriodNotifyHandler->StopListening();
-    delete iMaxReportingPeriodNotifyHandler;
-    iMaxReportingPeriodNotifyHandler =  NULL;
-
+    if (iMaxReportingPeriodNotifyHandler)
+    	{
+	    iMaxReportingPeriodNotifyHandler->StopListening();
+	    delete iMaxReportingPeriodNotifyHandler;
+	    iMaxReportingPeriodNotifyHandler =  NULL;
+    	}
+    	
     delete iRepository;  
     iRepository = NULL;
     

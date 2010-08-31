@@ -34,3 +34,4 @@ enum EDebugLogMode
 #define KLogParameterData   0x08 // log parameter data
 
 #endif // MEDIATORDEBUG_HRH
+

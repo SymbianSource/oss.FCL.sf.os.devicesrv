@@ -30,7 +30,12 @@ popd
 pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\accessoryadaptation\group\
 REM call bldmake bldfiles
 REM call abld build remconadaptation
-call sbs -p remconadaptation
+if not "%1"=="" goto default
+call sbs -p remconadaptation.mmp -c armv5.%1
+:default
+call sbs -p remconadaptation.mmp -c armv5
+call sbs -p remconadaptation.mmp -c winscw
+REM Add other variants if applicable
 popd
 @echo build remconadaptation... Finished
 

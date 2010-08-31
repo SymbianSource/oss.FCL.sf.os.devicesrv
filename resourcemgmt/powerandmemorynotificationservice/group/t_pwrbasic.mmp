@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -15,7 +15,7 @@
 // 
 //
 
-TARGET          t_pwrbasic.exe
+TARGET          t_pwrbasic.exe  //RTEST
 CAPABILITY      PowerMgmt
 TARGETTYPE      EXE
 
@@ -29,6 +29,8 @@ SOURCEPATH      ../tsrc
 SOURCE          t_pwrbasic.cpp
 
 LIBRARY         euser.lib
-LIBRARY         powermgrcli.lib 
+LIBRARY         powermgrcli.lib
+LIBRARY 		efsrv.lib
+LIBRARY 		charconv.lib
 
 SMPSAFE

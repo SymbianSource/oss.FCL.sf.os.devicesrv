@@ -330,7 +330,7 @@ void CHWRMPluginHandler::EventL( const TUint32 aIndId, TDesC8& aData )
 //
 void CHWRMPluginHandler::RegisterForIndicationsL(MHWRMIndicationHandler* aCallback)
 	{
-    COMPONENT_TRACE2( _L( "HWRM Server - CHWRMPluginHandler::RegisterForIndications(), Count() = %d" ), iIndicationCallbacks.Count() );
+    COMPONENT_TRACE2( _L( "HWRM Server - CHWRMPluginHandler::RegisterForIndicationsL(), Count() = %d" ), iIndicationCallbacks.Count() );
 
 	iIndicationCallbacks.AppendL(aCallback);
 	}

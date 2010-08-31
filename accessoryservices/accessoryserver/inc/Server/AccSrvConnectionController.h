@@ -176,8 +176,7 @@ NONSHARABLE_CLASS( MAccSrvConnectionControllerObserver )
 *  @lib AccServer.lib
 *  @since S60 3.1
 */
-NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
-                                                   public MAccSrvConnectionControllerObserver
+NONSHARABLE_CLASS( CAccSrvConnectionController ) : public MAccSrvConnectionControllerObserver
     {
     public  :// Constructors and destructor
 
@@ -297,7 +296,13 @@ NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
 												TAccPolGenericID& aOldGenericId,
 												const CAccSrvConnectionHandler* aCaller, 
 												TInt aError  );
-        
+		
+
+		void HandleConnectionUpdateValidationL( const TAccPolGenericID& aGenericID, 
+                                                TAccPolGenericID& aOldGenericId,
+		                                        const CAccSrvSettingsHandler* aCaller, 
+		                                        TInt aError  );
+       
         
         /**
         * From MAccSrvConnectionControllerObserver
@@ -334,12 +339,6 @@ NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
         */
 		void SetDefaultAccessoryInformation( const TAccPolGenericID& aGenericID, 
 													 const TUint32 aDefaultValue);
-
-        /**
-        * From CActive
-        */
-        void RunL();
-        void DoCancel();
 
     protected:  // New functions
 
@@ -385,19 +384,8 @@ NONSHARABLE_CLASS( CAccSrvConnectionController ) : public CActive,
 	    TUint32                                 iInformationNoteUID;	  
 	    TUint32                                 iInformationNoteDefault;
 
-        // Indicates should accfw show notes about connected accessory. This is 
-        // set to ETrue when accessory is connected and EFalse after note is shown.
-        // The reason for this is to prevent multiple notes one after another
-        TBool                                   iShowNotes;
         CAccSrvWiredConnectionPublisher*        iWiredConnPublisher; // Owned
 
-		// Ui notifier
-		RNotifier iNotifier;
-		
-		// Response data from notifier
-		TInt iReplyValue;
-		TPckg<TInt> iReplyPck;
-	
     public:     // Friend classes
 
     protected:  // Friend classes

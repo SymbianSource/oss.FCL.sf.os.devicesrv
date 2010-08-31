@@ -19,14 +19,14 @@
 #ifndef __PLATFORMENV_IBY__
 #define __PLATFORMENV_IBY__
 
-file=ABI_DIR\BUILD_DIR\PlatformEnv.dll       SHARED_LIB_DIR\PlatformEnv.dll
+file=ABI_DIR\BUILD_DIR\platformenv.dll       SHARED_LIB_DIR\platformenv.dll
 
 #ifdef FF_USE_MASS_STORAGE_CONFIG
-patchdata PlatformEnv.dll@KDriveInfoDefaultRemovableMassStorage FF_DEFAULT_REMOVABLE_MASS_STORAGE
-patchdata PlatformEnv.dll@KDriveInfoLogicallyRemovableDrive1 FF_LOGICALLY_REMOVABLE_DRIVE1
+patchdata platformenv.dll@KDriveInfoDefaultRemovableMassStorage FF_DEFAULT_REMOVABLE_MASS_STORAGE
+patchdata platformenv.dll@KDriveInfoLogicallyRemovableDrive1 FF_LOGICALLY_REMOVABLE_DRIVE1
 #endif // FF_USE_MASS_STORAGE_CONFIG
 
-patchdata PlatformEnv.dll@KDriveInfoUsbDrivesStart FF_USB_DRIVE_START
+patchdata platformenv.dll@KDriveInfoUsbDrivesStart FF_USB_DRIVE_START
 
 file=ABI_DIR\BUILD_DIR\disknotifyhandler.dll SHARED_LIB_DIR\disknotifyhandler.dll
 file=ABI_DIR\BUILD_DIR\sysversioninfo.dll    SHARED_LIB_DIR\sysversioninfo.dll

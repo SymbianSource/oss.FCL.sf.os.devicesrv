@@ -316,7 +316,7 @@ void CAccSrvServerModel::AddPhysicalConnectionL( const TAccPolGenericID& aGeneri
 // CAccSrvServerModel::RemovePhysicalConnectionL
 // -----------------------------------------------------------------------------
 //
-void CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGenericID )
+TInt CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGenericID )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection()" );
 
@@ -329,7 +329,9 @@ void CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGene
         iPhysicalConnectionArray.Remove( index );
         }
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection - return void" );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection - return %d", index );
+
+	return index;
     }
 
 // -----------------------------------------------------------------------------
@@ -501,6 +503,43 @@ void CAccSrvServerModel::GetLastConnectedAccessoryL( TAccPolGenericID& aGenericI
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::GetLastConnectedAccessoryL - return" );
     }
+	
+// -----------------------------------------------------------------------------
+// CAccSrvServerModel::GetLastConnectedWiredAccessory
+//
+// Last connected wired accessory is to be searched in the iConnectionArray 
+// -----------------------------------------------------------------------------
+//
+TBool CAccSrvServerModel::GetLastConnectedWiredAccessory( TAccPolGenericID& aGenericID ) const
+    {
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::GetLastConnectedWiredAccessoryL()" );
+    
+    TInt arrCount = 0;
+    
+    if ( (arrCount = iConnectionArray.Count()) != 0 )
+        {
+        TUint arrIndex = 0;
+        TAccPolGenericID iGenericID;
+        
+        while(arrIndex < arrCount)
+            {
+            iGenericID = iConnectionArray[arrIndex];
+            
+            if( iGenericID.PhysicalConnectionCaps(KPCWired) )
+                {
+                aGenericID = iGenericID;
+                return ETrue;
+                }
+            arrIndex++;
+            }        
+        }
+        
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::GetLastConnectedWiredAccessory - return" );
+    
+    return EFalse;
+    
+    }
+
 
 // -----------------------------------------------------------------------------
 // CAccSrvServerModel::SetAccessoryMode

@@ -181,25 +181,28 @@ void CASYProxyCommandObserver::DoCancel()
     {
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel()" );
 
-    iAsyProxyCommsSrvc->iAsyComms.CancelNotifyProcessCommand();
-
-    if ( !iInDestructionPhase )
+    if ( iAsyProxyCommsSrvc )
         {
-        COM_TRACE_( "[AccFW:AsyProxy] Proxy Command Observation is Cancelled while Destruction is not in Progress" );
-    #ifdef _DEBUG
-        TRAPD( errUpdate, iAsyProxyCommsSrvc->UpdateAsyCommsStackL() );
-        TRAPD( errCreate, iAsyProxyCommsSrvc->CreateAsyCommandHandlerL( this ) );
-        
-        COM_TRACE_1( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel - errUpdate == %d", errUpdate );
-        COM_TRACE_1( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel - errCreate == %d", errCreate );
-    #else
-        TRAP_IGNORE( iAsyProxyCommsSrvc->UpdateAsyCommsStackL() );
-        TRAP_IGNORE( iAsyProxyCommsSrvc->CreateAsyCommandHandlerL( this ) );
-    #endif
-        }
+        iAsyProxyCommsSrvc->iAsyComms.CancelNotifyProcessCommand();
     
-    iAsyProxyCommsSrvc->Destroy( KErrNotFound ); // Transaction Id is not known know
-
+        if ( !iInDestructionPhase )
+            {
+            COM_TRACE_( "[AccFW:AsyProxy] Proxy Command Observation is Cancelled while Destruction is not in Progress" );
+        #ifdef _DEBUG
+            TRAPD( errUpdate, iAsyProxyCommsSrvc->UpdateAsyCommsStackL() );
+            TRAPD( errCreate, iAsyProxyCommsSrvc->CreateAsyCommandHandlerL( this ) );
+            
+            COM_TRACE_1( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel - errUpdate == %d", errUpdate );
+            COM_TRACE_1( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel - errCreate == %d", errCreate );
+        #else
+            TRAP_IGNORE( iAsyProxyCommsSrvc->UpdateAsyCommsStackL() );
+            TRAP_IGNORE( iAsyProxyCommsSrvc->CreateAsyCommandHandlerL( this ) );
+        #endif
+            }
+        
+        iAsyProxyCommsSrvc->Destroy( KErrNotFound ); // Transaction Id is not known know
+        }
+        
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommandObserver::DoCancel - return void" );
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,10 @@
 TARGET		sysmontesthelper.dll
 TARGETTYPE	dll
 UID			0x1000008d 0x1028359d
+
+// The Secure ID used here is to be able to get 
+// the value of the restart count variable set by CMonitor in a P&S key  
+SECUREID  	0x200086A8
 TARGETPATH	/sys/bin
 
 CAPABILITY	ALL -TCB

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -13,7 +13,7 @@
 // Description:
 //
 
-PRINT Run CCustomCmdTestActivateRfForEmergencyCall tests
+PRINT Run CCustomCmdTestDeactivateRfForEmergencyCall tests
 
 LOAD_SUITE tunitcustcmd_server
 
@@ -30,6 +30,6 @@ START_TESTCASE 			DEVSRVS-SSREFPLUGINS-CUSTCMD-0008
 //! 					2.	Initialize - Initialising the custom cmd
 //! 					3.	Execute - Executing the custom cmd
 //! @SYMTestExpectedResults Command should execute normally and should complete with KErrNone.
-RUN_TEST_STEP 100 tunitcustcmd_server CCustomCmdTestActivateRfForEmergencyCall
+RUN_TEST_STEP 100 tunitcustcmd_server CCustomCmdTestDeactivateRfForEmergencyCall
 END_TESTCASE 			DEVSRVS-SSREFPLUGINS-CUSTCMD-0008
 

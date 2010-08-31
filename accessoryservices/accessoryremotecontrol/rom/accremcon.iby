@@ -20,14 +20,14 @@
 #ifndef ACCREMCON_IBY
 #define ACCREMCON_IBY
 
-file=ABI_DIR\BUILD_DIR\RemConExtensionApi.dll          	SHARED_LIB_DIR\RemConExtensionApi.dll
+file=ABI_DIR\BUILD_DIR\remconextensionapi.dll          	SHARED_LIB_DIR\RemConExtensionApi.dll
 
-ECOM_PLUGIN( RemConKeyEventConverter.dll, RemConKeyEventConverter.rsc )
+ECOM_PLUGIN( remconkeyeventconverter.dll, remconkeyeventconverter.rsc )
 
 #ifndef __PRODUCT_REMCON_TSP
 
 #ifndef RD_TSP_CLIENT_MAPPER
-ECOM_PLUGIN( RemConTspController.dll, RemConTspController.rsc )
+ECOM_PLUGIN( remcontspcontroller.dll, remcontspcontroller.rsc )
 #endif // RD_TSP_CLIENT_MAPPER
 
 #endif

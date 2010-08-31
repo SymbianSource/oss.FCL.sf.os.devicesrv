@@ -21,7 +21,7 @@
 
 #include <featreg.iby> // Feature Registry (featreg.dll)
 
-#ifndef SYMBIAN_EXCLUDE_FMTX
+#ifdef FF_FMTX
 file=ABI_DIR\DEBUG_DIR\HWRMFmTxClient.dll 	 SYSTEM_BINDIR\HWRMFmTxClient.dll
 #endif
 

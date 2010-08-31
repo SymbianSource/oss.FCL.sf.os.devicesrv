@@ -221,7 +221,7 @@ TCopyProtctListenRetValues CTVOutConfigForHDMI::ListenCopyProtectionIfNoMissedEv
     if  ( iLastRecordedCopyProtectEnabledStatus != currentCopyProtectStatus )
         {
         INFO("Copy Protection status changed while not listening.");
-		iLastRecordedCopyProtectEnabledStatus = currentCopyProtectStatus;
+        iLastRecordedCopyProtectEnabledStatus = currentCopyProtectStatus;
         retStruct.iFSMEventId = EIfTVOutConfigEventSetCopyProtectStatusChanged;
         }
     else if ( !IsActive() )
@@ -645,7 +645,7 @@ void CTVOutConfigForHDMI::RunL()
 //
 // ----------------------------------------------------------------------------
 //
-TInt CTVOutConfigForHDMI::RunError( TInt aError )
+TInt CTVOutConfigForHDMI::RunError( TInt /*aError*/ )
     {
     FUNC_LOG;
 

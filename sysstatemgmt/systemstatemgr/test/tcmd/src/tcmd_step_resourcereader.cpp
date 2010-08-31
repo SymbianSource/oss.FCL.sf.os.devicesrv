@@ -1880,6 +1880,7 @@ TInt CResourceReaderTest::StartTestInThreadL(TThreadParams::TFunction aFunction)
 	User::WaitForRequest(status);
 	TExitCategoryName category = thread.ExitCategory();
 	RDebug::Print(_L("***** Exit Category = %S *****"),&category);
+	INFO_PRINTF2(_L("***** Exit Category = %S *****"), &category);
 	TEST(category.Compare(KPanicCmdResourceReader) == 0); // always expecting a resource reader panic
 	const TInt exitReason = thread.ExitReason();
 	thread.Close();

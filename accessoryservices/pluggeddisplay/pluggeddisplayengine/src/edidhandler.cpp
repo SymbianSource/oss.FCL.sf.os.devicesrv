@@ -25,6 +25,7 @@
 #include <e32math.h>
 #include <accessoriescrkeys.h>
 #include <centralrepository.h>
+#include <sysutil.h>
 
 #include "pdeconstants.h"
 #include "tvoutconfigforhdmi.h"
@@ -192,7 +193,7 @@ CAccPolHdmiSink* CEDIDHandler::CreateHdmiSinkL()
         {
         hdmiSink = CAccPolHdmiSink::NewL(
             iExtensionParserPtr->BasicAudio(),
-            iTVOutConfigForHDMI.GetTvOutConfig()->CopyProtectionStatus() );
+            ETrue );
         }
     else
         {
@@ -636,7 +637,7 @@ void CEDIDHandler::RunL()
 // RunL
 //------------------------------------------------------------------------------
 //
-TInt CEDIDHandler::RunError( TInt aError )
+TInt CEDIDHandler::RunError( TInt /*aError*/ )
     {
     FUNC_LOG;
     
@@ -770,7 +771,65 @@ void CEDIDHandler::FillCommonHdmiDviTimings( THdmiDviTimings& aTimings ) const
 		}
     Mem::FillZ( ( TAny* )&aTimings.iProductName, ( sizeof( TChar ) * KProductNameChars ) );
     Mem::FillZ( ( TAny* )&aTimings.iProductDescription, ( sizeof( TChar ) * KProductDescriptorsChars ) );
-    aTimings.iSourceType = THdmiDviTimings::ESourceTypeUnknown;
+    	
+    TInt err = KErrNone;
+    CDeviceTypeInformation* deviceTypeInfo = NULL;
+    TRAP(err, deviceTypeInfo = SysUtil::GetDeviceTypeInfoL());
+    
+    if(KErrNone == err)
+        {
+        #define MAX(a, b) (((a)>(b)) ? (a) : (b))
+        #define MIN(a, b) (((a)<(b)) ? (a) : (b))
+        
+        TPtrC16 bufPtrModelCode;
+        TPtrC16 bufPtrManufacturerName;
+        TUint loopCount;
+        TUint maxLen;
+        TUint maxCharsLen;
+        TUint minNameCharsLen;
+        TUint minDescritopCharsLen;
+        
+        deviceTypeInfo->GetManufacturerName(bufPtrManufacturerName);
+        deviceTypeInfo->GetModelCode(bufPtrModelCode);
+        maxLen = MAX(bufPtrModelCode.Length(),bufPtrManufacturerName.Length());
+        maxCharsLen = MAX(KProductNameChars,KProductDescriptorsChars);
+        minNameCharsLen = MIN(KProductNameChars, bufPtrModelCode.Length());
+        minDescritopCharsLen = MIN(KProductDescriptorsChars, bufPtrManufacturerName.Length());
+        
+        INFO_1( "maxLen : %d", maxLen);
+        INFO_1( "maxCharsLen : %d", maxCharsLen);
+        INFO_1( "minNameCharsLen : %d", minNameCharsLen);
+        INFO_1( "minDescritopCharsLen : %d", minDescritopCharsLen);
+        
+        for(loopCount = 0; loopCount < maxLen; loopCount++)
+            {
+            if(loopCount >= maxCharsLen)
+                {
+                        break;
+                }
+            else
+                {
+                    if(loopCount <  minNameCharsLen)
+                        {
+                        aTimings.iProductName[loopCount] = bufPtrModelCode[loopCount];
+                        INFO_1( "aTimings.iProductName : %d", aTimings.iProductName[loopCount].GetLowerCase());
+                        }
+                    if(loopCount <  minDescritopCharsLen)
+                        {
+                        aTimings.iProductDescription[loopCount] = bufPtrManufacturerName[loopCount];
+                        INFO_1( "aTimings.iProductDescription : %d", aTimings.iProductDescription[loopCount].GetLowerCase());
+                        }
+                }
+            }
+        INFO("Before Deleting Pointer deviceTypeInfo");
+        delete deviceTypeInfo;
+        INFO("After Deleting Pointer deviceTypeInfo");
+        aTimings.iSourceType = THdmiDviTimings::ESourceTypePCGeneral;
+        }
+    else
+        {
+        aTimings.iSourceType = THdmiDviTimings::ESourceTypeUnknown;
+        }
     }
 
 //------------------------------------------------------------------------------

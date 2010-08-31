@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,7 @@
 #define PSMSTORAGE_H
 
 #include <e32base.h>
-#include <xmlengdom.h>
+#include <xml/dom/xmlengdom.h>
 #include <psmtypes.h>
 
 /**

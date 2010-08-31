@@ -16,7 +16,7 @@
 #include "mctest_f.h"
 #include <e32cons.h>
 
-_LIT(KLogFile,"C:\\logs\\mctest_f.log");
+_LIT(KLogFile,"C:\\logs\\testexecute\\mctest_f.htm");
 _LIT8(KCrLf,"\r\n");
 _LIT8(KRTest,"RTEST:");
 

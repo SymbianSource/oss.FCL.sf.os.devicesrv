@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -88,11 +88,17 @@ TVerdict CCustomCmdTestDeviceSecurityPinCheck::doTestStepPreambleL()
 	RProcess processHandle;
 	
 	TInt temp = processHandle.Create(KExeToDefineStartUpPS, KNullDesC);
+	TRequestStatus status1;
+	processHandle.Rendezvous(status1);
 	processHandle.Resume();
+	User::WaitForRequest(status1);
 	processHandle.Close();
 		
 	processHandle.Create(KExeToDefineStartUpStatePS, KNullDesC);
-	processHandle.Resume();
+    TRequestStatus status2;
+    processHandle.Rendezvous(status2);
+    processHandle.Resume();
+    User::WaitForRequest(status2);
 	processHandle.Close();
 
 	//For stopping the key simulation

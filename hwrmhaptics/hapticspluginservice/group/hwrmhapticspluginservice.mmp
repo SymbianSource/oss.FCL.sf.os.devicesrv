@@ -36,4 +36,6 @@ LIBRARY                 ecom.lib
 LIBRARY                 bafl.lib
 LIBRARY                 estor.lib
 
+SMPSAFE
+
 // end of file

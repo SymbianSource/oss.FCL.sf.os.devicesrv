@@ -27,6 +27,10 @@
 #include <accpolobjecttypes.h>
 #include <s32mem.h>
 #include <accpolhdmiobjectcon.h>
+#include <accessoryservicesinternalpskeys.h>
+#ifdef FF_AUTOMOTIVESTACK
+#include <autoaudiopskeys.h>
+#endif
 
 // ----------------------------------------------------------------------------------
 // CASYStubService::CASYStubService() 
@@ -123,6 +127,10 @@ void CASYStubService::Service( TInt aTestCaseID,
             break;
 
         case ETFAsyConnOpenCable:
+            {            
+            }
+            break;
+//        case ETFAsyConnOpenCable:
         case ETFAsyConnectOpenCable3Poles:
             {
             TRequestStatus status;
@@ -140,7 +148,7 @@ void CASYStubService::Service( TInt aTestCaseID,
             TBuf<KHWModelIDMaxLength> HWModelID( _L("opencable"));
 
             //Set GenericID header
-            iGenericIDHeader.iAccessoryDeviceType = KDTAVDevice;
+            iGenericIDHeader.iAccessoryDeviceType = KDTHeadset;
             iGenericIDHeader.iPhysicalConnection = KPCWired;
             iGenericIDHeader.iApplicationProtocol = 0x0;
 
@@ -170,7 +178,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 
@@ -311,7 +319,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 
@@ -377,7 +385,7 @@ void CASYStubService::Service( TInt aTestCaseID,
                 nameValueArray );
             nameValueArray.Close();
 
-            iAccessoryControl.ConnectAccessory( status, genericID, ETrue );
+            iAccessoryControl.ConnectAccessory( status, genericID, EFalse );
             User::WaitForRequest( status );
             TInt retval = status.Int();
 
@@ -846,6 +854,20 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             break;
             }
+#ifdef FF_AUTOMOTIVESTACK           
+        case ETFAsyRTPStreamingConn:
+            {
+            RProperty property;          
+            CleanupClosePushL ( property );
+            COMPONENT_TRACE( ( _L( "ASYSTUB - CTFTestControlObserver::Service - Attaching to RTP streaming key" ) ) );
+            User::LeaveIfError ( property.Attach ( KPSUidAccessoryServices, KPSAutoKeyRTPStreamingConnectionStatus ) );
+            COMPONENT_TRACE( ( _L( "ASYSTUB - CTFTestControlObserver::Service - publishing to RTP streaming key" ) ) );                        
+            User::LeaveIfError ( property.Set ( aParam1 ) );
+            CleanupStack::PopAndDestroy (); // property
+            }
+            break;
+#endif
+            
         default:
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Subscribe destination is WIRELESS ASY" ) ) );

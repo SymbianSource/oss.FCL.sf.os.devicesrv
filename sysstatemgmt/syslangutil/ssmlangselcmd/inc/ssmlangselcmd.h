@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+ * Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
  * All rights reserved.
  * This component and the accompanying materials are made available
  * under the terms of "Eclipse Public License v1.0"
@@ -19,9 +19,11 @@
 #ifndef SSMLANGSELCMD_H
 #define SSMLANGSELCMD_H
 
+#include "ssmcommonlocale.h"
 #include <e32base.h>
 #include <ssm/ssmcustomcommand.h>
 #include <ssm/ssmadaptationcli.h>
+#include <e32hashtab.h> 
 
 class CSsmMapperUtility;
 
@@ -157,6 +159,97 @@ private:
      */
     void UseLanguage(const TInt aLang);
 
+    /**
+    * Initialize the language region mapping
+    * 
+    */
+    void InitializeRegionMappingL();
+
+    /**
+    * Used to check whether the region is valid or not
+    * 
+    * @param aRegion Region to be validated
+    * 
+    * @return ETrue if the region code was found in the list, EFalse otherwise.
+    */
+    TBool IsRegionValidL(const TInt aRegion) const;
+    
+    /**
+    * Get the stored Region and Collation code from Central Repository
+    * 
+    * @param aRegion On return, will store the Region code fetched from CR
+    * @param aCollation On return, will store the Collation code fetched from CR
+    * 
+    */
+    void GetIndividualSettingsFromCentRepL(TInt& aRegion, TInt& aCollation);
+
+    /**
+    * Store the given Region and Collation code to Central Repository
+    * 
+    * @param aRegion Region code to be stored in CR
+    * @param aCollation Collation code to be stored in CR
+    * 
+    * @return Success code, Contains any of the error code in case of any error.
+    */
+    TInt SetIndividualSettingsToCentRep(const TInt aRegion, const TInt aCollation);
+
+    /**
+    * Gets the selected Region and Collation codes. If not set will get the asscoiated codes 
+    * for the language
+    * 
+    * @param aLastSelectedLang Contains the seleted Language code
+    * @param aLastSelectedRegion On success contains the Region code
+    * @param aLastSelectedCollation On success contains the Collation code
+    * 
+    * @return ETrue If the Region and Collation codes are valid or found the mapped Region 
+    * incase of auto selection, EFalse otherwise.
+    */
+    TBool ValidateAndGetSettings(const TInt aLastSelectedLang, TInt& aLastSelectedRegion, TInt& aLastSelectedCollation);
+
+    /**
+    * Gets the selected Region and Collation codes. If not set will get the asscoiated codes 
+    * for the language
+    * 
+    * @param aLastSelectedLang Contains the seleted Language code
+    * @param aLastSelectedRegion On success contains the Region code
+    * @param aLastSelectedCollation On success contains the Collation code
+    * 
+    * @return ETrue If the Region and Collation codes are valid or found the mapped Region 
+    * incase of auto selection, EFalse otherwise. Leaves with any of error code incase of any error
+    */
+    TBool ValidateAndGetSettingsL(const TInt aLastSelectedLang, TInt& aLastSelectedRegion, TInt& aLastSelectedCollation);
+
+    /**
+    * Loads the default language setting if it is valid
+    * 
+    * @return KErrNone if the default language settings are valid and loaded successfully,
+    * any of the error code otherwise.
+    */
+    TInt ValidateAndUseDefaultLanguage();
+
+    /**
+    * Loads the corresponsing locale codes
+    * 
+    * @param aLang Language code to be loaded
+    * @param aRegion Region code to be loaded
+    * @param aCollation Collation code to be loaded
+    * 
+    * @return Success code, Contains any of the error code in case of any error.
+    */
+    TInt UseLocale( const TInt aLang, const TInt aRegion, const TInt aCollation );
+
+    /**
+    * Gets the region mapped with the given language after validating
+    * 
+    * @param aLanguage Language code for getting associated Region code
+    * @param aRegion On return contains the Region code associated with 
+    * the given language code
+    * 
+    * @return ETrue if the region code was found in the list, EFalse otherwise.
+    */
+
+    TBool ValidateAndGetMappedRegion( const TInt aLanguage, TInt& aRegion );
+
 private: // data
 
     /** Custom command environment. Not owned. Set in Initialise. */
@@ -191,14 +284,20 @@ private: // data
     /** Internal state of the object. */
     enum TState
         {
+        EQueryListNone = 0,
         EQueryListSize = 1,
-        EQueryListContent
+        EQueryListContent = 2
         };
     TState iState;
     
     // The mapper utility instance, owned.
     CSsmMapperUtility* iMapperUtility;
 
+    /** Array of  language and region mappings. */
+    RHashSet<TLanguageRegion>  iLangRegionMappingHashSet;
+    
+    /** Array of  valid regions. */
+    RArray<TLanguageRegion>  iRegionsArray;
     };
 
 #endif // SSMLANGSELCMD_H

@@ -103,10 +103,11 @@ void CRemConInterfaceSelector::ConstructL()
 		}
 	CleanupStack::PopAndDestroy(currentHeap);
 	
-	iLock = new (ELeave) RNestableLock();
-	CleanupStack::PushL(iLock);
-	LEAVEIFERRORL(iLock->CreateLocal());
-	CleanupStack::Pop(iLock);
+	RNestableLock* lock = new (ELeave) RNestableLock;
+    CleanupStack::PushL(lock);
+	LEAVEIFERRORL(lock->CreateLocal());
+	CleanupStack::Pop(lock);
+	iLock = lock;
 	}
 
 CRemConInterfaceSelector::CRemConInterfaceSelector()
@@ -441,15 +442,15 @@ This should be run from the thread in which the bulk interfaces are to run.
 void CRemConInterfaceSelector::BulkSessionConnectL()
 	{
 	LOG_FUNC
-	iBulkSession = new(ELeave)RRemConBulk();
-	CleanupStack::PushL(iBulkSession);
-	LEAVEIFERRORL(iBulkSession->Connect());
-	CleanupStack::Pop(iBulkSession);
 
-	CleanupCloseDeleteAndNullPushL(reinterpret_cast<RRemCon**>(&iBulkSession));
+	RRemConBulk* bulkSession = new(ELeave)RRemConBulk;
+	CleanupStack::PushL(bulkSession);
+	LEAVEIFERRORL(bulkSession->Connect());
+	CleanupClosePushL(*bulkSession);
 	RCIS_VERBOSE_ASSERT(iBulkReceiver, ERemConIfSelInternalError);
-	iBulkReceiver->InitialiseL(*iBulkSession, iBulkMaxDataLength);
-	CleanupStack::Pop(&iBulkSession);
+	iBulkReceiver->InitialiseL(*bulkSession, iBulkMaxDataLength);
+	CleanupStack::Pop(2, bulkSession);
+	iBulkSession = bulkSession;
 	}
 
 /**

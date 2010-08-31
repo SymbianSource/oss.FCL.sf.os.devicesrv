@@ -66,6 +66,7 @@ LIBRARY					acccontrol.lib
 LIBRARY					accclient.lib
 LIBRARY					efsrv.lib
 LIBRARY					fbscli.lib
+LIBRARY					sysutil.lib
 
 #ifdef TRACE_INTO_FILE
 LIBRARY					flogger.lib

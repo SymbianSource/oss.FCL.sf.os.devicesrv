@@ -40,6 +40,7 @@ PRJ_TESTEXPORTS
 ../data/cenrep/10200C8C.txt /epoc32/data/z/private/10202be9/10200c8c.txt
 ../data/cenrep/10200C8D.txt /epoc32/data/z/private/10202be9/10200c8d.txt
 ../data/cenrep/20008EA6.txt /epoc32/data/z/private/10202be9/20008ea6.txt
+../data/cenrep/10205043.txt /epoc32/data/z/private/10202be9/10205043.txt
 
 ../data/cenrep/10200C8B.txt /epoc32/release/winscw/udeb/z/private/10202be9/10200c8b.txt
 ../data/cenrep/10200C8C.txt /epoc32/release/winscw/udeb/z/private/10202be9/10200c8c.txt
@@ -98,5 +99,5 @@ PRJ_TESTMMPFILES
 ../multiclient/mctest_b/mctest_b.mmp
 ../plugins/testuiplugin_f/group/hwrmtestuiplugin_f.mmp
 ../plugins/testuiplugin_b/group/hwrmtestuiplugin_b.mmp
-../multiclient/HWRMLightTestF/group/HWRMLightTestF.mmp
-../multiclient/HWRMLightTestB/group/HWRMLightTestB.mmp
+//../multiclient/HWRMLightTestF/group/HWRMLightTestF.mmp
+//../multiclient/HWRMLightTestB/group/HWRMLightTestB.mmp

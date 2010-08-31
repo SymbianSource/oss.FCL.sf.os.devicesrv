@@ -204,7 +204,7 @@ void CPsmStorage::CreateConfigArrayL( RConfigInfoArray& aPsmConfigArray, const T
             }
 
         // Add info to list
-        aPsmConfigArray.Append( configInfo );
+        aPsmConfigArray.AppendL( configInfo );
 
         // handle next element set
         setElement = nodeList.Next().AsElement();

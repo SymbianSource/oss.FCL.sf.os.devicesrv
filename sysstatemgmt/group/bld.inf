@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -24,6 +24,9 @@ PRJ_EXPORTS
 
 PRJ_MMPFILES
 
+#include "../systemstatemgr/group/bld.inf"
+#include "../systemstatereferenceplugins/group/bld.inf"
+#include "../systemstateplugins/group/bld.inf"
 #include "../ssmmapperutility/group/bld.inf"
 #include "../ssmpolicyplugins/group/bld.inf"
 #include "../ssmutilityplugins/group/bld.inf"
@@ -31,6 +34,7 @@ PRJ_MMPFILES
 #include "../ssmcustcmds/group/bld.inf"
 #include "../syslangutil/group/bld.inf"
 #include "../sysrestart/group/bld.inf"
+#include "../systemstarter/group/bld.inf"
 #include "../sysuiprovider/group/bld.inf"
 
 

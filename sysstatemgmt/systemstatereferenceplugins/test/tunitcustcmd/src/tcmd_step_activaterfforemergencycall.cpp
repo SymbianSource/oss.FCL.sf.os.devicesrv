@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,6 +22,9 @@
 #include "tcmd_step_activaterfforemergencycall.h"
 #include "ssmcustomcmdfactory.h"
 #include "cmdactivaterfforemergencycall.h"
+#include <e32property.h>
+const TUint32 KEmergencyCallRfAdaptationPluginPropertyKey = 0x2000E657;
+const TUid KPropertyCategory={0x2000D75B};
 
 CCustomCmdTestActivateRfForEmergencyCall::~CCustomCmdTestActivateRfForEmergencyCall()
 	{
@@ -41,6 +44,11 @@ void CCustomCmdTestActivateRfForEmergencyCall::TestCustomCmdActivateRfForEmergen
 	{
 	_LIT(KTESTLOG, "TestCustomCmdActivateRfForEmergencyCallL");
 	INFO_PRINTF1(KTESTLOG);
+	// Setting the P and S key will route the request to the reference plugins instead of the actual plugins
+	TInt err = RProperty::Define(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, RProperty::EInt);
+	TEST(KErrNone == err || KErrAlreadyExists == err);
+    err = RProperty::Set(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, 1);
+    TEST(KErrNone == err);
 
 	//Create Deactivate Rf For Emergency Call custom command
 	MSsmCustomCommand* customCmdActivateRfForEmergencyCall = SsmCustomCmdFactory::CmdActivateRfForEmergencyCallNewL();
@@ -56,12 +64,11 @@ void CCustomCmdTestActivateRfForEmergencyCall::TestCustomCmdActivateRfForEmergen
 	//Command parameter is not used inside the Execute. So passing any dummy data should be fine
 	//Execute the command
 	customCmdActivateRfForEmergencyCall->Execute(dummy, status);
-	TEST(KRequestPending == status.Int());
 
 	//Wait for the request to be completed
 	User::WaitForRequest(status);
 	TEST(KErrNone == status.Int());
-
+	
 	//Execute the command once again
 	customCmdActivateRfForEmergencyCall->Execute(dummy, status);
 
@@ -73,12 +80,14 @@ void CCustomCmdTestActivateRfForEmergencyCall::TestCustomCmdActivateRfForEmergen
 	//checking the status to KErrNone instead of KErrCancel.
 	User::WaitForRequest(status);
 	TEST(KErrNone == status.Int());
-
+	
 	//Close the command
 	customCmdActivateRfForEmergencyCall->Close();
 
 	//Releasing the comand will delete itself.
 	customCmdActivateRfForEmergencyCall->Release();
+	err = RProperty::Delete(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey);
+	TEST(KErrNone == err);
 	}
 
 TVerdict CCustomCmdTestActivateRfForEmergencyCall::doTestStepL()

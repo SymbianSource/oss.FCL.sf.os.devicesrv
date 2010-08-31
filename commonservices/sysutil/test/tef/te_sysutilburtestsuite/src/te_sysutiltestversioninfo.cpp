@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -98,9 +98,13 @@ error codes are those that we expect.
 */
 void CSysUtilTestVersionInfoStep::TestAllAPIsL()
 	{
-	SetTestPath(EFalse);
-	
-	TBool passed = ETrue;
+    TBool passed = ETrue;
+	TInt error = SetTestPath(ETrue);
+	if(KErrNone != error)
+	    {
+	    RDebug::Printf("Setting test path to ETrue failed with error %d", error);
+	    passed = EFalse;
+	    }
 	
 	TBuf16<KSysUtilVersionTextLength> actualValue;
 	RDebug::Printf("Testing SW Version \n");

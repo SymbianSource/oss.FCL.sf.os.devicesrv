@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,8 +24,8 @@
 
 
 #include "tss_procstartwithfandf.h"
-#include "ssmtestappsucessfulafterretry.h"
 #include "ssmtestappslow.h"
+#include "ssmtestapps.h"
 
 const TInt KProcStartStopperTimeout = 5000000;
 const TInt KWaitTimeForTestAppForFAndF = 500;	// 500ms is the delay given for the KTestAppForFAndF test app for each retry.

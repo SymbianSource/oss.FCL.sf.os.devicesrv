@@ -29,4 +29,4 @@ RESOURCE APP_REGISTRATION_INFO
 	// filename of application binary (minus extension)
 	app_file="ssmtestapppanic";
 	}
-	
+

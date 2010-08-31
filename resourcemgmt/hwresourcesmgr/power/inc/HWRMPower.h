@@ -62,9 +62,20 @@ class MHWRMBatteryFullChargingTimeObserver;
 * User::WaitForRequest(status);
 * User::LeaveIfError(status.Int());
 * 
-* // Start receiving periodical voltage measurements.
+* // Start receiving periodical power measurements.
+* //
+* // Note: There is a maximum reporting period defined for each product through the
+* //       CenRep Key KPowerMaxReportingPeriod defined in HWRMPowerDomainCRKeys.h.
+* //       The reporting will stop after this maximum reporting period by default.
+* //       The application can configure this dynamically.
+* //       Setting maximum report period to zero results in infinite notifications.
+* //
 * TRequestStatus& statusStart;
-* TIntervalMultiple intervalMultiple = EThreeTimesBaseTimeInterval;
+* TInt intervalMultiple = 3; // Three times the base time interval.
+* //
+* // Note: The base time interval is different for each product.
+* //       GetBaseTimeIntervalL API returns this value.
+* //
 * power->StartAverageVoltageReporting(statusStart, intervalMultiple);
 *  
 * User::WaitForRequest(statusStart);

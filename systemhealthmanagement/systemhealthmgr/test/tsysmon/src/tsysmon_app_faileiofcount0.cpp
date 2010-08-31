@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,7 +19,10 @@
  @internalComponent - Internal Symbian test code   
 */
 
+#include <e32property.h>
 #include "sysmontesthelper.h"
+
+const TUint32 KRestartExeCount = 33;
 
 
 TInt MainL()
@@ -28,11 +31,14 @@ TInt MainL()
 
 	TInt runCount = 0;
     CCommandLineArguments* args = CCommandLineArguments::NewLC();
+    TInt err = RProperty::Define(KTestSysMon, KRestartExeCount, RProperty::EInt);
+    RDebug::Printf("Defining P&S key with key %d returns with err %d", err, KRestartExeCount);
+    
     runCount = CSysMonTestHelper::ReadRunCountL(args->Arg(0));
 	CSysMonTestHelper::IncrementRunCountL(args->Arg(0));
     CleanupStack::PopAndDestroy(args);
 
-    
+    RDebug::Printf("runCount = %d", runCount);
     switch (runCount)
         {
 		case 0:
@@ -42,7 +48,7 @@ TInt MainL()
 			sysmon.OpenL();
 			CleanupClosePushL(sysmon);
 			
-			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_donothing.exe"), KNullDesC);
+			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_donothing.exe"), _L("33"));
 			props->SetMonitored(ETrue);
 			props->SetStartupType(EStartProcess);
 			props->SetStartMethod(EWaitForStart);
@@ -53,12 +59,15 @@ TInt MainL()
 			RProcess slave1;
 			slave1.Create(_L("tsysmon_app_donothing.exe"), _L("5000"));
 			CleanupClosePushL(slave1);
+			TRequestStatus status;
+			slave1.Rendezvous(status);
 			slave1.Resume();
+			User::WaitForRequest(status);
 
 			// Register with SysMon
 			sysmon.MonitorL(*props, slave1);
 			slave1.Terminate(KErrNone);
-
+			
 			CleanupStack::PopAndDestroy(3, &sysmon);
 			break;
 			}
@@ -68,6 +77,7 @@ TInt MainL()
             break;
 			}
         }
+    
 	RDebug::Print(_L("appfwk-sysmon-0033: End MainL"));
 	return KErrNone;
 	}
