@@ -41,7 +41,7 @@ public:
 	command of this type.
 	@param The response error.
 	*/
-	IMPORT_C virtual void MrccacoResponse(TRemConCoreApiOperationId aOperationId, TInt aError);
+	virtual void MrccacoResponse(TRemConCoreApiOperationId aOperationId, TInt aError);
 	};
 
 #endif // REMCONCOREAPICONTROLLEROBSERVER_H

@@ -208,12 +208,7 @@ void CSSYChannel::DoCancel()
 // CSSYChannel::RunError()
 // ----------------------------------------------------------------------------------
 // 
-#ifdef _DEBUG
 TInt CSSYChannel::RunError( TInt aError )
-#else
-// not used in UREL builds
-TInt CSSYChannel::RunError( TInt /*aError*/ )
-#endif
     {
     SSY_TRACE( EMust, "ORIENTATIONSSY:RunError %d", aError );
     
@@ -308,6 +303,17 @@ void CSSYChannel::RunL()
             break;
         case EChannelOpening:
             {
+            // Before completing channel opening, get max data rate from actual SSY
+            if ( !iSensorProperties->DataRateUpdated() )
+                {
+                TSensrvProperty maxdatarate;
+                RSensrvChannelList affectedChannels;
+                // Get max data rate
+                iOrientationHandler->GetMaxDataRateL( maxdatarate );
+                // Set property
+                iSensorProperties->SetProperty( maxdatarate, affectedChannels );
+                }
+
             SetChannelState( EChannelOpen );
             iCallback->ChannelOpened( iChannelInfo.iChannelId, iStatus.Int(), this, this );
             break;

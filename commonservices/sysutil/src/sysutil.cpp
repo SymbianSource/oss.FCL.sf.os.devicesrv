@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -834,7 +834,7 @@ static void ReadDeviceAttribFilesAsArraysL(
 	_LIT( KWildCardChar, "*" );
 	
 	RFs fs;
-	User::LeaveIfError( fs.Connect() );
+	fs.Connect();
 	CleanupClosePushL( fs );
 	
 	// Get the localised version of deviceattributes.ini, if available, and use

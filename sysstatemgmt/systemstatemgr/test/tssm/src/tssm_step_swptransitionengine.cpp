@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -281,9 +281,7 @@ void CSsmSwpTransitionEngineTest::doTestRequestSimpleL()
 	CleanupStack::PushL(cleSession);
 
 	// Define and set the rproperty
-	TInt err = (iProperty.Define(RProcess().SecureId(), KSwpTestKey1, RProperty::EInt));
-	INFO_PRINTF2(_L("doTestRequestSimpleL :: Define KSwpTestKey1 returns : %d "), err);
-	TEST ((KErrNone == err) ||(KErrAlreadyExists == err));
+	TEST(KErrNone == iProperty.Define(RProcess().SecureId(), KSwpTestKey1, RProperty::EInt));
 	TEST(KErrNone == iProperty.Set(RProcess().SecureId(), KSwpTestKey1, 0));
 
 	TInt value;

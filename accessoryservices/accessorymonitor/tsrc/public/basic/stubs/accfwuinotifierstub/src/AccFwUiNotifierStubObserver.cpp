@@ -70,8 +70,8 @@ void CAccFWUINotifierStubObserver::RunL()
 	TBool booli( EFalse );
 	booli = 1 & buf().iParam2;
 	
-	iService->SetObserverSelection( some, boolibuf().iParam1, buf().iParam2);
-	
+	//iService->SetObserverSelection( some, booli/*buf().iParam1, buf().iParam2*/ //);
+/*	
 	if( !IsActive() )
 		{
 		iStatus = KRequestPending;

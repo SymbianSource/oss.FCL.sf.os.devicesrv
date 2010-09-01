@@ -281,6 +281,18 @@ class CSensrvChannel : public CBase
         CSensrvConditionEvaluator* ConditionEvaluatorL();
 
         /**
+        * Get clients of this channel. The client identified by aCallerSecureId
+        * is not added to the affected clients list.
+        *
+        * @since S60 5.0
+        * @param[in,out] aAffectedClients On return contains client
+        *                 processes priorities for this channel.
+        * @param[in]     aCallerSecureId Identifies the listener which is filtered away.
+        */
+        void GetAffectedClients( RArray<TInt>& aAffectedClients,
+                                 TSecureId aCallerSecureId );
+
+        /**
         * Gets listener for session.
         *
         * @since S60 5.0

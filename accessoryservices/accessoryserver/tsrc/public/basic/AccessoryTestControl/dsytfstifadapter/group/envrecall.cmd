@@ -55,7 +55,7 @@ REM call abld export
 call sbs -c armv5 EXPORT
 call sbs -c winscw EXPORT
 REM call abld build accessoryadaptation
-call sbs -p accessoryadaptation.mmp
+call sbs -p accessoryadaptation
 popd
 @echo build accessoryadaptation... Finished
 

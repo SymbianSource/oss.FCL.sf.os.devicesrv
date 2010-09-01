@@ -13,8 +13,8 @@
 // Description:
 //
 
-#include <test/ctefunitserver.h>
-#include <test/tefunit.h>
+#include <ctefunitserver.h>
+#include <tefunit.h>
 #include "hwrmtest.h"
 
 // Require: return server name : must be the same that the exe name

@@ -22,8 +22,8 @@ pushd \sf\mw\btservices\bluetoothengine\btaudioman\group
 REM call bldmake bldfiles
 REM call abld makefile btaudiomanclient
 REM call abld reallyclean btaudiomanclient
-call sbs -p btaudiomanclient.mmp -c armv5 CLEAN
-call sbs -p btaudiomanclient.mmp -c winscw CLEAN
+call sbs -p btaudiomanclient -c armv5 REALLYCLEAN
+call sbs -p btaudiomanclient -c winscw REALLYCLEAN
 popd
 @echo Cleaning BT Audioman Client... Finished
 
@@ -33,8 +33,8 @@ pushd \sf\mw\appsupport\coreapplicationuis\accfwuinotifier\group
 REM call bldmake bldfiles
 REM call abld makefile 
 REM call abld reallyclean
-call sbs -c armv5 CLEAN
-call sbs -c winscw CLEAN
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
 popd
 @echo Cleaning accfwuinotifier... Finished
 
@@ -44,8 +44,8 @@ pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\a
 REM call bldmake bldfiles
 REM call abld makefile accessoryadaptation
 REM call abld clean accessoryadaptation
-call sbs -p accessoryadaptation.mmp -c armv5 CLEAN
-call sbs -p accessoryadaptation.mmp -c winscw CLEAN
+call sbs -p accessoryadaptation -c armv5 CLEAN
+call sbs -p accessoryadaptation -c winscw CLEAN
 popd
 @echo Cleaning accessoryadaptation... Finished
 
@@ -54,8 +54,8 @@ popd
 pushd \sf\os\devicesrv\accessoryservices\pluggeddisplay\pluggeddisplayasy\group
 REM call bldmake bldfiles
 REM call abld reallyclean
-call sbs -c armv5 CLEAN
-call sbs -c winscw CLEAN
+call sbs -c armv5 REALLYCLEAN
+call sbs -c winscw REALLYCLEAN
 popd
 @echo Cleaning Plugged Display ASY... Finished
 

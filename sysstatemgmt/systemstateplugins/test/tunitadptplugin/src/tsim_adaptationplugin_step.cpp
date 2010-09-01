@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,14 +22,12 @@
 
 
 #include <s32mem.h>
-#include <e32property.h>
 #include "tsim_adaptationplugin_step.h"
 
 //
 // Run the tests
 //
-const TUint32 KSimPluginPropertyKey = 0x2000D76B;
-const TUid KPropertyCategory={0x2000D75B};              // tcustomcmd_server SID = KSsmServerName SID (changed in tcustomcmd_server.mmp file)
+
 
 CTestSimAdaptationPlugin::CTestSimAdaptationPlugin()
 	:CAdaptationTestBase(KTCTestSimAdaptationPlugin)
@@ -104,12 +102,9 @@ void CTestSimAdaptationPlugin::TestNotifyCancel()
 //from CAdaptationTestBase
 TVerdict CTestSimAdaptationPlugin::doTestStepL()
 	{
+	TInt err = KErrNone;
+
 	__UHEAP_MARK;
-	
-    TInt err = RProperty::Define(KPropertyCategory, KSimPluginPropertyKey, RProperty::EInt);
-    TEST((KErrNone == err) || (KErrAlreadyExists == err));
-    err = RProperty::Set(KPropertyCategory, KSimPluginPropertyKey, 1);
-    TEST(KErrNone == err);
 	
 	TRAP(err, TestGetSimOwned());
 	TEST(err == KErrNone);
@@ -133,8 +128,6 @@ TVerdict CTestSimAdaptationPlugin::doTestStepL()
 	TestGetCancel();
 	//TestRelease();			// have to test this part too ...
 
-    err = RProperty::Delete(KPropertyCategory, KSimPluginPropertyKey);
-    TEST(KErrNone == err);
 	__UHEAP_MARKEND;
 
 	return TestStepResult();

@@ -22,12 +22,8 @@ pushd \ncp_sw\corecom\modemadaptation_ext\adaptationlayer_ext\systemadaptation\a
 REM call bldmake bldfiles
 REM call abld makefile remconadaptation
 REM call abld reallyclean remconadaptation
-if not "%1"=="" goto default
-call sbs -p remconadaptation.mmp -c armv5.%1 CLEAN
-:default
-call sbs -p remconadaptation.mmp -c armv5 CLEAN
-call sbs -p remconadaptation.mmp -c winscw CLEAN
-REM Add other variants if applicable
+call sbs -p remconadaptation -c armv5 REALLYCLEAN
+call sbs -p remconadaptation -c winscw REALLYCLEAN
 popd
 @echo Cleaning remconadaptation... Finished
 

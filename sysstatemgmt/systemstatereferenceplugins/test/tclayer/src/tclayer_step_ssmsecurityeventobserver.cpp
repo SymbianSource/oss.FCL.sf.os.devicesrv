@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,8 +19,6 @@
  @internalComponent - Internal Symbian test code  
 */
 
-#include <e32property.h>
-#include <w32std.h>
 #include "ssmdebug.h"
 #include "strtsecphaseobserver.h"
 #include "ssmsecurityeventobserver.h"
@@ -35,8 +33,6 @@
 
 //Exe name which defines security state PS keys
 _LIT (KExeToDefineSecurityStatePS, "\\sys\\bin\\definesecuritystateps.exe");
-const TUint32 KMiscPluginPropertyKey = 0x2000E658;
-const TUid KPropertyCategory={0x2000D75B};
 
 CLayerTestSsmEventObserver::CLayerTestSsmEventObserver()
 	{
@@ -64,31 +60,15 @@ TVerdict CLayerTestSsmEventObserver::doTestStepPreambleL()
 
 	//Start the test exe which defines security state related property keys
 	RProcess processHandle;
-	CleanupClosePushL(processHandle);
 	processHandle.Create(KExeToDefineSecurityStatePS, KNullDesC);
 	processHandle.Resume();
-	TRequestStatus status;
-    processHandle.Rendezvous(status);
-    User::WaitForRequest(status);
-	        
-    TInt retVal = status.Int();
-    INFO_PRINTF2(_L("retVal = %d"),retVal);
-    TEST(KErrNone == retVal);
-    // leave if the process has not started properly
-    User::LeaveIfError(retVal);
-    CleanupStack::PopAndDestroy();
-	//processHandle.Close();
-    
-    TInt error = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
-    TInt error1 = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
-    INFO_PRINTF3(_L("Defining and setting property returned %d & %d"), error, error1);
+	processHandle.Close();
 
 	return CTestStep::doTestStepPreambleL();
 	}
 
 TVerdict CLayerTestSsmEventObserver::doTestStepPostambleL()
 	{
-    TInt error = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
 	return CTestStep::doTestStepPostambleL();
 	}
 
@@ -102,9 +82,6 @@ static TInt CallBackL(TAny* aLayerTestSsmEventObserver)
 
 void CLayerTestSsmEventObserver::SimulatePasswordEntry()
 	{
-    /*RWsSession wsSession;
-    wsSession.Connect();*/
-    
 	TRawEvent eventDown;
 	TRawEvent eventUp;
 
@@ -113,21 +90,12 @@ void CLayerTestSsmEventObserver::SimulatePasswordEntry()
 	UserSvr::AddEvent(eventDown);
 	eventUp.Set(TRawEvent::EKeyUp, EStdKeyComma);
 	UserSvr::AddEvent(eventUp);
-	User::After(1000000);
 
-/*    eventDown.Set(TRawEvent::EKeyDown, EStdKeyEnter);
-    UserSvr::AddEvent(eventDown);
-    eventUp.Set(TRawEvent::EKeyUp, EStdKeyEnter);
-    UserSvr::AddEvent(eventUp);*/
-    
-	eventDown.Set(TRawEvent::EButton1Down, 60, 600);
+	eventDown.Set(TRawEvent::EKeyDown, EStdKeyEnter);
 	UserSvr::AddEvent(eventDown);
-	eventUp.Set(TRawEvent::EButton1Up, 60, 600);
+	eventUp.Set(TRawEvent::EKeyUp, EStdKeyEnter);
 	UserSvr::AddEvent(eventUp);
 	User::After(1000000);
-	
-   /* wsSession.Flush();
-    wsSession.Close();*/
 	}
 
 void CLayerTestSsmEventObserver::CallBackRunL()

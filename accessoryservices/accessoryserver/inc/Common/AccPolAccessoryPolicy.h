@@ -195,17 +195,6 @@ class CAccPolAccessoryPolicy : public CBase
         * @see AccessoryTypes.h for supported HW device types.
         */        
         IMPORT_C TUint32 SupportedHWDevicesL();           
-        
-        /**
-        * Check to see if the requested capability is defined for the genericId
-        *
-        * @since S60 3.1
-        * @param aGenericID Generic ID of the list to be used
-        * @param aName Name of the capability
-        * @return True if the requested capability is defined for the genericId. Else False. 
-        */
-        IMPORT_C TBool IsCapabilityDefinedL(const TAccPolGenericID& aGenericId,
-                                            const TUint32& aName );
                          
     public: // Functions from base classes
         

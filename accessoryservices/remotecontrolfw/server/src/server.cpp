@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -1740,28 +1740,36 @@ TInt CRemConServer::DeliverMessageToClient(CRemConMessage& aMsg, CRemConSession&
 	LOGINCOMINGDELIVERED;
 	TInt err = KErrNone;
 
-	// First off check if the client supports this
-	if(!aSess.SupportedMessage(aMsg))
-        {
-        err = KErrArgument;
-        
-        // 'Take ownership' of it by destroying it- it's finished with.
-        delete &aMsg;
-        }
-	else if ( aSess.CurrentReceiveMessage().Handle() )
+	if ( aSess.ClientAvailable() )
 		{
-		// If the client can take the message now put it on the right queue.
-
-		err = aSess.WriteMessageToClient (aMsg);
-		// If the message was a command, and it was delivered with no error, 
-		// then put it in the 'incoming delivered' log. Otherwise, delete it 
-		// because it's finished with.
-		if ((aMsg.MsgType() == ERemConCommand) || (aMsg.MsgType() == ERemConNotifyCommand))
+		// First off check if the client supports this
+		if(!aSess.SupportedMessage(aMsg))
 			{
-			if (err == KErrNone )
+			err = KErrArgument;
+
+			// 'Take ownership' of it by destroying it- it's finished with.
+			delete &aMsg;
+			}
+		else if ( aSess.CurrentReceiveMessage().Handle() )
+			{
+			// If the client can take the message now put it on the right queue.
+
+			err = aSess.WriteMessageToClient (aMsg);
+			// If the message was a command, and it was delivered with no error,
+			// then put it in the 'incoming delivered' log. Otherwise, delete it
+			// because it's finished with.
+			if ((aMsg.MsgType() == ERemConCommand) || (aMsg.MsgType() == ERemConNotifyCommand))
 				{
-				// We'll need to remember it for the response coming back.
-				IncomingDelivered().Append(aMsg); 
+				if (err == KErrNone )
+					{
+					// We'll need to remember it for the response coming back.
+					IncomingDelivered().Append(aMsg);
+					}
+				else
+					{
+					// 'Take ownership' of it by destroying it- it's finished with.
+					delete &aMsg;
+					}
 				}
 			else
 				{
@@ -1771,12 +1779,19 @@ TInt CRemConServer::DeliverMessageToClient(CRemConMessage& aMsg, CRemConSession&
 			}
 		else
 			{
-			// 'Take ownership' of it by destroying it- it's finished with.			
-			delete &aMsg;
+			IncomingPendingDelivery().Append(aMsg);
 			}
 		}
 	else
 		{
+		// The client has not yet registered the interfaces they're interested
+		// in, so put the message on the incoming pending delivery queue until
+		// they do.
+		// Return KErrNone to avoid sending a reject. We're assuming that the
+		// client will eventually successfully receive the message, as we
+		// don't have a better basis on which to operate. This is identical to
+		// the case where a client doesn't have an outstanding receive request
+		// at this time.
 		IncomingPendingDelivery().Append(aMsg);
 		}
 	

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -199,9 +199,10 @@ TInt RTestSsmMiscAdaptation::HeapMarkEnd()
 TInt RTestSsmMiscAdaptation::CleanupAdaptations()
 	{
 	TInt ret = KErrNone;
-    // Since actual plugins are being used, they cannot be unloaded.
-    // Hence return without doing anything. There will be HeapMarkEnd to check that
-    // memory is not leaked.
+	if(Handle())
+		{
+		ret =  SendReceive(EDebugCleanupAdaptations);
+		}
 	return ret;
 	}
 

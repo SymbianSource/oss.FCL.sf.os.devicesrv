@@ -78,20 +78,21 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         // prio 0xFFC7
         r_cmd_initclkeys,
         r_cmd_initramdrive,
-        r_cmd_rtc,              // prio 0xFF97
-        // prio 0xFF96 -  rtc (tzsrv, mediator & hwrmsrv have been moved to extended startuplist but uses the same multiplewait command )
+        // prio 0xFFA7
+        r_cmd_splash,
+        // prio 0xFF97
+        r_cmd_rtc,
+        // prio 0xFF96 - rtc (tzsrv, cntsrv, mediator & hwrmsrv have been moved to extended startup list but use the same multiplewait command)
         r_cmd_multiwaitforever1,
         // prio 0xFF87
         r_cmd_accsrv,
         r_cmd_selectlanguage,   // Select UI language to use
-        // prio 0xFF86 - accsrv, seleclanguage (dbrecovery has been moved to extended startup list but uses the same multiplewait command))
+        // prio 0xFF86 - accsrv, seleclanguage (dbrecovery has been moved to extended startup list but uses the same multiplewait command)
         r_cmd_multiwaitforever2,
         // prio 0xFF85
-        r_cmd_loadlocalesup,    // Observes changes in locale data        
+        r_cmd_loadlocalesup,    // Observes changes in locale data
         // prio 0xFF79
         r_cmd_aknstart,         // UI Framework
-        r_cmd_hbthemeserver,	//CR:KJLN-7WBEGU
-        r_cmd_devicedialog,     //CR:KJLN-7WBEGU   
         // prio 0xFF77
         r_cmd_apparc_init,      // Init application framework
         // prio 0xFF75
@@ -141,29 +142,6 @@ RESOURCE SSM_WAIT_FOR_APPARC_INIT r_cmd_apparc_init
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_devicedialog
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_devicedialog
-    {
-    priority = 0xFF79;
-    severity = ECmdCriticalSeverity;             
-    name = "Z:\\sys\\bin\\hbdevicedialogappserver.exe";    
-    execution_behaviour = ESsmWaitForSignal;
-    }    
-
-// ---------------------------------------------------------------------------
-// r_cmd_hbthemeserver
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_START_PROCESS_INFO r_cmd_hbthemeserver
-    {
-    priority = 0xFF79;
-    name = "z:\\sys\\bin\\hbthemeserver.exe";
-    execution_behaviour = ESsmWaitForSignal;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cmd_initclkeys
 // ---------------------------------------------------------------------------
 //
@@ -203,8 +181,6 @@ RESOURCE SSM_START_SSM_UTILITY_PLUGIN r_cmd_loadlocalesup
     filename = "ssmlocaleobserversup.dll";
     ordinal = 1;
     }
-
-
 
 // ---------------------------------------------------------------------------
 // r_cmd_loadpowersup
@@ -352,6 +328,16 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_selectlanguage
     dllname = "ssmlangselcmd.dll";
     ordinal = 1; // SelectLanguage
     retries = 2;
+    }
+
+// ---------------------------------------------------------------------------
+// r_cmd_splash
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_splash
+    {
+    priority = 0xFFA7;
+    name = "Z:\\sys\\bin\\splashscreen.exe";
     }
 
 // ---------------------------------------------------------------------------

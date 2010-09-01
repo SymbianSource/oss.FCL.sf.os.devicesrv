@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -40,9 +40,6 @@ _LIT (KExeToDefineEmergencyCallPS, "\\sys\\bin\\defineemergencycallps.exe");
 // Use to write the PIN Check Security test case nos.
 _LIT(KTestCmdSecurityCheckTestFile, "c:\\cmdsecuritychecktest\\pinchecksecuritycaseno.txt");
 
-const TUid KPropertyCategory={0x2000D75B};
-const TUint32 KMiscPluginPropertyKey = 0x2000E658;
-
 static TInt CallBack2L(TAny* aCCustomCmdTestSecurityCheck);
 
 CCustomCmdTestSimSecurityCheck::~CCustomCmdTestSimSecurityCheck()
@@ -68,14 +65,6 @@ TVerdict CCustomCmdTestSimSecurityCheck::doTestStepPreambleL()
 	
 	//Needed fro calling calback for stopping active scheduler
 	iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
-	
-    TInt err = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
-	INFO_PRINTF2(_L("Define Test Property returns : %d "), err);
-	TEST(KErrNone == err || KErrAlreadyExists == err);
-    err = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
-	INFO_PRINTF2(_L("Set Test Property returns : %d "), err);
-	TEST(KErrNone == err);
-
 
 	RProcess processHandle;
 	CleanupClosePushL(processHandle);
@@ -109,7 +98,7 @@ TVerdict CCustomCmdTestSimSecurityCheck::doTestStepPreambleL()
 	
 	//connect to file server
 	User::LeaveIfError(iFs.Connect());
-	err = iFs.MkDirAll(KDirNameOfTestCasesNumFile);
+	TInt err = iFs.MkDirAll(KDirNameOfTestCasesNumFile);
 	if (KErrAlreadyExists != err && KErrNone != err)
 		{
 		INFO_PRINTF1(_L("Leaving as it could not create directory"));
@@ -136,8 +125,6 @@ TVerdict CCustomCmdTestSimSecurityCheck::doTestStepPostambleL()
 	{
 	iFs.Delete(KTestCmdSecurityCheckTestFile);
 	iFs.Close();
-	TInt err = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
-	TEST(KErrNone == err);
 	return CTestStep::doTestStepPostambleL();
 	}
 
@@ -183,11 +170,9 @@ void CCustomCmdTestSimSecurityCheck::TestGeneralL()
 	
 	TUid uid1 = CSsmUiSpecific::StartupPSUid();
 	TEST(KPSStartupUid == uid1);
-	INFO_PRINTF3(_L("Test GeneralL : KPSStartupUid = %d ; Got from CSsmUiSpecific::StartupPSUid = %d "), KPSStartupUid, uid1);
 
 	TUid uid2 = CSsmUiSpecific::SecurityPinNotifierUid();
 	TEST(KSecurityPinNotifierUid == uid2);
-	INFO_PRINTF3(_L("Test GeneralL : KSecurityPinNotifierUid = %d ; Got from CSsmUiSpecific::SecurityPinNotifierUid = %d "), KPSStartupUid, uid2);
 	
 	TEST( CSsmUiSpecific::IsSimlessOfflineSupported() );
 	
@@ -968,8 +953,6 @@ static TInt CallBack3L(TAny* aCCustomCmdTestSimSecurityCheck)
 
 void CCustomCmdTestSimSecurityCheck::SimulatePasswordEntry()
 	{
-    const TInt okButtonPos1 = 60; //the position of ok button
-    const TInt okButtonPos2 = 600; //the position of ok button
 	TRawEvent eventDown;
 	TRawEvent eventUp;
 
@@ -980,11 +963,11 @@ void CCustomCmdTestSimSecurityCheck::SimulatePasswordEntry()
 	UserSvr::AddEvent(eventUp);
 	User::After(100000);
 
-    eventDown.Set(TRawEvent::EButton1Down, okButtonPos1,okButtonPos2);
-    UserSvr::AddEvent(eventDown);
-    eventUp.Set(TRawEvent::EButton1Up, okButtonPos1, okButtonPos2);
-    UserSvr::AddEvent(eventUp);
-    User::After(100000);
+	eventDown.Set(TRawEvent::EKeyDown, EStdKeyEnter);
+	UserSvr::AddEvent(eventDown);
+	eventUp.Set(TRawEvent::EKeyUp, EStdKeyEnter);
+	UserSvr::AddEvent(eventUp);
+	User::After(100000);
 	}
 
 void CCustomCmdTestSimSecurityCheck::CallBack3RunL()

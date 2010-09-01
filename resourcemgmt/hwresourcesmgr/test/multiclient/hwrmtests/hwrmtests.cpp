@@ -17,7 +17,7 @@
 #include <e32cons.h>
 
 _LIT(KDirectoryPath, "C:\\logs\\");
-_LIT(KLogFile,"C:\\logs\\testexecute\\hwrmtests.htm");
+_LIT(KLogFile,"C:\\logs\\hwrmtests.log");
 _LIT8(KCrLf,"\r\n");
 _LIT8(KRTest,"RTEST:");
 

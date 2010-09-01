@@ -23,8 +23,7 @@ class MHWRMBatteryChargingStatusObserver;
 
 /* Observer class for charging status change */
 
-class CHWRMChargingStatusObs: public CBase,
-                              public MPsPropertyObserver
+class CHWRMChargingStatusObs: public MPsPropertyObserver
     {
     public:
         static CHWRMChargingStatusObs* NewL(MHWRMBatteryChargingStatusObserver* aChargingStatusCallback);

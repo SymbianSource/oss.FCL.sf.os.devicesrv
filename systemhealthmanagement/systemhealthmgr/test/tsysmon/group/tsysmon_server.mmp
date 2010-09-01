@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -50,7 +50,6 @@ SOURCE tsysmon_step_run_count_check.cpp
 SOURCE tsysmon_steploadsysmon.cpp
 SOURCE tsysmon_stepoomsysmon.cpp
 SOURCE tsysmon_stepcancelallmonitors.cpp
-SOURCE tsysmon_steposrestarttest.cpp
 
 LIBRARY	euser.lib
 LIBRARY	testexecuteutils.lib

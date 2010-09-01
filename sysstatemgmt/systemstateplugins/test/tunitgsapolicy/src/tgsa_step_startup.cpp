@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,20 +27,10 @@
 #include <ssm/ssmcommandlist.h>
 #include <ssm/ssmsubstates.hrh>
 #include <ssm/ssmcommand.h>
-#include <ssmsubstateext.hrh>
 
 
 #ifdef SYMBIAN_SSM_GRACEFUL_SHUTDOWN
-TSsmCommandType ArrCriticalStartUp[] = {ESsmCmdPublishSystemState,  //r_cmd_publishstate
-                                        ESsmCmdStartProcess,        //r_cmd_sysagt
-                                        ESsmCmdCustomCommand,       //r_cmd_initpskeys
-                                        ESsmCmdCustomCommand,       //r_cmd_checkuserdrive
-                                        ESsmCmdCustomCommand,       //r_cmd_deltempfiles
-                                        ESsmCmdStartProcess,        //r_cmd_reservedisk
-                                        ESsmCmdStartProcess,        //r_cmd_sysmon
-                                        ESsmCmdStartProcess,        //r_cmd_ssmutilsrv
-                                        ESsmCmdMultipleWait         //r_cmd_multiwaitforever
-                                        };
+TSsmCommandType ArrCriticalStartUp[] = { ESsmCmdCustomCommand,ESsmCmdPublishSystemState,ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess,ESsmCmdStartProcess, ESsmCmdSetPAndSKey, ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdLoadSup };
 #else
 TSsmCommandType ArrCriticalStartUp[] = { ESsmCmdCustomCommand,ESsmCmdPublishSystemState,ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess,ESsmCmdStartProcess, ESsmCmdSetPAndSKey, ESsmCmdStartProcess, ESsmCmdStartProcess, ESsmCmdStartProcess };
 #endif
@@ -49,45 +39,8 @@ TSsmCommandType ArrNetworkingStartUp[] = { ESsmCmdPublishSystemState,ESsmCmdStar
 #ifdef TEST_SSM_GRACEFUL_OFFLINE
 TSsmCommandType ArrNonCriticalStartUp[] = { ESsmCmdSetPAndSKey, ESsmCmdSetPAndSKey,ESsmCmdSetPAndSKey,ESsmCmdPublishSystemState ,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdAMAStarter};
 #else
-TSsmCommandType ArrNonCriticalStartUp[] = { ESsmCmdCustomCommand,       //r_cmd_sastate
-                                            ESsmCmdPublishSystemState,  //r_cmd_publishstate
-                                            ESsmCmdSetPAndSKey,         //r_cmd_psstate
-                                            ESsmCmdCustomCommand,       //r_cmd_startupmode
-                                            ESsmCmdLoadSup,             //r_cmd_loadpowersup
-                                            ESsmCmdCustomCommand,       //r_cmd_rfsfirstboot
-                                            ESsmCmdCustomCommand,       //r_cmd_rfsdeep
-                                            ESsmCmdCustomCommand,       //r_cmd_rfsnormal
-                                            ESsmCmdCustomCommand,       //r_cmd_initclkeys
-                                            ESsmCmdCustomCommand,       //r_cmd_initramdrive
-                                            ESsmCmdStartProcess,        //r_cmd_wserv
-                                            ESsmCmdStartProcess,        //r_cmd_splash
-                                            ESsmCmdStartProcess,        //r_cmd_tzsrv
-                                            ESsmCmdStartProcess,        //r_cmd_mediator
-                                            ESsmCmdStartProcess,        //r_cmd_hwrmsrv
-                                            ESsmCmdCustomCommand,       //r_cmd_rtc
-                                            ESsmCmdMultipleWait,        //r_cmd_multiwaitforever1
-                                            ESsmCmdStartProcess,        //r_cmd_dbrecovery
-                                            ESsmCmdStartProcess,        //r_cmd_accsrv
-                                            ESsmCmdCustomCommand,       //r_cmd_selectlanguage
-                                            ESsmCmdMultipleWait,        //r_cmd_multiwaitforever2
-                                            ESsmCmdLoadSup,             //r_cmd_loadlocalesup
-                                            ESsmCmdLoadSup,             //r_cmd_loadcollation
-                                            ESsmCmdLoadSup,             //r_cmd_loadregion
-                                            ESsmCmdLoadSup,             //r_cmd_loaduilanguage
-                                            ESsmCmdCustomCommand,       //r_cmd_aknstart
-                                            ESsmCmdWaitForApparcInit,   //r_cmd_apparc_init
-                                            ESsmCmdCustomCommand        //r_cmd_rfspostui
-                                            };
+TSsmCommandType ArrNonCriticalStartUp[] = { ESsmCmdPublishSystemState ,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdStartProcess,ESsmCmdAMAStarter};
 #endif
-TSsmCommandType ArrCriticalAppsStartUp[] = {ESsmCmdCustomCommand,       //r_cmd_sastate
-                                            ESsmCmdPublishSystemState,  //r_cmd_publishstate
-                                            ESsmCmdSetPAndSKey,         //r_cmd_psstate
-                                            ESsmCmdCustomCommand,       //r_cmd_selftest
-                                            ESsmCmdStartProcess,        //r_cmd_cfserver
-                                            ESsmCmdStartApp,            //r_cmd_sysap
-                                            ESsmCmdStartProcess,        //r_cmd_profmon
-                                            ESsmCmdMultipleWait         //r_cmd_multiwaitforever
-                                            };
 
 CGsaStartupTest::~CGsaStartupTest()
 	{
@@ -170,8 +123,9 @@ New Test CaseID 		DEVSRVS-SSPLUGINS-GSA-0010
 	INFO_PRINTF1(_L("> CGsaStartupTest::doTestPrepareCommandListL"));
 	TestPrepareCommandListL(ESsmStartup ,ESsmStartupSubStateCriticalStatic, KErrNone);
 	TestPrepareCommandListL(ESsmStartup ,KSsmAnySubState, KErrNone);
+	TestPrepareCommandListL(ESsmStartup ,ESsmStartupSubStateCriticalDynamic, KErrNone);
+	TestPrepareCommandListL(ESsmStartup ,ESsmStartupSubStateNetworkingCritical, KErrNone);
 	TestPrepareCommandListL(ESsmStartup ,ESsmStartupSubStateNonCritical, KErrNone);
-	TestPrepareCommandListL(ESsmStartup ,ESsmStateStartingCriticalApps, KErrNone); //ESsmStateStartingCriticalApps = 0x31
 	TestPrepareCommandListL(ESsmStartup ,100, KErrNotFound);
 	}
 
@@ -185,8 +139,10 @@ void CGsaStartupTest::doTestCommandListL()
 	INFO_PRINTF1(_L("> CGsaStartupTest::doTestCommandListL"));
 
 	TestCommandListL(ESsmStartup, ESsmStartupSubStateCriticalStatic, sizeof(ArrCriticalStartUp) / sizeof(ArrCriticalStartUp[0]));
+	TestCommandListL(ESsmStartup, KSsmAnySubState, sizeof(ArrCriticalStartUp) / sizeof(ArrCriticalStartUp[0]));
+	TestCommandListL(ESsmStartup, ESsmStartupSubStateCriticalDynamic, sizeof(ArrDynamicStartUp) / sizeof(ArrDynamicStartUp[0]));
+	TestCommandListL(ESsmStartup, ESsmStartupSubStateNetworkingCritical, sizeof(ArrNetworkingStartUp) / sizeof(ArrNetworkingStartUp[0]));
 	TestCommandListL(ESsmStartup, ESsmStartupSubStateNonCritical, sizeof(ArrNonCriticalStartUp) / sizeof(ArrNonCriticalStartUp[0]));
-	TestCommandListL(ESsmStartup, ESsmStateStartingCriticalApps, sizeof(ArrCriticalAppsStartUp) / sizeof(ArrCriticalAppsStartUp[0]));	
 	}
 
 /**
@@ -200,22 +156,46 @@ void CGsaStartupTest::doTestGetNextStateL()
 	CGsaStatePolicyStartup* policy = CreateAndInitializeStartUpPolicyLC();
 
 	TSsmState state(ESsmStartup, KSsmAnySubState);
-	TSsmState result(ESsmStartup, ESsmStartupSubStateNonCritical);
-	// KSsmAnySubState (KSsmAnySubState) will return ESsmStartupSubStateNonCritical only for the first time, 
+	TSsmState result(ESsmStartup, ESsmStartupSubStateCriticalDynamic);
+	// KSsmAnySubState (KSsmAnySubState) will return ESsmStartUpSubStateCriticalDynamic only for the first time, 
 	// next call will always return the next sub state for transition.
 	TestGetNextState(policy, state, KErrNone, result);
 
 	TSsmState firstState(ESsmStartup, ESsmStartupSubStateCriticalStatic);
-	TSsmState firstResult(ESsmStartup, ESsmStartupSubStateNonCritical);
+	TSsmState firstResult(ESsmStartup, ESsmStartupSubStateCriticalDynamic);
 	TestGetNextState(policy, firstState, KErrNone, firstResult);
 
-	TSsmState secondState(ESsmStartup, ESsmStartupSubStateNonCritical);
-	TSsmState secondResult(ESsmStartup, ESsmStateStartingCriticalApps);
+	TSsmState secondState(ESsmStartup, ESsmStartupSubStateCriticalDynamic);
+	TSsmState secondResult(ESsmStartup, ESsmStartupSubStateNetworkingCritical);
 	TestGetNextState(policy, secondState, KErrNone, secondResult);
 
-	TSsmState thirdState(ESsmStartup, ESsmStateStartingCriticalApps);
-	TSsmState thirdResult(ESsmStartup, ESsmStateSelfTestOK);
+	TSsmState thirdState(ESsmStartup, ESsmStartupSubStateNetworkingCritical);
+	TSsmState thirdResult(ESsmStartup, ESsmStartupSubStateNonCritical);
 	TestGetNextState(policy, thirdState, KErrNone, thirdResult);
+#ifdef __WINS__
+	TSsmState fourthState(ESsmStartup, ESsmStartupSubStateNonCritical);
+	TSsmState fourthResult(ESsmNormal, KSsmAnySubState);
+	TestGetNextState(policy, fourthState, KErrNone, fourthResult);
+#else
+	TSsmState fourthState(ESsmStartup, ESsmStartupSubStateNonCritical);
+	TSsmState fourthResult(ESsmStartup, 0x48);//Added 0x48 sub-state for new test for ARMV5 
+	TestGetNextState(policy, fourthState, KErrNone, fourthResult);
+	//This new state test Added for the one more sub-state available in ARMV5 compare to WINSCW
+	TSsmState fourthToNextState(ESsmStartup, 0x48);
+	TSsmState fourthToNextStateResult(ESsmNormal, KSsmAnySubState);
+	TestGetNextState(policy, fourthToNextState, KErrNone, fourthToNextStateResult);
+#endif
+
+	TSsmState fifthState(ESsmStartup, KSsmAnySubState);
+	TSsmState fifthResult(ESsmStartup, ESsmStartupSubStateCriticalDynamic);
+	// KSsmAnySubState (0xffff) will return ESsmStartUpSubStateCriticalDynamic only for the first time, 
+	// next call will always return the next sub state for transition.
+	TestGetNextState(policy, fifthState, KErrNone, fifthResult);
+	
+	//Commented this test because CGsaStatePolicyStartup::GETNExtstate panicks if substate is unknown
+	//TSsmState unknownState(ESsmStartup, 100);
+	//TSsmState knownResult(ESsmStartup, 0);
+	//TestGetNextState(policy, unknownState, KErrNone, knownResult);
 
 	CleanupStack::PopAndDestroy(policy);
 	}

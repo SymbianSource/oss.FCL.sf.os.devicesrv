@@ -1,0 +1,37 @@
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+//
+
+PRINT Run GsaStateTranToShutdownStep tests
+
+LOAD_SUITE tgsa_i_server
+
+START_TESTCASE 				DEVSRVS-SSPLUGINS-GSA-0035
+//! @SYMTestCaseID			DEVSRVS-SSPLUGINS-GSA-0035
+//! @SYMDEF				DEF119568
+//! @SYMTestCaseDesc			Checks for state transitions to fail and shutdown states from normal state 
+//! 					under different scenarios.
+//! @SYMTestType			CIT	
+//! @SYMTestPriority			Critical
+//! @SYMTestActions			Test checks the results for request state transition under different scenarios:
+//! 					1. Normal state to Shutdown state.
+//! 					Scenario 1 - Request for state transition to shutdown state - invalid substate
+//! 					Scenario 2 - Request for state transition to shutdown state - critical substate(Restart)
+//! 					Scenario 3 - Request for state transition to shutdown state - critical substate(Standby)
+//! @SYMTestExpectedResults		1. Normal state to Shutdown state.
+//! 					Scenario 1 - Request to transit to the shutdown state will be completed with KErrNotSupported
+//! 					Scenario 2 - First request will be completed with KErrNone
+//! 					Second request will be completed with KErrNotSupported
+RUN_TEST_STEP 100 tgsa_i_server GsaStateTranToShutdownStep
+END_TESTCASE 				DEVSRVS-SSPLUGINS-GSA-0035

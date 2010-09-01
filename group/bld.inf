@@ -32,9 +32,7 @@ PRJ_MMPFILES
 #include "../mediator/group/bld.inf"
 #include "../psmservices/group/bld.inf"
 #include "../resourcemgmt/group/bld.inf"
-#include "../resourceinterfaces/group/bld.inf"
 #include "../sysstatemgmt/group/bld.inf"
-#include "../systemhealthmanagement/systemhealthmgr/group/bld.inf"
 
 
 PRJ_TESTMMPFILES

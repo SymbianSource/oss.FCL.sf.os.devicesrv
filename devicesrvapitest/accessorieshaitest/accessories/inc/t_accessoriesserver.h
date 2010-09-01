@@ -20,7 +20,7 @@
 #define T_ACCESSORIES_SERVER_H
 
 //EPOC Includes
-#include <test/testserver2.h>
+#include <testserver2.h>
 
 /**
  * This wrapper class extends the test server and creates test server for Accessories

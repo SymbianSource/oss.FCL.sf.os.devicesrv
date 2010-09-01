@@ -898,14 +898,8 @@ void CTCChannelTilt::DataReceived( CSensrvChannel& aChannel,
 // CTCChannelTilt::DataError
 // ----------------------------------------------------------------------------------
 //
-#ifdef _DEBUG
 void CTCChannelTilt::DataError( CSensrvChannel& /*aChannel*/, 
     TSensrvErrorSeverity aError )
-
-#else
-void CTCChannelTilt::DataError( CSensrvChannel& /*aChannel*/, 
-    TSensrvErrorSeverity /*aError*/ )
-#endif
     {
     FUNC_LOG;
     
@@ -1156,14 +1150,8 @@ void CTCChannelTilt::PropertyChanged( CSensrvChannel& aChannel,
 // CTCChannelTilt::PropertyChanged
 // ----------------------------------------------------------------------------------
 //
-#ifdef _DEBUG
 void CTCChannelTilt::PropertyError( CSensrvChannel& /*aChannel*/, 
     TSensrvErrorSeverity aError )
-#else
-// not used in UREL builds
-void CTCChannelTilt::PropertyError( CSensrvChannel& /*aChannel*/, 
-    TSensrvErrorSeverity /*aError*/ )
-#endif
     {
     FUNC_LOG;
     INFO_1( "Property error [%d]", aError );
@@ -1173,12 +1161,7 @@ void CTCChannelTilt::PropertyError( CSensrvChannel& /*aChannel*/,
 // CTCChannelTilt::SetPropertySuccessIndicationChanged
 // -----------------------------------------------------------------------------
 //
-#ifdef _DEBUG
 void CTCChannelTilt::SetPropertySuccessIndicationChanged( TSetPropertySuccessIndicator aIndication )
-#else
-// not used in UREL builds
-void CTCChannelTilt::SetPropertySuccessIndicationChanged( TSetPropertySuccessIndicator /*aIndication*/ )
-#endif
     {
     FUNC_LOG;
     

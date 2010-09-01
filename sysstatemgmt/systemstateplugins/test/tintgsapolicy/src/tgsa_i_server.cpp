@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -90,13 +90,25 @@ CTestStep* CGsaIntTestServer::CreateTestStep(const TDesC& aStepName )
 	//Following tests can be run only on techview emulator as it requires restarting of the emulator
 //#ifdef __WINS__
 	CTestStep* testStep = NULL;
-	if (aStepName == KTGsaStateTranFromNormalStep)
+	if (aStepName == KTGsaStateTranToShutdownStep)
+		{
+		testStep = new CGsaStateTranToDiffStatesTest(KTestProcTranToShutdown);
+		}
+	else if (aStepName == KTGsaStateTranFromShutdownStep)
+		{
+		testStep = new CGsaStateTranToDiffStatesTest(KTestProcTranFromShutdown);
+		}
+	else if (aStepName == KTGsaStateTranFromNormalStep)
 		{
 		testStep = new CGsaStateTranToDiffStatesTest(KTestProcTranFromNormal);
 		}
 	else if (aStepName == KTGsaStateTranFromStartupStep)
 		{
 		testStep = new CGsaStateTranToDiffStatesTest(KTestProcTranFromStartup);
+		}
+	else if (aStepName == KTGsaStateTranFromStartuptoShutdownStep)
+		{
+		testStep = new CGsaStateTranToDiffStatesTest(KTGsaStateTranFromStartuptoShutdownStep);
 		}
 	else if (aStepName == KTGsaDuplicateSubstateStep)
 		{

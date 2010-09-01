@@ -16,7 +16,7 @@
 
 
 #include <hwrmfmtxcommands.h>
-#include <ecom/implementationproxy.h>
+#include <implementationproxy.h>
 #include "hwrmfmtxwatcherplugin.h"
 //#include "hwrmfmtxaccobserver.h"
 //#include "hwrmfmtxusbobserver.h"

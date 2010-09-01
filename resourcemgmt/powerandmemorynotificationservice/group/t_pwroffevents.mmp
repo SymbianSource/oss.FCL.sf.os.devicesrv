@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,7 @@
 // 
 //
 
-TARGET          t_pwroffevents.exe //RTEST
+TARGET          t_pwroffevents.exe
 // requires PowerMgmt because it is a unit test of the server code that will call the Power API which requires it
 // requires DiskAdmin because the test will make the server call RFs::FinaliseDrives() as part of power-off sequence
 CAPABILITY      PowerMgmt DiskAdmin 
@@ -41,7 +41,6 @@ LIBRARY         euser.lib efsrv.lib bafl.lib
 #if defined (SYMBIAN_SSM_GRACEFUL_SHUTDOWN)
 LIBRARY			ssmcmn.lib estor.lib
 #endif
-LIBRARY 		charconv.lib
 
 
 SMPSAFE

@@ -28,7 +28,7 @@
 
 #include <psmsrvdomaincrkeys.h>
 #include <centralrepository.h>
-#include "psmclientimpl.h"
+
 #include "PSMTest.h"
 
 
@@ -126,16 +126,7 @@ TInt CPSMTest::RunMethodL(
         ENTRY( "OpenClosePerformanceChange", CPSMTest::OpenClosePerformanceChange ),
         ENTRY( "OpenClosePerformanceEnd", CPSMTest::OpenClosePerformanceEnd ),
         ENTRY( "ChangePsmPerformance", CPSMTest::ChangePsmPerformance ),
-
-#ifdef _DEBUG 
-        //OOM tests for psm server
-        ENTRY( "OOMChangePsmInit", CPSMTest::OOMNotifyPowerSaveModeChangeInitL ),
-        ENTRY( "OOMCancelPsm", CPSMTest::OOMCancelPowerSaveModeChangeL ),
-        ENTRY( "OOMBackupAndGetSettings", CPSMTest::OOMPsmBackupAndGetSettingsL ),
-        ENTRY( "OOMGetSettings", CPSMTest::OOMPsmGetSettingsL ),
-        ENTRY( "OOMBackupSettings", CPSMTest::OOMPsmBackupSettingsL ),
-#endif  //_DEBUG       
-        ENTRY( "ChangeSettingsPerformance", CPSMTest::ChangeSettingsPerformance )    
+        ENTRY( "ChangeSettingsPerformance", CPSMTest::ChangeSettingsPerformance )
         };
 
     const TInt count = sizeof( KFunctions ) / 
@@ -1251,160 +1242,6 @@ CPSMTestObserver::CPSMTestObserver()
 //
 CPSMTestObserver::~CPSMTestObserver()
     {
-    }   
+    }
 */
-#ifdef _DEBUG 
-// -----------------------------------------------------------------------------
-// CPSMTest::OOMNotifyPowerSaveModeChangeInit
-// -----------------------------------------------------------------------------
-//
-TInt CPSMTest::OOMNotifyPowerSaveModeChangeInitL(CStifItemParser& /*aItem*/)
-    {    
-    CPsmClient* psmClient = CPsmClient::NewL( *this );
-    CleanupStack::PushL(psmClient);
-    CPsmClientImpl* psmImpl = static_cast<CPsmClientImpl*> (psmClient);
-	psmImpl->HeapReset();
-	psmImpl->HeapMark();
-    for (TInt allocFailRate = 1;; allocFailRate++)
-        {        
-        psmImpl->SetHeapFailure( allocFailRate );                
-        psmImpl->ChangePowerSaveMode(1);
-        // Wait for mode to change
-        iSchedulerWait.Start();
-        
-        if (iErrorCode == KErrNone)
-            {
-            iErrorCode = KErrNone;            
-            break;            
-            }     
-        }
-	psmImpl->HeapMarkEnd();
-	psmImpl->HeapReset();   
-    CleanupStack::PopAndDestroy(psmClient);
-    return KErrNone;  
-    }
-
-// -----------------------------------------------------------------------------
-// CPSMTest::OOMCancelPowerSaveModeChange
-// -----------------------------------------------------------------------------
-//
-TInt CPSMTest::OOMCancelPowerSaveModeChangeL( CStifItemParser& /*aItem*/ )
-    {
-    CPsmClient* psmClient = CPsmClient::NewL( *this );
-    CleanupStack::PushL(psmClient);
-    CPsmClientImpl* psmImpl = static_cast<CPsmClientImpl*> (psmClient);
-    psmImpl->ChangePowerSaveMode(0);
-    for (TInt allocFailRate = 1;; allocFailRate++)
-        {
-        psmImpl->HeapReset();
-        psmImpl->SetHeapFailure( allocFailRate );
-        psmImpl->HeapMark();        
-        psmImpl->CancelPowerSaveModeChange();        
-        // Wait for mode to change
-        iSchedulerWait.Start();
-        psmImpl->HeapMarkEnd();
-        if (iErrorCode == KErrNone )
-            {
-            iErrorCode = KErrNone;
-            psmImpl->HeapReset();  
-            break;            
-            }       
-        }
-    CleanupStack::PopAndDestroy(psmClient); 
-    return KErrNone;  
-    }
-
-
-// -----------------------------------------------------------------------------
-// CPSMTest::OOMPsmBackupAndGetSettings
-// -----------------------------------------------------------------------------
-//
-TInt CPSMTest::OOMPsmBackupAndGetSettingsL( CStifItemParser& /*aItem*/ )
-    {
-    CPsmClient* psmClient = CPsmClient::NewL( *this );
-    CleanupStack::PushL(psmClient);
-   
-    CPsmClientImpl* psmImpl = static_cast<CPsmClientImpl*> (psmClient);
-    psmImpl->HeapReset();
-    psmImpl->HeapMark(); 
-    for (TInt allocFailRate = 1;; allocFailRate++)
-        {
-        
-        psmImpl->SetHeapFailure( allocFailRate );
-              
-        TInt err = psmImpl->PsmSettings().BackupAndGetSettings( iPsmConfigArray, KCenRepUid2 );
-       
-        if (err == KErrNone)
-            {
-            
-            break;            
-            }         
-        }
-    psmImpl->HeapMarkEnd();
-    psmImpl->HeapReset();  
-    CleanupStack::PopAndDestroy(psmClient);
-    return KErrNone;  
-    }
-
-// -----------------------------------------------------------------------------
-// CPSMTest::OOMPsmGetSettings
-// -----------------------------------------------------------------------------
-//
-TInt CPSMTest::OOMPsmGetSettingsL( CStifItemParser& /*aItem*/ )
-    {
-    CPsmClient* psmClient = CPsmClient::NewL( *this );
-    CleanupStack::PushL(psmClient);
-    CPsmClientImpl* psmImpl = static_cast<CPsmClientImpl*> (psmClient);
-
-    for (TInt allocFailRate = 1;; allocFailRate++)
-        {
-        psmImpl->HeapReset();
-        psmImpl->SetHeapFailure( allocFailRate );
-        psmImpl->HeapMark();       
-        TInt err = psmImpl->PsmSettings().GetSettings( iPsmConfigArray, KCenRepUid2 );
-        psmImpl->HeapMarkEnd();
-        if (err == KErrNone)
-            {
-            psmImpl->HeapReset();  
-            break;            
-            }         
-        }
-    CleanupStack::PopAndDestroy(psmClient);
-    return KErrNone;  
-    }
-
-// -----------------------------------------------------------------------------
-// CPSMTest::OOMPsmBackupSettings
-// -----------------------------------------------------------------------------
-//
-TInt CPSMTest::OOMPsmBackupSettingsL( CStifItemParser& /*aItem*/ )
-    {
-    CPsmClient* psmClient = CPsmClient::NewL( *this );
-    CleanupStack::PushL(psmClient);
-    CPsmClientImpl* psmImpl = static_cast<CPsmClientImpl*> (psmClient);
-	//IGNORE the error of Powersave mode request. If Powersave mode is not enabled the Backupsettings will fail with KErrWrite.
-    psmImpl->ChangePowerSaveMode(1);
-    iSchedulerWait.Start();    
-    RConfigInfoArray psmConfigArray;
-    GenerateConfigArray( psmConfigArray, EPsmsrvModePowerSave, 0 ); 
-    psmImpl->HeapReset();
-    psmImpl->HeapMark();
-    for (TInt allocFailRate = 1;; allocFailRate++)
-        {       
-        psmImpl->SetHeapFailure( allocFailRate );
-        TInt err = psmImpl->PsmSettings().BackupSettings( psmConfigArray, KCenRepUid2 );
-        iLog->Log( _L("PSMTest: BackupSettings- iPsmConfigArray.Count(): %d"), psmConfigArray.Count() );
-        if (err == KErrNone)
-            {            
-            break;            
-            }      
-        }
-    psmImpl->HeapMarkEnd();
-    psmImpl->HeapReset(); 
-    psmConfigArray.Close();   
-    CleanupStack::PopAndDestroy(psmClient);
-    return KErrNone; 
-    }
-
-#endif //_DEBUG     
 //  End of File

@@ -1,4 +1,4 @@
-// Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -93,14 +93,12 @@ TInt CStartupSplashScreen::StartSplashScreen()
    
   	// Define a splash property to control display and removal of
   	// the splash screen on system start up.    
- 	// Ignoring the error value.
-	TInt err = RProperty::Define(KSplashPropertyKey, RProperty::EInt, 
+ 	RProperty::Define(KSplashPropertyKey, RProperty::EInt, 
  							KSplashReadPolicy, KSplashWritePolicy);
-	DEBUGPRINT2(_L("Defining the KSplashPropertyKey completed with %d"), err);
-
+  
  	// Create and set off the splash screen process.
 	RProcess splash;	 
-	err = splash.Create(*iSplashPath, KNullDesC);
+	TInt err = splash.Create(*iSplashPath, KNullDesC);
 	if (err == KErrNone)
 		{
 		splash.Resume();

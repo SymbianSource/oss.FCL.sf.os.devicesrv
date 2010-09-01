@@ -31,6 +31,7 @@
 #include "audioclientstubAppView.h"
 #include "audioclientstubremconobserver.h"
 
+_LIT(KText, "Hello World!");
 
 // ============================ MEMBER FUNCTIONS ===============================
 

@@ -80,8 +80,7 @@ void CSensrvPluginProxy::ConstructL()
     User::LeaveIfError(iMutex.CreateLocal());
 
     iMutex.Wait();
-    
-		// coverity[SIZECHECK]
+
     iLoadWaitQueue = CSensrvTransactionQueue::NewL(ETrue);
 
     iTransactionMonitor = CSensrvTransactionMonitor::NewL(*this);

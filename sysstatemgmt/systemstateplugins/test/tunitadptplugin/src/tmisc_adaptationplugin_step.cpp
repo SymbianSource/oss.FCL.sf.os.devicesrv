@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,16 +20,13 @@
 */
 
 
-#include <e32property.h>
+
 #include <s32mem.h>
 #include "tmisc_adaptationplugin_step.h"
 
 //
 // Run the tests
 //
-
-const TUid KPropertyCategory={0x2000D75B};              // tcustomcmd_server SID = KSsmServerName SID (changed in tcustomcmd_server.mmp file)
-const TUint32 KMiscPluginPropertyKey = 0x2000E658;
 
 CTestMiscAdaptationPlugin::CTestMiscAdaptationPlugin()
 	:CAdaptationTestBase(KTCTestMiscAdaptationPlugin)
@@ -177,12 +174,6 @@ TVerdict CTestMiscAdaptationPlugin::doTestStepL()
 	{
 	__UHEAP_MARK;
 	
-	TInt err = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
-	INFO_PRINTF2(_L("Defining KMiscPluginPropertyKey returns %d"), err);
-	TEST((KErrNone == err) || (KErrAlreadyExists == err));
-	err = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
-	TEST(KErrNone == err);
-		
 	TestSecurityStateChange();
 
 	TestGetGlobalStartupMode();
@@ -209,10 +200,7 @@ TVerdict CTestMiscAdaptationPlugin::doTestStepL()
 
 	TestCancel();
 	//TestRelease();			// have to test this part too ...
-	
-	err = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
-	TEST(KErrNone == err);
-	
+
 	__UHEAP_MARKEND;
 
 	return TestStepResult();

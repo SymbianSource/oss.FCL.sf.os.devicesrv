@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -28,12 +28,10 @@
     #define ASSERT_ALWAYS_TRACE     AssertTraceFunc( _L8( __FILE__ ), __LINE__ )
     #define ASSERT_TRACE( a )       if( !( a ) ) { ASSERT_ALWAYS_TRACE; }
     #define ERROR_TRACE_1( a, b )   TraceFunc( _L( a ), b )
-    #define ERROR_TRACE_2( a, b, c )   TraceFunc( _L( a ), b,c )
 #else
     #define ASSERT_ALWAYS_TRACE
     #define ASSERT_TRACE( a )
     #define ERROR_TRACE_1( a, b )
-	#define ERROR_TRACE_2( a, b, c )
 #endif
 
 #if defined _DEBUG && defined __SYSLANG_TRACE__

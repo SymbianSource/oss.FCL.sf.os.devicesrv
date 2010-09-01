@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,10 +22,6 @@
 #include "tcmd_step_coopsysperformshutdownactions.h"
 #include "ssmcustomcmdfactory.h"
 #include "cmdcoopsysperformshutdownactions.h"
-#include <e32property.h>
-
-const TUint32 KStateAdaptationPluginPropertyKey = 0x2000D76A;
-const TUid KPropertyCategory={0x2000D75B};
 
 CCustomCmdTestCoopSysPerformShutdownActions::~CCustomCmdTestCoopSysPerformShutdownActions()
 	{
@@ -43,11 +39,6 @@ New Test CaseID 		DEVSRVS-SSREFPLUGINS-CUSTCMD-0004
 
 void CCustomCmdTestCoopSysPerformShutdownActions::TestCustomCmdCoopSysPerformShutdownActionsL()
 	{
-	// Setting the P and S key will route the request to the reference plugins instead of the actual plugins
-    TInt err = RProperty::Define(KPropertyCategory, KStateAdaptationPluginPropertyKey, RProperty::EInt);
-    TEST(KErrNone == err || KErrAlreadyExists == err);
-    err = RProperty::Set(KPropertyCategory, KStateAdaptationPluginPropertyKey, 1);
-    TEST(KErrNone == err);
 	_LIT(KTESTLOG, "TestCustomCmdCoopSysPerformShutdownActionsL");
 	INFO_PRINTF1(KTESTLOG);
 
@@ -90,8 +81,6 @@ void CCustomCmdTestCoopSysPerformShutdownActions::TestCustomCmdCoopSysPerformShu
 	
 	//Releasing the comand will delete itself.
 	customCmdCoopSysPerformShutdownActions->Release();
-	err = RProperty::Delete(KPropertyCategory, KStateAdaptationPluginPropertyKey);
-    TEST(KErrNone == err);
 	}
 
 TVerdict CCustomCmdTestCoopSysPerformShutdownActions::doTestStepL()

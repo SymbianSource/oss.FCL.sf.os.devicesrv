@@ -173,6 +173,9 @@ NONSHARABLE_CLASS( CTCStateTiltListenData ): public CTCStateTilt,
         // Pointer to the timer
         CTCSendEventTimer* iTimerToSend;
         
+        // Flag that states if the property has changed
+        TBool iHasChanged;
+        
         // The requested amount of data
         TInt iRequestedDataCount;
         

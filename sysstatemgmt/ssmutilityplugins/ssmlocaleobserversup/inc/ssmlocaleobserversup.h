@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -15,15 +15,13 @@
 *
 */
 
-#ifndef __SSMLOCALEOBSERVERSUP_H__
-#define __SSMLOCALEOBSERVERSUP_H__
+#ifndef C_SSMLOCALEOBSERVERSUP_H
+#define C_SSMLOCALEOBSERVERSUP_H
 
-#include "ssmcommonlocale.h"
 #include <e32base.h>
 #include <e32property.h>
 #include <f32file.h>
 #include <ssm/ssmutility.h>
-#include <e32hashtab.h> 
 
 class CEnvironmentChangeNotifier;
 
@@ -77,32 +75,34 @@ private:
     /**
     * Copied fron SysLocale.
     * SaveLocaleL saves TLocale class to the given directory
-    * 
+    * and initiates missing independent data, if any.
+    * Note, that independent data is created only once and it is
+    * shared by all the locales. Therefore, it is recommended
+    * to call this method upon early boot phase of a device.
     * @param aPath Directory path containing locale data files.
     *              (e.g. "c:\dir" or c:\dir\")
     */
-    void SaveRegionL( const TDesC& aPath );
+    void SaveLocaleL( const TDesC& aPath );
 
     /**
     * Copied fron SysLocale.
-    * LoadRegionL restores TLocale class from the given directory.
-    *
+    * LoadLocaleL restores TLocale class from the given directory.
+    * If locale independent data (see note)
+    * exists, its data overrides the restored TLocale data.
     * @param aPath Directory path containing locale data files
     *              (e.g. "c:\dir" or c:\dir\")
     */
-    void LoadRegionL( const TDesC& aPath );
-    
+    void LoadLocaleL( const TDesC& aPath );
+
     /**
-    * Initialize the language region mapping
-    * 
+    * Stores locale independent data.
     */
-    void InitializeRegionMappingL();
-    
+    void SaveIndependentDataL( const TLocale& aLocale, const TDesC& aPath );
+
     /**
-    * Gets the associated region for the given language
-    * 
+    * Loads locale independent data.
     */
-    TInt MappedRegionL(const TInt aLanguage);
+    void LoadIndependentDataL( TLocale& aLocale, const TDesC& aPath );
 
 private: // data
 
@@ -127,10 +127,6 @@ private: // data
     */
     RFs iFs;
 
-    /**
-    * Array of  language and region mappings.
-    */
-    RHashSet<TLanguageRegion>  iLangRegionMappingHashSet;
     };
 
-#endif // __SSMLOCALEOBSERVERSUP_H__
+#endif // C_SSMLOCALEOBSERVERSUP_H

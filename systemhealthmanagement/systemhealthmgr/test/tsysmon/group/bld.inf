@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -62,8 +62,6 @@ tsysmon_app_failecnorcount1fail.mmp
 PRJ_TESTEXPORTS
 ../group/shmatest_sysmon.iby								/epoc32/rom/include/shmatest_sysmon.iby
 ../group/sysmontest.iby										/epoc32/rom/include/sysmontest.iby
-../group/sysmon_iof_tests.iby								/epoc32/rom/include/sysmon_iof_tests.iby
-../group/sysmon_osrestart_tests.iby							/epoc32/rom/include/sysmon_osrestart_tests.iby
 
 // Shma batch files for hardware test execution
 ../scripts/hardware/shmatest_sysmon_run.bat                     	/epoc32/data/z/shmatest/shmatest_sysmon_run.bat
@@ -140,5 +138,3 @@ PRJ_TESTEXPORTS
 ../scripts/shmatest_sysmon_regselfecnorcapsok.script 		z:/shmatest/shmatest_sysmon_regselfecnorcapsok.script
 ../scripts/shmatest_sysmon_regselfecnorcapsnops.script 		z:/shmatest/shmatest_sysmon_regselfecnorcapsnops.script
 ../scripts/shmatest_sysmon_failecnorcount1fail.script 		z:/shmatest/shmatest_sysmon_failecnorcount1fail.script
-../scripts/shmatest_sysmon_restartos.script 		z:/shmatest/shmatest_sysmon_restartos.script
-../scripts/shmatest_sysmon_criticalnoretries.script 		z:/shmatest/shmatest_sysmon_criticalnoretries.script

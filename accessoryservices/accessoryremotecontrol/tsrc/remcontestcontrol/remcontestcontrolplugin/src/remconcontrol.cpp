@@ -472,7 +472,6 @@ void CRemConControl::CallApiFunctionL( TRemConControlTestCaseState& aParameter )
         	break;                
 
         case ETFRemCon_LaunchAudioClient:
-            {
             // reset return channel
             TRemConClientKeyDataBuf keyDatabuf;     
             TRemConClientKeyData keyData;
@@ -496,7 +495,6 @@ void CRemConControl::CallApiFunctionL( TRemConControlTestCaseState& aParameter )
                     retval = status.Int();
                     }
                 }
-            }
             break;
             
         case ETFRemCon_CloseAudioClient:
@@ -508,7 +506,6 @@ void CRemConControl::CallApiFunctionL( TRemConControlTestCaseState& aParameter )
             break;
 
         case ETFRemCon_CheckClientKey:
-            {
             TRemConClientKeyDataBuf keyDataBuf;
             retval = RProperty::Get( KTFRemConTestProperty, KTFRemConClientKey, keyDataBuf );
             if ( retval == KErrNone )
@@ -524,7 +521,6 @@ void CRemConControl::CallApiFunctionL( TRemConControlTestCaseState& aParameter )
                     }
                 
                 }
-            }
             break;
             
         default:

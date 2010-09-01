@@ -37,8 +37,6 @@ SOURCE          PSMTestBlocks.cpp
 //RESOURCE        resource_file2
 
 USERINCLUDE     ../inc
-USERINCLUDE     ../../../inc/client
-USERINCLUDE     ../../../inc/util
 
 OS_LAYER_SYSTEMINCLUDE
 

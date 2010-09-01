@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,10 +26,6 @@
 #include "shmadebug.h"
 #include "shmapanic.h"
 #include <u32hal.h>
-
-#ifdef _DEBUG
-#include <e32property.h>
-#endif // _DEBUG
 
 const TInt CMonitor::iOffset = _FOFF(CMonitor, iSglQueLink);
 const TInt KDelayRequiredForRestartSys = 5000000;	 // required by RestartSys API, see comments in RestartSys::RestartSystem()
@@ -149,7 +145,7 @@ void CMonitor::RestartProcessL()
 #ifdef _DEBUG
 	TPtrC fileName = iStartupProperties->FileName();
 #endif
-	DEBUGPRINT3(_L("SysMonMonitor: Going to restart %S, old process id=%u"), &fileName, iProcessId.Id());  
+	DEBUGPRINT3(_L("SysMonMonitor: Going to restart %S, old process id=%u"), &fileName, iProcessId.Id());
 	
 	CStartSafe* startSafe = CStartSafe::NewL();	
 	CleanupStack::PushL(startSafe);
@@ -182,20 +178,6 @@ void CMonitor::RestartProcessL()
 	CleanupStack::PopAndDestroy(startSafe);	
 	DEBUGPRINT3(_L("SysMonMonitor: %S restarted, new iProcessId=%u. Logon to monitor again"), &fileName, iProcess.Id().Id());
 	
-#ifdef _DEBUG
-    TInt restartExeCount = 0;
-    // The argument passed to the process is converted into an integer and is used as the key to set the RProperty.
-    // This way each process' restart count is stored in a unique key.
-    TPtrC processArgs = iStartupProperties->Args();
-    TLex processArgsToInt(processArgs);
-    err = processArgsToInt.Val(restartExeCount);
-    if( KErrNone == err )
-        {
-        err = RProperty::Set(RProcess().SecureId(), restartExeCount, ++iRestartCount);
-        DEBUGPRINT4(_L("SysMonMonitor: Setting Test Property with key %d to %d completed with error %d"), restartExeCount, iRestartCount, err);
-        }
-#endif // _DEBUG
-    
 	iProcessId = iProcess.Id();
 	iReLaunchAttempts++;	// Increment after each re-launch attempt.
 	if (!iReLaunchIntervalTimer->IsActive())

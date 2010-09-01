@@ -82,7 +82,6 @@ void CSensrvChannel::ConstructL()
     {
     COMPONENT_TRACE( ( _L( "Sensor Server - CSensrvChannel::ConstructL()" ) ) );
 
-		// coverity[SIZECHECK]
     iChannelQueue = CSensrvTransactionQueue::NewL( ETrue );
 
     iChannelInfo.iChannelGroup = TSensrvResourceChannelInfo::ESensrvChannelGroupNotSolved;
@@ -980,7 +979,34 @@ TInt CSensrvChannel::RecalculateBufferingCount()
     return previousLow;
     }
 
+// ---------------------------------------------------------------------------
+// CSensrvChannel::GetAffectedClients
+//
+// Client is considered as "affected" if the channel is opened by the client.
+// When the channel is open, channel listener also exists.
+// Priorities are queried from ChannelListener.
+// ---------------------------------------------------------------------------
+//
+void CSensrvChannel::GetAffectedClients( RArray<TInt>& aAffectedClients,
+                                         TSecureId aCallerSecureId  )
+    {
+    COMPONENT_TRACE( ( _L( "Sensor Server - CSensrvChannel::GetAffectedClients()" ) ) );
 
+    TInt count(iListenerList.Count());
+    for (TInt i=0; i < count; i++)
+        {
+        if (aCallerSecureId == iListenerList[i]->Session().SecureId() )
+            {
+            //Filter away
+            }
+        else
+            {
+            aAffectedClients.Append( iListenerList[i]->Priority() );
+            }
+        }
+
+    COMPONENT_TRACE( ( _L( "Sensor Server - CSensrvChannel::GetAffectedClients - %d client(s) found - return" ), count ) );
+    }
 
 // ---------------------------------------------------------------------------
 // Creates a new condition evaluator or returns an existing one.

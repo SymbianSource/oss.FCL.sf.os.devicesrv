@@ -22,20 +22,8 @@
 #include "ssmpanic.h"
 #include <e32property.h>
 #include "ssmdebug.h"
-#include <f32file.h>
-#include <ctsydomainpskeys.h>
-#include <mmtsy_names.h>
-#include <pathinfo.h>
-#include <securitynotification.h>
-#include <ssm/ssmstate.h>
-#include <startupdomainpskeys.h>
-#include "ssmmapperutilitystatic.h"
-#include "ssmmapperutilityinternalpskeys.h"
-#include "ssmsubstateext.hrh"
-#include "ssmswp.hrh"
-#include "trace.h"
 
-const TUid KPSStartupDefaultUid = {0x2000E65E};
+const TUid KPSStartupUid = {0x2000E65E};
 const TUid KSecurityPinNotifierUid = {0x2000E667};
 const TUid KScreenOutputChannel = {0x10009D48};
 const TUid KEmergencyCallPropertyCategory = {0x2001032C};
@@ -52,17 +40,8 @@ const TUint KValidateRTCPropertyKey = 0x2001D2AB;
 //Number of clusterSize to be reserve for phone memory space 
 const TInt KNumberOfCluster = 2;
 
-//For test code
-/** Channel used to communicate with Security Notifier. */
-static const TUid KSecurityNotifierChannel = { 0x1000598F };
-
-// Type definitions for a buffer containing a drive id (drive letter + :).
-const TInt KDriveIdLength = 2;
-typedef TBuf<KDriveIdLength> TDriveId;
-
-const TUint32 KMiscPluginPropertyKey = 0x2000E658;
-const TUid KPropertyCategory={0x2000D75B};              // tcustomcmd_server SID = KSsmServerName SID (changed in tcustomcmd_server.mmp file)
-
+_LIT(KTsyModuleName, "mm.tsy");
+_LIT(KTsyPhoneName, "GsmPhone1");
 
 CSsmUiSpecific::CSsmUiSpecific()
 : iReferenceCount(1), iReservedPhoneMemory(0)
@@ -76,85 +55,36 @@ EXPORT_C CSsmUiSpecific::~CSsmUiSpecific()
 
 EXPORT_C TUid CSsmUiSpecific::StartupPSUid()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("StartupPSUid :: Calling S60 plugins functions ");
-        return KPSUidStartup;        
-        }
-    else
-        {
-        DEBUGPRINT1A("StartupPSUid :: Calling Symbian(dummy) plugins functions ");
-        return KPSStartupDefaultUid;
-        }	
+	return KPSStartupUid;
 	}
 
 EXPORT_C TUid CSsmUiSpecific::SecurityPinNotifierUid()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("SecurityPinNotifierUid :: Calling S60 plugins functions ");
-        return KSecurityNotifierUid;  
-        }
-    else
-        {
-        DEBUGPRINT1A("SecurityPinNotifierUid :: Calling Symbian(dummy) plugins functions ");
-        return KSecurityPinNotifierUid;
-        }   
-
+	return KSecurityPinNotifierUid;
 	}
 
 EXPORT_C TUint CSsmUiSpecific::EmergencyCallPropertyKey()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("EmergencyCallPropertyKey :: Calling S60 plugins functions ");
-        return KCTsyCallState;       
-        }
-    else
-        {
-        DEBUGPRINT1A("EmergencyCallPropertyKey :: Calling Symbian(dummy) plugins functions ");
-        return KEmergencyCallPropertyKey;
-        }   
-
+	return KEmergencyCallPropertyKey;
 	}
 
 EXPORT_C TUid CSsmUiSpecific::EmergencyCallPropertyCategory()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("EmergencyCallPropertyCategory :: Calling S60 plugins functions ");
-        return KPSUidCtsyCallInformation;       
-        }
-    else
-        {
-        DEBUGPRINT1A("EmergencyCallPropertyCategory :: Calling Symbian(dummy) plugins functions ");
-        return KEmergencyCallPropertyCategory;
-        }   
-
+	return KEmergencyCallPropertyCategory;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsSimSupported()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsSimSupported :: Calling S60 plugins functions ");
-        return SsmMapperUtility::FeatureStatus( TUid::Uid( KFeatureIdSimCard ) );       
-        }
-    else
-        {
-        DEBUGPRINT1A("IsSimSupported :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
-
+	return ETrue;
 	}
 
 EXPORT_C void CSsmUiSpecific::SetSecurityStatus(const TStrtSecurityStatus& aSecurityStatus)
-	{   
+	{
 	iStrtSecurityStatus = aSecurityStatus;
 	}
 
 EXPORT_C TStrtSecurityStatus CSsmUiSpecific::SecurityStatus() const
-	{   
+	{
 	return iStrtSecurityStatus;
 	}
 
@@ -197,269 +127,83 @@ EXPORT_C void CSsmUiSpecific::Release()
 
 EXPORT_C TUid CSsmUiSpecific::ScreenOutputChannelUid()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("ScreenOutputChannelUid :: Calling S60 plugins functions ");
-        return KSecurityNotifierChannel;       
-        }
-    else
-        {
-        DEBUGPRINT1A("ScreenOutputChannelUid :: Calling Symbian(dummy) plugins functions ");
-        return KScreenOutputChannel;
-        }   
-
+	return KScreenOutputChannel;
 	}
 
 EXPORT_C TUint CSsmUiSpecific::SimStatusPropertyKey()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("SimStatusPropertyKey :: Calling S60 plugins functions ");
-        return KPSSimStatus;        
-        }
-    else
-        {
-        DEBUGPRINT1A("SimStatusPropertyKey :: Calling Symbian(dummy) plugins functions ");
-        return KSimStatusPropertyKey;
-        }   
+	return KSimStatusPropertyKey;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsSimStateChangeAllowed()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsSimStateChangeAllowed :: Calling S60 plugins functions ");
-        TSsmState state;
-        TInt err = SsmMapperUtility::GetCurrentState( state );
-        ERROR( err, "Failed to get current state" );
-        return ( err == KErrNone &&
-                 ( state.MainState() == ESsmStartup && state.SubState() == ESsmStateSecurityCheck ) ||
-                 ( state.MainState() == ESsmStartup && state.SubState() == ESsmStateNonCritical ) ||
-                   state.MainState() == ESsmNormal );        
-        }
-    else
-        {
-        DEBUGPRINT1A("IsSimStateChangeAllowed :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
-
+	return ETrue;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsAmaStarterSupported()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsAmaStarterSupported :: Calling S60 plugins functions ");
-        return SsmMapperUtility::FeatureStatus( TUid::Uid( KFeatureIdExtendedStartup ) );       
-        }
-    else
-        {
-        DEBUGPRINT1A("IsAmaStarterSupported :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
-
+	return ETrue;
 	}
 
 EXPORT_C HBufC* CSsmUiSpecific::GetTsyModuleNameL()
 	{
-    DEBUGPRINT1A("GetTsyModuleNameL :: Calling S60 plugins functions ");
-    /*****************************************************
-    *   Series 60 Customer / TSY
-    *   Needs customer TSY implementation
-    *****************************************************/
-
-    HBufC* name = KMmTsyModuleName().AllocL();
-    INFO_1( "TSY name: %S", name );
-    return name;      
+	HBufC* tstModuleName = KTsyModuleName().AllocL();
+	return tstModuleName;
 	}
 
 EXPORT_C TUid CSsmUiSpecific::StarterPSUid()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("StarterPSUid :: Calling S60 plugins functions ");
-        return KPSStarterUid;        
-        }
-    else
-        {
-        DEBUGPRINT1A("StartupPSUid :: Calling Symbian(dummy) plugins functions ");
-        return KSecurityStatusPropertyCategory;
-        }   
+	return KSecurityStatusPropertyCategory;
 	}
 
 EXPORT_C HBufC* CSsmUiSpecific::PhoneTsyNameL()
 	{
-    DEBUGPRINT1A("PhoneTsyNameL :: Calling S60 plugins functions ");
-    /*****************************************************
-    *   Series 60 Customer / TSY
-    *   Needs customer TSY implementation
-    *****************************************************/
-
-    HBufC* name = KMmTsyPhoneName().AllocL();
-    INFO_1( "Phone name: %S", name );
-    return name;     
+	HBufC* tsyPhoneName = KTsyPhoneName().AllocL();
+	return tsyPhoneName;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsSimPresent()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsSimPresent :: Calling S60 plugins functions ");
-        TInt value( 0 );
-        TInt err = RProperty::Get( SsmMapperUtility::PsUid( KPSUidStartup ), KPSSimStatus, value );
-        ERROR( err, "Failed to get value of KPSUidStartup::KPSSimStatus" );
-        return ( err == KErrNone &&
-                 ( value == ESimUsable ||
-                   value == ESimReadable ||
-                   value == ESimNotReady ) );       
-        }
-    else
-        {
-        DEBUGPRINT1A("IsSimPresent :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
+	return ETrue;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsSimlessOfflineSupported()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsSimlessOfflineSupported :: Calling S60 plugins functions ");
-        return SsmMapperUtility::FeatureStatus(
-            TUid::Uid( KFeatureIdFfSimlessOfflineSupport ) );      
-        }
-    else
-        {
-        DEBUGPRINT1A("IsSimlessOfflineSupported :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
+	return ETrue;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsNormalBoot()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsNormalBoot :: Calling S60 plugins functions ");
-        TInt value( 0 );
-        TInt errorCode = RProperty::Get( SsmMapperUtility::PsUid( KPSUidStartup ), KPSStartupReason, value );
-        ERROR( errorCode, "Failed to get value of KPSUidStartup::KPSStartupReason" );
-
-        TBool ret = ( errorCode == KErrNone && value == ENormalStartup );
-        INFO_1( "Is normal boot = %d", ret );
-        return ret;     
-        }
-    else
-        {
-        DEBUGPRINT1A("IsNormalBoot :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
+	return ETrue;
 	}
 
 EXPORT_C TBool CSsmUiSpecific::IsSimChangedReset()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("IsSimChangedReset :: Calling S60 plugins functions ");
-        TUid startupPsUid( SsmMapperUtility::PsUid( KPSUidStartup ) );
-        TInt value( 0 );
-        TInt errorCode = RProperty::Get( startupPsUid, KPSStartupReason, value );
-        ERROR( errorCode, "Failed to get value of KPSUidStartup::KPSStartupReason" );
-
-        TBool ret( EFalse );
-        if ( errorCode == KErrNone && value == ESIMStatusChangeReset )
-            {
-            errorCode = RProperty::Get( startupPsUid, KPSSimChanged, value );
-            ret = ( errorCode == KErrNone && value == ESimChanged );
-            }
-
-        INFO_1( "Is SIM changed reset = %d", ret );
-        return ret;       
-        }
-    else
-        {
-        DEBUGPRINT1A("IsSimChangedReset :: Calling Symbian(dummy) plugins functions ");
-        return ETrue;
-        }   
+	return ETrue;
 	}
 
 EXPORT_C TUint CSsmUiSpecific::RFStatusPropertyKey()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("RFStatusPropertyKey :: Calling S60 plugins functions ");
-        return SWP_UID_SSM_RF_STATUS;        
-        }
-    else
-        {
-        DEBUGPRINT1A("RFStatusPropertyKey :: Calling Symbian(dummy) plugins functions ");
-        return KRFStatusPropertyKey;
-        }   
+	return KRFStatusPropertyKey;
 	}
 
 EXPORT_C TUid CSsmUiSpecific::RFStatusPropertyCategory()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("RFStatusPropertyCategory :: Calling S60 plugins functions ");
-        return TUid::Uid( SWP_UID_SSM_RF_STATUS );       
-        }
-    else
-        {
-        DEBUGPRINT1A("RFStatusPropertyCategory :: Calling Symbian(dummy) plugins functions ");
-        return KRFStatusPropertyCategory;
-        }   
+	return KRFStatusPropertyCategory;
 	}
-
 EXPORT_C TUint CSsmUiSpecific::ValidateRTCPropertyKey()
     {
-    if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("ValidateRTCPropertyKey :: Calling S60 plugins functions ");
-        return KRTCPropertyKey;       
-        }
-    else
-        {
-        DEBUGPRINT1A("ValidateRTCPropertyKey :: Calling Symbian(dummy) plugins functions ");
-        return KValidateRTCPropertyKey;
-        }   
-
+    return KValidateRTCPropertyKey;
     }
 
 EXPORT_C TUid CSsmUiSpecific::ValidateRTCPropertyCategory()
     {
-    if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("ValidateRTCPropertyCategory :: Calling S60 plugins functions ");
-        return KPSStarterUid;        
-        }
-    else
-        {
-        DEBUGPRINT1A("ValidateRTCPropertyCategory :: Calling Symbian(dummy) plugins functions ");
-        return KValidateRTCPropertyCategory;
-        }   
+    return KValidateRTCPropertyCategory;
     }
 
 EXPORT_C TInt CSsmUiSpecific::PhoneMemoryRootDriveId()
 	{
-	if (!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("PhoneMemoryRootDriveId :: Calling S60 plugins functions ");
-        TInt driveId = EDriveC;
-        TDriveId driveIdBuf = PathInfo::PhoneMemoryRootPath().Left( KDriveIdLength );
-        if ( driveIdBuf.Length() > 0 )
-            {
-            TInt err = RFs::CharToDrive( driveIdBuf[0], driveId ) ;
-            INFO_1( "PhoneMemoryRootDriveId - CharToDrive returns: %d", err );            
-            }
-
-        INFO_1( "Phone memory root path ID: %d", driveId );
-        return driveId;      
-        }
-    else
-        {
-        DEBUGPRINT1A("PhoneMemoryRootDriveId :: Calling Symbian(dummy) plugins functions ");
-        return EDriveC;
-        }   
+	return EDriveC;
 	}
 
 /**
@@ -469,21 +213,6 @@ void CSsmUiSpecific::ConstructL()
 	{
 	User::LeaveIfError( iReservedPhoneMemoryFs.Connect() );
 	}
-
-/**
-    Helper function to check for P&S Key
-*/
-TBool CSsmUiSpecific::IsTestPsKeyDefined()
-    {
-    TBool testPsKeyDefined = EFalse;
-    TInt result = RProperty::Get(KPropertyCategory, KMiscPluginPropertyKey, testPsKeyDefined);
-    DEBUGPRINT3(_L("KMiscPluginPropertyKey %d Error %d"), testPsKeyDefined, result);
-    if ((KErrNone != result) && (KErrNotFound != result))
-        {
-        User::Leave(result);
-        }
-    return testPsKeyDefined;
-    }
 
 /**
 Reserve two ClusterSize in Phone Memory Space on H/W

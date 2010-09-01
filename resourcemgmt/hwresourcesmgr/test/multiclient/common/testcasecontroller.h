@@ -20,10 +20,10 @@
 #include <e32def.h>
 #include <eikenv.h>
 #include <hwrmlight.h>
-#include <hwrm/hwrmextendedlight.h>
-#include <hwrm/hwrmenhancedlight.h>
+#include <hwrmextendedlight.h>
+#include <hwrmenhancedlight.h>
 #include <hwrmvibra.h>
-#include <hwrm/hwrmfmtx.h>
+#include <hwrmfmtx.h>
 #include "McFramework.h"
 #include "tc_log.h"
 #include "testcaseids.h"

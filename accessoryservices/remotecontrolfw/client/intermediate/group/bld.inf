@@ -23,7 +23,7 @@ remconinterfacebase.mmp
 
 PRJ_EXPORTS
 ../public/remconinterfaceselector.h 	SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remconinterfaceselector.h)
-../public/remconinterfacebase.h 		SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/remconinterfacebase.h)
-../public/remconinterfaceif.h 			SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/remconinterfaceif.h)
+../public/remconinterfacebase.h 		SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/remconinterfacebase.h)
+../public/remconinterfaceif.h 			SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/remconinterfaceif.h)
 ../public/remconerrorobserver.h 			SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remconerrorobserver.h)
 ../public/remconinterfacefeatures.h		SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/remconinterfacefeatures.h)

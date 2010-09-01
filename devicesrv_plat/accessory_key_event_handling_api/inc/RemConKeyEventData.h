@@ -22,9 +22,7 @@
 #define TREMCONKEYEVENTDATA_H
 
 //  INCLUDES
-#ifndef __KERNEL_MODE__
 #include <e32std.h>
-#endif
 
 // CONSTANTS
 

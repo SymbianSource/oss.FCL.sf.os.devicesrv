@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -10,20 +10,10 @@
 //
 // Contributors:
 //
-// Description: This adaptation plugin implementation is for test/reference purposes.   
-// The loading of this plugin is controlled through test macro defined in the iby file "ssmcompatibility.iby".
-// If the macro "TEST_SSM_MACRO" is not defined, original plugins are loaded and this plugin is not loaded.
-// If the test P & S key is set in the test code, the calls are routed to the reference or dummy implementations.
-// Else the actual plugins are loaded and the calls are routed to the actual implementations.
-// The test P & S key which it looks for is KSimPluginPropertyKey (0x2000D76A)
+// Description:
 //
 
 #include "simadaptationref.h"
-#include "ssmdebug.h"
-#include <e32property.h> 
-
-const TUint32 KSimPluginPropertyKey = 0x2000D76B;
-const TUid KPropertyCategory={0x2000D75B};
 
 /**
 Function to create new Sim Adaptation Plugin.
@@ -50,7 +40,6 @@ CSimAdaptationRef* CSimAdaptationRef::NewL()
 CSimAdaptationRef::~CSimAdaptationRef()
 	{
 	delete iTimer;
-	iSaaSimAdaptationLib.Close();
 	}
 
 CSimAdaptationRef::CSimAdaptationRef()
@@ -59,11 +48,6 @@ CSimAdaptationRef::CSimAdaptationRef()
 
 void CSimAdaptationRef::ConstructL()
 	{
-	DEBUGPRINT1A("Loading Actual plugins");
-    _LIT(KSaaSimAdaptationDLL, "saaSimadaptation.dll");
-    User::LeaveIfError(iSaaSimAdaptationLib.Load(KSaaSimAdaptationDLL));
-    iSaaSimAdaptationDll = (MSimAdaptation *)(iSaaSimAdaptationLib.Lookup(1)()); 
-    
 	iTimer = CSimRefAdaptationTimer::NewL();
 	}
 
@@ -73,20 +57,11 @@ void CSimAdaptationRef::Release()
 	delete this;
 	}
 
-void CSimAdaptationRef::GetSimOwned(TDes8& aOwnedPckg, TRequestStatus& aStatus)
+void CSimAdaptationRef::GetSimOwned(TDes8& /*aOwnedPckg*/, TRequestStatus& aStatus)
 	{
-	if(!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("GetSimOwned:: Calling Actual plugins functions (saaSimadaptation.dll)");
-        iSaaSimAdaptationDll->GetSimOwned(aOwnedPckg,aStatus);
-        }
-    else
-        {
-        DEBUGPRINT1A("GetSimOwned :: Calling ref plugins functions (Simadaptationref.dll)");
-        aStatus = KRequestPending;
-        TRequestStatus* pStatus = &aStatus;
-        User::RequestComplete(pStatus, KErrNone);      
-        }	
+	aStatus = KRequestPending;
+	TRequestStatus* pStatus = &aStatus;
+	User::RequestComplete(pStatus, KErrNone);
 	}
 
 /**
@@ -95,16 +70,10 @@ void CSimAdaptationRef::GetSimOwned(TDes8& aOwnedPckg, TRequestStatus& aStatus)
 */
 void CSimAdaptationRef::GetCancel()
 	{
-	if(!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("GetCancel ::Calling Actual plugins functions (saaSimadaptation.dll)");
-        iSaaSimAdaptationDll->GetCancel();
-        }
 	}
 
 /**
-  The reference implementation completes with KErrNotSupported. This is required for automated testing.
-  Actual plugins return expected values and this can be verified by manual testing
+  The reference implementation completes with KErrNotSupported since there is no SIM support on HRP/Techview.
   On a device, Sim Adaptation Plug-in would complete 'aTypePckg' with one of the event types in TSsmSimEventType.
   
   
@@ -125,23 +94,8 @@ void CSimAdaptationRef::GetCancel()
 */
 void CSimAdaptationRef::NotifySimEvent(TDes8& /*aTypePckg*/, TRequestStatus& aStatus)
 	{
-	if(!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("NotifySimEvent :: Calling Actual plugins functions (saaSimadaptation.dll)");
-        /* Only clayersup.dll has an outstanding request. If this is passed to the actual plugin, the
-        request will never complete till a SIM event happens. This would add the test code requests in a queue
-        and the test code waits indefinitely. Hence, complete the request with KErrCancel. This would free the 
-        queue for test code to be executed. It has not impact on the test environment */
-        TRequestStatus *request = &aStatus; 
-        User::RequestComplete(request, KErrCancel);
-        }
-    else
-        {
-        DEBUGPRINT1A("NotifySimEvent :: Calling ref plugins functions (Simadaptationref.dll)");
-        aStatus = KRequestPending;
-        iTimer->After(2000000,aStatus);      
-        }   
-
+	aStatus = KRequestPending;
+	iTimer->After(2000000,aStatus);
 	}
 
 /**
@@ -150,36 +104,12 @@ void CSimAdaptationRef::NotifySimEvent(TDes8& /*aTypePckg*/, TRequestStatus& aSt
 */
 void CSimAdaptationRef::NotifyCancel()
 	{
-	if(!IsTestPsKeyDefined())
-        {
-        DEBUGPRINT1A("NotifyCancel :: Calling Actual plugins functions (saaSimadaptation.dll)");
-        iSaaSimAdaptationDll->NotifyCancel();
-        }
-    else
-        {
-        DEBUGPRINT1A("NotifyCancel :: Calling ref plugins functions (Simadaptationref.dll)");
-        if(iTimer->IsActive())
-            {
-            iTimer->Cancel();           
-            }     
-        }	
+	if(iTimer->IsActive())
+		{
+		iTimer->Cancel();			
+		}
 	}
 
-/**
-    Helper function to check for P&S Key
-*/
-TBool CSimAdaptationRef::IsTestPsKeyDefined()
-    {
-    TBool testPsKeyDefined = EFalse;
-    TInt result = RProperty::Get(KPropertyCategory, KSimPluginPropertyKey, testPsKeyDefined);
-    DEBUGPRINT3(_L("KSimPluginPropertyKey %d Error %d"), testPsKeyDefined, result);
-    if ((KErrNone != result) && (KErrNotFound != result))
-        {
-        //Could not retrieve property value. Tests might fail 
-        DEBUGPRINT1A("IsTestPsKeyDefined ERROR :: Could not retrieve property value)");
-        }
-    return testPsKeyDefined;
-    }
 
 
 CSimRefAdaptationTimer::CSimRefAdaptationTimer():CTimer(CActive::EPriorityUserInput)

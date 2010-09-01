@@ -75,9 +75,8 @@ void CTCSendEventTimer::ConstructL( TInt aSetTimerToHzLevel )
 	User::LeaveIfError( ret );
 	iTimerToHzLevel = aSetTimerToHzLevel;
 	}
-void CTCSendEventTimer::Start(TInt aHrz)
+void CTCSendEventTimer::Start()
 	{
-	iTimerToHzLevel = aHrz;
 	TTimeIntervalMicroSeconds32 interval( KOneSecondInMicroSeconds / iTimerToHzLevel );
 		
 	if( !IsActive() )

@@ -206,10 +206,7 @@ enum TTFASYReference
     ETFAsyConnectOpenCable3Poles,
     ETFAsyConnUSB,
     ETFAsyConnUSB2,
-    ETFAsyConnHDMI,    
-#ifdef FF_AUTOMOTIVESTACK
-    ETFAsyRTPStreamingConn
-#endif
+    ETFAsyConnHDMI
     };
 
 

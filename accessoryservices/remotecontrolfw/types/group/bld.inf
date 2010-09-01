@@ -24,7 +24,7 @@ remcontypes.mmp
 PRJ_EXPORTS
 ../public/remconaddress.h				SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remconaddress.h)
 ../public/playertype.h					SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/playertype.h)
-../public/messagetype.h 				SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/messagetype.h)
-../public/clienttype.h					SYMBIAN_OS_LAYER_PUBLIC_EXPORT_PATH(remcon/clienttype.h)
+../public/messagetype.h 				SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/messagetype.h)
+../public/clienttype.h					SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/clienttype.h)
 ../public/clientid.h					SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/clientid.h)
 ../public/remconifdetails.h				SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(remcon/remconifdetails.h)

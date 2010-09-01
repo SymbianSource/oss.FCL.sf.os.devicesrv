@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,7 +27,6 @@ Destructor
  */
 CSysUtilsGetLangSWVersionStep::~CSysUtilsGetLangSWVersionStep()
 	{
-    SetTestPath(EFalse);
 	}
 
 /**
@@ -62,7 +61,7 @@ TVerdict CSysUtilsGetLangSWVersionStep::doTestStepL()
 
 	version.Insert(0,KDummy);
 
-	TInt fileErr = CheckIsFileExist( _L("C:\\versions\\langsw.txt"));
+	TInt fileErr = CheckIsFileExist( _L("Z:\\resource\\versions\\langsw.txt"));
 
 	if(fileErr == KErrNone)
 		{
@@ -75,7 +74,7 @@ TVerdict CSysUtilsGetLangSWVersionStep::doTestStepL()
 			}
 		INFO_PRINTF1(_L("Deleted P&S properties successfully."));
 		
-		err = SetTestPath(ETrue);
+		err = SetTestPath(EFalse);
 		if( err != KErrNone )
 			{
 			ERR_PRINTF2(_L("Could not turn test path off. Error = %d"), err);
@@ -114,11 +113,7 @@ TVerdict CSysUtilsGetLangSWVersionStep::doTestStepL()
 			if (version.Compare(testBuf)!=0)
 				{
 				ERR_PRINTF1(_L("software language formatted incorrectly"));
-				ERR_PRINTF1(_L("From ini file: "));
-				ERR_PRINTF1(testBuf);
-				ERR_PRINTF1(_L("From txt file: "));
-				ERR_PRINTF1(version);
-				ERR_PRINTF2(_L("Comparison returned value %d"), version.Compare(testBuf));
+				INFO_PRINTF1(testBuf);
 				SetTestStepResult(EFail);
 				}
 			else
@@ -137,7 +132,6 @@ TVerdict CSysUtilsGetLangSWVersionStep::doTestStepL()
 		SetTestStepResult(EFail);
 		}
 		
-	SetTestPath(EFalse);
 	return TestStepResult(); 	
 	}
 

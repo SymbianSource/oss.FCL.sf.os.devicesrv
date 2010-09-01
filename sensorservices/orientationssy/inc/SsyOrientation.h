@@ -104,14 +104,14 @@ NONSHARABLE_CLASS( CSSYOrientation ) : public CBase,
         /**
         * Create configurations for angles and timers
         */
-        TInt CreateConfigurations();
+        void CreateConfigurations();
         
         /**
         * Used for creating configuration for angle definitions
         *
         * @param aConfigurationForState the configuration to set.
         */
-        TInt SetConfigurationForState( 
+        void SetConfigurationForState( 
         const TOrientationConfiguration&
               aConfigurationForState );
         

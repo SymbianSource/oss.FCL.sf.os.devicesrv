@@ -110,13 +110,8 @@ void CTCCenrepObserver::HandleNotifyGeneric( TUint32 aKey )
 // CTCCenrepObserver::HandleNotifyError
 // -----------------------------------------------------------------------------
 //
-#ifdef _DEBUG
 void CTCCenrepObserver::HandleNotifyError(
     TUint32 /*aKey*/, TInt aError, CCenRepNotifyHandler* aHandler)
-#else
-void CTCCenrepObserver::HandleNotifyError(
-    TUint32 /*aKey*/, TInt /*aError*/, CCenRepNotifyHandler* aHandler)
-#endif
     {
     ERROR_1( aError, "CTCCenrepObserver::HandleNotifyError - aError: %d ", aError ); 
     

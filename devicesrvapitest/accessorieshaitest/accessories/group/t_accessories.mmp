@@ -33,7 +33,12 @@ SOURCE			t_raccessoryconnectiondata.cpp t_accessoriesserver.cpp t_raccessoryserv
 USERINCLUDE		../inc
 USERINCLUDE		../../common/inc 
 
-OS_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE	/epoc32/include
+SYSTEMINCLUDE	/epoc32/include/oem
+SYSTEMINCLUDE	/epoc32/include/test
+SYSTEMINCLUDE	/epoc32/include/kernel
+
+
 
 LIBRARY			euser.lib
 LIBRARY			efsrv.lib

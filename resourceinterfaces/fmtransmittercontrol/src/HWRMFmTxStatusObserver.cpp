@@ -203,7 +203,20 @@ void CHWRMFmTxStatusObserver::OrderNotification()
 // -----------------------------------------------------------------------------
 //
 TFmTxState CHWRMFmTxStatusObserver::Status()
-    {    
+    {
+    COMPONENT_TRACE1( _L( "HWRM FM Tx Client - CHWRMFmTxStatusObserver::Status()" ));
+    
+    TInt value(EFmTxStateUnknown);
+    
+    TInt err = RProperty::Get(KPSUidHWRMFmTx, KHWRMFmTxStatus, value);
+    
+    if ( err == KErrNone )
+        {
+		COMPONENT_TRACE1( _L( "HWRM FM Tx Client - CHWRMFmTxStatusObserver::Status - RPropert::Get ok" ) );        	
+        	
+        iFmTxState = static_cast<TFmTxState>(value);
+        }
+    
     COMPONENT_TRACE2( _L( "HWRM FM Tx Client - CHWRMFmTxStatusObserver::Status - return 0x%x" ), iFmTxState );
     
     return iFmTxState;

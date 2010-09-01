@@ -110,10 +110,9 @@ void CRemConSync::Synchronize()
 //	   
 void CRemConSync::SynchronizeResponse()
     {
-    iActive->iStatus = KRequestPending;
-    iSync->SynchronizeResponse(iActive->iStatus, iError);
-    iActive->SetActive();
-    COMPONENT_TRACE( ( _L( "REMCONTESTCONTROL -  SynchronizeResponse return" )) );
+		iSync->SynchronizeResponse(iActive->iStatus, iError);
+		iActive->iStatus = KRequestPending;
+		iActive->SetActive();
 	}
    
 void CRemConSync::GetCommandSourceInfo(TRemConExtCmdSource& aSource)

@@ -280,6 +280,7 @@ void CTCStateTiltListenData::HandleEventL( TTCEventId aId, TTCEvent* aEvent )
                 {
                 property.iProperty.GetValue( iHzSamplingRate );
                 INFO_1( "Sampling rate changed to: %d", iHzSamplingRate );
+                iHasChanged = ETrue;
                 HandleStateEntryL();
                 }
             break;
@@ -354,8 +355,19 @@ void CTCStateTiltListenData::HandleStateEntryL()
     if( !iTimerToSend )
         {
         iTimerToSend = CTCSendEventTimer::NewL( iHzSamplingRate, *this );
+		iTimerToSend->Start();
         }
-	iTimerToSend->Start(iHzSamplingRate);
+    else if( iHasChanged )
+        {
+        delete iTimerToSend;
+        iTimerToSend = NULL;
+        iTimerToSend = CTCSendEventTimer::NewL( iHzSamplingRate, *this );
+        iHasChanged = EFalse;
+        }
+	else
+		{
+		iTimerToSend->Start();
+		}
     }
 
 // ----------------------------------------------------------------------------------
@@ -462,7 +474,7 @@ void CTCStateTiltListenData::CompleteEventL()
     else
     	{
     	if( iTimerToSend )
-    		iTimerToSend->Start(iHzSamplingRate);
+    		iTimerToSend->Start();
     	}
     }
 
@@ -500,11 +512,7 @@ void CTCStateTiltListenData::SendDataAfterTimer()
 // CTCStateTiltListenData::CenrepValueChanged
 // -----------------------------------------------------------------------------
 //
-#ifdef _DEBUG
 void CTCStateTiltListenData::CenrepValueChanged( TUint32 aKey, CRepository& aRepository )
-#else
-void CTCStateTiltListenData::CenrepValueChanged( TUint32 /*aKey*/, CRepository& aRepository )
-#endif
     {
     FUNC_LOG;
 

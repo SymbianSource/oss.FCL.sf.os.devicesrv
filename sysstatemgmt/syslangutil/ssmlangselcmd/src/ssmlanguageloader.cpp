@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -20,10 +20,38 @@
 #include <hal.h>
 
 #include "ssmlanguageloader.h"
-#include "ssmcommonlocale.h"
 #include "trace.h"
 
+_LIT( KLocaleDllNameBase, "ELOCL" );
+_LIT( KLocaleDllExtensionFormat, ".%u" );
+_LIT( KLocaleDllExtensionPadding, "0" );
+_LIT( KDefaultLocaleDllNameExtension, ".LOC" );
+const TInt KMaxLocaleDllNameLength = 16;
+const TInt KMaxLocaleDllExtensionLength = 6;
+const TInt KMinLocaleDllExtensionLength = 3;
+const TInt KLocaleDllExtensionPaddingPosition = 1;
+
 // ======== MEMBER FUNCTIONS ========
+
+// ---------------------------------------------------------------------------
+// SsmLanguageLoader::LoadLanguage
+//
+// ---------------------------------------------------------------------------
+//
+TInt SsmLanguageLoader::LoadLanguage( const TInt aLanguage )
+    {
+    FUNC_LOG;
+    INFO_1( "Loading language %d", aLanguage );
+
+    TInt errorCode = StoreLanguageToHal( aLanguage );
+    ERROR( errorCode, "Failed to store language code to HAL" );
+
+    errorCode = LoadLocaleDll( aLanguage );
+    ERROR( errorCode, "Failed to load locale DLL" );
+
+    return errorCode;
+    }
+
 
 // -----------------------------------------------------------------------------
 // SsmLanguageLoader::StoreLanguageToHal
@@ -39,96 +67,70 @@ TInt SsmLanguageLoader::StoreLanguageToHal( const TInt aLanguage )
     }
 
 
-// ---------------------------------------------------------------------------
-// SsmLanguageLoader::LoadLocale
+// -----------------------------------------------------------------------------
+// SsmLanguageLoader::LoadLocaleDll
 //
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt SsmLanguageLoader::LoadLocale( const TInt aLanguage, const TInt aRegion, const TInt aCollation)
+TInt SsmLanguageLoader::LoadLocaleDll( const TInt aLanguage )
     {
     FUNC_LOG;
 
-    TInt errorCode = StoreLanguageToHal( aLanguage );
-    ERROR( errorCode, "Failed to store language code to HAL" );
-
-    //Format the language dll to be loaded
-    //Dot plus four to six digit locale
-    TBuf<KMaxDllExtensionLength> extension; 
-    extension.Format( KDllExtensionFormat, aLanguage );
-
-    //Padd with zero to make the file extension length to be minimum of four
-    for( ; extension.Length() < KMinDllExtensionLength ;) 
-        {
-        extension.Insert( KDllExtensionPaddingPosition, KDllExtensionPadding );
-        }
-
-    TBuf<KMaxDllNameLength> languageDllName( KLanguageDllNameBase );
-    languageDllName.Append( extension );
-    INFO_1( "Loading language DLL named '%S'", &languageDllName );
-
-    //Format the region dll to be loaded
-    //Dot plus four to six digit locale
-    extension.Zero();
-    extension.Format( KDllExtensionFormat, aRegion );
-
-    //Padd with zero to make the file extension length to be minimum of four
-    for( ; extension.Length() < KMinDllExtensionLength ;) 
-        {
-        extension.Insert( KDllExtensionPaddingPosition, KDllExtensionPadding );
-        }
-
-    TBuf<KMaxDllNameLength> regionDllName( KRegionDllNameBase );
-    regionDllName.Append( extension );
-    INFO_1( "Loading Region DLL named '%S'", &regionDllName );
-
-
-    //Format the collation file to be loaded
-    //Dot plus four to six digit locale
-    extension.Zero();
-    extension.Format( KDllExtensionFormat, aCollation );
-
-    //Padd with zero to make the file extension length to be minimum of four
-    for( ; extension.Length() < KMinDllExtensionLength ;) 
-        {
-        extension.Insert( KDllExtensionPaddingPosition, KDllExtensionPadding );
-        }
-
-    TBuf<KMaxDllNameLength> collationDllName( KCollationDllNameBase );
-    collationDllName.Append( extension );
-    INFO_1( "Loading Collation DLL named '%S'", &collationDllName );
+    // Dot plus five digit locale
+    TBuf<KMaxLocaleDllExtensionLength> extension; 
+    extension.Format( KLocaleDllExtensionFormat, aLanguage );
     
-    //Load the given Language, Region and Collation dlls
-    errorCode = ChangeLocale( languageDllName, regionDllName, collationDllName );
+    // Padd ".1" to ".01" for compatibility.
+    if ( extension.Length() < KMinLocaleDllExtensionLength ) 
+        {
+        extension.Insert( KLocaleDllExtensionPaddingPosition,
+                          KLocaleDllExtensionPadding );
+        }
+    
+    TBuf<KMaxLocaleDllNameLength> localeDllName;
+    localeDllName = KLocaleDllNameBase;
+    localeDllName.Append( extension );
+
+    INFO_1( "Loading DLL named '%S'", &localeDllName );
+
+    TInt errorCode = ChangeLocale( localeDllName );
+
+    if ( errorCode == KErrNotFound ) // Try default locale
+        {
+        INFO( "SsmLanguageLoader: Loading default locale" );
+
+        localeDllName = KLocaleDllNameBase;
+        localeDllName.Append( KDefaultLocaleDllNameExtension );
+
+        errorCode = ChangeLocale( localeDllName );
+        }
+
     if ( errorCode == KErrNone )
         {
         TLocale().Set();
         }
+
     return errorCode;
     }
 
-// ---------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 // SsmLanguageLoader::ChangeLocale
 //
-// ---------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //
-TInt SsmLanguageLoader::ChangeLocale( const TDesC& aLanguageDllName,  const TDesC& aRegionDllName, const TDesC& aCollationDllName )
+TInt SsmLanguageLoader::ChangeLocale( const TDesC& aLocaleDllName )
     {
     FUNC_LOG;
-    TExtendedLocale extLocale;
 
-    INFO_3( "Loading Language dll '%S', Region dll '%S' and Collation dll '%S'",
-            &aLanguageDllName, &aRegionDllName, &aCollationDllName );
-    TInt errorCode = extLocale.LoadLocale( aLanguageDllName, aRegionDllName, aCollationDllName);
+    TExtendedLocale extLocale;
+    TInt errorCode = extLocale.LoadLocale( aLocaleDllName );
+    ERROR( errorCode, "Failed to load locale" );
+
     if ( errorCode == KErrNone )
         {
-        //Save the loaded locale settings
         errorCode = extLocale.SaveSystemSettings();
-        ERROR( errorCode, "Failed to save locale settings" );
-        }
-    else
-        {
-        INFO_3( "Failed to load Language dll '%S', Region dll '%S' and Collation dll '%S'",
-                    &aLanguageDllName, &aRegionDllName, &aCollationDllName );
+        ERROR( errorCode, "Failed to set locale" );
         }
 
     return errorCode;

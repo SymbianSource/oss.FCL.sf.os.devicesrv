@@ -110,21 +110,21 @@ const TCaseInfo CSysUtiltests::Case ( const TInt aCaseNumber ) const
         {
 
 		// To add new test cases, add new items to this array
-        ENTRY( "[SYSUTIL] GetVersionInfo test", &CSysUtiltests::GetVersionInfo ),
-        ENTRY( "[SYSUTIL] GetVersionInfo2 test", &CSysUtiltests::GetVersionInfo2 ),
-        ENTRY( "[SYSUTIL] GetOSVersionInfo test", &CSysUtiltests::GetOSVersionInfo ),
-        ENTRY( "[SYSUTIL] GetProductVersionInfo test", &CSysUtiltests::GetProductVersionInfo ),
-        ENTRY( "[SYSUTIL] GetOSVersionInfo2 test", &CSysUtiltests::GetOSVersionInfo2 ),
-        ENTRY( "[SYSUTIL] GetProductVersionInfo2 test", &CSysUtiltests::GetProductVersionInfo2 ),
-        ENTRY( "[SYSUTIL] GetProductCode test", &CSysUtiltests::GetProductCode ),
+        ENTRY( "[SYSUTIL] GetVersionInfo test", CSysUtiltests::GetVersionInfo ),
+        ENTRY( "[SYSUTIL] GetVersionInfo2 test", CSysUtiltests::GetVersionInfo2 ),
+        ENTRY( "[SYSUTIL] GetOSVersionInfo test", CSysUtiltests::GetOSVersionInfo ),
+        ENTRY( "[SYSUTIL] GetProductVersionInfo test", CSysUtiltests::GetProductVersionInfo ),
+        ENTRY( "[SYSUTIL] GetOSVersionInfo2 test", CSysUtiltests::GetOSVersionInfo2 ),
+        ENTRY( "[SYSUTIL] GetProductVersionInfo2 test", CSysUtiltests::GetProductVersionInfo2 ),
+        ENTRY( "[SYSUTIL] GetProductCode test", CSysUtiltests::GetProductCode ),
         
-        OOM_ENTRY( "[OOM_SYSUTIL] GetVersionInfo test", &CSysUtiltests::GetVersionInfo ,ETrue,1,5 ),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetVersionInfo2 test", &CSysUtiltests::GetVersionInfo2,ETrue,1,5 ),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetOSVersionInfo test", &CSysUtiltests::GetOSVersionInfo ,ETrue,1,5),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetProductVersionInfo test", &CSysUtiltests::GetProductVersionInfo ,ETrue,1,5),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetOSVersionInfo2 test", &CSysUtiltests::GetOSVersionInfo2 ,ETrue,1,5),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetProductVersionInfo2 test", &CSysUtiltests::GetProductVersionInfo2 ,ETrue,1,5),
-        OOM_ENTRY( "[OOM_SYSUTIL] GetProductCode test", &CSysUtiltests::GetProductCode ,ETrue,1,5)
+        OOM_ENTRY( "[OOM_SYSUTIL] GetVersionInfo test", CSysUtiltests::GetVersionInfo ,ETrue,1,5 ),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetVersionInfo2 test", CSysUtiltests::GetVersionInfo2,ETrue,1,5 ),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetOSVersionInfo test", CSysUtiltests::GetOSVersionInfo ,ETrue,1,5),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetProductVersionInfo test", CSysUtiltests::GetProductVersionInfo ,ETrue,1,5),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetOSVersionInfo2 test", CSysUtiltests::GetOSVersionInfo2 ,ETrue,1,5),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetProductVersionInfo2 test", CSysUtiltests::GetProductVersionInfo2 ,ETrue,1,5),
+        OOM_ENTRY( "[OOM_SYSUTIL] GetProductCode test", CSysUtiltests::GetProductCode ,ETrue,1,5)
         
         };
 

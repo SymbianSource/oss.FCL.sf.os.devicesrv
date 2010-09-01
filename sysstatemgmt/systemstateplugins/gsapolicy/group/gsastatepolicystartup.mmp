@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,7 +16,7 @@
 #ifdef WINS
 TARGET			ssm.state.policy.0000.dll
 #else
-TARGET			ssm.refrence.state.policy.hw.0000.dll
+TARGET			ssm.state.policy.hw.0000.dll
 #endif
 TARGETTYPE		dll
 UID				0x2000D75D 0x2000D75F
@@ -56,6 +56,14 @@ END
 SOURCEPATH		../resource/wins
 START RESOURCE	gsastartupcmdlist8.rss
 TARGETPATH		/private/2000d75b/startup/8
+END
+
+// Launch 'sysstart.exe' if startup resource is not found. If 'sysstart.exe' fails, launch 'sysagt2svr.exe' and 'wserv.exe'
+// resource file to fallback to 'sysstart.exe'
+// resource file path format : "z:/private/<SID of SSM>/startup/fallback/"
+SOURCEPATH		../resource/wins
+START RESOURCE	fallbacktosysstart.rss
+TARGETPATH		/private/2000d75b/startup/fallback
 END
 
 #else	//for hardware//

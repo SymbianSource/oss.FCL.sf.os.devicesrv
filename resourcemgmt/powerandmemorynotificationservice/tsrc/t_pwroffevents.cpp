@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,7 +18,6 @@
 #include <e32test.h>        //RTest
 #include <e32svr.h>         //RDebug
 #include <savenotf.h>       //RSaveSession, MSaveObserver, CSaveNotifier
-#include <e32consf.h>		//for logging to file
 #ifndef SYMBIAN_ENABLE_SPLIT_HEADERS
 #include <shutdownsrv.h>    //CServShutdownServer
 #else //SYMBIAN_ENABLE_SPLIT_HEADERS
@@ -289,8 +288,6 @@ static void DoRunL()
 
 TInt E32Main()
 	{
-	LogRTestToFile(TheTest);
-    TheTest.Title();
 	__UHEAP_MARK;
 	CTrapCleanup* tc = CTrapCleanup::New();
     TEST(tc != NULL);

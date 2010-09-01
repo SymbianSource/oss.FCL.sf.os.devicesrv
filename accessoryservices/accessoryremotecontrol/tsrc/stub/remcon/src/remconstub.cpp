@@ -84,6 +84,7 @@ void CRemConStub::ConstructL()
 	
 	COMPONENT_TRACE( ( _L( "REMCONSTUB - CRemConStub::ConstructL() - Enter" ) ) );
 	
+	TInt retval(KErrNone);
 	TRemConAddress addr;
 	addr.BearerUid() = Uid();	// implementation UID of this bearer 
 	Observer().ConnectIndicate(addr);
@@ -290,7 +291,7 @@ void CRemConStub::TestCaseCommandReceived(TInt aTFControlKey, TRemConPckgStubBuf
 			// This branch is used for following test cases
 						
 			TPhoneCmdHandlerKeyEventBuf cmdDataBuf;
-			cmdDataBuf().iOperationId = (TUint)-1;
+			cmdDataBuf().iOperationId = -1;
 			(void)iSubcribeToControl.Set(KTFPhoneCmdHandlerProperty, KTFPhoneCmdHandlerKey,cmdDataBuf);
 	    				
 			}

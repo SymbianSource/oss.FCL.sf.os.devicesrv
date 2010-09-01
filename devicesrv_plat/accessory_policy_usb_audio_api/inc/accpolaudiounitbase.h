@@ -37,7 +37,7 @@ public:
     /**
      * Destructor.
      */
-    IMPORT_C virtual ~CAccPolAudioUnitBase();
+    virtual ~CAccPolAudioUnitBase();
 
     /**
      * Assign operator for audio unit base class.

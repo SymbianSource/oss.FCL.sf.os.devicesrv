@@ -1,3 +1,2 @@
 EXPORTS
-	?LibEntryL@@YAPAVMT_RStarterSession@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class MT_RStarterSession * LibEntryL(class CTestModuleIf &)
-
+	?CreateTestSuiteL@@YAPAVMEUnitTest@@XZ @ 1 NONAME ; class MEUnitTest * __cdecl CreateTestSuiteL(void)

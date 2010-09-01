@@ -89,9 +89,7 @@ const TRemConControlTestCaseState KVolumeUpPressStates[] =
         { ETFRemCon_LaunchAudioClient,            {}, 0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeUp, ERemConKeyModifierNone,ERemConKeyStateDown, ERemConKeyEventNone },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},0, (TText8*) L"", ETrue, ETFRemConEvent_VolumeUp},
-
-        /*{ ETFRemCon_CloseAudioClient,            {}, 0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,            {}, 0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -100,14 +98,10 @@ const TRemConControlTestCaseState KVolumeUpPressStates[] =
 const TRemConControlTestCaseState KVolumeUpReleaseShortStates[] =
     {   
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeUp, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_VolumeUp },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -116,14 +110,10 @@ const TRemConControlTestCaseState KVolumeUpReleaseShortStates[] =
 const TRemConControlTestCaseState KVolumeUpReleaseLongStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeUp, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventLongPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_VolumeUp },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -132,14 +122,10 @@ const TRemConControlTestCaseState KVolumeUpReleaseLongStates[] =
 const TRemConControlTestCaseState KVolumeDownPressStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeDown, ERemConKeyModifierNone,ERemConKeyStateDown, ERemConKeyEventNone },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},0, (TText8*) L"", ETrue, ETFRemConEvent_VolumeDown },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -148,14 +134,10 @@ const TRemConControlTestCaseState KVolumeDownPressStates[] =
 const TRemConControlTestCaseState KVolumeDownReleaseShortStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeDown, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_VolumeDown },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -164,9 +146,7 @@ const TRemConControlTestCaseState KVolumeDownReleaseShortStates[] =
 const TRemConControlTestCaseState KVolumeDownReleaseLongStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeDown, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventLongPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_VolumeDown},
         { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
@@ -181,9 +161,7 @@ const TRemConControlTestCaseState KInvalidVolumeStates[] =
     	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeVolumeDown, ERemConKeyModifierNone,ERemConKeyStateDown, ERemConKeyEventLongPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
     	{ ETFRemCon_CheckClientKey,                {},0, (TText8*) L"", ETrue, ETFRemConEvent_None},
-
-    	/*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+    	{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 
@@ -195,14 +173,10 @@ const TRemConControlTestCaseState KInvalidVolumeStates[] =
 const TRemConControlTestCaseState KMediaPlayAndPauseStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodePlayPause, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},2, (TText8*) L"", ETrue, ETFRemConEvent_CoreApiPlaybackSpeedX1},
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
                                     
 //
@@ -211,14 +185,10 @@ const TRemConControlTestCaseState KMediaPlayAndPauseStates[] =
 const TRemConControlTestCaseState KMediaStopStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeStop, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},2, (TText8*) L"", ETrue, ETFRemConEvent_CodeStop },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
     
 //
@@ -227,14 +197,10 @@ const TRemConControlTestCaseState KMediaStopStates[] =
 const TRemConControlTestCaseState KMediaForwardPressStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeForward, ERemConKeyModifierNone,ERemConKeyStateDown, ERemConKeyEventRepeat },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},0, (TText8*) L"", ETrue, ETFRemConEvent_CodeForward},
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -243,14 +209,10 @@ const TRemConControlTestCaseState KMediaForwardPressStates[] =
 const TRemConControlTestCaseState KMediaForwardReleaseStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeForward, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventLongPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_CodeForward},
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
     
 //
@@ -259,14 +221,10 @@ const TRemConControlTestCaseState KMediaForwardReleaseStates[] =
 const TRemConControlTestCaseState KMediaRewindPressStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeBack, ERemConKeyModifierNone,ERemConKeyStateDown, ERemConKeyEventRepeat },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },        
         { ETFRemCon_CheckClientKey,                {},0, (TText8*) L"", ETrue, ETFRemConEvent_CodeBack},
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -275,14 +233,10 @@ const TRemConControlTestCaseState KMediaRewindPressStates[] =
 const TRemConControlTestCaseState KMediaRewindReleaseStates[] =
     {
     	{ ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-    	/*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+    	{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
     	{ ETFRemCon_Subscribe,                      { ERemConKeyCodeBack, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventLongPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},1, (TText8*) L"", ETrue, ETFRemConEvent_CodeBack},
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
     };
 
 //
@@ -291,14 +245,10 @@ const TRemConControlTestCaseState KMediaRewindReleaseStates[] =
 const TRemConControlTestCaseState KMediaNextTrackStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeForward, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},2, (TText8*) L"", ETrue, ETFRemConEvent_CodeForward },
-
-        /*{ ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }*/
-
+        { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
 	};
 //
 // ACCREMCON [Media Previous Track Event]
@@ -306,9 +256,7 @@ const TRemConControlTestCaseState KMediaNextTrackStates[] =
 const TRemConControlTestCaseState KMediaPreviousTrackStates[] =
     {
         { ETFRemConEvent_NormalHandler,             {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
-
-        /*{ ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },*/
-
+        { ETFRemCon_LaunchAudioClient,            {},0, (TText8*) L"", ETrue, ETFRemConEvent_None },
         { ETFRemCon_Subscribe,                      { ERemConKeyCodeBack, ERemConKeyModifierNone,ERemConKeyStateUp, ERemConKeyEventShortPress },0, (TText8*) L"", ETrue, ETFRemConEvent_None  },
         { ETFRemCon_CheckClientKey,                {},2, (TText8*) L"", ETrue, ETFRemConEvent_CodeBack },
         { ETFRemCon_CloseAudioClient,          {},0, (TText8*) L"", ETrue, ETFRemConEvent_None }
@@ -544,9 +492,7 @@ const TRemConControlTestCaseState KSpeedDialStates[] =
         { ETFRemConEvent_CmdHandler,                {},0, (TText8*) L"", EFalse, ETFRemConEvent_None }, 
         { ETFRemConEvent_SetCallState,  {}, EPSCTsyCallStateNone,  (TText8*) L"",      EFalse, ETFRemConEvent_None               },
         { ETFRemCon_Subscribe,          {}, ERemConExtSpeedDial,        (TText8*) L"1", EFalse, ETFRemConEvent_None               },
-
-        { ETFRemConEvent_CheckEvent,             {}, 0,(TText8*) L"",                    EFalse, ETFRemConEvent_None          },
-
+        { ETFRemConEvent_CheckEvent,             {}, 0,(TText8*) L"",                    EFalse, ETFRemConEvent_SpeedDial          },
     };
 
 //

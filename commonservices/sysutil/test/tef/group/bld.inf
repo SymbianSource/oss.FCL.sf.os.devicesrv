@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -62,10 +62,6 @@ PRJ_TESTEXPORTS
 ../../data/lang_valid.txt														z:/resource/versions/lang_valid.txt
 ../../data/langsw_valid.txt														z:/resource/versions/langsw_valid.txt
 ../../data/purpose_valid.txt													z:/resource/versions/purpose_valid.txt
-../../data/sw_test.txt															z:/resource/versions/test/sw.txt
-../../data/lang_test.txt														z:/resource/versions/test/lang.txt
-../../data/langsw_test.txt														z:/resource/versions/test/langsw.txt
-../../data/purpose_test.txt														z:/resource/versions/test/purpose.txt
 
 ../../data/deviceattributes_empty_file.ini										z:/resource/versions/deviceattributes_empty_file.ini
 ../../data/deviceattributes_invalid_format.ini									z:/resource/versions/deviceattributes_invalid_format.ini

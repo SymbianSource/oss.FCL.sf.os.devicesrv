@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2002-2004 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -19,9 +19,9 @@
 #ifndef __DosServer_IBY__
 #define __DosServer_IBY__
 
-file=ABI_DIR\BUILD_DIR\dossrv.dll       SHARED_LIB_DIR\dossrv.dll
-file=ABI_DIR\BUILD_DIR\dosserver.exe    PROGRAMS_DIR\dosserver.exe
-file=ABI_DIR\BUILD_DIR\dsclient.dll    SHARED_LIB_DIR\dsclient.dll
+file=ABI_DIR\BUILD_DIR\DosSrv.dll       SHARED_LIB_DIR\DosSrv.dll
+file=ABI_DIR\BUILD_DIR\DosServer.exe    PROGRAMS_DIR\DosServer.exe
+file=ABI_DIR\BUILD_DIR\DSClient.dll     SHARED_LIB_DIR\DSClient.dll
 
 #endif  //__DosServer_IBY__
 

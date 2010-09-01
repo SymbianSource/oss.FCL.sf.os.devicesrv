@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -46,7 +46,6 @@ const TInt KTestAppFailure = 12345; // Just a random number used to indicate tha
 _LIT(KTestProcTranFromNormalWoCap, "ssmstatetranfromnormalwocap.exe");
 
 _LIT(KTestAppLogFileLoc, "C:\\logs\\ssmtest\\");
-_LIT(KFileForFAndF, "c:\\countforfnf.dat"); //This file is used by KTestAppForFAndF
 
 const TInt KTestCommandLineMaxLength = 200;
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,7 +19,6 @@
  @internalComponent - Internal Symbian test code
 */
 
-#include <e32property.h>
 #include "ssmserverpanic.h"
 #include "ssmswppolicyframe.h"
 #include "ssmswppolicyresolver.h"
@@ -34,8 +33,6 @@
 
 
 const TInt KTestInvalidPanicCategory = -988;
-// property uids should be real uids (use these temporarily for test purposes)
-const TUint key={0x01};
 _LIT(KSsmSwpPolicyServerName, "TestSsmSwpPolicyServer");
 
 //----------------------------------------------------------------------------------------------------------------
@@ -68,7 +65,7 @@ TInt StartSwpInvalidListInThreadL(CSsmValidSwpListTest* aSsmValidSwpListTest)
 	User::SetJustInTime(EFalse);
 	thread.Resume();
 	User::WaitForRequest(status);
-	
+
 	// always expecting a state transition engine panic
 	TExitCategoryName category = thread.ExitCategory();
 	if (category.Compare(KPanicSysStateMgr) != 0)
@@ -104,6 +101,9 @@ void ThreadDispatchSwpInvalidListFunctionL(CSsmValidSwpListTest* aSsmValidSwpLis
 	CleanupStack::PushL(sched);
 	CActiveScheduler::Install(sched);
 
+	// property uids should be real uids (use these temporarily for test purposes)
+	const TUint key={0x01};
+
 	// Create a swp policy resolver and register our property
 	CSsmSwpPolicyResolver* resolver = CSsmSwpPolicyResolver::NewL();
 	CleanupStack::PushL(resolver);
@@ -129,7 +129,6 @@ void ThreadDispatchSwpInvalidListFunctionL(CSsmValidSwpListTest* aSsmValidSwpLis
 
 	//Request transition according to the reason action, which will define the invalid list
 	const TSsmSwp swp(key, aSsmValidSwpListTest->Function());
-	
 	handler->SubmitRequestL(swp);
 
 	sched->Start();
@@ -201,12 +200,10 @@ TVerdict CSsmValidSwpListTest::doTestStepL()
 
 	__UHEAP_MARK;
 
-	TInt err = RProperty::Define(RProcess().SecureId(), key, RProperty::EInt);
-	TEST(err == KErrNone || err == KErrAlreadyExists);
 	INFO_PRINTF1(_L("Checking cmd list without a Publish System Swp command"));
 	TInt exitReason(0);
 	SetFunction(ESwpCmdWithoutPublishSwp);
-	TRAP(err, exitReason = StartSwpInvalidListInThreadL(this));
+	TRAPD(err, exitReason = StartSwpInvalidListInThreadL(this));
 	TEST(err == KErrNone);
 	INFO_PRINTF2(_L("    -- StartSwpInvalidListInThreadL method completed with '%d'."), err);
 	TEST(exitReason == ESwpTransitionEngineError16);
@@ -246,13 +243,12 @@ TVerdict CSsmValidSwpListTest::doTestStepL()
 	TEST(err == KErrNone);
 	INFO_PRINTF2(_L("    -- StartSwpInvalidListInThreadL method completed with '%d'."), err);
 	const TInt threadExitReason = iThread.ExitReason();
-	TBuf<16> threadExitCategory = iThread.ExitCategory();
 	// This is the exit reason for the ssmswppolicyserver
 	TEST(threadExitReason == KSsmTestAppRvError);
 	// this is the exit reason for the engine.
 	TEST(exitReason == ESwpTransitionEngineError20);
 	iThread.Close();
-	INFO_PRINTF4(_L("    -- received panic '%d', category '%S', expected was '%d'."), threadExitReason, &threadExitCategory, KSsmTestAppRvError);
+	INFO_PRINTF3(_L("    -- received panic '%d', expected was '%d'."), threadExitReason, KSsmTestAppRvError);
 
 	INFO_PRINTF1(_L("Checking cmd list with too many Multiple Wait command and and no deferred commands - Validation should be OK - Panic originates in HandleCleReturnValue returning an error"));
 	exitReason=0;
@@ -271,9 +267,7 @@ TVerdict CSsmValidSwpListTest::doTestStepL()
 	INFO_PRINTF2(_L("    -- StartSwpInvalidListInThreadL method completed with '%d'."), err);
 	TEST(exitReason == ESwpTransitionEngineError20);
 	INFO_PRINTF3(_L("    -- received panic '%d', expected was '%d'."), exitReason, ESwpTransitionEngineError20);
-	
-	err = RProperty::Delete(RProcess().SecureId(), key);
-	TEST(err == KErrNone);
+
 	__UHEAP_MARKEND;
 
 	// this test raises panics due to negative testing - close them to clear the screen.

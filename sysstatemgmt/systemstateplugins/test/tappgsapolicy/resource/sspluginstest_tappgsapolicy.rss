@@ -22,8 +22,8 @@
 
 NAME STAG
 
-#include <eikon.rh>
-#include <eikon.rsg>
+#include <techview/eikon.rh>
+#include <techview/eikon.rsg>
 
 RESOURCE RSS_SIGNATURE { }
 

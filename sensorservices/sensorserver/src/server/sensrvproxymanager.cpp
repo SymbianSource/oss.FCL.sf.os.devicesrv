@@ -90,10 +90,7 @@ void CSensrvProxyManager::ConstructL()
 
     iServerShutdown = CSensrvShutdown::NewL( *this );
 
-		// coverity[SIZECHECK]
     iWaitQueueQueryChannels = CSensrvTransactionQueue::NewL(ETrue);
-    	
-    // coverity[SIZECHECK]	
     iWaitQueueOpenChannel   = CSensrvTransactionQueue::NewL(ETrue);
 
     // Create ecom changelistener, which will make the initial check for plugins

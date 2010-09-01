@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -335,35 +335,28 @@ void CCLayerTestStarterSession::doTestEndSplashScreen()
 	INFO_PRINTF1(_L("Deleting splash screen property"));
 	ret = RProperty::Delete(KPSUidStartup, KPSSplashShutdown);
 	TEST(ret == KErrNone || ret == KErrNotFound);
-	INFO_PRINTF2(_L("ret val is : %d"), ret);
 		
 	
 	INFO_PRINTF1(_L("Ending splashscreen without defining property"));
 	ret = starterSession.EndSplashScreen();
 	TEST(ret == KErrNotFound);
-	INFO_PRINTF2(_L("ret val is : %d"), ret);
 	
 	INFO_PRINTF1(_L("Defining splash screen property"));
 	// In a test enviroment we don't need to worry about protecting the property
 	// so allow anything to change it
 	_LIT_SECURITY_POLICY_PASS(KAllPass); //lint !e648 Suppress overflow in computing constant for operation
 	ret = RProperty::Define(KPSUidStartup, KPSSplashShutdown, RProperty::EInt, KAllPass, KAllPass);
-	INFO_PRINTF3(_L("KPSUidStartup = %x, KPSSplashShutdown = %x"), KPSUidStartup, KPSSplashShutdown);
 	TEST(ret == KErrNone);
-	INFO_PRINTF2(_L("ret val is : %d"), ret);
 	
 	INFO_PRINTF1(_L("Ending splashscreen with property defined"));
 	ret = starterSession.EndSplashScreen();
 	TEST(ret == KErrNone);
-	INFO_PRINTF2(_L("ret val is : %d"), ret);
 	
 	INFO_PRINTF1(_L("Reading splash screen property"));
 	TInt value;
 	ret = RProperty::Get(KPSUidStartup, KPSSplashShutdown, value);
 	TEST(ret == KErrNone);
-	INFO_PRINTF2(_L("ret val is : %d"), ret);
 	TEST(value == ESplashShutdown);
-	INFO_PRINTF3(_L("Property value is : %d .Expected : %d"), ret, ESplashShutdown);
 	
 	INFO_PRINTF1(_L("Close on connected RStartSession"));
 	starterSession.Close();

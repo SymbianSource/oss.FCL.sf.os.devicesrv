@@ -33,6 +33,9 @@
 //extern ?external_function( ?arg_type,?arg_type );
 
 // CONSTANTS
+_LIT( KEnter, "Enter" );
+_LIT( KOnGoing, "On-going" );
+_LIT( KExit, "Exit" );
 
 // MACROS
 //#define ?macro ?macro_def
@@ -135,20 +138,20 @@ const TCaseInfo CTspClientTestModule::Case (
     static TCaseInfoInternal const KCases[] =
         {
         // To add new test cases, add new items to this array
-        ENTRY( "Set a process id playing", 	            &CTspClientTestModule::SetProcessIdPlayingL ),
-        ENTRY( "Set and move a process id playing", 	&CTspClientTestModule::SetAndMoveProcessIdPlayingL ),
-        ENTRY( "Set and remove a process id playing", 	&CTspClientTestModule::SetAndRemoveProcessIdPlayingL ),
-        ENTRY( "Set two and set first process id playing", 	&CTspClientTestModule::SetTwoAndSetFirstProcessIdPlayingL ),
-        ENTRY( "Set a process id registered", 	            &CTspClientTestModule::SetProcessIdRegisteredL ),
-        ENTRY( "Set and move a process id registered", 	&CTspClientTestModule::SetAndMoveProcessIdRegisteredL ),
-        ENTRY( "Set and remove a process id registered", 	&CTspClientTestModule::SetAndRemoveProcessIdRegisteredL ),
-        ENTRY( "Set two and set first process id registered", 	&CTspClientTestModule::SetTwoAndSetFirstProcessIdRegisteredL ),
-        ENTRY( "Set a process id stopped", 	            &CTspClientTestModule::SetProcessIdStoppedL ),
-        ENTRY( "Set and move a process id stopped", 	&CTspClientTestModule::SetAndMoveProcessIdStoppedL ),
-        ENTRY( "Set and remove a process id stopped", 	&CTspClientTestModule::SetAndRemoveProcessIdStoppedL ),
-        ENTRY( "Set two and set first process id stopped", 	&CTspClientTestModule::SetTwoAndSetFirstProcessIdStoppedL ),
-        ENTRY( "Check out of range", 	&CTspClientTestModule::CheckOutOfRangeL ),
-        ENTRY( "AddAPI Usage from Multiple Threads Simultaneously", &CTspClientTestModule::MultiThreadTestSyncL ),
+        ENTRY( "Set a process id playing", 	            SetProcessIdPlayingL ),
+        ENTRY( "Set and move a process id playing", 	SetAndMoveProcessIdPlayingL ),
+        ENTRY( "Set and remove a process id playing", 	SetAndRemoveProcessIdPlayingL ),
+        ENTRY( "Set two and set first process id playing", 	SetTwoAndSetFirstProcessIdPlayingL ),
+        ENTRY( "Set a process id registered", 	            SetProcessIdRegisteredL ),
+        ENTRY( "Set and move a process id registered", 	SetAndMoveProcessIdRegisteredL ),
+        ENTRY( "Set and remove a process id registered", 	SetAndRemoveProcessIdRegisteredL ),
+        ENTRY( "Set two and set first process id registered", 	SetTwoAndSetFirstProcessIdRegisteredL ),
+        ENTRY( "Set a process id stopped", 	            SetProcessIdStoppedL ),
+        ENTRY( "Set and move a process id stopped", 	SetAndMoveProcessIdStoppedL ),
+        ENTRY( "Set and remove a process id stopped", 	SetAndRemoveProcessIdStoppedL ),
+        ENTRY( "Set two and set first process id stopped", 	SetTwoAndSetFirstProcessIdStoppedL ),
+        ENTRY( "Check out of range", 	CheckOutOfRangeL ),
+        ENTRY( "AddAPI Usage from Multiple Threads Simultaneously", MultiThreadTestSyncL ),
         };
 
     // Verify that case number is valid

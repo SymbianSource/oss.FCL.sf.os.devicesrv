@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -176,7 +176,6 @@ void CStepCancelAllMonitors::DoTestCancelAllMonitorsL()
         iAppStartSignalSem.Wait();
 
         INFO_PRINTF2(_L("Process killed with %d"), err);
-        User::After(2000000);
         TEST(EFalse == Exists(KTestAppGood));
         }
     

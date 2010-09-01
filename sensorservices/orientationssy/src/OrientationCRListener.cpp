@@ -91,7 +91,7 @@ void CSsyOrientationCRListener::RunL()
 	SSY_TRACE( EExtended, "ORIENTATIONSSY:RunL::Key %d changed", iStatus.Int() );
     iRepository->NotifyRequest( iStatus.Int(), iStatus );
 
-        User::LeaveIfError(iCallBack.CreateConfigurations());
+	iCallBack.CreateConfigurations();
 
     if( !IsActive() )
         {

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -47,7 +47,6 @@ _LIT(KRegisterCountFile, "C:\\Register_ResultFile.txt");
 _LIT(KRestartCountFile, "C:\\Restart_ResultFile.txt");
 
 const TInt KMaxTestIdLength = 20; // TestId is of the format APPFWK-SYSMON-00xx
-const TUid KTestSysMon={0x200086A8};    // Category value to be used to define restart P&S key 
 
 class CSysMonTestHelper : public CBase
 	{
@@ -58,7 +57,7 @@ public:
 	IMPORT_C static TInt ReadRunCountL(const TDesC& aProcessFilename);
 	IMPORT_C static void IncrementRunCountL(const TDesC& aProcessFilename);
 	IMPORT_C static TInt GetRestartCountL();
-	IMPORT_C static TInt GetRegisterCount(TInt aKey);
+	IMPORT_C static TInt GetRegisterCountL();
 	
 	IMPORT_C static CSysMonTestHelper* NewLC();
 	IMPORT_C static CSysMonTestHelper* NewL();

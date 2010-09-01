@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -465,7 +465,7 @@ TInt RMediatorServer::IssueCommand( TUid aDomain,
     command.iCommandId = aCommandId;
     command.iVersion = aVersion;
     //Time out is initiatilized to 0 as its not used on the server side.  
-    //this is just to supress the tool warnings.
+    //this is just to compress the tool warnings.
     command.iTimeout = 0;
     TCommandBuffer commandBuffer( command );
         
@@ -504,12 +504,6 @@ TInt RMediatorServer::IssueResponse( TUid aDomain,
     // And command
     TCommand command;
     command.iCommandId = aCommandId;
-    //All the remaining parameters of TCommand are initiatilized to 0 as its not used on the server side.  
-    //this is just to suppress the tool warnings.
-    command.iVersion = TVersion(0,0,0);
-	command.iCaps.SetEmpty();
-    command.iTimeout = 0;
-
     TCommandBuffer commandBuffer( command );
         
     // Status
@@ -548,12 +542,6 @@ TInt RMediatorServer::CancelCommand( TUid aDomain,
     // And command
     TCommand command;
     command.iCommandId = aCommandId;
-    //All the remaining parameters of TCommand are initiatilized to 0 as its not used on the server side.  
-    //this is just to suppress the tool warnings.
-	command.iVersion = TVersion(0,0,0);
-	command.iCaps.SetEmpty();
-    command.iTimeout = 0;
-
     TCommandBuffer commandBuffer( command );
         
     // Send the command                                 

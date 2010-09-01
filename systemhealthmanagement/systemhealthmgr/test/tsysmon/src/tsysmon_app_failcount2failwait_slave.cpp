@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -41,6 +41,7 @@ LOCAL_C TInt MainL()
         {
 		case 1:
 			{
+			RProcess::Rendezvous(KErrNone);
 			User::After(KWaitTime);
 			time1.HomeTime();
 			datetime1 = time1.DateTime();
@@ -51,12 +52,12 @@ LOCAL_C TInt MainL()
 	
 			helper = CSysMonTestHelper::NewLC();
 			helper->WriteResultL(millisecs);
-			RProcess::Rendezvous(KErrNone);
 			CleanupStack::PopAndDestroy(helper);
 			break;
 			}
 		case 2:
 			{
+			RProcess::Rendezvous(KErrNone);
 			time1.HomeTime();
 			datetime1 = time1.DateTime();
 			millisecs = (datetime1.MicroSecond() / 1000) + 
@@ -65,7 +66,7 @@ LOCAL_C TInt MainL()
 						(datetime1.Hour() * 60 * 60 * 1000);
 											
 			TInt secondRunTime;
-			CSysMonTestHelper::GetResultIntL(_L("38"), secondRunTime);
+			CSysMonTestHelper::GetResultIntL(_L("APPFWK-SYSMON-0038"), secondRunTime);
 			CSysMonTestHelper* helper = CSysMonTestHelper::NewLC();
 			
 			if ( (secondRunTime - millisecs)  < 2000 )
@@ -76,7 +77,6 @@ LOCAL_C TInt MainL()
 				{
 				helper->WriteResultL(0);
 				}
-			RProcess::Rendezvous(KErrNone);
 			CleanupStack::PopAndDestroy(helper);
 			keepRunning = ETrue;
 			break;

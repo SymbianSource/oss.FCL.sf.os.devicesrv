@@ -34,5 +34,3 @@ data/cenrep/10205043.txt 		z:/private/10202be9/10205043.txt
 ./conf/hwresourcesandenhancements_1020506A.crml OS_LAYER_EXPORTS_CRML(hwresourcesandenhancements_1020506a.crml)
 ./conf/hwresourcesandenhancements_10200C8D.crml OS_LAYER_EXPORTS_CRML(hwresourcesandenhancements_10200c8d.crml)
 
-// Customization interface confml file
-./conf/ci_hwresourcesandenhancements.confml 		OS_LAYER_EXPORTS_CONFML(ci_hwresourcesandenhancements.confml)

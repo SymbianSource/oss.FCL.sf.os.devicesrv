@@ -22,11 +22,9 @@ PRJ_EXPORTS
 
 PRJ_MMPFILES
 
-#include "../activitymanager/group/bld.inf"
 #include "../commonengine/group/bld.inf"
 #include "../commonengineresources/group/bld.inf"
 #include "../PlatformEnv/group/bld.inf"
-#include "../sysutil/group/bld.inf"
 
 PRJ_TESTMMPFILES
 

@@ -266,13 +266,6 @@ NONSHARABLE_CLASS(CPSMTest) : public CScriptBase,
         // From MPsmChangeCompleteObserver
         virtual void PowerSaveModeChangeError( const TInt aError );
 
-#ifdef _DEBUG
-        TInt OOMNotifyPowerSaveModeChangeInitL( CStifItemParser& aItem );
-        TInt OOMCancelPowerSaveModeChangeL( CStifItemParser& aItem );
-        TInt OOMPsmBackupAndGetSettingsL( CStifItemParser& /*aItem*/ );
-        TInt OOMPsmGetSettingsL( CStifItemParser& /*aItem*/ );
-        TInt OOMPsmBackupSettingsL( CStifItemParser& /*aItem*/ );      
-#endif //_DEBUG     
 
     public:     // Data
         // ?one_line_short_description_of_data

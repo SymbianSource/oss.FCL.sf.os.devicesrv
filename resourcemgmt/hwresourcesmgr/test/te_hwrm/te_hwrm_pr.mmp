@@ -33,7 +33,17 @@ USERINCLUDE		../utils
 USERINCLUDE     ../../include
 USERINCLUDE     ../../server/inc
 
-OS_LAYER_SYSTEMINCLUDE
+#ifndef SYMBIAN_OLD_EXPORT_LOCATION
+SYSTEMINCLUDE	/epoc32/include/test
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+SYSTEMINCLUDE	/epoc32/include/platform/test
+SYSTEMINCLUDE	/epoc32/include/platform/hwrm
+#else
+SYSTEMINCLUDE	/epoc32/include
+SYSTEMINCLUDE	/epoc32/include/test
+SYSTEMINCLUDE	/epoc32/include/hwrm
+#endif
+
 
 STATICLIBRARY	tefunit.lib
 LIBRARY			euser.lib

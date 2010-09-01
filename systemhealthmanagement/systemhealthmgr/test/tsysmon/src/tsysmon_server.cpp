@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -41,7 +41,6 @@
 #include "tsysmon_steploadsysmon.h"
 #include "tsysmon_stepoomsysmon.h"
 #include "tsysmon_stepcancelallmonitors.h"
-#include "tsysmon_steposrestarttest.h"
 
 CSysMonTestServer* CSysMonTestServer::NewLC()
 	{
@@ -169,14 +168,6 @@ CTestStep* CSysMonTestServer::CreateTestStep(const TDesC& aStepName)
     else if(aStepName == KCTestCaseCancelAllMonitors)
         {
         testStep = new CStepCancelAllMonitors();
-        }
-    else if(aStepName == KCTestCaseCriticalNoRetriesStep)
-        {
-        testStep = new CStepOSRestart(KCTestCaseCriticalNoRetries);
-        }
-    else if(aStepName == KCTestCaseRestartOSStep)
-        {
-        testStep = new CStepOSRestart(KCTestCaseRestartOS);
         }
 	else 
 		{

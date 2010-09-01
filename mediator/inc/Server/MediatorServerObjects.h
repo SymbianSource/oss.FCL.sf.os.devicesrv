@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2005 - 2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2005 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -827,7 +827,14 @@ class CEvent : public CItem
         */  
         RPointerArray<MMediatorServerEventObserver>& GetObservers();
         
-              
+        /**
+        * Adds an array of observers to event
+        * @since S60 3.1
+        * @param aObservers reference to observer array
+        * @return None.
+        */      
+        void AddObservers( RPointerArray<MMediatorServerEventObserver>& aObservers );
+        
         /**
         * Gets TEvent structure of the current event
         * @since S60 3.1

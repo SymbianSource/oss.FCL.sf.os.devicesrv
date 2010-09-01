@@ -63,9 +63,6 @@ public:
 private:
 	CSsmUiSpecific();
 	void ConstructL();
-	
-    //Helper function to check for P&S Key
-    static TBool IsTestPsKeyDefined();
 private:
 	TStrtSecurityStatus iStrtSecurityStatus;
 	TInt iReferenceCount;

@@ -30,7 +30,7 @@
 
 // CONSTANTS
 const TInt KMinASYHeapSize      = 0x2000;
-const TInt KDefaultASYHeapSize  = 0x8000;
+const TInt KDefaultASYHeapSize  = 0x4000;
 const TInt KMaxASYHeapSize      = 0x8000;
 
 const TInt KMinASYStackSize     = 0x1000;

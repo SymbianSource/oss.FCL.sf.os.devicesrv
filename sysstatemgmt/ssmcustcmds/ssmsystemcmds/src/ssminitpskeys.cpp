@@ -274,7 +274,6 @@ void CSsmInitPsKeys::InitializeKeysL()
              KWriteDeviceDataPolicy );
     SetL( KPSStarterUid, KRTCPropertyKey, 0 );
     
-
     INFO( "KPSUidStartup::KIgnoreSecurityEvent" );
     DefineL( KPSUidStartup,
              KIgnoreSecurityEvent,

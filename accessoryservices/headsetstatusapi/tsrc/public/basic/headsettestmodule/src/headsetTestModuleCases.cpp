@@ -131,14 +131,14 @@ const TCaseInfo CheadsetTestModule::Case (
     static TCaseInfoInternal const KCases[] =
         {
         // To add new test cases, add new items to this array
-        ENTRY( "HeadsetStatus test", &CheadsetTestModule::HeadsetStatusTestL ),
+        ENTRY( "HeadsetStatus test", HeadsetStatusTestL ),
         // Example how to use OOM functionality
         //OOM_ENTRY( "Loop test with OOM", LoopTest, ETrue, 2, 3),
         //OOM_FUNCENTRY( PrintTest, ETrue, 1, 3 ),
         
-        ENTRY( "SetObserver test",      &CheadsetTestModule::SetObserverL ),
-        ENTRY( "StartObserving test",   &CheadsetTestModule::StartObservingL ),
-        ENTRY( "StopObserving test",    &CheadsetTestModule::StopObservingL )
+        ENTRY( "SetObserver test",      SetObserverL ),
+        ENTRY( "StartObserving test",   StartObservingL ),
+        ENTRY( "StopObserving test",    StopObservingL )
         };
 
     // Verify that case number is valid

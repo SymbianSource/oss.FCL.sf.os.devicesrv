@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -113,8 +113,8 @@ CPsmManager::~CPsmManager()
     if ( iPluginLoader )
         {
         delete iPluginLoader;
-        }    
-    
+        }
+
     // Close mode observers array
     iModeObservers.Close();
 
@@ -286,14 +286,14 @@ TInt CPsmManager::RunError( TInt aError )
     }
 
 // -----------------------------------------------------------------------------
-// CPsmManager::RegisterObserverL
+// CPsmManager::RegisterObserver
 // -----------------------------------------------------------------------------
 //
-void CPsmManager::RegisterObserverL( MPsmModeChangeObserver* aObserver )
+void CPsmManager::RegisterObserver( MPsmModeChangeObserver* aObserver )
     {
-    COMPONENT_TRACE( ( _L( "PSM Server - CPsmManager::RegisterObserverL()" ) ) );
-    iModeObservers.AppendL( aObserver );    
-    COMPONENT_TRACE( ( _L( "PSM Server - CPsmManager::RegisterObserverL() return" ) ) );
+    COMPONENT_TRACE( ( _L( "PSM Server - CPsmManager::RegisterObserver()" ) ) );
+    iModeObservers.Append( aObserver );
+    COMPONENT_TRACE( ( _L( "PSM Server - CPsmManager::RegisterObserver - return" ) ) );
     }
 
 // -----------------------------------------------------------------------------
@@ -326,27 +326,4 @@ MPsmSettingsProvider& CPsmManager::SettingsProvider()
     return *iSettingsHandler; 
     }
 
-#ifdef _DEBUG 
-// -----------------------------------------------------------------------------
-// CPsmManager::ClosePluginLoader
-// For testing purpose 
-// -----------------------------------------------------------------------------
-void CPsmManager::ClosePluginLoader()
-    {
-    if(iPluginLoader)
-        {
-        delete iPluginLoader;
-        iPluginLoader=NULL;
-        }
-    }
-
-// -----------------------------------------------------------------------------
-// CPsmManager::CompressModeObserversArray
-// For testing purpose 
-// -----------------------------------------------------------------------------
-void CPsmManager::CompressModeObserversArray()
-    {
-    iModeObservers.Compress();
-    }
-#endif // _DEBUG 
 // End of file

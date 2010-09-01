@@ -52,11 +52,7 @@ CSSYProperty::CSSYProperty( const TInt /*aSensorNumber*/,
 
     for ( TInt index = 0; index < aNumberOfProperties ; index++ )
         {
-        if(iChannelProperties.Append( aProperties[ index ])!= KErrNone )
-        {
-         iChannelProperties.Reset();
-         break;
-        }
+        iChannelProperties.Append( aProperties[ index ] );
         }
 
     SSY_TRACE_OUT();
@@ -301,13 +297,14 @@ TInt CSSYProperty::SetProperty(
 
     else if ( aProperty.GetPropertyId() == KSensrvPropIdDataRate )
         {
-        // Since Orientation is an event, the data rate property is made readonly.
-        // In ssyconfiguration.h file, the datarate property is defined as writable,
-        // it is not modified due to backward compatibility. 
-        // Now it is changed and the orientation channel property is made readonly always.
-        
+        SSY_TRACE( EExtended, "ORIENTATIONSSY: Updating data rate property" );
+        // Data rate property is replaced in a different way than others.
+        // Note that this can be done only once as this property is set to read only.
+        aProperty.GetValue( intValue );
+        // Leave value to 0, update only max value because that is the only value we can provide
         if( iChannelProperties.Count() >= index )
             {
+            iChannelProperties[index].iIntMaxValue = intValue;
             iChannelProperties[index].iReadOnly = ETrue;
             }
         

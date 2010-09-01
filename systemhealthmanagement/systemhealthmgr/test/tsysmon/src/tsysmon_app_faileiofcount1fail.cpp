@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,9 +19,8 @@
  @internalComponent - Internal Symbian test code   
 */
 
-#include <e32property.h>
 #include "sysmontesthelper.h"
-const TUint32 KRestartExeCount = 34;
+
 
 TInt MainL()
 	{
@@ -29,8 +28,6 @@ TInt MainL()
 
 	TInt runCount = 0;
     CCommandLineArguments* args = CCommandLineArguments::NewLC();
-    TInt err = RProperty::Define(KTestSysMon, KRestartExeCount, RProperty::EInt);
-    RDebug::Printf("Defining P&S key with key %d returns with err %d", err, KRestartExeCount);
     runCount = CSysMonTestHelper::ReadRunCountL(args->Arg(0));
 	CSysMonTestHelper::IncrementRunCountL(args->Arg(0));
     CleanupStack::PopAndDestroy(args);
@@ -45,7 +42,7 @@ TInt MainL()
 			sysmon.OpenL();
 			CleanupClosePushL(sysmon);
 
-			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_dontrendezvous.exe"), _L("34"));
+			CStartupProperties* props = CStartupProperties::NewLC(_L("tsysmon_app_dontrendezvous.exe"), KNullDesC);
 			props->SetMonitored(ETrue);
 			props->SetStartupType(EStartProcess);
 			props->SetStartMethod(EWaitForStart);
@@ -56,10 +53,7 @@ TInt MainL()
 			RProcess slave1;
 			slave1.Create(_L("tsysmon_app_dontrendezvous.exe"), _L("5000"));
 			CleanupClosePushL(slave1);
-			TRequestStatus status;
-			slave1.Rendezvous(status);
 			slave1.Resume();
-			User::WaitForRequest(status);
 
 			// Register with SysMon
 			sysmon.MonitorL(*props, slave1);

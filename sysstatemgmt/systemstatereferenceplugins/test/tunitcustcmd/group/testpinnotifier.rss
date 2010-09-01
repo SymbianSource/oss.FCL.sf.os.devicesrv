@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,13 +19,8 @@
  @internalComponent - Internal Symbian test code 
 */
 
-#include <avkon.rh>
-#include <avkon.rsg>
-
-#include <eikon.rh>
-#include <eikon.rsg>
-
-#define qtn_sen_pindlg_auth_title             "Security check"
+#include <techview/eikon.rh>
+#include <techview/eikon.rsg>
 
 NAME SPIN
 
@@ -35,31 +30,21 @@ RESOURCE RSS_SIGNATURE
 
 RESOURCE TBUF16 { buf=""; }
 
-
-
 RESOURCE DIALOG r_security_pin
 	{
-    flags = EGeneralQueryFlags;
-    title="Security check";
-	buttons=R_AVKON_SOFTKEYS_OK_CANCEL;
+	title="Security check";
+	buttons=R_EIK_BUTTONS_CANCEL_OK;
 
 	items =
 		{
-		DLG_LINE 
-		    {
-		    type = EAknCtQuery;
-		    id = EGeneralQuery;
-		    control = AVERELL_DATA_QUERY 
-		        {
-		        layout = EPinLayout;
-		        label = qtn_sen_pindlg_auth_title;
-		        control = SECRETED 
-		            {
-		            num_letters = 8   ;//KSenMaxPasswordLength
-		            };
-		        };
-		    }
+		DLG_LINE
+			{
+			type = EEikCtSecretEd; //Control factory id.
+			id = 0;
+			control = SECRETED
+				{
+				num_letters=8;
+				};
+			}
 		};
 	}
-
-RESOURCE TBUF r_pinnotdlg_auth_title                { buf = qtn_sen_pindlg_auth_title; }

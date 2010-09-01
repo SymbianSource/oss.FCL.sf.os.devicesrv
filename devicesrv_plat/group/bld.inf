@@ -68,6 +68,3 @@
 #include "../sensor_data_compensator_plugin_api/group/bld.inf"
 #include "../ddc_access_api/group/bld.inf"
 #include "../tv_out_behaviour_api/group/bld.inf"
-#ifdef FF_AUTOMOTIVESTACK
-#include "../autoaudio_plugin_api/group/bld.inf"
-#endif

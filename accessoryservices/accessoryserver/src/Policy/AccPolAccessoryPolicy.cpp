@@ -35,11 +35,7 @@
 
 // CONSTANTS
 
-#ifdef FF_AUTOMOTIVESTACK
-const TInt KAccMaxRules = 8;
-#else
 const TInt KAccMaxRules = 7;
-#endif
 
 const TInt  KAccConfigMaxCapabilityGroups = 64;
 const TInt  KAccGidIntBuf                 = 100;
@@ -84,7 +80,7 @@ CAccPolAccessoryPolicy::CAccPolAccessoryPolicy( CCapabilityStorage * aCapability
     }
 
 // Destructor
-EXPORT_C CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()
+CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()
     {
     API_TRACE_( "[AccFW: ACCPOLICY] CAccPolAccessoryPolicy::~CAccPolAccessoryPolicy()" );
     
@@ -391,9 +387,6 @@ void CAccPolAccessoryPolicy::GetAccessoryModeFromRulesTableL(
      {KPCWired,     KAccMonoAudio},
      {KPCBluetooth, KAccStereoAudio},
      {KPCBluetooth, KAccMonoAudio},
-#ifdef FF_AUTOMOTIVESTACK	 
-	 {KPCUSB,   	KAccStereoAudio},
-#endif
      {KPCWired,     0},
      {KPCBluetooth, 0}
     };
@@ -473,11 +466,7 @@ void CAccPolAccessoryPolicy::SetAccessoryModeL(
             }
         }
     else if ( gID.PhysicalConnectionCaps( KPCWired ) ||
-              gID.PhysicalConnectionCaps( KPCHDMI )
-#ifdef FF_AUTOMOTIVESTACK
-			  || gID.PhysicalConnectionCaps ( KPCUSB )
-#endif
-			)
+              gID.PhysicalConnectionCaps( KPCHDMI ) )
         {
         if( gID.DeviceTypeCaps( KDTHeadset ) )
             {
@@ -1250,13 +1239,4 @@ EXPORT_C TUint32 CAccPolAccessoryPolicy::SupportedHWDevicesL()
     return supportedDevices;
     }
 
-EXPORT_C TBool CAccPolAccessoryPolicy::IsCapabilityDefinedL(
-        const TAccPolGenericID& aGenericId,
-        const TUint32& aName )
-    {
-    if(iCapabilityStorage->GetCapability(aGenericId,aName) != NULL)
-        return ETrue;
-    else
-        return EFalse;
-    }
 //  End of File

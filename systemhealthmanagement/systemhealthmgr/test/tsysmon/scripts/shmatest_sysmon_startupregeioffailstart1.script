@@ -1,4 +1,5 @@
-// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+//
+// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,7 +27,7 @@ LOAD_SERVER tsysmon_server
 //! @SYMREQ			REQ6604 REQ9457
 //! @SYMTestType		CIT
 //! @SYMTestPriority		Critical
-//! @SYMTestCaseDependencies	appfwk-sysmon-0044_<emulator|hardware>0.rsc is merged with criticalappscmdlist.rsc
+//! @SYMTestCaseDependencies	appfwk-sysmon-0044_<emulator|hardware>0.rsc must be used in place of SSCForStartupMode0.rsc
 //! @SYMTestCaseDesc		Use the new startup configuration format to register for process monitoring, with 'EIgnoreOnFailure' policy, have the process fail during startup.
 //! @SYMTestActions		Create a SSC file which will contain an item for a test application with EStartupProcess2, EWaitForStart, retry count = 0, EIgnoreOnFailure, and monitor = 1. The test application will be in the Critical Static section.
 //! The test application records a count in a file to check whether it is being loaded first time or second time.

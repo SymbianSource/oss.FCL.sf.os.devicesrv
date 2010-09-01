@@ -224,8 +224,8 @@ void CSSYControlOrientation::CreateAndRegisterChannelsL(
 
         if ( channel )
             {
-            User::LeaveIfError(iChannelArray.Append( channel ));
-            User::LeaveIfError(channelInfoList.Append( channelInfo));
+            iChannelArray.Append( channel );
+            channelInfoList.Append( channelInfo );
             }
         }
 

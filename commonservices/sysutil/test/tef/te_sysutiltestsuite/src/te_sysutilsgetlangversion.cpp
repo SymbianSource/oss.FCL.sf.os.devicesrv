@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -28,7 +28,6 @@ Destructor
 CSysUtilsGetLangVersionStep::~CSysUtilsGetLangVersionStep()
 
 	{
-    SetTestPath(EFalse);
 	}
 
 /**
@@ -64,7 +63,7 @@ TVerdict CSysUtilsGetLangVersionStep::doTestStepL()
 	
 	version.Insert(0,KDummy);
 	
-	TInt fileErr = CheckIsFileExist( _L("C:\\versions\\lang.txt"));
+	TInt fileErr = CheckIsFileExist( _L("Z:\\resource\\versions\\lang.txt"));
 	
 	/* This test is not valid if file does not exist
 	 * Reason for missing file is that "english engineering" package
@@ -81,7 +80,7 @@ TVerdict CSysUtilsGetLangVersionStep::doTestStepL()
 			}
 		INFO_PRINTF1(_L("Deleted P&S properties successfully."));
 		
-		err = SetTestPath(ETrue);
+		err = SetTestPath(EFalse);
 		if( err != KErrNone )
 			{
 			ERR_PRINTF2(_L("Could not turn test path off. Error = %d"), err);
@@ -120,11 +119,7 @@ TVerdict CSysUtilsGetLangVersionStep::doTestStepL()
 			if (version.Compare(testBuf)!=0)
 				{
 				ERR_PRINTF1(_L("language version formatted incorrectly"));
-				INFO_PRINTF1(_L("From ini file: "));
 				INFO_PRINTF1(testBuf);
-				INFO_PRINTF1(_L("From txt file: "));
-				INFO_PRINTF1(version);
-				INFO_PRINTF2(_L("Comparison returned value %d"), version.Compare(testBuf)); 
 				SetTestStepResult(EFail);
 				}
 			else
@@ -142,8 +137,7 @@ TVerdict CSysUtilsGetLangVersionStep::doTestStepL()
 		ERR_PRINTF1(_L("Lang.txt is missing, should be included to base packets"));
 		SetTestStepResult(EFail);
 		}
-	
-	SetTestPath(EFalse);
+
 	return TestStepResult();
 	}
 

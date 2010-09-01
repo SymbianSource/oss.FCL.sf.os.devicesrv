@@ -41,8 +41,8 @@ USERINCLUDE     ../../inc
 OS_LAYER_SYSTEMINCLUDE
 
 LIBRARY         euser.lib
+LIBRARY         ws32.lib
 LIBRARY         ecom.lib
 LIBRARY         hwrmhapticspacketizer.lib 
 LIBRARY         hwrmhapticseffectdatagetterfw.lib
 
-SMPSAFE

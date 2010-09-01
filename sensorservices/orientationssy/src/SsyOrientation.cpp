@@ -186,7 +186,7 @@ CSSYOrientation::~CSSYOrientation()
 void CSSYOrientation::ConstructL()
     {
     iRepository = CRepository::NewL( KCRUidOrientationSsySettings );
-     User::LeaveIfError(CreateConfigurations());
+    CreateConfigurations();
     
 #ifdef AUTO_ORIENTAION_TEST
     iCRListener = CSsyOrientationCRListener::NewL( *this, iRepository );
@@ -1090,13 +1090,11 @@ void CSSYOrientation::SendDataAfterTimer()
 // CSSYOrientation::SetConfigurationForState()
 // ----------------------------------------------------------------------------------
 //
-TInt CSSYOrientation::SetConfigurationForState(
+void CSSYOrientation::SetConfigurationForState(
  const TOrientationConfiguration& aConfigurationForState )
     {
     SSY_TRACE_IN();
     TBool wasFound( EFalse );
-    TInt retVal( KErrNone );
-    
     // Check if is in array
     for( TInt i = 0; i != iConfigArray.Count(); i++ )
         {
@@ -1104,17 +1102,15 @@ TInt CSSYOrientation::SetConfigurationForState(
         if( aConfigurationForState.iOrientationState == iConfigArray[ i ].iOrientationState )
             {
             iConfigArray.Remove( i );
-            retVal = iConfigArray.Insert( aConfigurationForState, i );
+            iConfigArray.Insert( aConfigurationForState, i );
             wasFound = ETrue;
             }
         }
     if( !wasFound )
         {
-        retVal = iConfigArray.Append( aConfigurationForState );
+        iConfigArray.Append( aConfigurationForState );
         }
-	
     SSY_TRACE_OUT();
-    return retVal;
     }
 
 // ----------------------------------------------------------------------------------
@@ -1143,12 +1139,11 @@ void CSSYOrientation::GetConfigurationForState(
 // CSSYOrientation::CreteConfigurations()
 // ----------------------------------------------------------------------------------
 //
-TInt CSSYOrientation::CreateConfigurations()
+void CSSYOrientation::CreateConfigurations()
     {
     SSY_TRACE_IN();
     
     TInt repValue( 0 );
-    TInt retVal( KErrNone );
     
     // This is used in initialisation
     if( iConfigForCurrentState.iOrientationState == TSensrvOrientationData::EOrientationUndefined )
@@ -1213,13 +1208,7 @@ TInt CSSYOrientation::CreateConfigurations()
     SSY_TRACE( EExtended, "ORIENTATIONSSY:CreteConfigurations::EOrientationDisplayUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds=%d", repValue );
     configForDisplayUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds = repValue;
     
-    retVal = SetConfigurationForState( configForDisplayUp );
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState(configForDisplayUp)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-         }
+    SetConfigurationForState( configForDisplayUp );
     
     // Configuration for display down
     TOrientationConfiguration configForDisplayDown;
@@ -1267,14 +1256,7 @@ TInt CSSYOrientation::CreateConfigurations()
     iRepository->Get( KOriStateDisplayDownToDisplayDownwardsTimerKey, repValue );
     SSY_TRACE( EExtended, "ORIENTATIONSSY:CreteConfigurations::EOrientationDisplayDown.iOrientationDisplayDownwards.iTimerValueInMilSeconds=%d", repValue );
     configForDisplayDown.iOrientationDisplayDownwards.iTimerValueInMilSeconds = repValue;
-
-    retVal = SetConfigurationForState( configForDisplayDown);
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState(configForDisplayDown)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-         }
+    SetConfigurationForState( configForDisplayDown );
     
     // Configuration for left up
     TOrientationConfiguration configForDisplayLeftUp;
@@ -1322,14 +1304,7 @@ TInt CSSYOrientation::CreateConfigurations()
     iRepository->Get( KOriStateDisplayLeftUpToDisplayDownwardsTimerKey, repValue );
     SSY_TRACE( EExtended, "ORIENTATIONSSY:CreteConfigurations::EOrientationDisplayLeftUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds=%d", repValue );
     configForDisplayLeftUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds = repValue;
-
-    retVal = SetConfigurationForState( configForDisplayLeftUp );
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState(configForDisplayLeftUp)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-         }
+    SetConfigurationForState( configForDisplayLeftUp );
     
     // Configuration for right up
     TOrientationConfiguration configForDisplayRightUp;
@@ -1377,14 +1352,7 @@ TInt CSSYOrientation::CreateConfigurations()
     iRepository->Get( KOriStateDisplayRightUpToDisplayDownwardsTimerKey, repValue );
     SSY_TRACE( EExtended, "ORIENTATIONSSY:CreteConfigurations::EOrientationDisplayRightUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds=%d", repValue );
     configForDisplayRightUp.iOrientationDisplayDownwards.iTimerValueInMilSeconds = repValue;
-
-    retVal = SetConfigurationForState( configForDisplayRightUp );
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState( configForDisplayRightUp)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-         }
+    SetConfigurationForState( configForDisplayRightUp );
     
     // Configuration for upwards
     TOrientationConfiguration configForDisplayUpwards;
@@ -1432,14 +1400,7 @@ TInt CSSYOrientation::CreateConfigurations()
     iRepository->Get( KOriStateDisplayUpwardsToDisplayDownwardsTimerKey, repValue );
     SSY_TRACE( EExtended, "ORIENTATIONSSY:CreteConfigurations::EOrientationDisplayUpwards.iOrientationDisplayDownwards.iTimerValueInMilSeconds=%d", repValue );
     configForDisplayUpwards.iOrientationDisplayDownwards.iTimerValueInMilSeconds = repValue;
-
-    retVal = SetConfigurationForState( configForDisplayUpwards);
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState( configForDisplayUpwards)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-         }
+    SetConfigurationForState( configForDisplayUpwards );
     
     // Configuration for downwards
     TOrientationConfiguration configForDisplayDownwards;
@@ -1489,14 +1450,7 @@ TInt CSSYOrientation::CreateConfigurations()
     configForDisplayDownwards.iOrientationDisplayDownwards.iAngle = 0;
     configForDisplayDownwards.iOrientationDisplayDownwards.iTimerValueInMilSeconds = 0;
     
-
-    retVal = SetConfigurationForState( configForDisplayDownwards);
-    if( retVal != KErrNone)
-        {
-        SSY_TRACE( EExtended, "ORIENTATIONSSY:SetConfigurationForState( configForDisplayDownwards)=%d", retVal);
-        SSY_TRACE_OUT();
-	return retVal;
-        }
+    SetConfigurationForState( configForDisplayDownwards );
     
     if( iConfigForCurrentState.iOrientationState != TSensrvOrientationData::EOrientationUndefined )
         {
@@ -1505,7 +1459,6 @@ TInt CSSYOrientation::CreateConfigurations()
         }
     
     SSY_TRACE_OUT();
-    return retVal;
     }
 
 // ----------------------------------------------------------------------------------

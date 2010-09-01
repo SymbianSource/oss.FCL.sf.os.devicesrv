@@ -99,7 +99,7 @@ void CASYProxyCommsService::ConstructL()
     // Zero handler needs CASYProxyCommsStack just to get simple Active Object
     //  because CActiveScheduler will be start later in any way
 
-    iZeroObserver = CASYProxyCommandObserver::NewL( NULL );
+    CASYProxyCommandObserver* iZeroObserver = CASYProxyCommandObserver::NewL( NULL );
 
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::ConstructL - return void" );
     }
@@ -148,11 +148,7 @@ CASYProxyCommsService::~CASYProxyCommsService()
         delete iAsyProxyCommsStack;
         iAsyProxyCommsStack = 0;
         }
-    if ( iZeroObserver )
-        {
-        delete iZeroObserver;
-        }
-    
+
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::~CASYProxyCommsService" );
     }
 

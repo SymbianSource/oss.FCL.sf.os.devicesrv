@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -14,7 +14,6 @@
 //
 
 #include "tcustcmd_step_activateemergencycall.h"
-#include "tcustcmd_const.h"
 
 CCustomCmdTestActivateEmergencyCall::~CCustomCmdTestActivateEmergencyCall()
 	{
@@ -45,23 +44,10 @@ TVerdict CCustomCmdTestActivateEmergencyCall::doTestStepL()
 	INFO_PRINTF1(_L("doTestStepL"));
 	TInt err = 0;
 	__UHEAP_MARK;
-	
-    err = RProperty::Define(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, RProperty::EInt);
-    TEST(KErrNone == err || KErrAlreadyExists == err);
-    INFO_PRINTF2(_L("RProperty::Define(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, RProperty::EInt); returns %d"), err);
-    err = RProperty::Set(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, 1);
-    TEST(KErrNone == err); 
-    INFO_PRINTF2(_L("RProperty::Set(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey, 1); returns %d"), err);
-    
 	TRAP(err,TestHandleActivateEmergencyCallL());	
 	TEST(KErrNone == err);
 	TRAP(err,TestHandleActivateEmergencyCallCancelL());
 	TEST(KErrNone == err);
-	
-	err = RProperty::Delete(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey);
-	TEST(KErrNone == err);
-	INFO_PRINTF2(_L("RProperty::Delete(KPropertyCategory, KEmergencyCallRfAdaptationPluginPropertyKey); returns %d"), err);
-	
 	__UHEAP_MARKEND;
 	return TestStepResult();
 	}

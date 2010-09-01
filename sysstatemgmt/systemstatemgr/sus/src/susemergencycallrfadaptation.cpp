@@ -278,6 +278,8 @@ void CEmergencyCallRfAdaptation::RunL()
 	DEBUGPRINT2A("CEmergencyCallRfAdaptationRequests processed the request with funtion id: %d", iCurrentMessage->Function());
 	iCurrentMessage->Complete(iStatus.Int());
 	DeleteAdaptationMessage();
+	iCurrentMessage = NULL;  
+
 	if( (iPendingEmergencyRequestsQueue.Count()) > 0 )
 		{
         CEmergencyAdaptationMessage *messageCopy = NULL;
@@ -293,6 +295,7 @@ TInt CEmergencyCallRfAdaptation::RunError( TInt aError )
 		{
         iCurrentMessage->Complete(aError);
 		DeleteAdaptationMessage();
+		iCurrentMessage = NULL;
 		}
 	
 	while( (iPendingEmergencyRequestsQueue.Count() > 0 ))
@@ -300,6 +303,7 @@ TInt CEmergencyCallRfAdaptation::RunError( TInt aError )
         Dequeue(iCurrentMessage);
         iCurrentMessage->Complete(aError);
         DeleteAdaptationMessage();
+        iCurrentMessage = NULL;
         }
 	
 	return KErrNone;
@@ -312,6 +316,7 @@ void CEmergencyCallRfAdaptation::DoCancel()
 		{
 		iCurrentMessage->Complete(KErrCancel);
 		DeleteAdaptationMessage();
+		iCurrentMessage = NULL;
 		}
 		
 	while( (iPendingEmergencyRequestsQueue.Count() > 0 ))
@@ -319,6 +324,7 @@ void CEmergencyCallRfAdaptation::DoCancel()
         Dequeue(iCurrentMessage);
         iCurrentMessage->Complete(KErrCancel);
         DeleteAdaptationMessage();
+        iCurrentMessage = NULL;
 		}
 	}
 
@@ -343,8 +349,7 @@ void CEmergencyCallRfAdaptation::RemovePriorityClientSession()
  */
 void CEmergencyCallRfAdaptation::DeleteAdaptationMessage()
     {
-	//Do not delete iCurrentMessage if it is owned by iAdaptationReservedMessageArray.
-	if(iCurrentMessage->IsMessageReserved())
+    if(iCurrentMessage->IsMessageReserved())
         {
         iCurrentMessage->UnsetMessageStatus(EMsgInUse);
         ++iReserveMsgCount;
@@ -352,8 +357,7 @@ void CEmergencyCallRfAdaptation::DeleteAdaptationMessage()
     else
         {
         delete iCurrentMessage;
-		}
-	iCurrentMessage = NULL;
+        }    
     }
 
 void CEmergencyCallRfAdaptation::Dequeue(CEmergencyAdaptationMessage *&aCurrentMessage)

@@ -25,9 +25,8 @@ TARGETTYPE		exe
 TARGETPATH		/sys/bin
 UID				0x1000007A 0xA00056EB
 VENDORID		0x70000001
-SECUREID 		0x2000D75B
-
-CAPABILITY 		WriteDeviceData   
+// Use KPSUidStartup as the secure id of this test server to allow P+S keys to be defined
+SECUREID 		0x101F8766
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
@@ -48,7 +47,6 @@ LIBRARY			ssmuiproviderdll.lib
 LIBRARY			etel.lib
 LIBRARY			etelmm.lib
 LIBRARY			centralrepository.lib
-LIBRARY			ws32.lib
 
 // testcode
 SOURCEPATH		../src

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -38,8 +38,6 @@
 //Exe name which defines startup PS keys
 _LIT (KExeToDefineStartUpPS, "\\sys\\bin\\definestartupps.exe");
 _LIT(KStartUpPSKeys, "startupkeys");
-const TUint32 KMiscPluginPropertyKey = 0x2000E658;
-const TUid KPropertyCategory={0x2000D75B};
 
 CCustomCmdTestPublishStartupMode::~CCustomCmdTestPublishStartupMode()
 	{
@@ -95,17 +93,11 @@ TVerdict CCustomCmdTestPublishStartupMode::doTestStepPreambleL()
     
         //Needed for calling callback for stopping active scheduler
         iAsyncStopScheduler = new(ELeave) CAsyncCallBack(CActive::EPriorityIdle);
-        
-        // Setting the P and S key will route the request to the reference plugins instead of the actual plugins
-        TInt err = RProperty::Define(KPropertyCategory, KMiscPluginPropertyKey, RProperty::EInt);
-        TEST(KErrNone == err || KErrAlreadyExists == err);
-        err = RProperty::Set(KPropertyCategory, KMiscPluginPropertyKey, 1);
-        TEST (KErrNone == err);
-
+    
         INFO_PRINTF1(_L("Define global startup mode property"));
     
         //Start the test exe which defines startup related property keys
-        err = process.Create(KExeToDefineStartUpPS, KStartUpPSKeys());
+        TInt err = process.Create(KExeToDefineStartUpPS, KStartUpPSKeys());
         INFO_PRINTF2(_L("Define global startup mode property process created with %d"), err);
         TEST(KErrNone == err);
         User::LeaveIfError(err);
@@ -124,11 +116,6 @@ TVerdict CCustomCmdTestPublishStartupMode::doTestStepPreambleL()
 
 TVerdict CCustomCmdTestPublishStartupMode::doTestStepPostambleL()
 	{
-	if (iTestStepName == KTestPublishStartupModeWithCap)
-	    {
-	    TInt err = RProperty::Delete(KPropertyCategory, KMiscPluginPropertyKey);
-	    TEST (KErrNone == err);
-	    }
 	return CTestStep::doTestStepPostambleL();
 	}
 
@@ -214,8 +201,8 @@ void CCustomCmdTestPublishStartupMode::doTestCreateExecuteAndDestroyL()
 	TEST(iRequestStatus == KErrNone);
 	
     err = RProperty::Get(CSsmUiSpecific::StartupPSUid(), KPSGlobalStartupMode, startUpMode);
-    INFO_PRINTF3(_L("Startup mode is %d ; Expected %d"), startUpMode, EStartupModeNormal);
-    TEST(startUpMode == EStartupModeNormal);
+    INFO_PRINTF3(_L("Startup mode is %d ; Expected %d"), startUpMode, 0);
+    TEST(startUpMode == 0);
 	
     // Hidden Reset functionality is not supported in techview\hrp, so the request will be completed with KErrNotSupported
     // And the hidden reset reason would same as we set in the test code, ie., ENormalStartup.
@@ -243,7 +230,6 @@ New Test CaseID 		DEVSRVS-SSREFPLUGINS-CUSTCMD-0022
 void CCustomCmdTestPublishStartupMode::doTestFactoryCreateAndExecuteCancelL()
 	{
 	INFO_PRINTF1(_L("Entering test for factory create, execute cancel and destroy"));
-		
 	__UHEAP_MARK;
 	
 	INFO_PRINTF1(_L("Testing factory create for publish startup mode"));

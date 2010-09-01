@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -27,7 +27,8 @@
   On a device when NotifySimEvent is called, Sim Adaptation Plug-in would request for notification 
   from the Cooperating System for 'aEvent'.
   
-  The reference implementation has to complete the notification request with KErrNotSupported.
+  On HRP/Techview,the reference implementation has to complete the notification request with KErrNotSupported
+  since there is no Cooperating System on HRP/Techview.
   
   But this implementation will cause problems in the following scenario.
   
@@ -44,7 +45,7 @@
   In this context if NotifySimEvent just completes the message immediately this results in a infinite 
   loop and starves other active objects with same priority.
   
-  This makes testing of Adaptation servers notification functionality impossible on PlatSim/device.
+  This makes testing of Adaptation servers notification functionality impossible on HRP/Techview.
   
   *********Solution*********
 
@@ -96,13 +97,8 @@ public:
 private:
 	CSimAdaptationRef();
 	void ConstructL();
-	//Helper function to check for P&S Key
-    TBool IsTestPsKeyDefined();
-	
 private:
 	CSimRefAdaptationTimer* iTimer;
-	MSimAdaptation* iSaaSimAdaptationDll;
-	RLibrary iSaaSimAdaptationLib;
 	};
 
 

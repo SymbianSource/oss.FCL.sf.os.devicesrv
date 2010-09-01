@@ -38,7 +38,7 @@ public:
     /**
      * Destructor.
      */
-    IMPORT_C virtual ~CAccPolObjectBase();        
+    virtual ~CAccPolObjectBase();        
         
     /**
      * Sets the object type.

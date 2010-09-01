@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,10 +16,8 @@
 TARGET          tsysmon_app_faileiofcount0.exe
 TARGETTYPE      exe
 UID             0 0x10283594
-SECUREID 		0x200086A8
 
 USERINCLUDE     ../src
-USERINCLUDE     ../../../../../sysstatemgmt/inc
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 SOURCEPATH      ../src
@@ -40,7 +38,7 @@ CAPABILITY		ProtServ PowerMgmt
 	END
 #else
 	SOURCEPATH      ../resource/hardware
-	START RESOURCE	appfwk-sysmon-eiof_hardware0.rss
+	START RESOURCE	appfwk-sysmon-0033_hardware0.rss
 		TARGETPATH	/private/2000d75b/startup/test
 	END
 #endif

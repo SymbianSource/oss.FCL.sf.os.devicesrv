@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,11 +26,12 @@
 
 void MainL()
     {
+    RProcess::Rendezvous(KErrNone);
+
     CCommandLineArguments* args = CCommandLineArguments::NewLC();
     CSysMonTestHelper::IncrementRunCountL(args->Arg(0));
     CleanupStack::PopAndDestroy(args);
 	
-    RProcess::Rendezvous(KErrNone);
 	while (ETrue)
 		{
 		User::After(5000000); // 5 seconds

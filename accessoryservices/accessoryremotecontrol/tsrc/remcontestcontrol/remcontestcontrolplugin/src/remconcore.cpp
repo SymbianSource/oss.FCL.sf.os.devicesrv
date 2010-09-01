@@ -262,10 +262,9 @@ void CRemConCore::Response(TRemConCoreApiOperationId /*aOperationId*/, TInt /*aE
 void CRemConCore::Play()
 {
 		TUint numRemotes;		
-		
-		iActive->iStatus = KRequestPending;
  		iCoreController->Play(iActive->iStatus, numRemotes, ERemConCoreApiButtonPress);
- 		iActive->SetActive();
+ 		iActive->iStatus = KRequestPending;
+		iActive->SetActive();
 }
  
  // -----------------------------------------------------------------------------

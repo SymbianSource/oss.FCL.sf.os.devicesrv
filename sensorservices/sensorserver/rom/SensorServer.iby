@@ -20,7 +20,7 @@
 #define SENSORSERVER_IBY
 
 file=ABI_DIR\BUILD_DIR\sensorserver.exe          PROGRAMS_DIR\sensorserver.exe
-file=ABI_DIR\BUILD_DIR\sensrvclient.dll          SHARED_LIB_DIR\sensrvclient.dll
+file=ABI_DIR\BUILD_DIR\SensrvClient.dll          SHARED_LIB_DIR\SensrvClient.dll
 file=ABI_DIR\BUILD_DIR\sensrvutil.dll            SHARED_LIB_DIR\sensrvutil.dll
 
 #endif // SENSORSERVER_IBY

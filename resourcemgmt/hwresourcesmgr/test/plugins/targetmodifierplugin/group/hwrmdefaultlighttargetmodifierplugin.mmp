@@ -34,8 +34,13 @@ END
 USERINCLUDE     ../inc
 USERINCLUDE     ../../../../include // telephony/hwrm/include
 
-OS_LAYER_SYSTEMINCLUDE
-
+#ifndef SYMBIAN_OLD_EXPORT_LOCATION
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+#else
+SYSTEMINCLUDE   /epoc32/include
+SYSTEMINCLUDE   /epoc32/include/hwrm
+SYSTEMINCLUDE   /epoc32/include/featmgr
+#endif
 LIBRARY         euser.lib 
 LIBRARY         ecom.lib
 LIBRARY         featmgr.lib

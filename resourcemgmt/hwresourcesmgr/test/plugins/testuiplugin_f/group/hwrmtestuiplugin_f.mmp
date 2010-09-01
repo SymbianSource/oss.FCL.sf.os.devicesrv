@@ -31,7 +31,8 @@ SOURCE          hwrmtestuiplugin_f.cpp
 USERINCLUDE     ../inc
 USERINCLUDE		../../../../common/inc
 
-OS_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE   /epoc32/include/ecom
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 LIBRARY         euser.lib 
 LIBRARY			ecom.lib

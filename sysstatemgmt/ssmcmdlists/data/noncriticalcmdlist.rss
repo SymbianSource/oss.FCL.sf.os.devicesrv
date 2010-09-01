@@ -77,9 +77,8 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_createswp_uiphase,
         r_cmd_createswp_rfstatus,
         r_cmd_waitforofflinequery,
-        // prio 0xFFD7
-        r_cmd_setswp_uistart,   // After offline query has been made
-        r_cmd_bsengine,
+        r_cmd_setswp_uistart,   // After offline query has been made // prio 0xFFD7 
+        r_cmd_bsengine,					// prio 0xFFD3      
         // prio 0xFFC7
         r_cmd_setswp_rfon,
         r_cmd_setswp_rfoff,
@@ -97,7 +96,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 //
 RESOURCE SSM_START_PROCESS_INFO r_cmd_bsengine
     {
-    priority = 0xFFD7;
+    priority = 0xFFD3;
     name = "z:\\sys\\bin\\bsengine.exe";
     execution_behaviour = ESsmWaitForSignal;
     timeout = 10000;
@@ -232,6 +231,8 @@ RESOURCE SSM_SET_PUBLISH_AND_SUBSCRIBE r_cmd_startupready
     }
 
 // ---------------------------------------------------------------------------
+ 
+// ---------------------------------------------------------------------------
 // r_cmd_waitforofflinequery
 // ---------------------------------------------------------------------------
 //
@@ -309,17 +310,6 @@ RESOURCE CMD_PARAM_WAIT_PS_2 r_dlldata_waitofflinequery
     target2 = 102;          // EBootIntoOfflineMode
     }
 
-// ---------------------------------------------------------------------------
-// r_dlldata_waitphone
-// ---------------------------------------------------------------------------
-//
-RESOURCE CMD_PARAM_WAIT_PS r_dlldata_waitphone
-    {
-    category = 0x101F8766;  // KPSUidStartup
-    key = 0x00000044;       // KPSPhonePhase1Ok
-    target = 101;           // EPhonePhase1Ok
-    }
-	
 // ===========================================================================
 // Conditional blocks in alphabetical order
 // ===========================================================================
@@ -337,69 +327,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_firstboot
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_alwaysonline
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_alwaysonline
-    {
-    feature_id = KFeatureIdAlwaysOnLine;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_cellbroadcast
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_cellbroadcast
-    {
-    feature_id = KFeatureIdCellBroadcast;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_emailfw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_emailfw
-    {
-    feature_id = KFeatureIdFfEmailFramework;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_iadv2
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_iadv2
-    {
-    feature_id = KFeatureIdFfIaupdatePhase2;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_ippush
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_ippush
-    {
-    feature_id = KFeatureIdIpPush;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_omapoc
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_omapoc
-    {
-    feature_id = KFeatureIdOmaPoc;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_omasuplplugins
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_omasuplplugins
-    {
-    feature_id = KFeatureIdOmaSuplPlugins;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_feat_pnp_mobile_services
 // ---------------------------------------------------------------------------
 //
@@ -409,48 +336,12 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_pnp_mobile_services
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_remotestoragefw
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_remotestoragefw
-    {
-    feature_id = KFeatureIdRemoteStorageFw;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_runtime_dcmo;
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_runtime_dcmo
-    {
-    feature_id = KFeatureIdFfRuntimeDeviceCapabilityConfiguration;
-    }
-	
-// ---------------------------------------------------------------------------
-// r_cond_feat_sappolicymgmt
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_sappolicymgmt
-    {
-    feature_id = KFeatureIdSapPolicyManagement;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_feat_sdnd
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_sdnd
     {
     feature_id = KFeatureIdSdnd;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_feat_simcard
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_simcard
-    {
-    feature_id = KFeatureIdSimCard;
     }
 
 // ---------------------------------------------------------------------------
@@ -481,51 +372,12 @@ RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_syncml_dm_fota
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_feat_tvout
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_FEATURE_VALUE r_cond_feat_tvout
-    {
-    feature_id = KFeatureIdTvOut;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_firstboot_or_fotareset_or_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_firstboot_or_fotareset_or_deeprfsreset
-    {
-    lhs = r_cond_fotareset_or_deeprfsreset;
-    rhs = r_cond_ps_firstboot;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_fotareset_or_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_OR r_cond_fotareset_or_deeprfsreset
-    {
-    lhs = r_cond_ps_fotareset;
-    rhs = r_cond_ps_deeprfsreset;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_no_sdnd
 // ---------------------------------------------------------------------------
 //
 RESOURCE SSM_CND_LOGICAL_NOT r_cond_no_sdnd
     {
     sub_condition = r_cond_feat_sdnd;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_pnp_mobile_services_and_firstboot
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_LOGICAL_AND r_cond_pnp_mobile_services_and_firstboot
-    {
-    lhs = r_cond_feat_pnp_mobile_services;
-    rhs = r_cond_ps_firstboot;
     }
 
 // ---------------------------------------------------------------------------
@@ -551,17 +403,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_bootonline
     }
 
 // ---------------------------------------------------------------------------
-// r_cond_ps_deeprfsreset
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_deeprfsreset
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000045;      // KPSStartupReason
-    value = EDeepRFSReset;
-    }
-
-// ---------------------------------------------------------------------------
 // r_cond_ps_fotareset
 // ---------------------------------------------------------------------------
 //
@@ -570,17 +411,6 @@ RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_fotareset
     category = 0x101F8766; // KPSUidStartup
     key = 0x00000045;      // KPSStartupReason
     value = EFirmwareUpdate;
-    }
-
-// ---------------------------------------------------------------------------
-// r_cond_ps_normalboot
-// ---------------------------------------------------------------------------
-//
-RESOURCE SSM_CND_PUB_SUB_VALUE r_cond_ps_normalboot
-    {
-    category = 0x101F8766; // KPSUidStartup
-    key = 0x00000012;      // KStartupCleanBoot
-    value = 101;           // EStartupNormalBoot
     }
 
 // ---------------------------------------------------------------------------

@@ -21,7 +21,6 @@ MAKEFILE = 	$(EPOCROOT)/sf/os/devicesrv/commonservices/commonengine/config/expor
 $(call push,MAKEFILE_STACK,$(MAKEFILE))
 
 CONFFILES =		$(MAKEFILEDIR)../conf/commonengine.confml              	$(EPOCROOT)/epoc32/rom/config/confml_data/s60/ \
-			$(MAKEFILEDIR)../conf/ci_commonengine.confml            $(EPOCROOT)/epoc32/rom/config/confml_data/s60/ \
 							$(MAKEFILEDIR)../conf/commonengine_1020503B.crml 	     	$(EPOCROOT)/epoc32/rom/config/confml_data/s60/
 		
 commonengine_config					:: commonengine_config-conf

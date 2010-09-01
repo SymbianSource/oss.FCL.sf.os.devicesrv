@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -36,11 +36,9 @@ TVerdict CResultCheckStep::doTestStepL()
 	TInt expectedResult = 0;
 	TInt expectedRegisterCount = 0;
 	TInt expectedRestartCount = 0;
-	TInt processArguments = 0;
 	if (!GetIntFromConfig(ConfigSection(), KTSysMonServerExpectedResult, expectedResult) ||
 		!GetIntFromConfig(ConfigSection(), KTSysMonServerExpectedRegisterCount, expectedRegisterCount) ||
-		!GetIntFromConfig(ConfigSection(), KTSysMonServerExpectedRestartCount, expectedRestartCount) ||
-		!GetIntFromConfig(ConfigSection(), KTSysMonServerProcessArguments, processArguments))
+		!GetIntFromConfig(ConfigSection(), KTSysMonServerExpectedRestartCount, expectedRestartCount))
 		{
 		ERR_PRINTF1(_L("Error reading ini file data"));
 		User::Leave(KErrNotFound);
@@ -50,7 +48,7 @@ TVerdict CResultCheckStep::doTestStepL()
 	TInt actualRegisterCount = 0;
 	TInt actualRestartCount = 0;
 	CSysMonTestHelper::GetResultIntL(ConfigSection(), actualResult);
-	actualRegisterCount = CSysMonTestHelper::GetRegisterCount(processArguments);
+	actualRegisterCount = CSysMonTestHelper::GetRegisterCountL();
 	actualRestartCount = CSysMonTestHelper::GetRestartCountL();
 
 	INFO_PRINTF2(_L("Actual result: %d"), actualResult);

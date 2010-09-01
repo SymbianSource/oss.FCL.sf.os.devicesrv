@@ -16,13 +16,13 @@
 #ifndef hwrmtestbase_h
 #define hwrmtestbase_h
 
-#include <test/tefunit.h>
+#include <tefunit.h>
 #include <hwrmvibra.h>
 #include <hwrmlight.h>
-#include <hwrm/hwrmextendedlight.h>
-#include <hwrm/hwrmenhancedlight.h>
+#include <hwrmextendedlight.h>
+#include <hwrmenhancedlight.h>
 #include <hwrmpower.h>
-#include <hwrm/hwrmfmtx.h>
+#include <hwrmfmtx.h>
 #include <rmocklight.h>
 #include <rmockpowerstate.h>
 #include <rmockvibra.h>

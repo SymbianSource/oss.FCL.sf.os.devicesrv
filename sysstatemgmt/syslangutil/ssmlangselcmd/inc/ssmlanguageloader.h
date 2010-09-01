@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -11,7 +11,8 @@
 *
 * Contributors:
 *
-* Description: Declaration of SsmLanguageLoader class.
+* Description:
+* Declaration of SsmLanguageLoader class.
 *
 */
 
@@ -33,15 +34,15 @@ class SsmLanguageLoader
 public:
 
     /**
-    * Store language code to HAL and load corresponding Language, Region and Collation DLLs.
+    * Store language code to HAL and load corresponding locale DLL.
     *
-    * @param aLanguage Language code identifying which language DLL to load.
-    * @param aRegion Region code identifying which region DLL to load.
-    * @param aCollation Collation code identifying which collation DLL to load.
+    * @since S60 3.2
+    * @param aLanguage Language code identifying which locale DLL to load.
     * @return KErrNone if loading was successful, one of Symbian error codes
     * otherwise.
     */
-    static TInt LoadLocale( const TInt aLanguage, const TInt aRegion, const TInt aCollation);
+    static TInt LoadLanguage( const TInt aLanguage );
+
 private:
 
     /**
@@ -54,13 +55,23 @@ private:
     static TInt StoreLanguageToHal( const TInt aLanguage );
 
     /**
-    * Loads the given Language, Region and Collation DLLs and saves the settings
+    * Find the correct locale DLL to use by language code and take it to
+    * use.
     *
-    * @param aLanguageDllName The name of the Language DLL to load.
-    * @param aRegionDllName The name of the Region DLL to load.
-    * @param aCollationDllName The name of the Collation DLL to load.
+    * @param aLanguageCode The language code to find a locale dll for.
     * @return KErrNone if successful, one of Symbian error codes otherwise.
     */
-    static TInt ChangeLocale( const TDesC& aLanguageDllName,  const TDesC& aRegionDllName, const TDesC& aCollationDllName );
+    static TInt LoadLocaleDll( const TInt aLanguage );
+
+    /**
+    * Take a locale DLL to use by name.
+    *
+    * @param aLocaleDllName The name of the locale DLL to load.
+    * @return KErrNone if successful, one of Symbian error codes otherwise.
+    */
+    static TInt ChangeLocale( const TDesC& aLocaleDllName );
+
     };
+
+
 #endif // SSMLANGUAGELOADER_H

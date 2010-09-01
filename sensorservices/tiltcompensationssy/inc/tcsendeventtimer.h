@@ -72,7 +72,8 @@ NONSHARABLE_CLASS( CTCSendEventTimer ): public CActive
         // @see CActive
         TInt RunError( TInt aError );
 	public:
-		void Start(TInt aHrz );
+		void Start( );
+        
     private: // Private data for base channel
     
     // The timer object

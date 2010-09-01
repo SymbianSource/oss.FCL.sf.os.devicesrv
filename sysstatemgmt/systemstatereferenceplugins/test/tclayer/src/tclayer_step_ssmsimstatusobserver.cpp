@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -185,9 +185,8 @@ void CCLayerTestSsmSimStatusObserver::doTestSimChangedAndOwnedL()
 	__UHEAP_MARK;
 	
 	// Delete any existing defines, ignore return value
-	TInt err1 = RProperty::Delete(CSsmUiSpecific::StartupPSUid(), KPSSimChanged);
-	TInt err2 = RProperty::Delete(CSsmUiSpecific::StartupPSUid(), KPSSimOwned);
-	INFO_PRINTF3(_L("Value of err1 & err2 = %d & %d"), err1, err2);
+	(void) RProperty::Delete(CSsmUiSpecific::StartupPSUid(), KPSSimChanged);
+	(void) RProperty::Delete(CSsmUiSpecific::StartupPSUid(), KPSSimOwned);
 	TInt err = KErrNone;
 	
 	INFO_PRINTF1(_L("Constructing SSM SIM publish cmd"));	
@@ -231,7 +230,6 @@ void CCLayerTestSsmSimStatusObserver::doTestSimChangedAndOwnedL()
 	
 	INFO_PRINTF1(_L("Initializing SSM SIM status observer without defining SIM changed property"));
 	err = RProperty::Define(CSsmUiSpecific::StartupPSUid(), KPSSimOwned, RProperty::EInt);
-	INFO_PRINTF2(_L("Define returns err = %d") ,err);
 	TEST(err == KErrNone);
 	simCustomCmd->Execute(emptyBuf, iRequestStatus);
 	

@@ -63,10 +63,12 @@ void CPsmClientImpl::ConstructL()
 CPsmClientImpl::~CPsmClientImpl()
     {
     COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::~CPsmClientImpl()" ) ) );
-    
+
     CancelPowerSaveModeChange();
+
     delete iActive;
     delete iSettings;
+
     iPsmServer.Close();
 
     COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::~CPsmClientImpl - return" ) ) );
@@ -166,40 +168,5 @@ CPsmSettings& CPsmClientImpl::PsmSettings() const
     COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::PsmSettings - return" ) ) );
     return *iSettings;
     }
-
-#ifdef _DEBUG     
-TInt CPsmClientImpl::HeapMark()
-    {
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapMark()" ) ) );
-    TInt err = iPsmServer.SendReceiveSync( EDebugHeapMark, TIpcArgs() );
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapMark - return" ) ) );   
-    return err;
-    }
-
-TInt CPsmClientImpl::HeapMarkEnd()
-    {
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapMarkEnd()" ) ) );
-    TInt err = iPsmServer.SendReceiveSync( EDebugHeapMarkEnd, TIpcArgs() );   
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapMarkEnd - return" ) ) );   
-    return err;    
-    }
-
-TInt CPsmClientImpl::SetHeapFailure(TInt aFailureRate)
-    {
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::SetHeapFailure()" ) ) );
-    TInt err = iPsmServer.SendReceiveSync( EDebugSetHeapFailure, TIpcArgs(aFailureRate) );
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::SetHeapFailure - return" ) ) );   
-    return err; 
-    }
-
-TInt CPsmClientImpl::HeapReset()
-    {
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapReset()" ) ) );
-    TInt err = iPsmServer.SendReceiveSync( EDebugHeapReset, TIpcArgs() );
-    COMPONENT_TRACE( ( _L( "PSM Client - CPsmClientImpl::HeapReset - return" ) ) );   
-    return err; 
-    }
-
-#endif //_DEBUG     
 
 // End of file

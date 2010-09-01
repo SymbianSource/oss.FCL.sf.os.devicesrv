@@ -35,6 +35,7 @@
 // CONSTANTS
 
 const TUid KScreenOutputChannel = {0x00000666};
+_LIT(KAccFwUiNotifierResource, "accfwnoteuinotifier.rsc"); 
 
 
 // MACROS

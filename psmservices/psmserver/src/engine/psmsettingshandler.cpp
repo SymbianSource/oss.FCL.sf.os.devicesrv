@@ -25,29 +25,6 @@
 #include "psmtrace.h"
 
 // -----------------------------------------------------------------------------
-// CloseHandler
-// closes the storage handler
-// -----------------------------------------------------------------------------
-//
-void CleanupStorage(TAny* aPtr)
-    {
-    CPsmStorage* self = static_cast<CPsmStorage*> (aPtr);
-    //Ignore the Trap as Cleanup can't leave.
-    TRAP_IGNORE(self->CloseStorageL());
-    }
-
-// -----------------------------------------------------------------------------
-// CloseHandler
-// closes the backup storage handler
-// -----------------------------------------------------------------------------
-//
-void CleanupBackupStorage(TAny* aPtr)
-    {
-    CPsmBackupStorage* self = static_cast<CPsmBackupStorage*> (aPtr);
-    //Ignore the Trap as Cleanup can't leave.
-    TRAP_IGNORE(self->CloseStorageL());
-    }
-	
 // CPsmSettingsHandler::NewL
 // Two-phased constructor.
 // -----------------------------------------------------------------------------
@@ -137,13 +114,10 @@ void CPsmSettingsHandler::BackupAndGetSettingsL(
     RConfigInfoArray& aPsmConfigArray, TUint32 aRepository )
     {
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSettingsHandler::BackupAndGetSettingsL()" ) ) );
-    //Close config handle in case of any error
-    CleanupStack::PushL(TCleanupItem(CleanupStorage, iConfigStorage));
     // Change settings from normal config storage
     iConfigStorage->InitStorageL( aRepository );
     ChangeSettingsL( aPsmConfigArray, aRepository, *iConfigStorage );
     iConfigStorage->CloseStorageL();
-    CleanupStack::Pop(iConfigStorage);
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmSettingsHandler::BackupAndGetSettingsL() - return" ) ) );
     }
 
@@ -252,9 +226,7 @@ void CPsmSettingsHandler::ChangeSettingsL(
     // First, get current settings
     RConfigInfoArray currentSettings;
     CleanupClosePushL( currentSettings );
-    
-    //Close backup handler in case of any error
-    CleanupStack::PushL(TCleanupItem(CleanupBackupStorage, iBackupStorage));
+
     iBackupStorage->InitStorageL( aRepository );
     iBackupStorage->ListCurrentSettingSetL( currentSettings );
 
@@ -273,8 +245,8 @@ void CPsmSettingsHandler::ChangeSettingsL(
         if ( !found )
             {
             // Add new settings to backup
-            settingsToBackUp.AppendL( aPsmConfigArray[ i ] );
-            currentSettings.AppendL( aPsmConfigArray[ i ] );
+            settingsToBackUp.Append( aPsmConfigArray[ i ] );
+            currentSettings.Append( aPsmConfigArray[ i ] );
             }
         }
 
@@ -300,7 +272,7 @@ void CPsmSettingsHandler::ChangeSettingsL(
     RConfigInfoArray settingsFromBackUp;
     CleanupClosePushL( settingsFromBackUp );
 
-    for ( TInt i = 0; currentSettings.Count() != i; ++i )
+    for ( TInt i = 0; currentSettings.Count() != i; i++ )
         {
         TPsmsrvConfigInfo& currentInfo = currentSettings[ i ];
         TBool found = EFalse;
@@ -315,9 +287,9 @@ void CPsmSettingsHandler::ChangeSettingsL(
         if ( !found )
             {
             // not found, get setting from backup
-            settingsFromBackUp.AppendL( currentInfo );
+            settingsFromBackUp.Append( currentInfo );
             currentSettings.Remove( i );
-            --i;
+            i--;
             }
         else
             {
@@ -340,14 +312,12 @@ void CPsmSettingsHandler::ChangeSettingsL(
     // add settings from backup to settings
     for ( TInt i = 0; i < settingsFromBackUp.Count(); i++ )
         {
-        //Ignore the error returned by Append  
-        aPsmConfigArray.Append( settingsFromBackUp[ i ]);
+        aPsmConfigArray.Append( settingsFromBackUp[ i ] );
         }
 
     // Cleanup config arrays
     CleanupStack::PopAndDestroy( &settingsFromBackUp );
     CleanupStack::PopAndDestroy( &settingsToBackUp );
-    CleanupStack::Pop( iBackupStorage );
     CleanupStack::PopAndDestroy( &currentSettings );
 
     User::LeaveIfError( err );
@@ -378,19 +348,15 @@ void CPsmSettingsHandler::ChangeCenRepSettingsL()
         CleanupClosePushL( psmConfigArray );
 
         const TUint32 repository = passiveConfigs[i];
-        //Close Cenrep handler in case of any error
-        CleanupStack::PushL(TCleanupItem(CleanupStorage, iCenRepStorage));
+
         iCenRepStorage->InitStorageL( repository );
 
         if ( EPsmsrvModeNormal == iMode )
             {
-            //Close Cenrep handler in case of any error
-    		CleanupStack::PushL(TCleanupItem(CleanupBackupStorage, iBackupStorage));	
             // Moving to normal mode, get passive config set from baskup storage
             iBackupStorage->InitStorageL( repository );
             iBackupStorage->ListPassiveConfigSetL( psmConfigArray );
             iBackupStorage->CloseStorageL();
-            CleanupStack::Pop( iBackupStorage );
             }
         else
             {
@@ -403,7 +369,6 @@ void CPsmSettingsHandler::ChangeCenRepSettingsL()
 
         // close storage
         iCenRepStorage->CloseStorageL();
-        CleanupStack::Pop( iCenRepStorage );
         CleanupStack::PopAndDestroy( &psmConfigArray );
         }
 

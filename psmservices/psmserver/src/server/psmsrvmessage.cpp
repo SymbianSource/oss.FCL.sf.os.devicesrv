@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -153,14 +153,5 @@ void CPsmMessage::NotifyPsmModeChangeComplete( const TInt aError )
 
     COMPONENT_TRACE( ( _L( "PSM Server - CPsmMessage::NotifyPsmModeChangeComplete - return" ) ) );
     }
-
-// -----------------------------------------------------------------------------
-// CPsmMessage::MessageHandle
-// -----------------------------------------------------------------------------
-//
-TInt CPsmMessage::MessageHandle() const
-        {
-        return iMessage.Handle();
-        }
 
 // End of file

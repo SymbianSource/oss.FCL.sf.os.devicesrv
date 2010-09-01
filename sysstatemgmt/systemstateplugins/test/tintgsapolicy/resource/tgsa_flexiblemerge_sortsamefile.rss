@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,6 @@
 
 #include <ssm/ssmcmd.rh>
 #include <ssm/ssmsubstates.hrh>
-#include "ssmsubstateext.hrh"
 
 UID2 KUidSsmCommandListResourceFile
 
@@ -38,7 +37,7 @@ RESOURCE SSM_COMMAND_LIST_MAPPING r_command_list_mapping
 		{
 		SSM_COMMANDLISTID_TO_RESOURCEID
 			{
-			command_list_id = ESsmStateNonCritical;
+			command_list_id = 0x49;
 			resource_id = r_non_critical_commands;
 			}
 		};
@@ -49,10 +48,16 @@ RESOURCE SSM_COMMAND_LIST r_non_critical_commands
 	commands =
 		{
 		r_command_test_app
+		,	r_command_publish_system_state	
 		,	r_command_test_proc		
 		};
 	}
 
+RESOURCE SSM_PUBLISH_SYSTEM_STATE r_command_publish_system_state
+	{
+	severity = ECmdCriticalSeverity;
+	priority = 150;
+	}	
 	
 RESOURCE SSM_START_APP_INFO r_command_test_app
 	{

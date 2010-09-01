@@ -26,7 +26,7 @@
 #include <e32std.h>
 #include <e32base.h>
 #include <eiknotapi.h>
-#include <eikdialg.h>
+#include <techview/eikdialg.h>
 #include <e32cmn.h>
 
 

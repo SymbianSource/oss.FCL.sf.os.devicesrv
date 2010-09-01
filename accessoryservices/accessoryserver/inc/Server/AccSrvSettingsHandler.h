@@ -23,7 +23,6 @@
 #include <e32base.h>
 #include <AccModeSettingArray.h>
 #include "AccSrvServerModel.h"
-#include "AccPolAccessoryPolicy.h"
 
 // CONSTANTS
 _LIT_SECURITY_POLICY_C1(KNoCapability, ECapability_None);
@@ -61,8 +60,7 @@ NONSHARABLE_CLASS( CAccSrvSettingsHandler ) : public CBase
         * Two-phased constructor.
         */
         static CAccSrvSettingsHandler* NewL( CAccSrvConnectionController* aConCtrl,
-                                             CAccSrvServerModel& aModel,
-                                             CAccPolAccessoryPolicy* aPolicy );
+                                             CAccSrvServerModel& aModel );
 
         /**
         * Destructor.
@@ -181,8 +179,7 @@ NONSHARABLE_CLASS( CAccSrvSettingsHandler ) : public CBase
         * C++ default constructor.
         */
         CAccSrvSettingsHandler( CAccSrvConnectionController* aConCtrl,
-                                CAccSrvServerModel& aModel,
-                                CAccPolAccessoryPolicy* aPolicy );
+                                CAccSrvServerModel& aModel );
 
         /**
         * By default Symbian 2nd phase constructor is private.
@@ -255,10 +252,6 @@ NONSHARABLE_CLASS( CAccSrvSettingsHandler ) : public CBase
 
         // Tells wheter lights set on or off by accessory server.
         TAccSettingsLights iLightsOn;
-
-        //Handle to the Accessory Policy
-        CAccPolAccessoryPolicy*         iPolicy;//Not owned
-
 
     public:     // Friend classes
 

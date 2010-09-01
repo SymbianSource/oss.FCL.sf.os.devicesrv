@@ -1,4 +1,4 @@
-// Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -21,9 +21,6 @@
 */
 
 #include "tcmd_step_execute.h"
-#include <e32property.h>
-const TUint32 KRtcAdaptationPluginPropertyKey = 0x2000D76C;
-const TUid KPropertyCategory={0x2000D75B};
 
 /**
  This function is wrapped in  Callback and used to stop the CActiveScheduler
@@ -87,29 +84,19 @@ Test CaseID         DEVSRVS-SSREFPLUGINS-CUSTCMD-0028
 void CTestCustomCmdExecute::TestCustomCmdValidateRTC()
     {
     INFO_PRINTF1(_L("TestCustomCmdValidateRTC started"));
-    // Setting the P and S key will route the request to the reference plugins instead of the actual plugins
-    TInt err = RProperty::Define(KPropertyCategory, KRtcAdaptationPluginPropertyKey, RProperty::EInt);
-    TEST(KErrNone == err || KErrAlreadyExists == err);
-    err = RProperty::Set(KPropertyCategory, KRtcAdaptationPluginPropertyKey, 1);
-    TEST(KErrNone == err);
-    
     //Create ValidateRTC custom command
     MSsmCustomCommand* customCmdValidateRTC = SsmCustomCmdFactory::CmdValidateRTCNewL();
     customCmdValidateRTC->Initialize(iCmdEnv);
     ExecuteCommand(customCmdValidateRTC);
-    // In the reference plugins, the API completes with KErrNotSupported. Hence we check for the same
     TEST(KErrNotSupported == iStatus.Int());
     ExecuteCommand(customCmdValidateRTC);
     customCmdValidateRTC->ExecuteCancel();
-    // In the reference plugins, the API completes with KErrNotSupported. Hence we check for the same
     TEST(KErrNotSupported == iStatus.Int());
     //Close the command
     customCmdValidateRTC->Close();
     //Releasing the comand will delete itself.
     customCmdValidateRTC->Release();
-    INFO_PRINTF3(_L("TestCustomCmdValidateRTC completed with %d Expected %d"),iStatus.Int(),KErrNone);
-    err = RProperty::Delete(KPropertyCategory, KRtcAdaptationPluginPropertyKey);
-    TEST(KErrNone == err);
+    INFO_PRINTF3(_L("TestCustomCmdValidateRTC completed with %d Expected %d"),iStatus.Int(),KErrNotSupported);
     }
 
 /**

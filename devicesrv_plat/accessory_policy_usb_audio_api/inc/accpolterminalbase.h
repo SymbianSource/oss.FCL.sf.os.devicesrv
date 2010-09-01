@@ -32,7 +32,7 @@ public:
     /**
      * Destructor.
      */
-    IMPORT_C virtual ~CAccPolTerminalBase();
+    virtual ~CAccPolTerminalBase();
 
     /**
      * Assign operator for audio terminal base class.

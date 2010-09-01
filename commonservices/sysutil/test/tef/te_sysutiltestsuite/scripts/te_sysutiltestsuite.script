@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,15 +19,12 @@ LOAD_SUITE te_sysutiltestsuite
 
 RUN_UTILS MkDir c:\versions
 
-RUN_UTILS CopyFile z:\resource\versions\test\purpose.txt c:\versions\purpose.txt
-RUN_UTILS MakeReadWrite c:\versions\purpose.txt
-
 START_TESTCASE				SYSLIB-BAFL-CT-4068
 //!@SYMTestCaseID			SYSLIB-BAFL-CT-4068
 //!@SYMTestCaseDesc			To ensure the pr information can be obtained correctly and 
 //!@SYMTestCaseDesc			contains the correct information.
 //!@SYMTestPriority			High
-//!@SYMTestActions			Get the pr information from Z:\resource\versions\test\purpose.txt 
+//!@SYMTestActions			Get the pr information from Z:\resource\versions\purpose.txt 
 //!@SYMTestActions			using the SysUtil::GetPRInformation method and compare it against 
 //!@SYMTestActions			a string literal set in an ini file. The ini file is located 
 //!@SYMTestActions			in z:\testdata\inifiles\.
@@ -37,17 +34,12 @@ START_TESTCASE				SYSLIB-BAFL-CT-4068
 RUN_TEST_STEP 1000 te_sysutiltestsuite SysUtilsGetPRInformation z:\testdata\inifiles\te_sysutildata.ini ResourceFiles
 END_TESTCASE				SYSLIB-BAFL-CT-4068
 
-RUN_UTILS DeleteFile c:\versions\purpose.txt
-
-RUN_UTILS CopyFile z:\resource\versions\test\sw.txt c:\versions\sw.txt
-RUN_UTILS MakeReadWrite c:\versions\sw.txt
-
 START_TESTCASE				SYSLIB-BAFL-CT-4001
 //!@SYMTestCaseID			SYSLIB-BAFL-CT-4001
 //!@SYMTestCaseDesc			To ensure the software version can be obtained correctly and 
 //!@SYMTestCaseDesc			contains the correct information.
 //!@SYMTestPriority			High
-//!@SYMTestActions			Get the software version from Z:\resource\versions\test\sw.txt 
+//!@SYMTestActions			Get the software version from Z:\resource\versions\sw.txt 
 //!@SYMTestActions			using the SysUtil::GetSWVersion method and compare it against 
 //!@SYMTestActions			a string literal set in an ini file. The ini file is located 
 //!@SYMTestActions			in z:\testdata\inifiles\.
@@ -57,17 +49,13 @@ START_TESTCASE				SYSLIB-BAFL-CT-4001
 RUN_TEST_STEP 1000 te_sysutiltestsuite SysUtilsGetSWVersion z:\testdata\inifiles\te_sysutildata.ini ResourceFiles
 END_TESTCASE				SYSLIB-BAFL-CT-4001
 
-RUN_UTILS DeleteFile c:\versions\sw.txt
-
-RUN_UTILS CopyFile z:\resource\versions\test\langsw.txt c:\versions\langsw.txt
-RUN_UTILS MakeReadWrite c:\versions\langsw.txt
 
 START_TESTCASE				SYSLIB-BAFL-CT-4002
 //!@SYMTestCaseID			SYSLIB-BAFL-CT-4002
 //!@SYMTestCaseDesc			To ensure the language software version can be obtained 
 //!@SYMTestCaseDesc			correctly and contains the correct information.
 //!@SYMTestPriority			High
-//!@SYMTestActions			Get the software language version from Z:\resource\versions\test\langsw.txt 
+//!@SYMTestActions			Get the software language version from Z:\resource\versions\langsw.txt 
 //!@SYMTestActions			using the SysUtil::GetLangSWVersion method and compare it 
 //!@SYMTestActions			against a string literal set in an ini file. The ini file is 
 //!@SYMTestActions			located in z:\testdata\inifiles\.
@@ -78,17 +66,13 @@ START_TESTCASE				SYSLIB-BAFL-CT-4002
 RUN_TEST_STEP 1000 te_sysutiltestsuite SysUtilsGetLangSWVersion z:\testdata\inifiles\te_sysutildata.ini ResourceFiles
 END_TESTCASE				SYSLIB-BAFL-CT-4002
 
-RUN_UTILS DeleteFile c:\versions\langsw.txt
-
-RUN_UTILS CopyFile z:\resource\versions\test\lang.txt c:\versions\lang.txt
-RUN_UTILS MakeReadWrite c:\versions\lang.txt
 
 START_TESTCASE				SYSLIB-BAFL-CT-4003
 //!@SYMTestCaseID			SYSLIB-BAFL-CT-4003
 //!@SYMTestCaseDesc			To ensure the language version can be obtained correctly and 
 //!@SYMTestCaseDesc			contains the correct information.
 //!@SYMTestPriority			High
-//!@SYMTestActions			Get the language version from Z:\resource\versions\test\lang.txt 
+//!@SYMTestActions			Get the language version from Z:\resource\versions\lang.txt 
 //!@SYMTestActions			using the SysUtil::GetLangVersion method an compare it against 
 //!@SYMTestActions			a string literal set in an ini file. The ini file is located 
 //!@SYMTestActions			in z:\testdata\inifiles\.
@@ -97,8 +81,6 @@ START_TESTCASE				SYSLIB-BAFL-CT-4003
 //!@SYMREQ					REQ8170
 RUN_TEST_STEP 1000 te_sysutiltestsuite SysUtilsGetLangVersion z:\testdata\inifiles\te_sysutildata.ini ResourceFiles
 END_TESTCASE				SYSLIB-BAFL-CT-4003
-
-RUN_UTILS DeleteFile c:\versions\lang.txt
 
 
 START_TESTCASE				SYSLIB-BAFL-CT-4004
