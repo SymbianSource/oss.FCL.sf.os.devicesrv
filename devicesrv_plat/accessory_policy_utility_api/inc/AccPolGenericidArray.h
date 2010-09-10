@@ -23,7 +23,7 @@
 #define ACCPOLGENERICIDARRAY_H
 
 //  INCLUDES
-#include <accpolgenericid.h>
+#include <AccPolGenericID.h>
 
 // CONSTANTS
 // Maximum amount of Generic ID -instances that an array can contain.

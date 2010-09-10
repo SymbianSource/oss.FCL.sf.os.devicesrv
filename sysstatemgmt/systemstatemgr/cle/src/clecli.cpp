@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -42,10 +42,16 @@ void RCleSession::ConnectL()
 		User::Leave( KErrAlreadyExists );
 		}
 
-	const TInt err = CreateSession(KCleSrvName, iVersion, KCleSrvMsgSlots);
+	TInt err = CreateSession(KCleSrvName, iVersion, KCleSrvMsgSlots);
 	if( (KErrNotFound == err) || (KErrServerTerminated == err) )
 		{
-		User::LeaveIfError( CCleServer::StartCleSrv(KCleSrvName) );
+		err = CCleServer::StartCleSrv(KCleSrvName);
+		DEBUGPRINT2(_L("Starting CleSrv completed with %d"),err);
+		if (KErrNone !=  err && KErrAlreadyExists != err)
+			{
+			User::Leave(err);
+			}
+
 		User::LeaveIfError( CreateSession(KCleSrvName, iVersion, KCleSrvMsgSlots) );
 		}
 	else
@@ -70,10 +76,17 @@ void RCleSession::ConnectL(const TDesC& aServerName)
 		User::Leave( KErrAlreadyExists );
 		}
 
-	const TInt err = CreateSession(aServerName, iVersion, KCleSrvMsgSlots);
+	TInt err = CreateSession(aServerName, iVersion, KCleSrvMsgSlots);
 	if( (KErrNotFound == err) || (KErrServerTerminated == err) )
 		{
-		User::LeaveIfError( CCleServer::StartCleSrv(aServerName) );
+		err = CCleServer::StartCleSrv(aServerName);
+
+		DEBUGPRINT2(_L("Starting CleSrv completed with %d"),err);
+		if (KErrNone !=  err && KErrAlreadyExists != err)
+			{
+			User::Leave(err);
+			}
+
 		User::LeaveIfError( CreateSession(aServerName, iVersion, KCleSrvMsgSlots) );
 		}
 	else

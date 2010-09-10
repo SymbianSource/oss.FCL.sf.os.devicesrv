@@ -101,6 +101,7 @@ CHWRMFmTxRdsTextConverter::~CHWRMFmTxRdsTextConverter()
     {
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxRdsTextConverter::~CHWRMFmTxRdsTextConverter()" ) );
 
+	iConvertFromUnicodeFile.Close();
     iFileServer.Close();
 
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxRdsTextConverter::~CHWRMFmTxRdsTextConverter - return" ) );

@@ -235,6 +235,7 @@ void CSsmLangSelCmd::InitializeRegionMappingL()
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHebrew,              ERegISR ) );
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangHindi,               ERegIND ) );
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangIndonesian,          ERegIDN ) );
+	iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangKorean,          	  ERegKOR ) );
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangLatvian,             ERegLVA ) );
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangLithuanian,          ERegLTU ) );
     iLangRegionMappingHashSet.InsertL( TLanguageRegion( ELangMalay,               ERegMYS ) );

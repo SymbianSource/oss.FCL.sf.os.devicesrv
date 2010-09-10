@@ -152,8 +152,12 @@ CASYProxyCommsService::~CASYProxyCommsService()
         {
         delete iZeroObserver;
         }
+	
+	iAsyComms.CloseSubSession();
+	iServer.Disconnect();
+	iServer.Close();
     
-    COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::~CASYProxyCommsService" );
+	COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::~CASYProxyCommsService" );
     }
 
 // -----------------------------------------------------------------------------

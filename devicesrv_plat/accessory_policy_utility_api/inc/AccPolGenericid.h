@@ -25,8 +25,8 @@
 //  INCLUDES
 #include <e32std.h>
 #include <e32base.h>
-#include <accpolgidheader.h> 
-#include <accpolgenericiddefinitions.h>
+#include <AccPolGIDHeader.h> 
+#include <AccPolGenericIdDefinitions.h>
 
 // CONSTANTS
 

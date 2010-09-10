@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -41,10 +41,17 @@ void RSsmSwpPolicySession::ConnectL()
 		User::Leave(KErrAlreadyExists);
 		}
 
-	const TInt err = CreateSession(KSsmSwpPolicySrvName, iVersion, KSsmSwpPolicySrvMsgSlots);
+	TInt err = CreateSession(KSsmSwpPolicySrvName, iVersion, KSsmSwpPolicySrvMsgSlots);
 	if((KErrNotFound == err) || (KErrServerTerminated == err))
 		{
-		User::LeaveIfError(CSsmSwpPolicyServer::StartSsmSwpPolicySrv(KSsmSwpPolicySrvName));
+		err = CSsmSwpPolicyServer::StartSsmSwpPolicySrv(KSsmSwpPolicySrvName);
+
+		DEBUGPRINT2(_L("Starting SsmSwpPolicySrv completed with %d"),err);
+		if (KErrNone !=  err && KErrAlreadyExists != err)
+			{
+			User::Leave(err);
+			}
+
 		User::LeaveIfError(CreateSession(KSsmSwpPolicySrvName, iVersion, KSsmSwpPolicySrvMsgSlots));
 		DEBUGPRINT1(_L("RSsmSwpPolicySession Connect Completed with KErrNone"));
 		}
@@ -72,10 +79,17 @@ void RSsmSwpPolicySession::ConnectL(const TDesC& aServerName)
 		User::Leave(KErrAlreadyExists);
 		}
 
-	const TInt err = CreateSession(aServerName, iVersion, KSsmSwpPolicySrvMsgSlots);
+	TInt err = CreateSession(aServerName, iVersion, KSsmSwpPolicySrvMsgSlots);
 	if((KErrNotFound == err) || (KErrServerTerminated == err))
 		{
-		User::LeaveIfError(CSsmSwpPolicyServer::StartSsmSwpPolicySrv(aServerName));
+		err = CSsmSwpPolicyServer::StartSsmSwpPolicySrv(aServerName);
+
+		DEBUGPRINT2(_L("Starting SsmSwpPolicySrv completed with %d"),err);
+		if (KErrNone !=  err && KErrAlreadyExists != err)
+			{
+			User::Leave(err);
+			}
+		
 		User::LeaveIfError(CreateSession(aServerName, iVersion, KSsmSwpPolicySrvMsgSlots));
 		DEBUGPRINT1(_L("RSsmSwpPolicySession Connect Completed with KErrNone"));
 		}
