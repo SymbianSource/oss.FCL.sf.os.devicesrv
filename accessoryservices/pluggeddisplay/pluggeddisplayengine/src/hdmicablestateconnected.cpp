@@ -829,13 +829,13 @@ void CHDMICableStateConnected::SubStateConnectedInput(
             {
             INFO( "Event: EIfAsyCommandHandlerEventSetCopyProtectionOn" );
             TInt retVal = iTVOutConfigForCopyProtect->GetTvOutConfig()->CopyProtection( ETrue );
-            iHDMICableStatusFSM.CopyProtectionSettingDone( retVal );
+            iHDMICableStatusFSM.CopyProtectionSettingDone( retVal, iTVOutConfigForCopyProtect->GetTvOutConfig()->CopyProtectionStatus() );
             }
         else if ( EIfAsyCommandHandlerEventSetCopyProtectionOff == aEvent )
             {
             INFO( "Event: EIfAsyCommandHandlerEventSetCopyProtectionOff" );
             TInt retVal = iTVOutConfigForCopyProtect->GetTvOutConfig()->CopyProtection( EFalse );
-            iHDMICableStatusFSM.CopyProtectionSettingDone( retVal );
+            iHDMICableStatusFSM.CopyProtectionSettingDone( retVal, iTVOutConfigForCopyProtect->GetTvOutConfig()->CopyProtectionStatus() );
             }
         else if ( EIfAsyCommandHandlerEventGetCopyProtectStatus == aEvent )
             {

@@ -46,11 +46,16 @@ public:
     * Brighness constants for ambien light sensor data channel.
     */
     static const TUint8 KAmbientLightVeryDark 	= 0;
-    static const TUint8 KAmbientLightDark 	    = 20;
+    static const TUint8 KAmbientLightDark 	= 20;
     static const TUint8 KAmbientLightTwilight 	= 40;
     static const TUint8 KAmbientLightLight      = 60;
     static const TUint8 KAmbientLightBright     = 80;
+    static const TUint8 KAmbientLightCloudy     = 85;
+    static const TUint8 KAmbientLightCloudySunny= 90;
     static const TUint8 KAmbientLightSunny      = 100;
+
+
+
 
     /**
     * Channel data type Id number

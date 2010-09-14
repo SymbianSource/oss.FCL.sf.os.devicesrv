@@ -622,14 +622,16 @@ void CAccSrvConnectionController::PromoteToConnectedL(
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::PromoteToConnectedL()" );
 
-    iServerModel->RemovePhysicalConnection( aGenericID ); //Move GID from physical connection array
-    iServerModel->AddConnectionL( aGenericID );            //to connection array
+    if( KErrNotFound != iServerModel->RemovePhysicalConnection( aGenericID )) //Move GID from physical connection array
+      {
+	    iServerModel->AddConnectionL( aGenericID );            //to connection array
 
-    iNotificationQueue->CompleteControlMessageL( ENewAccessoryConnected,
-                                                 KErrNone,
-                                                 aGenericID.UniqueID() );
+	    iNotificationQueue->CompleteControlMessageL( ENewAccessoryConnected,
+	                                                 KErrNone,
+	                                                 aGenericID.UniqueID() );
 
-    iConnectionStatusHandler->IssueRequest();
+	    iConnectionStatusHandler->IssueRequest();
+	  }
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvConnectionController::PromoteToConnectedL - return void" );
     }

@@ -316,7 +316,7 @@ void CAccSrvServerModel::AddPhysicalConnectionL( const TAccPolGenericID& aGeneri
 // CAccSrvServerModel::RemovePhysicalConnectionL
 // -----------------------------------------------------------------------------
 //
-void CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGenericID )
+TInt CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGenericID )
     {
     COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection()" );
 
@@ -329,7 +329,9 @@ void CAccSrvServerModel::RemovePhysicalConnection( const TAccPolGenericID& aGene
         iPhysicalConnectionArray.Remove( index );
         }
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection - return void" );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::RemovePhysicalConnection - return %d", index );
+
+	return index;
     }
 
 // -----------------------------------------------------------------------------
