@@ -32,7 +32,7 @@ const TUint KAccServBuildVersionNumber = 0;
 
 // The number of message slots available.
 // This determines the maximum number of outstanding requests.
-const TUint KDefaultMessageSlots       = 8;
+const TUint KDefaultMessageSlots       = 12;
 
 // Message parameter psoitions
 const TUint8 KAccServParamPosFirst     = 0;
