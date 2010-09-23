@@ -76,11 +76,12 @@ static TInt StartServer()
 			}
 		// Wait until the completion of the server creation
 		User::WaitForRequest( status );
-		if( status != KErrNone )
-			{
-			server.Close();
-			return status.Int();
-			}
+			
+		// We can't use the 'exit reason' if the server paniced as this
+		// is the panic 'reason' and may be '0' which cannot be distinguished
+		// from KErrNone
+		ret = (server.ExitType() == EExitPanic)? KErrGeneral : status.Int();
+			
 		// Server created successfully
 		server.Close(); // we're no longer interested in the other process
 		}

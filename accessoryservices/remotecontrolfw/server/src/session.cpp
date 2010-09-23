@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -30,7 +30,6 @@
 #include "bearermanager.h"
 #include "remconmessage.h"
 #include "connections.h"
-#include "activehelper.h"
 #include "session.h"
 #include "messagequeue.h"
 #include "remconserver.h"
@@ -43,18 +42,6 @@ _LIT8(KLogComponent, LOG_COMPONENT_REMCON_SERVER);
 PANICCATEGORY("session");
 #endif
 
-CRemConSession* CRemConSession::NewL(CRemConServer& aServer,
-		CBearerManager& aBearerManager,
-		const RMessage2& aMessage,
-		TUint aId)
-	{
-	LOG_STATIC_FUNC
-	CRemConSession* self = new(ELeave) CRemConSession(aServer, aBearerManager, aId);
-	CleanupStack::PushL(self);
-	self->ConstructL(aMessage);
-	CLEANUPSTACK_POP1(self);
-	return self;
-	}
 
 CRemConSession::CRemConSession(CRemConServer& aServer,
 		CBearerManager& aBearerManager,
@@ -63,37 +50,22 @@ CRemConSession::CRemConSession(CRemConServer& aServer,
 	iBearerManager(aBearerManager),
 	iId(aId)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	}
 
-void CRemConSession::ConstructL(const RMessage2& aMessage)
+void CRemConSession::BaseConstructL(const TClientInfo& aClientInfo)
 	{
 	LOG_FUNC;
 
-	// Get the client's process ID.
-	RThread thread;
-	LEAVEIFERRORL(aMessage.Client(thread));
-	CleanupClosePushL(thread);
-	RProcess process;
-	LEAVEIFERRORL(thread.Process(process));
-	iClientInfo.ProcessId() = process.Id();
-	process.Close();
-	iClientInfo.SecureId() = thread.SecureId();
-	CleanupStack::PopAndDestroy(&thread);
+	iClientInfo = aClientInfo;
 
 	iSendQueue = CMessageQueue::NewL();
-	
-	TCallBack cb(SendNextCb, this);
-	
-	iSendNextCallBack = new(ELeave) CAsyncCallBack(cb, CActive::EPriorityStandard);
-	
-	// Tell the server about us.
-	LEAVEIFERRORL(iServer.ClientOpened(*this));
 
-	// Set our pointer into the connection history at the current/'Last' item.
-	iServer.SetConnectionHistoryPointer(Id());
-	
-	iPendingMsgProcessor = new (ELeave) CActiveHelper(*this);
+	// The send callback is used by the base class to handle queued sends.
+	iSendNextCallBack = new(ELeave) CAsyncCallBack(CActive::EPriorityStandard);
+	TCallBack cb(SendNextCb, this);
+	iSendNextCallBack->Set(cb);
+
 	}
 
 CRemConSession::~CRemConSession()
@@ -101,16 +73,9 @@ CRemConSession::~CRemConSession()
 	LOG(KNullDesC8);
 	LOG_FUNC;
 	
-	delete iPendingMsgProcessor;
 	delete iSendNextCallBack;
 	delete iSendQueue;
-	// we will need to tell the server which bearer this used to be connected to
-	// this enables the server to not inform a bearer that is already connected
-	// that its been connected
-	// Tell the server we've gone away- it may start its shutdown timer.
-	iServer.ClientClosed(*this, iRemoteAddress.BearerUid());
 	delete iInterestedAPIs;
-	iPlayerName.Close();
 	}
 
 void CRemConSession::ServiceL(const RMessage2& aMessage)
@@ -118,7 +83,6 @@ void CRemConSession::ServiceL(const RMessage2& aMessage)
 	LOG(KNullDesC8);
 	LOG_FUNC;
 	LOG1(_L("\taMessage.Function() = %d"), aMessage.Function());
-
 	// Switch on the IPC number and call a 'message handler'. Message handlers 
 	// complete aMessage (either with Complete or Panic), or make a note of 
 	// the message for later asynchronous completion.
@@ -169,50 +133,18 @@ void CRemConSession::ServiceL(const RMessage2& aMessage)
 		CompleteClient(aMessage, KErrNone);
 		break;
 
-	case ERemConSetClientType:
-		SetClientType(aMessage);
+	case ERemConSetPlayerType:
+		SetPlayerType(aMessage);
 		// This is a sync API- check that the message has been completed.
 		// (NB We don't check the converse for async APIs because the message 
 		// may have been panicked synchronously.)
 		ASSERT_DEBUG(aMessage.IsNull());
 		break;
 
-	case ERemConGoConnectionOriented:
-		GoConnectionOriented(aMessage);
-		ASSERT_DEBUG(aMessage.IsNull());
-		break;
-
-	case ERemConGoConnectionless:
-		GoConnectionless(aMessage);
-		ASSERT_DEBUG(aMessage.IsNull());
-		break;
-
-	case ERemConConnectBearer:
-		ConnectBearer(aMessage);
-		break;
-
-	case ERemConConnectBearerCancel:
-		ConnectBearerCancel(aMessage);
-		ASSERT_DEBUG(aMessage.IsNull());
-		break;
-
-	case ERemConDisconnectBearer:
-		DisconnectBearer(aMessage);
-		break;
-
-	case ERemConDisconnectBearerCancel:
-		DisconnectBearerCancel(aMessage);
-		ASSERT_DEBUG(aMessage.IsNull());
-		break;
-
 	case ERemConSend:
 		Send(aMessage);
 		break;
-		
-	case ERemConSendNotify:
-		SendNotify(aMessage);
-		break;
-		
+				
 	case ERemConSendUnreliable:
 		SendUnreliable(aMessage);
 		break;
@@ -255,6 +187,38 @@ void CRemConSession::ServiceL(const RMessage2& aMessage)
 		ASSERT_DEBUG(aMessage.IsNull());
 		break;
 		
+	case ERemConGoConnectionOriented:
+		GoConnectionOriented(aMessage);
+		ASSERT_DEBUG(aMessage.IsNull());
+		break;
+
+	case ERemConGoConnectionless:
+		GoConnectionless(aMessage);
+		ASSERT_DEBUG(aMessage.IsNull());
+		break;
+
+	case ERemConConnectBearer:
+		ConnectBearer(aMessage);
+		break;
+
+	case ERemConConnectBearerCancel:
+		ConnectBearerCancel(aMessage);
+		ASSERT_DEBUG(aMessage.IsNull());
+		break;
+
+	case ERemConDisconnectBearer:
+		DisconnectBearer(aMessage);
+		break;
+
+	case ERemConDisconnectBearerCancel:
+		DisconnectBearerCancel(aMessage);
+		ASSERT_DEBUG(aMessage.IsNull());
+		break;
+		
+	case ERemConSendNotify:
+		SendNotify(aMessage);
+		break;
+		
 	default:
 		// Unknown message
 		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicIllegalIpc);
@@ -273,394 +237,51 @@ void CRemConSession::CompleteClient(const RMessage2& aMessage, TInt aError)
 		}
 	}
 
-void CRemConSession::SetClientType(const RMessage2& aMessage)
+void CRemConSession::GetPlayerTypeAndNameL(const RMessage2& aMessage, TPlayerTypeInformation& aPlayerType, RBuf8& aPlayerName)
 	{
-	LOG_FUNC;
-
-	if ( iType != ERemConClientTypeUndefined )
+	// check validity of descriptors
+	if (aMessage.GetDesLength(1) < 0 || aMessage.GetDesLength(2) < 0)
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeAlreadySet);
-		return;
+		LEAVEL(KErrBadDescriptor);
 		}
 
-	const TRemConClientType type = static_cast<TRemConClientType>(aMessage.Int0());
-	LOG1(_L("\trequested (TRemConClientType) type = %d"), type);
-	
-	TInt err = aMessage.GetDesLength(1);
-	if(err >= 0)
+	// Retrieve and validate the client type information 
+	TPckg<TPlayerTypeInformation> pckg(aPlayerType);
+	aMessage.ReadL(1, pckg);
+	switch (aPlayerType.iPlayerType)
 		{
-		TRAP(err, DoSetClientTypeL(aMessage));
-		if(err == KErrBadDescriptor)
-			{
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-			return;
-			}
+	case ERemConAudioPlayer:
+		// Valid
+	case ERemConVideoPlayer:
+		// Valid
+	case ERemConBroadcastingAudioPlayer:
+		// Valid
+	case ERemConBroadcastingVideoPlayer:
+		// Valid
+		break;
+	default:
+		// Invalid
+		LEAVEL(KErrArgument);
 		}
-	else if(err == KErrBadDescriptor)
+	switch (aPlayerType.iPlayerSubType)
 		{
-		// The additional parameters are optional (i.e. old or controller clients won't provide them).
-		err = KErrNone;
-		}
-	
-	if(err != KErrNone)
-		{
-		CompleteClient(aMessage, err);
-		}
-	else
-		{
-		switch ( type )
-			{
-		case ERemConClientTypeController:
-			iType = type;
-			CompleteClient(aMessage, KErrNone);
-			break;
-	
-		case ERemConClientTypeTarget:
-			// Check that there aren't already any target clients with the
-			// same process ID.
-			if ( !iServer.TargetClientWithSameProcessId(iClientInfo.ProcessId()) )
-				{
-				iType = type;
-				CompleteClient(aMessage, KErrNone);
-				}
-			else
-				{
-				CompleteClient(aMessage, KErrInUse);
-				}
-			break;
-	
-		default:
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-			break;
-			}
+	case ERemConNoSubType:
+		// Valid
+	case ERemConAudioBook:
+		// Valid
+	case ERemConPodcast:
+		// Valid
+		break;
+	default:
+		// Invalid
+		LEAVEL(KErrArgument);
 		}
 
-	if ( iType != ERemConClientTypeUndefined )
-		{
-		// The type got set, so tell the server, so it can tell the bearers if 
-		// necessary. 
-		iServer.ClientTypeSet(*this);
-		}
-	}
-
-void CRemConSession::DoSetClientTypeL(const RMessage2& aMessage)
-	{
-	// Retrieve the client type information 
-	RBuf8 typeBuf;
-	typeBuf.CreateL(sizeof(TPlayerTypeInformation));
-	CleanupClosePushL(typeBuf);
-	aMessage.ReadL(1, typeBuf);
-			
-	const TPlayerTypeInformation* Ptr = reinterpret_cast<const TPlayerTypeInformation*> (typeBuf.Ptr());
-	iPlayerType.iPlayerType = (*Ptr).iPlayerType;
-	iPlayerType.iPlayerSubType = (*Ptr).iPlayerSubType;
 	// Retrieve the client player name inforamtion
-	iPlayerName.CreateL(aMessage.Int2());
-	CleanupClosePushL(iPlayerName);
-	aMessage.ReadL(3, iPlayerName);	
-	CleanupStack::Pop(&iPlayerName);
-	
-	CleanupStack::PopAndDestroy(&typeBuf); 
-	}
-void CRemConSession::GoConnectionOriented(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we've had our type set...
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( !iRemoteAddress.IsNull() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicAlreadyConnectionOriented);
-		return;
-		}
-
-	if ( iConnectBearerMsg.Handle() || iDisconnectBearerMsg.Handle() || iSendMsg.Handle())
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-	if (iSending != ENotSending)
-		{
-		DoSendCancel();
-		}
-	EmptySendQueue();
-	
-	// Get the desired address from the message and check it.
-	const TUid uid = TUid::Uid(aMessage.Int0());
-	LOG1(_L("\tuid = 0x%08x"), uid);
-	// Check the requested bearer exists.
-	TBool bearerExists = iBearerManager.BearerExists(uid);
-	if ( !bearerExists)
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerPluginIncorrectInterface);
-		return;
-		}
-	// Check the bearer-specific part of the address.
-	TBuf8<TRemConAddress::KMaxAddrSize> buf;
-	TInt err = aMessage.Read(1, buf);
-	if ( err != KErrNone )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		return;
-		}
-
-	// Do security check- if this client won't be allowed to use the bearer 
-	// then fail the request. 
-	// NB This security check (repeated in debug at ConnectBearer and 
-	// DisconnectBearer time) is all that stands between a connection-oriented 
-	// client and the bearer, and is all the caps checking that RemCon does!
-	err = KErrPermissionDenied;
-	if ( iBearerManager.CheckPolicy(uid, aMessage) )
-		{
-		err = KErrNone;
-		}
-		
-		
-	// if alls well and we're connection oriented then set up as such
-	if (KErrNone == err)
-		{
-		// The client has passed all our checks- set our data member.
-		iRemoteAddress.BearerUid() = uid;
-		iRemoteAddress.Addr() = buf;
-		// tell the server
-		iServer.ClientGoConnectionOriented(*this,uid);
-		}
-				
-	CompleteClient(aMessage, err);
-	}
-
-void CRemConSession::GoConnectionless(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we've had our type set...
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( iRemoteAddress.IsNull() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicNotConnectionOriented);
-		return;
-		}
-
-	if ( iConnectBearerMsg.Handle() || iDisconnectBearerMsg.Handle() || iSendMsg.Handle())
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-	
-	if (iSending != ENotSending)
-		{
-		DoSendCancel();
-		}
-	EmptySendQueue();
-	
-	// we will need to tell the server which bearer this used to be connected to
-	// this enables the server to not inform a bearer that is already connected
-	// that its been connected
-	TUid oldUid = iRemoteAddress.BearerUid();
-	
-	iRemoteAddress.BearerUid() = KNullUid;	
-
-	// tell the server
-	iServer.ClientGoConnectionless(*this, oldUid);
-
-	CompleteClient(aMessage, KErrNone);
-	}
-
-void CRemConSession::ConnectBearer(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( iConnectBearerMsg.Handle() || iDisconnectBearerMsg.Handle() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-
-	if ( iRemoteAddress.IsNull() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicNotConnectionOriented);
-		return;
-		}
-
-	// Check the requested bearer exists.
-	TBool bearerExists = iBearerManager.BearerExists(iRemoteAddress.BearerUid());
-	// This check was done at GoConnectionOriented time.
-	ASSERT_DEBUG(bearerExists);
-	// So was this one.
-	ASSERT_DEBUG(iBearerManager.CheckPolicy(iRemoteAddress.BearerUid(), aMessage));
-
-	// Check the state of our given connection at the bearer level. If it is: 
-	// -) disconnected request the connection to come up,
-	// -) connecting or disconnecting, add message to the queue of pending 
-	//		messages, and process it once connecting/disconnecting has been completed
-	// -) connected, complete the client's message,
-
-	TConnectionState conState;
-	conState = iServer.ConnectionState(iRemoteAddress);
-
-	if ( conState == EDisconnected )
-		{
-		// The bearer may indicate connection synchronously, so set this 
-		// message _before_ we ask them
-		iConnectBearerMsg = aMessage;
-		TInt err = iBearerManager.Connect(iRemoteAddress);
-		if ( err != KErrNone )
-			{
-			CompleteClient(iConnectBearerMsg, err);
-			}
-		}
-	else if ( conState == EDisconnecting ||  conState == EConnecting )
-		{
-		if ( iPendingMsg.Handle() )
-			{
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-			return;
-			}
-		// Store the message, it will get processed later.
-		iPendingMsg = aMessage;
-		}
-	else // EConnected
-		{
-		CompleteClient(aMessage, KErrNone);
-		}
-		
-	}
-
-void CRemConSession::ConnectBearerCancel(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we've had our type set...
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( iConnectBearerMsg.Handle() )
-		{
-		CompleteClient(iConnectBearerMsg, KErrCancel);
-		}
-	else if ( iPendingMsg.Handle() && ( iPendingMsg.Function() == ERemConConnectBearer ))
-		{
-		CompleteClient(iPendingMsg, KErrCancel);
-		}
-		
-	CompleteClient(aMessage, KErrNone);
-	// At no point do we make any change to the processes going on underneath
-	// us- 'Cancel' APIs are just for cancelling interest in an async
-	// operation.
-	}
-
-void CRemConSession::DisconnectBearer(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( iDisconnectBearerMsg.Handle() || iConnectBearerMsg.Handle() || iSendMsg.Handle())
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-
-	if ( iRemoteAddress.IsNull() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicNotConnectionOriented);
-		return;
-		}
-
-	if (iSending != ENotSending)
-		{
-		DoSendCancel();
-		}
-	EmptySendQueue();
-	
-	// Check the requested bearer exists.
-	TBool bearerExists = iBearerManager.BearerExists(iRemoteAddress.BearerUid());
-	// This check was done at GoConnectionOriented time.
-	ASSERT_DEBUG(bearerExists);
-	// So was this one.
-	ASSERT_DEBUG(iBearerManager.CheckPolicy(iRemoteAddress.BearerUid(), aMessage));
-
-	// Check the state of the given connection. If it is:
-	// -) connected, request connection to go away,
-	// -) disconnected, compete the client's message,
-	// -) connecting or disconnecting, add message to the queue of pending 
-	//		messages, and process it once connecting/disconnecting has been completed
-
-	TInt err;
-	TConnectionState conState;
-	conState = iServer.ConnectionState(iRemoteAddress);
-
-	if ( conState == EConnected )
-		{
-		// The bearer may indicate disconnection synchronously, so set this 
-		// message _before_ we ask them
-		iDisconnectBearerMsg = aMessage;
-		err = iBearerManager.Disconnect(iRemoteAddress);
-		if ( err != KErrNone )
-			{
-			CompleteClient(iDisconnectBearerMsg, err);
-			}
-		}
-	else if ( conState == EDisconnecting ||  conState == EConnecting )
-		{
-		if ( iPendingMsg.Handle() )
-			{
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-			return;
-			}
-		// Store the message, it will get processed later.
-		iPendingMsg = aMessage;
-		}
-	else //disconnected
-		{
-		CompleteClient(aMessage, KErrNone);	
-		}
-	}
-
-void CRemConSession::DisconnectBearerCancel(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we've had our type set...
-	if ( iType != ERemConClientTypeController )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
-		return;
-		}
-
-	if ( iDisconnectBearerMsg.Handle() )
-		{
-		CompleteClient(iDisconnectBearerMsg, KErrCancel);
-		}
-	else if ( iPendingMsg.Handle() && (iPendingMsg.Function() == ERemConDisconnectBearer ))
-		{
-		CompleteClient(iPendingMsg, KErrCancel);
-		}
-		
-	CompleteClient(aMessage, KErrNone);
+	aPlayerName.CreateL(aMessage.GetDesLengthL(2));
+	CleanupClosePushL(aPlayerName);
+	aMessage.ReadL(2, aPlayerName);	
+	CleanupStack::Pop(&aPlayerName);
 	}
 
 void CRemConSession::Send(const RMessage2& aMessage)
@@ -676,529 +297,50 @@ void CRemConSession::Send(const RMessage2& aMessage)
 	
 	iSendMsg = aMessage;
 	
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
-		}
-
-	// Check we don't have a disconnect outstanding- this makes no sense from 
-	// a client viewpoint (they should cancel the disconnect first).
-	// [The client is allowed to have a connect request outstanding- the 
-	// bearer manager makes sure a bearer-level connect is not posted on the 
-	// same address twice.]
-	if ( iDisconnectBearerMsg.Handle() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-
-	TRAPD(err, DoSendL(aMessage));
-	if ( err != KErrNone )
-		{
-		CompleteClient(aMessage, err);
-		}
-	}
-
-/**
-Sends a notify message to the remote device.
-
-This function is intended for the RemCon controller client to send a notify
-command to the remote device.
-*/
-void CRemConSession::SendNotify(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we're not already sending...
-	if ( iSendMsg.Handle())
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicSendAlreadyOutstanding);
-		return;
-		}
-	
-	iSendMsg = aMessage;
-	
-	// Check we've had our type set...
-	if (Type() != ERemConClientTypeController)
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
-		return;
-		}
-
-	// Check we don't have a disconnect outstanding- this makes no sense from 
-	// a client viewpoint (they should cancel the disconnect first).
-	// [The client is allowed to have a connect request outstanding- the 
-	// bearer manager makes sure a bearer-level connect is not posted on the 
-	// same address twice.]
-	if ( iDisconnectBearerMsg.Handle() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-
-	TRAPD(err, DoSendNotifyL(aMessage));
-	if ( err != KErrNone )
-		{
-		CompleteClient(aMessage, err);
-		}
-	}
-
-void CRemConSession::DoSendL(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Get the data the client wants to send.
-	const TUid interfaceUid = TUid::Uid(aMessage.Int0());
-	LOG1(_L("\tinterfaceUid = 0x%08x"), interfaceUid);
-
-	if (aMessage.GetDesLengthL(1) != sizeof(TOperationInformation))
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		return;
-		}
-
-	TPckgBuf<TOperationInformation> opInfoPckg;
-	
-	TInt err= aMessage.Read(
-			1, // location of the descriptor in the client's message (as we expect them to have set it up)
-			opInfoPckg, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-	
-	if ( err != KErrNone )
-		{
-		LOG1(_L("\taMessage.Read = %d"), err);
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		return;
-		}	
-	
-	const TUint operationId = opInfoPckg().iOperationId;
-	LOG1(_L("\toperationId = 0x%02x"), operationId);
-	
-	const TRemConMessageSubType messageSubType = opInfoPckg().iMessageSubType;
-	LOG1(_L("\tmessageSubType = 0x%02x"), messageSubType);
-
-	
-	const TUint dataLength = (TUint)aMessage.GetDesLengthL(3);
-	LOG1(_L("\tdataLength = %d"), dataLength);
-	
-	// If the client wanted to send some operation-associated data, read it 
-	// from them.
-	RBuf8 sendDes;
-	if ( dataLength != 0 )
-		{
-		sendDes.CreateL(dataLength);
-		TInt err = aMessage.Read(
-			3, // location of the descriptor in the client's message (as we expect them to have set it up)
-			sendDes, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-		// NB We don't do LEAVEIFERRORL(aMessage.Read) because a bad client 
-		// descriptor is a panicking offence for them, not an 'error the 
-		// request' offence.
-		if ( err != KErrNone )
-			{
-			LOG1(_L("\taMessage.Read = %d"), err);
-			sendDes.Close();
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-			return;
-			}
-		}
-	CleanupClosePushL(sendDes);
-
-	// Before we ask the server to send, we must set our ClientInfo 
-	// correctly so the TSP can get information about the client. 
-	iClientInfo.Message() = aMessage;
-
-	CRemConMessage* msg = NULL;
-	
-	// Examine the session type.
-	switch ( iType )
-		{
-	case ERemConClientTypeTarget:
-		{
-		LOG(_L("\tTARGET send"));
-
-		msg = CRemConMessage::NewL(
-			TRemConAddress(), // we don't know which remotes it's going to yet
-			ERemConResponse, // targets can only send responses
-			messageSubType,
-			interfaceUid,
-			operationId,
-			sendDes, // msg takes ownership
-			Id(), // session id to match this response against the originating command
-			0, // transaction id not yet known
-			ETrue);
-		CLEANUPSTACK_POP1(&sendDes); // now owned by msg
-		
-		}
-		break;
-
-	case ERemConClientTypeController:
-		{
-		LOG(_L("\tCONTROLLER send"));
-        if (  (messageSubType == ERemConNotifyCommandAwaitingInterim)
-           || (messageSubType == ERemConNotifyCommandAwaitingChanged)
-            )
-        	{
-        	LOG(_L("\terror, not allowed to use Send() to send notify command"));
-        	CleanupStack::PopAndDestroy(&sendDes);
-        	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicIllegalIpc);
-        	return;
-        	}
-        else
-        	{
-        	msg = CRemConMessage::NewL(
-        			iRemoteAddress, // either specified (if we're connection-oriented) or null (we're connectionless- this field will be filled in by the TSP)
-        			ERemConCommand, 
-        			messageSubType,
-        			interfaceUid,
-        			operationId,
-        			sendDes, // msg takes ownership
-        			Id(), // session id for when the response comes back
-        			0, // we let the bearer manager invent a new transaction id when the message gets to it
-        			ETrue);
-        	}		
-		CLEANUPSTACK_POP1(&sendDes); // now owned by msg
-
-		}
-		break;
-
-	default:
-		DEBUG_PANIC_LINENUM;
-		break;
-		}
-	
-	ASSERT_DEBUG(iSendQueue);
-	// We know msg is valid at this stage as the code would leave or panic earlier if msg was 
-	// not set.
-	ASSERT_DEBUG(msg);
-	
-	if (iSending != ENotSending || !iSendQueue->IsEmpty())
-		{
-		iSendQueue->Append(*msg);
-		}
-	else
-		{
-		// we know msg cannot be null here as said above.
-		SendToServer(*msg);
-		}
-	}
-
-/**
-@see CRemConSession::SendNotify
-*/
-void CRemConSession::DoSendNotifyL(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Get the data the client wants to send.
-	const TUid interfaceUid = TUid::Uid(aMessage.Int0());
-	LOG1(_L("\tinterfaceUid = 0x%08x"), interfaceUid);
-
-	if (aMessage.GetDesLengthL(1) != sizeof(TOperationInformation))
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		return;
-		}
-
-	TPckgBuf<TOperationInformation> opInfoPckg;	
-	TInt err= aMessage.Read(
-			1, // location of the descriptor in the client's message (as we expect them to have set it up)
-			opInfoPckg, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-	
-	if ( err != KErrNone )
-		{
-		LOG1(_L("\taMessage.Read = %d"), err);
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		return;
-		}	
-	
-	const TUint operationId = opInfoPckg().iOperationId;
-	LOG1(_L("\toperationId = 0x%02x"), operationId);
-	
-	const TRemConMessageSubType messageSubType = opInfoPckg().iMessageSubType;
-	LOG1(_L("\tmessageSubType = 0x%02x"), messageSubType);
-	
-	const TUint dataLength = (TUint)aMessage.GetDesLengthL(2);
-	LOG1(_L("\tdataLength = %d"), dataLength);
-	
-	// If the client wanted to send some operation-associated data, read it 
-	// from them.
-	RBuf8 sendDes;
-	if ( dataLength != 0 )
-		{
-		sendDes.CreateL(dataLength);
-		TInt err = aMessage.Read(
-			2, // location of the descriptor in the client's message (as we expect them to have set it up)
-			sendDes, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-		// NB We don't do LEAVEIFERRORL(aMessage.Read) because a bad client 
-		// descriptor is a panicking offence for them, not an 'error the 
-		// request' offence.
-		if ( err != KErrNone )
-			{
-			LOG1(_L("\taMessage.Read = %d"), err);
-			sendDes.Close();
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-			return;
-			}
 		}
 
 	// Before we ask the server to send, we must set our ClientInfo 
 	// correctly so the TSP can get information about the client. 
 	iClientInfo.Message() = aMessage;
 
+	// Prepare the message for send. If DoPrepareSendMessageL() returns
+	// NULL, it panicked the client.
 	CRemConMessage* msg = NULL;
-	
-	if (messageSubType != ERemConNotifyCommandAwaitingInterim)
-		{
-		sendDes.Close();
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicIllegalIpc);
-		return;
-		}
-	
-	CleanupClosePushL(sendDes);
-	msg = CRemConMessage::NewL(
-			iRemoteAddress, // either specified (if we're connection-oriented) or null (we're connectionless- this field will be filled in by the TSP)
-			ERemConNotifyCommand, 
-			messageSubType,
-			interfaceUid,
-			operationId,
-			sendDes, // msg takes ownership
-			Id(), // session id for when the response comes back
-			0, // we let the bearer manager invent a new transaction id when the message gets to it
-			ETrue);	
-	CLEANUPSTACK_POP1(&sendDes); // now owned by msg
-	
-	LOG(_L("\tCONTROLLER send"));
-	ASSERT_DEBUG(iSendQueue);
-	if (iSending != ENotSending || !iSendQueue->IsEmpty())
-		{
-		iSendQueue->Append(*msg);
-		}
-	else
-		{
-		SendToServer(*msg);
-		}
-	}
+	TRAPD(err, msg = DoPrepareSendMessageL(aMessage));
 
-void CRemConSession::SendUnreliable(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	if ( err != KErrNone )
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
-		return;
+		CompleteClient(aMessage, err);
 		}
-
-	// Check we don't have a disconnect outstanding- this makes no sense from 
-	// a client viewpoint (they should cancel the disconnect first).
-	// [The client is allowed to have a connect request outstanding- the 
-	// bearer manager makes sure a bearer-level connect is not posted on the 
-	// same address twice.]
-	if ( iDisconnectBearerMsg.Handle() )
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBearerControlOutstanding);
-		return;
-		}
-
-	CRemConMessage* msg = NULL;
-	TRAPD(err, msg = DoCreateUnreliableMessageL(aMessage));
-	CompleteClient(aMessage, err);
-	if (err == KErrNone)
+	else if (msg)
 		{
 		ASSERT_DEBUG(iSendQueue);
-		if (iSending || !iSendQueue->IsEmpty())
+	
+		if (iSending != ENotSending || !iSendQueue->IsEmpty())
 			{
 			iSendQueue->Append(*msg);
 			}
 		else
 			{
+			// we know msg cannot be null here as said above.
 			SendToServer(*msg);
 			}
 		}
 	}
 
-CRemConMessage* CRemConSession::DoCreateUnreliableMessageL(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
-
-	// Get the data the client wants to send.
-	const TUid interfaceUid = TUid::Uid(aMessage.Int0());
-	LOG1(_L("\tinterfaceUid = 0x%08x"), interfaceUid);
-
-	if (aMessage.GetDesLengthL(1) != sizeof(TOperationInformation))
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		LEAVEL(KErrBadDescriptor);
-		}
-
-	TPckgBuf<TOperationInformation> opInfoPckg;
-	
-	TInt err= aMessage.Read(
-			1, // location of the descriptor in the client's message (as we expect them to have set it up)
-			opInfoPckg, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-	
-	if ( err != KErrNone )
-		{
-		LOG1(_L("\taMessage.Read = %d"), err);
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-		LEAVEL(KErrBadDescriptor);
-		}	
-	
-	const TUint operationId = opInfoPckg().iOperationId;
-	LOG1(_L("\toperationId = 0x%02x"), operationId);
-	
-	const TRemConMessageSubType messageSubType = opInfoPckg().iMessageSubType;
-	LOG1(_L("\tmessageSubType = 0x%02x"), messageSubType);
-
-	
-	const TUint dataLength = (TUint)aMessage.GetDesLengthL(2);
-	LOG1(_L("\tdataLength = %d"), dataLength);
-	
-	// If the client wanted to send some operation-associated data, read it 
-	// from them.
-	RBuf8 sendDes;
-	if ( dataLength != 0 )
-		{
-		sendDes.CreateL(dataLength);
-		TInt err = aMessage.Read(
-			2, // location of the descriptor in the client's message (as we expect them to have set it up)
-			sendDes, // descriptor to write to from client memory space
-			0 // offset into our descriptor to put the client's data
-			);
-		// NB We don't do LEAVEIFERRORL(aMessage.Read) because a bad client 
-		// descriptor is a panicking offence for them, not an 'error the 
-		// request' offence.
-		if ( err != KErrNone )
-			{
-			LOG1(_L("\taMessage.Read = %d"), err);
-			sendDes.Close();
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
-			LEAVEL(KErrBadDescriptor);
-			}
-		}
-	CleanupClosePushL(sendDes);
-
-	// Before we ask the server to send, we must set our ClientInfo 
-	// correctly so the TSP can get information about the client. 
-	iClientInfo.Message() = aMessage;
-
-	CRemConMessage* msg = NULL;
-	
-	// Examine the session type.
-	switch ( iType )
-		{
-	case ERemConClientTypeTarget:
-		{
-		LOG(_L("\tTARGET send"));
-
-		msg = CRemConMessage::NewL(
-			TRemConAddress(), // we don't know which remotes it's going to yet
-			ERemConResponse, // targets can only send responses
-			messageSubType,
-			interfaceUid,
-			operationId,
-			sendDes, // msg takes ownership
-			Id(), // session id to match this response against the originating command
-			0, // transaction id not yet known
-			EFalse);
-		CLEANUPSTACK_POP1(&sendDes); // now owned by msg
-		break;
-		}
-
-	case ERemConClientTypeController:
-		{
-		LOG(_L("\tCONTROLLER send"));
-		
-		// A client is not allowed to send an unreliable notify command.
-		if	(	(messageSubType == ERemConNotifyCommandAwaitingInterim)
-			||	(messageSubType == ERemConNotifyCommandAwaitingChanged)
-			)
-			{
-			LOG(_L8("\tNot allowed to send unreliable notify command"));
-			CleanupStack::PopAndDestroy(&sendDes);
-			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicIllegalIpc);
-			LEAVEL(KErrBadDescriptor);
-			}
-		
-		msg = CRemConMessage::NewL(
-			iRemoteAddress, // either specified (if we're connection-oriented) or null (we're connectionless- this field will be filled in by the TSP)
-			ERemConCommand, // controllers can only send commands
-			messageSubType,
-			interfaceUid,
-			operationId,
-			sendDes, // msg takes ownership
-			Id(), // session id for when the response comes back
-			0, // we let the bearer manager invent a new transaction id when the message gets to it
-			EFalse);
-		CLEANUPSTACK_POP1(&sendDes); // now owned by msg
-		
-		}
-		break;
-
-	default:
-		DEBUG_PANIC_LINENUM;
-		break;
-		}
-
-	return msg;
-	}
-
-void CRemConSession::SendToServer(CRemConMessage& aMsg)
-	{
-	LOG_FUNC;
-	
-	// Set our completion members.
-	NumRemotes() = 0;
-	NumRemotesToTry() = 0;
-	SendError() = KErrNone;
-
-	
-	iSending = (aMsg.IsReliableSend()) ? ESendingReliable: ESendingUnreliable;
-	switch ( iType )
-		{
-	case ERemConClientTypeTarget:
-		{
-		iServer.SendResponse(aMsg, *this);
-		break;
-		}
-	case ERemConClientTypeController:
-		{
-		iServer.SendCommand(aMsg);
-		break;
-		}
-	default:
-		DEBUG_PANIC_LINENUM;
-		break;
-		}
-	}
-
-
 void CRemConSession::SendCancel(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1234,45 +376,6 @@ void CRemConSession::SendCancel(const RMessage2& aMessage)
 	CompleteClient(aMessage, KErrNone);
 	}
 
-void CRemConSession::DoSendCancel()
-	{
-	LOG_FUNC;
-	// We must tell the server, and pull the CRemConMessage from the 
-	// 'outgoing pending TSP' queue if it's on it. If the TSP is currently 
-	// processing the CRemConMessage, we must tell it to stop before we 
-	// can complete the RMessage2 iSendMsg- the TSP might still be 
-	// dereferencing bits of it. (The TSP is given iSendMsg so it can 
-	// access the client's secure ID and do a capability check.)
-	// NB This only matters for commands- responses don't go through the 
-	// TSP.
-	// Not also that this processing *stops* this 
-	// CRemConSession::SendCancel method from being the very simple 'I'm 
-	// no longer interested in the completion of the asynchronous request' 
-	// type of API it (and all cancels) should be. It actually does work 
-	// as well. As long as this work is implemented _synchronously_, we 
-	// should be OK.
-	iServer.SendCancel(*this);
-
-	NumRemotesToTry() = 0;
-	iSendError = KErrCancel;
-	CompleteSend();
-	
-	}
-
-void CRemConSession::EmptySendQueue()
-	{
-	ASSERT_DEBUG(!iSendMsg.Handle())
-	ASSERT_DEBUG(iSendNextCallBack);
-	iSendNextCallBack->Cancel();
-	CRemConMessage* msg;
-	ASSERT_DEBUG(iSendQueue);
-	TSglQueIter<CRemConMessage>& iter = iSendQueue->SetToFirst();
-	while ((msg = iter++) != NULL)
-		{
-		iSendQueue->RemoveAndDestroy(*msg);
-		}
-	}
-
 void CRemConSession::Receive(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
@@ -1288,31 +391,26 @@ void CRemConSession::Receive(const RMessage2& aMessage)
 		return;
 		}
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
 	iReceiveMsg = aMessage;
-	// If there's anything waiting to be given to us, ReceiveRequest will call 
-	// back to us with it.
-	iServer.ReceiveRequest(*this);
+
+	DoReceive();
 	}
 
 void CRemConSession::ReceiveCancel(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1328,12 +426,10 @@ void CRemConSession::GetConnectionCount(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1359,12 +455,10 @@ void CRemConSession::GetConnections(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1414,12 +508,10 @@ void CRemConSession::NotifyConnectionsChange(const RMessage2& aMessage)
 
 	// Messages are pushed to us from bearers, so we don't need anything more 
 	// than some sanity checking here.
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1446,12 +538,10 @@ void CRemConSession::NotifyConnectionsChangeCancel(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 
-	// Check we've had our type set...
-	if (	Type() != ERemConClientTypeController
-		&&	Type() != ERemConClientTypeTarget
-		)
+	// Check we've had our features set...
+	if (!ClientAvailable())
 		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientFeaturesNotSet);
 		return;
 		}
 
@@ -1463,44 +553,11 @@ void CRemConSession::NotifyConnectionsChangeCancel(const RMessage2& aMessage)
 	CompleteClient(aMessage, KErrNone);
 	}
 
-void CRemConSession::RegisterInterestedAPIs(const RMessage2& aMessage)
+CRemConInterfaceDetailsArray* CRemConSession::ExtractInterestedAPIsL(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
 	
-	if(iType == ERemConClientTypeUndefined)
-		{
-		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicRegisterInterestedAPIsInNonTargetSession);
-		}
-	
-	TRAPD(err, DoRegisterInterestedAPIsL(aMessage));
-	
-	if(iType == ERemConClientTypeController)
-		{
-		iServer.ControllerClientAvailable();
-		}
-	else if(err == KErrNone) // must be target
-		{
-		iServer.TargetClientAvailable(*this);
-		
-		TInt count = iInterestedAPIs->Array().Count();
-		for(TInt ix=0; ix<count; ++ix)
-			{
-			CRemConInterfaceDetails* details = iInterestedAPIs->Array()[ix];
-			ASSERT_DEBUG(details);
-			if(details->IsBulk())
-				{
-				iServer.BulkServerRequired();
-				break;
-				}
-			}
-		}
-	
-	CompleteClient(aMessage, err);
-	}
-
-void CRemConSession::DoRegisterInterestedAPIsL(const RMessage2& aMessage)
-	{
-	LOG_FUNC;
+	CRemConInterfaceDetailsArray* result;
 	
 	RBuf8 buf;
 	buf.CreateL(aMessage.GetDesLengthL(0));
@@ -1509,61 +566,112 @@ void CRemConSession::DoRegisterInterestedAPIsL(const RMessage2& aMessage)
 	aMessage.ReadL(0, buf);
 	RDesReadStream ipcStream(buf);
 	
-	iInterestedAPIs = CRemConInterfaceDetailsArray::InternalizeL(ipcStream);
+	result = CRemConInterfaceDetailsArray::InternalizeL(ipcStream);
 	
 	ipcStream.Close(); 
-	CleanupStack::PopAndDestroy(&buf); 
+	CleanupStack::PopAndDestroy(&buf);
+	
+	return result;
 	}
 
-void CRemConSession::CompleteConnect(const TRemConAddress& aAddr, TInt aError)
+TBool CRemConSession::DoGetSendInfoLC(const RMessage2& aMessage, 
+		TUid& aInterfaceUid,
+		TUint& aOperationId,
+		TRemConMessageSubType& aMessageSubType,
+		RBuf8& aSendDes)
 	{
-	LOG_FUNC;
-	LOG2(_L("\taError = %d, aAddr.BearerUid = 0x%08x"), aError, aAddr.BearerUid());
+	// Get the data the client wants to send.
+	aInterfaceUid = TUid::Uid(aMessage.Int0());
+	LOG1(_L("\taInterfaceUid = 0x%08x"), aInterfaceUid);
 
-	LOG1(_L("\tiRemoteAddress.BearerUid = 0x%08x"), iRemoteAddress.BearerUid());
-	LOG1(_L("\tiConnectBearerMsg.Handle = %d"), iConnectBearerMsg.Handle());
-
-	if ( iRemoteAddress == aAddr )
+	if (aMessage.GetDesLengthL(1) != sizeof(TOperationInformation))
 		{
-		if ( iConnectBearerMsg.Handle() )
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
+		return EFalse;
+		}
+
+	TPckgBuf<TOperationInformation> opInfoPckg;
+	
+	TInt err= aMessage.Read(
+			1, // location of the descriptor in the client's message (as we expect them to have set it up)
+			opInfoPckg, // descriptor to write to from client memory space
+			0 // offset into our descriptor to put the client's data
+			);
+	
+	if ( err != KErrNone )
+		{
+		LOG1(_L("\taMessage.Read = %d"), err);
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
+		return EFalse;
+		}	
+	
+	aOperationId = opInfoPckg().iOperationId;
+	LOG1(_L("\taOperationId = 0x%02x"), aOperationId);
+	
+	aMessageSubType = opInfoPckg().iMessageSubType;
+	LOG1(_L("\taMessageSubType = 0x%02x"), aMessageSubType);
+
+	const TUint dataLength = (TUint)aMessage.GetDesLengthL(3);
+	LOG1(_L("\tdataLength = %d"), dataLength);
+	
+	// If the client wanted to send some operation-associated data, read it 
+	// from them.
+	if ( dataLength != 0 )
+		{
+		aSendDes.CreateL(dataLength);
+		TInt err = aMessage.Read(
+			3, // location of the descriptor in the client's message (as we expect them to have set it up)
+			aSendDes, // descriptor to write to from client memory space
+			0 // offset into our descriptor to put the client's data
+			);
+		// NB We don't do LEAVEIFERRORL(aMessage.Read) because a bad client 
+		// descriptor is a panicking offence for them, not an 'error the 
+		// request' offence.
+		if ( err != KErrNone )
 			{
-			// We are a session that has an outstanding request on this specific 
-			// connection address.
-			CompleteClient(iConnectBearerMsg, aError);
-			}
-		else 
-			{
-			// Connect bearer message is not valid. 
-			// Check for pending messages.
-			CheckForPendingMsg();
+			LOG1(_L("\taMessage.Read = %d"), err);
+			aSendDes.Close();
+			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
+			return EFalse;
 			}
 		}
+	CleanupClosePushL(aSendDes);
+	return ETrue;
 	}
 
-void CRemConSession::CompleteDisconnect(const TRemConAddress& aAddr, TInt aError)
+void CRemConSession::GoConnectionOriented(const RMessage2& aMessage)
 	{
-	LOG_FUNC;
-	LOG2(_L("\taError = %d, aAddr.BearerUid = 0x%08x"), aError, aAddr.BearerUid());
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
 
-	LOG1(_L("\tiRemoteAddress.BearerUid = 0x%08x"), iRemoteAddress.BearerUid());
-	LOG1(_L("\tiDisconnectBearerMsg.Handle = %d"), iDisconnectBearerMsg.Handle());
+void CRemConSession::GoConnectionless(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
 
-	if ( iRemoteAddress == aAddr )
-		{
-		if ( iDisconnectBearerMsg.Handle() )
-			{
-			// We are a session that has an outstanding request on this specific 
-			// connection address.
-			CompleteClient(iDisconnectBearerMsg, aError);
-			}
-		else 
-			{
-			// Diconnect bearer message is not valid. 
-			// Check for pending messages.
-			CheckForPendingMsg();
-			}
+void CRemConSession::ConnectBearer(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
 
-		}
+void CRemConSession::ConnectBearerCancel(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
+
+void CRemConSession::DisconnectBearer(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
+
+void CRemConSession::DisconnectBearerCancel(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
+	}
+
+void CRemConSession::SendNotify(const RMessage2& aMessage)
+	{
+	PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadType);
 	}
 
 void CRemConSession::ConnectionsChanged()
@@ -1586,8 +694,6 @@ void CRemConSession::CompleteSend()
 	LOG2(_L("\tiNumRemotes = %d, iSendError = %d"), iNumRemotes, iSendError);
 
 	ASSERT_DEBUG(NumRemotesToTry() == 0);
-	NumRemotesToTry() = -1;
-
 	
 	if (iSending == ESendingReliable)
 		{
@@ -1619,7 +725,7 @@ void CRemConSession::CompleteSendNotify()
 		{
 		CompleteClient(iSendMsg, iSendError);
 		}
-	
+
 	ASSERT_DEBUG(iSendQueue);
 	if (!iSendQueue->IsEmpty())
 		{
@@ -1629,20 +735,6 @@ void CRemConSession::CompleteSendNotify()
 	iSending = ENotSending;
 	}
 
-TInt CRemConSession::SendNextCb(TAny* aThis)
-	{
-	static_cast<CRemConSession*>(aThis)->DoSendNext();
-	return KErrNone;
-	}
-
-void CRemConSession::DoSendNext()
-	{
-	ASSERT_DEBUG(iSendQueue);
-	CRemConMessage& msg = iSendQueue->First();
-	iSendQueue->Remove(msg);
-	SendToServer(msg);
-	}
-
 void CRemConSession::PanicSend(TRemConClientPanic aCode)
 	{
 	LOG_FUNC;
@@ -1650,12 +742,6 @@ void CRemConSession::PanicSend(TRemConClientPanic aCode)
 
 	PANIC_MSG(iSendMsg, KRemConClientPanicCat, aCode);
 	}
-
-TBool CRemConSession::SupportedMessage(const CRemConMessage& aMsg)
-    {
-    // Return true unless this is a command for an unsupported interface
-    return !(aMsg.MsgType() == ERemConCommand && !FindInterfaceByUid(aMsg.InterfaceUid()));
-    }
 
 TInt CRemConSession::WriteMessageToClient(const CRemConMessage& aMsg)
 	{
@@ -1701,54 +787,21 @@ void CRemConSession::WriteMessageToClientL(const CRemConMessage& aMsg)
 	// the client instead.
 	LEAVEIFERRORL(iReceiveMsg.Write(1, aMsg.OperationData()));
 	}
-	
-void CRemConSession::CheckForPendingMsg() const
-	{
-	LOG_FUNC;
-	if (iPendingMsg.Handle())
-		{
-		ASSERT_DEBUG(iPendingMsgProcessor);
-		iPendingMsgProcessor->Complete();
-		}
-	}
-
-void CRemConSession::ProcessPendingMsgL()
-	{
-	LOG_FUNC;
-	if (!iPendingMsg.Handle())
-		{
-		// This means that the pending connect or disconnect message,
-		// has been cancelled by the time we got here.
-		// (It was cancelled between two following calls:
-		// iPendingMsgProcessor::Complete and iPendingMsgProcessor::RunL
-		return;
-		}
-		
-	ServiceL(iPendingMsg);
-	if (iPendingMsg.Handle())
-		{
-		// This means that the pending msg has not been completed in ServiceL call.
-		// It was stored either in iConnectBearerMsg or iDisconnectBearerMsg member.
-		// This also means that this message is not "pending" any more 
-		// (as processing of its copy has been started). 
-		// However because the copy will get completed we need to 
-		// clean iPendingMsg.iHandle here
-		// To supress coverity error for uninitialized use of 'emptyMsg' coverity annotations
-		// are used as the in-line default constructor of RMessage2 doesn't initialize all member variables.
-		// coverity[var_decl]
-		RMessage2 emptyMsg;
-		iPendingMsg = emptyMsg;
-		}
-	}
-
 
 TInt CRemConSession::SupportedInterfaces(RArray<TUid>& aUids)
 	{
-	LOG_FUNC
+	LOG_FUNC;
+
+	aUids.Reset();
+	return AppendSupportedInterfaces(aUids);
+	}
+
+TInt CRemConSession::AppendSupportedInterfaces(RArray<TUid>& aUids)
+	{
+	LOG_FUNC;
 	ASSERT_DEBUG(iInterestedAPIs);
 	TInt err = KErrNone;
-	
-	aUids.Reset();
+
 	TInt count = iInterestedAPIs->Array().Count();
 	for(TInt i=0; (i<count) && (err == KErrNone); i++)
 		{
@@ -1762,11 +815,18 @@ TInt CRemConSession::SupportedInterfaces(RArray<TUid>& aUids)
 
 TInt CRemConSession::SupportedBulkInterfaces(RArray<TUid>& aUids)
 	{
-	LOG_FUNC
+	LOG_FUNC;
+
+    	aUids.Reset();
+	return AppendSupportedBulkInterfaces(aUids);
+	}
+
+TInt CRemConSession::AppendSupportedBulkInterfaces(RArray<TUid>& aUids)
+	{
+	LOG_FUNC;
 	ASSERT_DEBUG(iInterestedAPIs);
 	TInt err = KErrNone;
-	
-	aUids.Reset();
+
 	TInt count = iInterestedAPIs->Array().Count();
 	for(TInt i=0; (i<count) && (err == KErrNone); i++)
 		{
@@ -1777,13 +837,13 @@ TInt CRemConSession::SupportedBulkInterfaces(RArray<TUid>& aUids)
 			err = aUids.Append(details->Uid());
 			}
 		}
-	
+
 	return err;
 	}
 
 TInt CRemConSession::SupportedOperations(TUid aInterfaceUid, RArray<TUint>& aOperations)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	TInt err = KErrNotSupported;
 	CRemConInterfaceDetails* details = FindInterfaceByUid(aInterfaceUid);
 	
@@ -1796,7 +856,7 @@ TInt CRemConSession::SupportedOperations(TUid aInterfaceUid, RArray<TUint>& aOpe
 
 CRemConInterfaceDetails* CRemConSession::FindInterfaceByUid(TUid aUid) const
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	ASSERT_DEBUG(iInterestedAPIs);
 	TInt count = iInterestedAPIs->Array().Count();
 	for(TInt ix=0; ix<count; ++ix)
@@ -1811,4 +871,21 @@ CRemConInterfaceDetails* CRemConSession::FindInterfaceByUid(TUid aUid) const
 	return NULL;
 	}
 
+void CRemConSession::DoSendNext()
+	{
+	LOG_FUNC;
+
+	ASSERT_DEBUG(iSendQueue);
+	CRemConMessage& msg = iSendQueue->First();
+	iSendQueue->Remove(msg);
+	SendToServer(msg);
+	}
+
+TInt CRemConSession::SendNextCb(TAny *aThis)
+	{
+	LOG_STATIC_FUNC;
+
+	static_cast<CRemConSession*>(aThis)->DoSendNext();
+	return KErrNone;
+	}
 

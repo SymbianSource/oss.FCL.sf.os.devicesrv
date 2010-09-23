@@ -24,7 +24,7 @@
 #include <e32def.h>
 #include <e32base.h>
 
-class CRemConSession;
+class CRemConControllerSession;
 
 /**
 Active Helper.
@@ -33,7 +33,7 @@ Helps with the session class's pending async connect/disconnect requests.
 NONSHARABLE_CLASS(CActiveHelper) : public CActive
 	{
 public:
-	CActiveHelper(CRemConSession &aSession);
+	CActiveHelper(CRemConControllerSession &aSession);
 	~CActiveHelper();
 	void Complete();
 private:
@@ -41,7 +41,7 @@ private:
 	void RunL();
 	void DoCancel();
 private:
-	CRemConSession& iSession;
+	CRemConControllerSession& iSession;
 	};
 
 

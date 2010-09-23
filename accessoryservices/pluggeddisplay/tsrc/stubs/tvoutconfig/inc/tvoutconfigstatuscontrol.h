@@ -35,6 +35,7 @@ const TUint32 KTVOutStatusControlCableConnect = 0x00000004; // Change this value
 const TUint32 KTVOutStatusControlCopyProtect  = 0x00000005; // Set to 0 for "Copy Ptotection off", 1 for "Copy Ptotection on"
 const TUint32 KTVOutStatusControlConfigChange = 0x00000006; // Change this value to indicate that TV Out stting has changed
 const TUint32 KTVOutStatusControlConfigChangeImmediateError = 0x00000007; // CTvOutConfig::SettingsChangedListener() should fail immediately with this code.
+const TUint32 KTVOutStatusControlAnalogCableConnect = 0x00000008;
 
 // Set to update the Supported CEA mode
 // 0 - All CEA modes defined in TFixedModeCea are supported

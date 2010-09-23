@@ -285,10 +285,10 @@ START_TESTCASE DEVSRVS-HWRM-P-CHRG-0016
 //!                5. After some time delay change the charging state to 'disconnected'
 //!@SYMTestExpectedResults Check the battery charging current notification stopped after the step 5, the callback receives the error code KErrNotReady.
 //!@SYMTestType CT
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenChargingCompleteL
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenDisconnectedL
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenChargingComplete3L
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenDisconnected3L
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenChargingCompleteL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenDisconnectedL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenChargingComplete3L
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingCurrentNotificationWhenDisconnected3L
 END_TESTCASE DEVSRVS-HWRM-P-CHRG-0016
 
 START_TESTCASE DEVSRVS-HWRM-P-CHRG-0017

@@ -197,7 +197,9 @@ void CHWRMTestBase::OpenPowerStateSessionL()
 	
 	iBatteryLevelObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMBatteryLevel,*this);
 	iBatteryStatusObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMBatteryStatus,*this);
+	iExtendedBatteryStatusObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMExtendedBatteryStatus,*this);
 	iChargingStatusObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMChargingStatus,*this);
+	iExtendedChargingStatusObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMExtendedChargingStatus,*this);
 	}
 
 void CHWRMTestBase::CleanupPropertyObservers()
@@ -205,9 +207,13 @@ void CHWRMTestBase::CleanupPropertyObservers()
 	delete iBatteryLevelObserver;
 	iBatteryLevelObserver = NULL;
 	delete iBatteryStatusObserver;
-	iBatteryLevelObserver = NULL;
+	iBatteryStatusObserver = NULL;
+	delete iExtendedBatteryStatusObserver;
+	iExtendedBatteryStatusObserver = NULL;
 	delete iChargingStatusObserver;
-	iBatteryLevelObserver = NULL;	
+	iChargingStatusObserver = NULL;
+	delete iExtendedChargingStatusObserver;
+	iExtendedChargingStatusObserver = NULL;
 	}
 
 void CHWRMTestBase::GetCRVibraAttributeL(TUint32 aVibraKey, TInt &aValue)
@@ -364,10 +370,20 @@ void CHWRMTestBase::ExpectBatteryStatusNotificationL(EPSHWRMBatteryStatus aStatu
 	iExpectedBatteryStatusNotifications.AppendL(aStatus);
 	}
 
+void CHWRMTestBase::ExpectExtendedBatteryStatusNotificationL(EPSHWRMBatteryStatus aStatus)
+    {
+    iExpectedExtendedBatteryStatusNotifications.AppendL(aStatus);
+    }
+
 void CHWRMTestBase::ExpectedChargingStatusNotificationsL(EPSHWRMChargingStatus aStatus)
 	{
 	iExpectedChargingStatusNotifications.AppendL(aStatus);
 	}
+
+void CHWRMTestBase::ExpectedExtendedChargingStatusNotificationsL(EPSHWRMChargingStatus aStatus)
+    {
+    iExpectedExtendedChargingStatusNotifications.AppendL(aStatus);
+    }
 	
 void CHWRMTestBase::ExpectVibraStatusNotificationL(CHWRMVibra::TVibraStatus aStatus)
 	{
@@ -741,8 +757,14 @@ void CHWRMTestBase::PsPropertyChanged(TInt aKey, TInt aValue)
 		BatteryStatusChanged(aValue);
 		break;
 	case KHWRMChargingStatus:
-		ChargingStatusChanged(aValue);
-		break;
+        ChargingStatusChanged(aValue);
+        break;
+	case KHWRMExtendedBatteryStatus:
+	    ExtendedBatteryStatusChanged(aValue);
+	    break;	
+	case KHWRMExtendedChargingStatus:
+        ExtendedChargingStatusChanged(aValue);
+        break;		
 	default:
 		break;
   		}
@@ -786,13 +808,32 @@ void CHWRMTestBase::BatteryLevelChanged(TInt aBatteryLevel)
     CheckForEndOfTransition();
  	}
  
+ void CHWRMTestBase::ExtendedBatteryStatusChanged(TInt aBatteryStatus)
+    {
+    if (iExpectedExtendedBatteryStatusNotifications.Count() > 0)
+        {
+        if (aBatteryStatus != iExpectedExtendedBatteryStatusNotifications[0])
+            {
+            INFO_PRINTF3(_L("### ERROR: ExtendedBatteryStatusChanged, expected:%d, actual:%d"),iExpectedExtendedBatteryStatusNotifications[0],aBatteryStatus);
+            SetTestFail();
+            }
+        iExpectedExtendedBatteryStatusNotifications.Remove(0);
+        }
+    else
+        {
+        INFO_PRINTF2(_L("### ERROR: ExtendedBatteryStatusChanged, expected:NONE, actual:%d"),aBatteryStatus);
+        SetTestFail();
+        }
+    CheckForEndOfTransition();
+    }
+
   void CHWRMTestBase::ChargingStatusChanged(TInt aChargingStatus)
 	{
   	if (iExpectedChargingStatusNotifications.Count() > 0)
   		{
   		if (aChargingStatus != iExpectedChargingStatusNotifications[0])
   			{
-	  		INFO_PRINTF3(_L("### ERROR: BatteryStatusChanged, expected:%d, actual:%d"),iExpectedChargingStatusNotifications[0],aChargingStatus);
+	  		INFO_PRINTF3(_L("### ERROR: ChargingStatusChanged, expected:%d, actual:%d"),iExpectedChargingStatusNotifications[0],aChargingStatus);
 	  		SetTestFail();
   			}
         iExpectedChargingStatusNotifications.Remove(0);
@@ -804,7 +845,26 @@ void CHWRMTestBase::BatteryLevelChanged(TInt aBatteryLevel)
  		}
     CheckForEndOfTransition();
  	}
- 	
+
+  void CHWRMTestBase::ExtendedChargingStatusChanged(TInt aChargingStatus)
+    {
+    if (iExpectedExtendedChargingStatusNotifications.Count() > 0)
+        {
+        if (aChargingStatus != iExpectedExtendedChargingStatusNotifications[0])
+            {
+            INFO_PRINTF3(_L("### ERROR: ExtendedChargingStatusChanged, expected:%d, actual:%d"),iExpectedExtendedChargingStatusNotifications[0],aChargingStatus);
+            SetTestFail();
+            }
+        iExpectedExtendedChargingStatusNotifications.Remove(0);
+        }
+    else
+        {
+        INFO_PRINTF2(_L("### ERROR: ExtendedChargingStatusChanged, expected:NONE, actual:%d"),aChargingStatus);
+        SetTestFail();
+        }
+    CheckForEndOfTransition();
+    }
+  
 void CHWRMTestBase::CheckPluginInsensitivity()
 	{
 	TInt value;
@@ -891,7 +951,9 @@ void CHWRMTestBase::CheckForEndOfTransition()
 		|| 	iExpectedLightNotifications.Count() 				!=0
 		|| 	iExpectedBatteryLevelNotifications.Count()			!=0
 		|| 	iExpectedBatteryStatusNotifications.Count()			!=0
+		||  iExpectedExtendedBatteryStatusNotifications.Count() !=0
 		|| 	iExpectedChargingStatusNotifications.Count()		!=0
+        ||  iExpectedExtendedChargingStatusNotifications.Count()!=0
 		||  iExpectedBatteryPowerMeasurementsError.Count()		!=0
 		||  iExpectedFmTxStatusNotifications.Count() 			!=0
 		||  iExpectedFmTxFrequencyNotifications.Count()			!=0
@@ -1134,7 +1196,9 @@ void CHWRMTestBase::TearDownL()
 	iExpectedFmTxFrequencyNotifications.Close();
 	iExpectedBatteryLevelNotifications.Close();
 	iExpectedBatteryStatusNotifications.Close();
+	iExpectedExtendedBatteryStatusNotifications.Close();
 	iExpectedChargingStatusNotifications.Close();
+	iExpectedExtendedChargingStatusNotifications.Close();
 	iExpectedVibraFeedbackModeNotifications.Close();
 	iExpectedBatteryPowerMeasurementsError.Close();
 #ifdef SYMBIAN_HWRM_EXTPOWERINFO
@@ -1281,11 +1345,21 @@ void CHWRMTestBase::CheckAllExpectedNotificationsReceived()
 		SetTestFail();
 		INFO_PRINTF1(_L("### ERROR Expected Battery Status Notification not received"));
 		}
+	if (iExpectedExtendedBatteryStatusNotifications.Count() != 0)
+        {
+        SetTestFail();
+        INFO_PRINTF1(_L("### ERROR Expected Extended Battery Status Notification not received"));
+        }
 	if (iExpectedChargingStatusNotifications.Count() != 0)
 		{
 		SetTestFail();
 		INFO_PRINTF1(_L("### ERROR Expected Charging Status Notification not received"));
 		}
+	if (iExpectedExtendedChargingStatusNotifications.Count() != 0)
+        {
+        SetTestFail();
+        INFO_PRINTF1(_L("### ERROR Expected Extended Charging Status Notification not received"));
+        }
 	if (iExpectedBatteryPowerMeasurementsError.Count() != 0)
 		{
 		SetTestFail();
@@ -1461,6 +1535,31 @@ void CHWRMTestBase::ChargingStatusChange(TInt aErrCode, CHWRMPower::TBatteryChar
 				INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusError"));
 				break;
 				}
+			case EChargingStatusIllegalChargerError:
+                {
+                INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusIllegalChargerError"));
+                break;
+                }
+            case EChargingStatusChargerUnderVoltageError:
+                {
+                INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusChargerUnderVoltageError"));
+                break;
+                }
+            case EChargingStatusChargerOverVoltageError:
+                {
+                INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusChargerOverVoltageError"));
+                break;
+                }
+            case EChargingStatusTempTooHotError:
+                {
+                INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusTempTooHotError"));
+                break;
+                }
+            case EChargingStatusTempTooColdError:
+                {
+                INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusTempTooColdError"));
+                break;
+                }
 			case EChargingStatusNotConnected:
 				{
 				INFO_PRINTF1(_L("INFO: Battery charging status changed: EChargingStatusNotConnected"));
@@ -1497,14 +1596,14 @@ void CHWRMTestBase::ChargingStatusChange(TInt aErrCode, CHWRMPower::TBatteryChar
 				}
 			}
 		
-		if (iExpectedChargingStatusNotifications.Count() > 0)
+		if (iExpectedExtendedChargingStatusNotifications.Count() > 0)
 			{
-			if (aChrgStatus != iExpectedChargingStatusNotifications[0])
+			if (aChrgStatus != iExpectedExtendedChargingStatusNotifications[0])
 				{
-				INFO_PRINTF3(_L("### ERROR: ChargingStatusChange, expected:%d, actual:%d"),iExpectedChargingStatusNotifications[0],aChrgStatus);
+				INFO_PRINTF3(_L("### ERROR: ChargingStatusChange, expected:%d, actual:%d"),iExpectedExtendedChargingStatusNotifications[0],aChrgStatus);
 				SetTestFail();
 				}
-			iExpectedChargingStatusNotifications.Remove(0);
+			iExpectedExtendedChargingStatusNotifications.Remove(0);
 			}
 		else
 			{

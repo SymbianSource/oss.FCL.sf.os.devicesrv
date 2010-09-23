@@ -136,6 +136,20 @@ enum EPSHWRMBatteryLevel
 const TUint32 KHWRMBatteryStatus = 0x00000002;
 
 /**
+ * Battery status of device. 
+ *
+ * This Property is a replacement for the existing property KHWRMBatteryStatus.
+ * It is strictly recommended to use the new property by any up-coming applications.
+ * Legacy property, KHWRMBatteryStatus, will be deprecated in the very next release.
+ *
+ * @see EPSHWRMBatteryStatus
+ *
+ * @publishedAll
+ * @released
+ */
+const TUint32 KHWRMExtendedBatteryStatus = 0x00000004;
+
+/**
 * Battery status of device.
 *
 * @publishedAll
@@ -144,9 +158,19 @@ const TUint32 KHWRMBatteryStatus = 0x00000002;
 enum EPSHWRMBatteryStatus
     {
     /**
-    Uninitialized or some other error
+		Uninitialized or some other error e.g.server not intialized
     */
-    EBatteryStatusUnknown        = -1, 
+		EBatteryStatusUnknown        							= -1,
+		/**
+		* e.g. Chemistry not supported like LiFePo or general battery not supported error
+		* Show "charging not allowed" note to user
+		*/
+		EBatteryStatusNotSupported								= -2,
+		/**
+		* e.g. Pirated Battery with wrong DBI Chip / DBI authentication failed
+		* Show "charging not allowed" note to user
+		*/
+		EBatteryStatusDbiAuthFailed        				= -3,    
     /**
     This can also be used during charging
     */
@@ -173,6 +197,20 @@ enum EPSHWRMBatteryStatus
 const TUint32 KHWRMChargingStatus = 0x00000003;
 
 /**
+ * Charging status of device.
+ *
+ * This Property is a replacement for the existing property KHWRMChargingStatus.
+ * It is strictly recommended to use the new property by any up-coming applications.
+ * Legacy property, KHWRMChargingStatus, will be deprecated in the very next release.
+ *
+ * @see EPSHWRMChargingStatus
+ *
+ * @publishedAll
+ * @released
+ */
+const TUint32 KHWRMExtendedChargingStatus = 0x00000005;
+
+/**
 * Charging status of device.
 *
 * @publishedAll
@@ -181,9 +219,29 @@ const TUint32 KHWRMChargingStatus = 0x00000003;
 enum EPSHWRMChargingStatus
     {
     /**
-    Some error has occurred when charger is connected or charging. 
+    Some error has occurred when charger is connected or charging.    
     */
-    EChargingStatusError              = -1, 
+    EChargingStatusError                        = -1,
+    /**
+     * Illegal charger is connected, device cannot charge
+     */
+    EChargingStatusIllegalChargerError          = -2,
+    /**
+     * Charger is under voltage, device cannot charge
+     */
+    EChargingStatusChargerUnderVoltageError     = -3,
+    /**
+     * Charger is over voltage, device cannot charge
+     */
+    EChargingStatusChargerOverVoltageError      = -4,
+    /**
+     * Wait for battery temperature to normalize before charging to proceed
+     */
+    EChargingStatusTempTooHotError              = -5,
+    /**
+     * Wait for battery temperature to normalize for charging
+     */
+    EChargingStatusTempTooColdError             = -6,
     /**
     Charger not connected/uninitialized
     */

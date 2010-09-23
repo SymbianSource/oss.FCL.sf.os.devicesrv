@@ -62,7 +62,7 @@ private:
 	void ConstructL();
 	TBool TransitionSupported(const TSsmState& aRequestedState) const;	
 	void GetCommandListPath(TUint aBootMode, TDes& aCmdListPath);
-	TInt GetBootupCountL();
+	void GetStartupCountAndMaxbootLimitL(TInt &aBootCount, TInt &aResetLimit);
 
 private:
 	TInt iHardwareReason;

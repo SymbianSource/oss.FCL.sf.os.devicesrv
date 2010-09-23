@@ -253,7 +253,7 @@ START_TESTCASE DEVSRVS-HWRM-L-0021
 //!  2. Call the new API to set the default color for the supported targets
 //!@SYMTestExpectedResults Check the API does not leave and passes the request to adaptation.
 //!@SYMTestType CT
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestLightDefaultColorL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestLightDefaultColorL
 END_TESTCASE DEVSRVS-HWRM-L-0021
 
 START_TESTCASE DEVSRVS-HWRM-L-0022
@@ -336,7 +336,7 @@ START_TESTCASE DEVSRVS-HWRM-L-0027
 //!@SYMTestActions Checks that the system switches to the proper state of the RGB color setting for multi client sessions
 //!@SYMTestExpectedResults Pass
 //!@SYMTestType CT
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestLightColor_MultiClientL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestLightColor_MultiClientL
 END_TESTCASE DEVSRVS-HWRM-L-0027
 
 START_TESTCASE DEVSRVS-HWRM-L-0028

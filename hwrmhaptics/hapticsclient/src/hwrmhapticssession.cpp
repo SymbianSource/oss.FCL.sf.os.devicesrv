@@ -155,11 +155,17 @@ TInt RHWRMHapticsSession::StartServer() const
         }
         
     User::WaitForRequest( status );
+    	
+    // We can't use the 'exit reason' if the server paniced as this
+    // is the panic 'reason' and may be '0' which cannot be distinguished
+    // from KErrNone
+    ret = (server.ExitType() == EExitPanic)? KErrGeneral : status.Int();
+    	
     server.Close();
 
-    COMPONENT_TRACE( ( _L( "RHWRMHapticsSession::StartServer - return %d" ), status.Int() ) );
+    COMPONENT_TRACE( ( _L( "RHWRMHapticsSession::StartServer - return %d" ), ret ) );
 
-    return status.Int();    
+    return ret;    
     }
 
 // ---------------------------------------------------------------------------

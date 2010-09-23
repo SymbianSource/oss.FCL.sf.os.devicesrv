@@ -35,6 +35,7 @@ USERINCLUDE		../inc
 USERINCLUDE		../../../gsapolicy/inc
 USERINCLUDE		../../../localinc
 USERINCLUDE		../../../../ssmpolicyplugins/inc
+USERINCLUDE		../../../../ssmpolicyplugins/cenrep
 
 SOURCEPATH		../src
 SOURCE			tgsa_server.cpp
@@ -49,7 +50,6 @@ SOURCE			gsastatepolicystartup.cpp
 SOURCE			gsastatepolicyshutdown.cpp
 SOURCE			gsastatepolicynormal.cpp
 SOURCE			gsastatepolicyfail.cpp
-SOURCE			ssmmaxbootattempts_patch.cpp
 
 SOURCEPATH		../../../localsrc
 SOURCE			ssmpanic.cpp
@@ -68,5 +68,6 @@ LIBRARY			domaincli.lib
 LIBRARY			ssmsuscli.lib
 LIBRARY			ssmstartsafe.lib
 LIBRARY			conditionevaluator.lib
+LIBRARY			centralrepository.lib
 
 SMPSAFE

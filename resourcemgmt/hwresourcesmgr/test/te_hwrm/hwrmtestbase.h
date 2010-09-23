@@ -167,9 +167,10 @@ protected: //useful functions
 	
 	void ExpectBatteryLevelNotificationL(EPSHWRMBatteryLevel aBatteryLevel);
 	void ExpectBatteryStatusNotificationL(EPSHWRMBatteryStatus aStatus);
+	void ExpectExtendedBatteryStatusNotificationL(EPSHWRMBatteryStatus aStatus);
 	void ExpectedChargingStatusNotificationsL(EPSHWRMChargingStatus aStatus);
-	
-	void ExpectBatteryPowerMeasurementsErrorL(TInt aErrorCode);
+	void ExpectedExtendedChargingStatusNotificationsL(EPSHWRMChargingStatus aStatus);
+	void ExpectBatteryPowerMeasurementsErrorL(TInt aErrorCode);	
 	
 	// TO DO: temp solution, need to add counters
 	void CheckPluginInsensitivity();
@@ -185,7 +186,9 @@ protected: //useful functions
 	void CleanupPropertyObservers();
 	void BatteryLevelChanged(TInt aBatteryLevel);
 	void BatteryStatusChanged(TInt aBatteryStatus);
+	void ExtendedBatteryStatusChanged(TInt aBatteryStatus);
 	void ChargingStatusChanged(TInt aChargingStatus);
+	void ExtendedChargingStatusChanged(TInt aChargingStatus);
 	
 	const TDesC& MapVibraModeState(CHWRMVibra::TVibraModeState aState);
 	const TDesC& MapVibraModeStatus(CHWRMVibra::TVibraStatus aStatus);
@@ -251,7 +254,9 @@ protected:
     RArray<CHWRMVibra::TVibraFeedbackModeState>	iExpectedVibraFeedbackModeNotifications;
 	RArray<EPSHWRMBatteryLevel> iExpectedBatteryLevelNotifications;
 	RArray<EPSHWRMBatteryStatus> iExpectedBatteryStatusNotifications;
+	RArray<EPSHWRMBatteryStatus> iExpectedExtendedBatteryStatusNotifications;
 	RArray<EPSHWRMChargingStatus> iExpectedChargingStatusNotifications;
+	RArray<EPSHWRMChargingStatus> iExpectedExtendedChargingStatusNotifications;
 	RArray<TInt> iExpectedBatteryPowerMeasurementsError;
 #ifdef SYMBIAN_HWRM_EXTPOWERINFO
 	RArray<TInt> iExpectedBatteryChargingTimeMeasurementsError;
@@ -316,7 +321,9 @@ protected:
 	// P&S property observers
 	CPsPropertyObserver* iBatteryLevelObserver;
 	CPsPropertyObserver* iBatteryStatusObserver;
+	CPsPropertyObserver* iExtendedBatteryStatusObserver;
 	CPsPropertyObserver* iChargingStatusObserver;
+	CPsPropertyObserver* iExtendedChargingStatusObserver;
 	
 	TBool iTearingDown;
 	TBool iIgnoreStatusNotifications;

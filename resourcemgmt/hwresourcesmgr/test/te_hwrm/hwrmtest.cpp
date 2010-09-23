@@ -145,8 +145,11 @@ CTestSuite* CHWRMTest::CreateSuiteL(const TDesC& aName)
     ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestLightSetColorReserveL);
     
     // Power State tests
-    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestPowerStatesL);
-	
+    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestPowerStatesL);	
+    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestPowerExtendedBatteryStatusL);
+    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestPowerBatteryStatusL);
+    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestPowerChargingStatusL);
+    
 	// Extended Lights
 	ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestExtendedLightSessionsL);
 
@@ -1349,17 +1352,78 @@ void CHWRMTest::TestLightSetColorReserveL()
 	ExecuteTestL();	
 	}
 
-
 void CHWRMTest::TestPowerStatesL()
-	{
-	INFO_PRINTF1(_L("Start test step: TestPowerStatesL"));
-	AddTestStateL(this, &CHWRMTest::PowerStateOpenL, KTwoTimeUnits);
-	AddTestStateL(this, &CHWRMTest::BatteryLevelL, KTwoTimeUnits);
-	AddTestStateL(this, &CHWRMTest::BatteryStateL, KTwoTimeUnits);
-	AddTestStateL(this, &CHWRMTest::ChargingStatusL, KTwoTimeUnits);	
+    {
+    INFO_PRINTF1(_L("Start test step: TestPowerStatesL"));
+    AddTestStateL(this, &CHWRMTest::PowerStateOpenL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyBatteryStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyChargingStatusL, KTwoTimeUnits);    
+    AddTestStateL(this, &CHWRMTest::BatteryLevelL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusL, KTwoTimeUnits);    
+    
+    ExecuteTestL(); 
+    }
+
+void CHWRMTest::TestPowerExtendedBatteryStatusL()
+    {
+    INFO_PRINTF1(_L("Start test step: TestPowerExtendedBatteryStatusL"));
+    AddTestStateL(this, &CHWRMTest::PowerStateOpenL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectNewBatteryStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectNewChargingStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateStatusOkL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateUnknownErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateUnsupportedL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateAuthErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateStatusLowL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateStatusEmptyL, KTwoTimeUnits);    
+    // Reset battery status to "Ok"
+    AddTestStateL(this, &CHWRMTest::ExtendedBatteryStateStatusOkL, KTwoTimeUnits);
+    
+    ExecuteTestL();
+    }
 	
-	ExecuteTestL();	
-	}
+void CHWRMTest::TestPowerBatteryStatusL()
+    {
+    INFO_PRINTF1(_L("Start test step: TestPowerBatteryStatusL"));
+    AddTestStateL(this, &CHWRMTest::PowerStateOpenL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyBatteryStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyChargingStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateStatusOkL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateUnknownErrorL, KTwoTimeUnits);
+		AddTestStateL(this, &CHWRMTest::BatteryStateUnsupportedL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateAuthErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateStatusLowL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::BatteryStateStatusEmptyL, KTwoTimeUnits);    
+    // Reset battery status to "Ok"
+    AddTestStateL(this, &CHWRMTest::BatteryStateStatusOkL, KTwoTimeUnits);
+    
+    ExecuteTestL();
+    }	
+
+void CHWRMTest::TestPowerChargingStatusL()
+    {
+    INFO_PRINTF1(_L("Start test step: TestPowerChargingStatusL"));
+    AddTestStateL(this, &CHWRMTest::PowerStateOpenL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyBatteryStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ExpectLegacyChargingStatusL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusNotConnectedL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusChargingOkL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusNotChargingL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusAlmostCompleteL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusCompletedChargingL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusChargingContinuesL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusIllegalErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusUnderVoltageErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusOverVoltageErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusTooHotErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::ChargingStatusTooColdErrorL, KTwoTimeUnits);
+    //Reset Charging Status to "completed"
+    AddTestStateL(this, &CHWRMTest::ChargingStatusCompletedChargingL, KTwoTimeUnits);
+    
+    ExecuteTestL();
+    }
 
 void CHWRMTest::TestExtendedLightSessionsL()
 	{
@@ -1478,10 +1542,10 @@ void CHWRMTest::TestPowerGetBaseTimeIntervalL()
 #ifdef SYMBIAN_HWRM_EXTPOWERINFO
 #define SET_CHARGINGSTATUS(s) \
 	{ \
-	iMockPowerState.CompleteL(KHWRMChargingStatus, s, 5); \
+	iMockPowerState.CompleteL(KHWRMExtendedChargingStatus, s, 5); \
 	User::After(KOneSecond); \
 	iChargingStatus = s; \
-	if(iChargingStatusCBregistered) ExpectedChargingStatusNotificationsL(s); \
+	if(iChargingStatusCBregistered) ExpectedExtendedChargingStatusNotificationsL(s); \
 	}
 
 void CHWRMTest::PowerAndPowerStateOpenL()
@@ -1509,6 +1573,36 @@ void CHWRMTest::PowerChargingStatusErrorL()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusErrorL"));
 	SET_CHARGINGSTATUS(EChargingStatusError);
 	}
+
+void CHWRMTest::PowerChargingStatusIllegalErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusIllegalErrorL"));
+    SET_CHARGINGSTATUS(EChargingStatusIllegalChargerError);
+    }
+
+void CHWRMTest::PowerChargingStatusUnderVoltageErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusUnderVoltageErrorL"));
+    SET_CHARGINGSTATUS(EChargingStatusChargerUnderVoltageError);
+    }
+
+void CHWRMTest::PowerChargingStatusOverVoltageErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusOverVoltageErrorL"));
+    SET_CHARGINGSTATUS(EChargingStatusChargerOverVoltageError);
+    }
+
+void CHWRMTest::PowerChargingStatusTooHotErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusTooHotErrorL"));
+    SET_CHARGINGSTATUS(EChargingStatusTempTooHotError);
+    }
+
+void CHWRMTest::PowerChargingStatusTooColdErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusTooColdErrorL"));
+    SET_CHARGINGSTATUS(EChargingStatusTempTooColdError);
+    }
 
 void CHWRMTest::PowerChargingStatusNotConnectedL()
 	{
@@ -1551,19 +1645,74 @@ void CHWRMTest::PowerChargingStatusError3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusError3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusError);
-		ExpectedChargingStatusNotificationsL(EChargingStatusError);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusError);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusError);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusError);
 	}
+
+void CHWRMTest::PowerChargingStatusIllegalError3L()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusIllegalError3L"));
+    if(iChargingStatusCBregistered)
+        {
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusIllegalChargerError);
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusIllegalChargerError);
+        }
+    SET_CHARGINGSTATUS(EChargingStatusIllegalChargerError);
+    }
+
+void CHWRMTest::PowerChargingStatusUnderVoltageError3L()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusUnderVoltageError3L"));
+    if(iChargingStatusCBregistered)
+        {
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargerUnderVoltageError);
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargerUnderVoltageError);
+        }
+    SET_CHARGINGSTATUS(EChargingStatusChargerUnderVoltageError);
+    }
+
+void CHWRMTest::PowerChargingStatusOverVoltageError3L()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusOverVoltageError3L"));
+    if(iChargingStatusCBregistered)
+        {
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargerOverVoltageError);
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargerOverVoltageError);
+        }    
+    SET_CHARGINGSTATUS(EChargingStatusChargerOverVoltageError);
+    }
+
+void CHWRMTest::PowerChargingStatusTooHotError3L()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusTooHotError3L"));
+    if(iChargingStatusCBregistered)
+        {
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusTempTooHotError);
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusTempTooHotError);
+        }   
+    SET_CHARGINGSTATUS(EChargingStatusTempTooHotError);
+    }
+
+void CHWRMTest::PowerChargingStatusTooColdError3L()
+    {
+    INFO_PRINTF1(_L("Step state: PowerChargingStatusTooColdError3L"));
+    if(iChargingStatusCBregistered)
+        {
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusTempTooColdError);
+        ExpectedExtendedChargingStatusNotificationsL(EChargingStatusTempTooColdError);
+        }
+    SET_CHARGINGSTATUS(EChargingStatusTempTooColdError);
+    }
 
 void CHWRMTest::PowerChargingStatusNotConnected3L()
 	{
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusNotConnected3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusNotConnected);
-		ExpectedChargingStatusNotificationsL(EChargingStatusNotConnected);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusNotConnected);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusNotConnected);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusNotConnected);
 	}
@@ -1573,8 +1722,8 @@ void CHWRMTest::PowerChargingStatusCharging3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusCharging3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusCharging);
-		ExpectedChargingStatusNotificationsL(EChargingStatusCharging);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusCharging);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusCharging);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusCharging);
 	}
@@ -1584,8 +1733,8 @@ void CHWRMTest::PowerChargingStatusNotCharging3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusNotCharging3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusNotCharging);
-		ExpectedChargingStatusNotificationsL(EChargingStatusNotCharging);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusNotCharging);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusNotCharging);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusNotCharging);
 	}
@@ -1595,8 +1744,8 @@ void CHWRMTest::PowerChargingStatusAlmostComplete3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusAlmostComplete3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusAlmostComplete);
-		ExpectedChargingStatusNotificationsL(EChargingStatusAlmostComplete);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusAlmostComplete);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusAlmostComplete);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusAlmostComplete);
 	}
@@ -1606,8 +1755,8 @@ void CHWRMTest::PowerChargingStatusComplete3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusComplete3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusChargingComplete);
-		ExpectedChargingStatusNotificationsL(EChargingStatusChargingComplete);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargingComplete);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargingComplete);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusChargingComplete);
 	}
@@ -1617,8 +1766,8 @@ void CHWRMTest::PowerChargingStatusContinued3L()
 	INFO_PRINTF1(_L("Step state: PowerChargingStatusContinued3L"));
 	if(iChargingStatusCBregistered)
 		{
-		ExpectedChargingStatusNotificationsL(EChargingStatusChargingContinued);
-		ExpectedChargingStatusNotificationsL(EChargingStatusChargingContinued);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargingContinued);
+		ExpectedExtendedChargingStatusNotificationsL(EChargingStatusChargingContinued);
 		}
 	SET_CHARGINGSTATUS(EChargingStatusChargingContinued);
 	}
@@ -2348,6 +2497,72 @@ void CHWRMTest::GetBatteryChargerTypeUSBMulticlientL()
 	TestBatteryChargerTypeMultiClientL((TInt)CHWRMPower::EBatteryChargerUsbDedicated);
 	}
 
+void CHWRMTest::GetBatteryChargerTypeUSBHispeedHost()
+    {
+    INFO_PRINTF1(_L("Step state: GetBatteryChargerTypeUSBHispeedHost"));
+    
+    CHWRMPower& power = GetPowerSessionWithCallbackRegisteredL();
+    
+    RMockPower& mockPower = GetMockPower();
+
+    TBuf8<1> emptyDes;
+    mockPower.ExpectProcessCmdL(HWRMPowerCommand::EGetBatteryChargerTypeCmdId, emptyDes);
+
+    HWRMPowerCommand::TBatteryChargerTypeData responsedata;
+    responsedata.iErrorCode = KErrNone;
+    responsedata.iChargerType = HWRMPowerCommand::EBatteryChargerUsbHispeedHost;
+
+    HWRMPowerCommand::TBatteryChargerTypeResponsePackage response(responsedata);
+    mockPower.CompleteL(HWRMPowerCommand::EGetBatteryChargerTypeCmdId, 2, response);
+    
+    CHWRMPower::TBatteryChargerType data;
+    User::LeaveIfError(power.GetBatteryChargerType(data));
+
+    if( data != CHWRMPower::EBatteryChargerUsbHispeedHost )
+        {
+        User::Leave(KErrGeneral);
+        }
+    }
+
+void CHWRMTest::GetBatteryChargerTypeUSBHispeedHostMulticlientL()
+    {
+    INFO_PRINTF1(_L("Step state: GetBatteryChargerTypeUSBHispeedHostMulticlientL"));
+    TestBatteryChargerTypeMultiClientL((TInt)CHWRMPower::EBatteryChargerUsbHispeedHost);
+    }
+
+void CHWRMTest::GetBatteryChargerTypeUSBAca()
+    {
+    INFO_PRINTF1(_L("Step state: GetBatteryChargerTypeUSBAca"));
+    
+    CHWRMPower& power = GetPowerSessionWithCallbackRegisteredL();
+    
+    RMockPower& mockPower = GetMockPower();
+
+    TBuf8<1> emptyDes;
+    mockPower.ExpectProcessCmdL(HWRMPowerCommand::EGetBatteryChargerTypeCmdId, emptyDes);
+
+    HWRMPowerCommand::TBatteryChargerTypeData responsedata;
+    responsedata.iErrorCode = KErrNone;
+    responsedata.iChargerType = HWRMPowerCommand::EBatteryChargerUsbAca;
+
+    HWRMPowerCommand::TBatteryChargerTypeResponsePackage response(responsedata);
+    mockPower.CompleteL(HWRMPowerCommand::EGetBatteryChargerTypeCmdId, 2, response);
+    
+    CHWRMPower::TBatteryChargerType data;
+    User::LeaveIfError(power.GetBatteryChargerType(data));
+
+    if( data != CHWRMPower::EBatteryChargerUsbAca )
+        {
+        User::Leave(KErrGeneral);
+        }
+    }
+
+void CHWRMTest::GetBatteryChargerTypeUSBAcaMulticlientL()
+    {
+    INFO_PRINTF1(_L("Step state: GetBatteryChargerTypeUSBAcaMulticlientL"));
+    TestBatteryChargerTypeMultiClientL((TInt)CHWRMPower::EBatteryChargerUsbAca);
+    }
+
 void CHWRMTest::GetBatteryChargerTypeWithPluginErrorL()
 	{
 	INFO_PRINTF1(_L("Step state: GetBatteryChargerTypeWithPluginErrorL"));
@@ -2509,6 +2724,11 @@ void CHWRMTest::TestPowerChargingStatusNotificationL()
 	AddTestStateL(this, &CHWRMTest::RegisterChargingStatusCallbackL, KOneTimeUnit);
 	
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusIllegalErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusUnderVoltageErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusOverVoltageErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooHotErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooColdErrorL, KTwoTimeUnits);	
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusNotConnectedL, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusChargingL, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusNotChargingL, KTwoTimeUnits);
@@ -2532,6 +2752,11 @@ void CHWRMTest::TestPowerChargingStatusNotificationMultiClient3L()
 	AddTestStateL(this, &CHWRMTest::RegisterChargingStatusCallbackMultiClient3L, KOneTimeUnit);
 	
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusError3L, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusIllegalError3L, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusUnderVoltageError3L, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusOverVoltageError3L, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooHotError3L, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooColdError3L, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusNotConnected3L, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusCharging3L, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusNotCharging3L, KTwoTimeUnits);
@@ -2616,6 +2841,21 @@ void CHWRMTest::TestPowerRemainingChargingTimeNotificationErrorL()
 	
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusErrorL, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
+	
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusIllegalErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
+        
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusOverVoltageErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
+    
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusUnderVoltageErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
+    
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooHotErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
+        
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooColdErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartRemainingChargingTimeErrorL, KTwoTimeUnits);
 	
 	ExecuteTestL();
 	}
@@ -2797,6 +3037,21 @@ void CHWRMTest::TestPowerChargingCurrentNotificationErrorL()
 	AddTestStateL(this, &CHWRMTest::PowerChargingStatusErrorL, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
 	
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusIllegalErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
+	    
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusOverVoltageErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
+	
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusUnderVoltageErrorL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
+	
+	AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooHotErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
+	    
+    AddTestStateL(this, &CHWRMTest::PowerChargingStatusTooColdErrorL, KTwoTimeUnits);
+    AddTestStateL(this, &CHWRMTest::StartChargingCurrentErrorL, KTwoTimeUnits);
+	        
 	ExecuteTestL();
 	}
 
@@ -2971,7 +3226,9 @@ void CHWRMTest::TestPowerGetBatteryChargerType()
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeNoCharger, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeACMain, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSB, KTwoTimeUnits);
-
+	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSBHispeedHost, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSBAca, KTwoTimeUnits);
+	
 	ExecuteTestL();
 	}
 
@@ -2984,7 +3241,9 @@ void CHWRMTest::TestPowerGetBatteryChargerTypeMulticlientL()
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeNoChargerMulticlientL, 2*KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeACMainMulticlientL, 2*KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSBMulticlientL, 2*KTwoTimeUnits);
-
+	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSBHispeedHostMulticlientL, 2*KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::GetBatteryChargerTypeUSBAcaMulticlientL, 2*KTwoTimeUnits);
+	
 	ExecuteTestL();
 	}
 
@@ -4413,6 +4672,34 @@ void CHWRMTest::PowerStateOpenL()
 	OpenPowerStateSessionL();		
 	}
 
+void CHWRMTest::ExpectLegacyBatteryStatusL()
+    {
+    delete iExtendedBatteryStatusObserver;
+    iExtendedBatteryStatusObserver = NULL;
+    iExpectedExtendedBatteryStatusNotifications.Reset();
+    }
+
+void CHWRMTest::ExpectLegacyChargingStatusL()
+    {
+    delete iExtendedChargingStatusObserver;
+    iExtendedChargingStatusObserver = NULL;
+    iExpectedExtendedChargingStatusNotifications.Reset();
+    }
+
+void CHWRMTest::ExpectNewBatteryStatusL()
+    {
+    delete iBatteryStatusObserver;
+    iBatteryStatusObserver = NULL;
+    iExpectedBatteryStatusNotifications.Reset();
+    }
+
+void CHWRMTest::ExpectNewChargingStatusL()
+    {
+    delete iChargingStatusObserver;
+    iChargingStatusObserver = NULL;
+    iExpectedChargingStatusNotifications.Reset();
+    }
+
 void CHWRMTest::BatteryLevelL()
 	{
 	INFO_PRINTF1(_L("Step state: BatteryLevelL"));
@@ -4433,6 +4720,128 @@ void CHWRMTest::BatteryStateL()
 	User::After(KOneSecond);
 	
 	}
+	
+// Pump New Values from MockServer and test the legacy keys
+void CHWRMTest::BatteryStateUnknownErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateUnknownErrorL"));
+     
+    ExpectBatteryStatusNotificationL(EBatteryStatusUnknown);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusUnknown,delay);
+    User::After(KOneSecond);    
+    }
+	
+void CHWRMTest::BatteryStateUnsupportedL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateUnsupportedL"));
+     
+    ExpectBatteryStatusNotificationL(EBatteryStatusUnknown);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusNotSupported,delay);
+    User::After(KOneSecond);    
+    }	
+
+void CHWRMTest::BatteryStateAuthErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateAuthErrorL"));
+    
+    ExpectBatteryStatusNotificationL(EBatteryStatusUnknown);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusDbiAuthFailed,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::BatteryStateStatusOkL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateStatusOkL"));
+        
+    ExpectBatteryStatusNotificationL(EBatteryStatusOk);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusOk,delay);
+    User::After(KOneSecond);    
+    }
+
+void CHWRMTest::BatteryStateStatusLowL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateStatusLowL"));
+    
+    ExpectBatteryStatusNotificationL(EBatteryStatusLow);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusLow,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::BatteryStateStatusEmptyL()
+    {
+    INFO_PRINTF1(_L("Step state: BatteryStateStatusEmptyL"));
+    
+    ExpectBatteryStatusNotificationL(EBatteryStatusEmpty);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMBatteryStatus,EBatteryStatusEmpty,delay);
+    User::After(KOneSecond);
+    }	
+			
+// Pump New Values from MockServer and test the extended keys
+void CHWRMTest::ExtendedBatteryStateUnknownErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateUnknownErrorL"));
+     
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusUnknown);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusUnknown,delay);
+    User::After(KOneSecond);    
+    }
+
+void CHWRMTest::ExtendedBatteryStateUnsupportedL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateUnsupportedL"));
+     
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusNotSupported);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusNotSupported,delay);
+    User::After(KOneSecond);    
+    }
+	
+void CHWRMTest::ExtendedBatteryStateAuthErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateAuthErrorL"));
+    
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusDbiAuthFailed);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusDbiAuthFailed,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ExtendedBatteryStateStatusOkL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateStatusOkL"));
+        
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusOk);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusOk,delay);
+    User::After(KOneSecond);    
+    }
+
+void CHWRMTest::ExtendedBatteryStateStatusLowL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateStatusLowL"));
+    
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusLow);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusLow,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ExtendedBatteryStateStatusEmptyL()
+    {
+    INFO_PRINTF1(_L("Step state: ExtendedBatteryStateStatusEmptyL"));
+    
+    ExpectExtendedBatteryStatusNotificationL(EBatteryStatusEmpty);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMExtendedBatteryStatus,EBatteryStatusEmpty,delay);
+    User::After(KOneSecond);
+    }
 
 void CHWRMTest::ChargingStatusL()
 	{
@@ -4444,6 +4853,127 @@ void CHWRMTest::ChargingStatusL()
 	User::After(KOneSecond);
 	
 	}
+
+void CHWRMTest::ChargingStatusNotConnectedL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusNotConnectedL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusNotConnected);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusNotConnected,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusChargingOkL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusChargingOkL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusCharging);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusCharging,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusNotChargingL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusNotChargingL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusNotCharging);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusNotCharging,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusAlmostCompleteL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusAlmostCompleteL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusAlmostComplete);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusAlmostComplete,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusCompletedChargingL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusCompletedChargingL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusChargingComplete);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusChargingComplete,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusChargingContinuesL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusChargingContinuesL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusChargingContinued);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusChargingContinued,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusErrorL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusError,delay);
+    User::After(KOneSecond);
+    }
+
+// Below API's publishes new Charging States and expects mapped states using the legacy P&S key
+void CHWRMTest::ChargingStatusIllegalErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusIllegalErrorL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusIllegalChargerError,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusUnderVoltageErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusUnderVoltageL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusChargerUnderVoltageError,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusOverVoltageErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusOverVoltageL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusChargerOverVoltageError,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusTooHotErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusTooHotErrorL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusTempTooHotError,delay);
+    User::After(KOneSecond);
+    }
+
+void CHWRMTest::ChargingStatusTooColdErrorL()
+    {
+    INFO_PRINTF1(_L("Step state: ChargingStatusTooColdErrorL"));
+    
+    ExpectedChargingStatusNotificationsL(EChargingStatusError);
+    TInt delay(5);
+    iMockPowerState.CompleteL(KHWRMChargingStatus,EChargingStatusTempTooColdError,delay);
+    User::After(KOneSecond);
+    }
 	
 void CHWRMTest::VibraOpenL()
 	{

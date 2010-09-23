@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -457,44 +457,6 @@ TBool CBearerManager::CheckPolicy(TUid aBearerUid, const RMessage2& aMessage)
 	return ret;
 	}
 
-void CBearerManager::ClientTypeSet(TBool aController)
-	{
-	LOG_FUNC;
-	LOG1(_L("\taController = %x"), aController);
-		
-	/* When a client (session) has its type set (controller or target) then 
-	   it will still have a bearer uid of NullUid. In this case we want to 
-	   update any bearers which now have a controller or target count moving to 1 */
-	const TUint count = iBearerIfs.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		MRemConBearerInterface* const bearerIf = iBearerIfs[ii].iIf;
-		MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
-
-		ASSERT_DEBUG(bearerIf);
-		/* maintain the controller and target count for each bearer 
-		   tell the bearer if the count has increased to 1
-		   by doing this in this loop we are sure we only 
-		   tell the bearer when we need to */
-		if (aController)
-			{
-			iBearerIfs[ii].iControllerCount++;
-			if (1 == iBearerIfs[ii].iControllerCount)
-				{
-				bearerIf->ClientStatus(TBool(iBearerIfs[ii].iControllerCount), TBool(iBearerIfs[ii].iTargetCount));
-				}
-			}
-		else
-			{
-			iBearerIfs[ii].iTargetCount++;
-			if (1 == iBearerIfs[ii].iTargetCount)
-				{
-				bearerIf->ClientStatus(TBool(iBearerIfs[ii].iControllerCount), TBool(iBearerIfs[ii].iTargetCount));
-				}
-			}
-		}
-	}
-
 void CBearerManager::TargetClientAvailable(TRemConClientId aId, const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName)
 	{
 	LOG_FUNC;
@@ -502,14 +464,41 @@ void CBearerManager::TargetClientAvailable(TRemConClientId aId, const TPlayerTyp
 	const TUint count = iBearerIfs.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
+		// maintain the controller and target count for each bearer 
+		// tell the bearer if the count has increased to 1
+		// by doing this in this loop we are sure we only 
+		// tell the bearer when we need to */
+		MRemConBearerInterface* const bearerIf = iBearerIfs[ii].iIf;
+		ASSERT_DEBUG(bearerIf);
+		iBearerIfs[ii].iTargetCount++;
+		if (1 == iBearerIfs[ii].iTargetCount)
+			{
+			bearerIf->ClientStatus(TBool(iBearerIfs[ii].iControllerCount), TBool(iBearerIfs[ii].iTargetCount));
+			}
+		
 		MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
-
 		if(bearerIfV3)
 			{
 			bearerIfV3->ClientAvailable(aId, aClientType, aClientSubType, aName);
 			}
 		}
 	}
+
+void CBearerManager::TargetFeaturesUpdated(TRemConClientId aId, const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName)
+    {
+    LOG_FUNC;
+        
+    const TUint count = iBearerIfs.Count();
+    for ( TUint ii = 0 ; ii < count ; ++ii )
+        {
+        MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
+
+        if(bearerIfV3)
+            {
+            bearerIfV3->TargetFeaturesUpdated(aId, aPlayerType, aPlayerSubType, aName);
+            }
+        }
+    }
 
 void CBearerManager::ControllerClientAvailable()
 	{
@@ -519,11 +508,24 @@ void CBearerManager::ControllerClientAvailable()
 	TInt err = iServer.ControllerSupportedInterfaces(supportedInterfaces);
 	LOG2(_L("\tGot %d supported interfaces with result %d"), supportedInterfaces.Count(), err);
 	
-	if(!err)
+	const TUint count = iBearerIfs.Count();
+	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		const TUint count = iBearerIfs.Count();
-		for ( TUint ii = 0 ; ii < count ; ++ii )
+		// maintain the controller and target count for each bearer 
+		// tell the bearer if the count has increased to 1
+		// by doing this in this loop we are sure we only 
+		// tell the bearer when we need to
+		MRemConBearerInterface* const bearerIf = iBearerIfs[ii].iIf;
+		ASSERT_DEBUG(bearerIf);
+		iBearerIfs[ii].iControllerCount++;
+		if (1 == iBearerIfs[ii].iControllerCount)
 			{
+			bearerIf->ClientStatus(TBool(iBearerIfs[ii].iControllerCount), TBool(iBearerIfs[ii].iTargetCount));
+			}
+
+		if(!err)
+			{
+			// If we know what the supported interface are we can tell the bearer
 			MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
 
 			if(bearerIfV3)
@@ -531,9 +533,9 @@ void CBearerManager::ControllerClientAvailable()
 				bearerIfV3->ControllerFeaturesUpdated(supportedInterfaces);
 				}
 			}
-		
-		supportedInterfaces.Close();
 		}
+	
+	supportedInterfaces.Close();
 	}
 
 void CBearerManager::ClientConnectionOriented(TUid aUid)
@@ -545,12 +547,11 @@ void CBearerManager::ClientConnectionOriented(TUid aUid)
 		{
 		MRemConBearerInterface* const bearerIf = iBearerIfs[ii].iIf;
 		ASSERT_DEBUG(bearerIf);
-		/* maintain the controller and target count for each bearer 
-		   target count won't change for this
-		   Controller won't change if we are the bearer being targetted by the controller
-		   it will go down if we're not.
-		   Tell the bearer if the controller count has decreased to zero
-		*/
+		// maintain the controller and target count for each bearer 
+		// target count won't change for this
+		// Controller won't change if we are the bearer being targetted by the controller
+		// it will go down if we're not.
+		// Tell the bearer if the controller count has decreased to zero
 		if (aUid != iBearerIfs[ii].iBearerUid)
 			{
 			iBearerIfs[ii].iControllerCount--;
@@ -577,13 +578,12 @@ void CBearerManager::ClientConnectionless(TUid aUid)
 		MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
 		ASSERT_DEBUG(bearerIf);
 
-		/* maintain the controller and target count for each bearer 
-		   target count won't change for this
-		   Controller won't change if we were the bearer being targetted by the controller
-		   it will go up if we're not.
-		   tell the bearer if the controller count has increased to 1 and provide
-		   it with the current feature list.	   
-		*/
+		// maintain the controller and target count for each bearer 
+		// target count won't change for this
+		// Controller won't change if we were the bearer being targetted by the controller
+		// it will go up if we're not.
+		// tell the bearer if the controller count has increased to 1 and provide
+		// it with the current feature list.	   
 		if (aUid != iBearerIfs[ii].iBearerUid)
 			{
 			iBearerIfs[ii].iControllerCount++;
@@ -621,21 +621,18 @@ void CBearerManager::ClientClosed(TBool aController, TUid aUid, TRemConClientId 
 		MRemConBearerInterface* const bearerIf = iBearerIfs[ii].iIf;
 		MRemConBearerInterfaceV3* const bearerIfV3 = iBearerIfs[ii].iIfV3;
 		ASSERT_DEBUG(bearerIf);
-		/* maintain the controller and target count for each bearer 
-		   the target count may change for this
-		   Controller won't change if we were the bearer being targetted by the controller
-		   it will go up if we're not.
-		   
-		*/
+		// maintain the controller and target count for each bearer 
+		// the target count may change for this
+		// Controller won't change if we were the bearer being targetted by the controller
+		// it will go up if we're not.
 		if (aController)
 			{
-			/* so if the aUid is not null then the closed session affects only
-			   the bearer it was pointing at. If the uid is NULL then its affecting
-			   all bearers
-			   tell the bearer if controller or target count has reached zero.
-			   If there are controllers left then let the bearer know the current
-			   feature set.
-			 */
+			// so if the aUid is not null then the closed session affects only
+			// the bearer it was pointing at. If the uid is NULL then its affecting
+			// all bearers
+			// tell the bearer if controller or target count has reached zero.
+			// If there are controllers left then let the bearer know the current
+			// feature set.
 			if ((aUid == iBearerIfs[ii].iBearerUid) || (KNullUid == aUid))
 				{
 				iBearerIfs[ii].iControllerCount--;
@@ -926,7 +923,7 @@ void CBearerManager::MrcboDoDisconnectIndicate(const TRemConAddress& aAddr)
 	LOG_FUNC;
 	
 	// Just call the handler for removed connections.
-	iServer.RemoveConnection(aAddr);
+	iServer.RemoveConnection(aAddr, KErrNone);
 	}
 
 TInt CBearerManager::MrcboDoConnectConfirm(const TRemConAddress& aAddr, TInt aError)
@@ -958,17 +955,7 @@ void CBearerManager::MrcboDoDisconnectConfirm(const TRemConAddress& aAddr, TInt 
 	if ( aError == KErrNone )
 		{
 		// Remove connection and complete notifications.
-		iServer.RemoveConnection(aAddr);
-		}
-
-	// Complete the specific request(s) that caused a DisconnectRequest on the 
-	// bearer. Tell all sessions- they remember the address they wanted to 
-	// connect to, and will filter on the address we give them.
-	const TUint count = iServer.Sessions().Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		ASSERT_DEBUG(iServer.Sessions()[ii]);
-		iServer.Sessions()[ii]->CompleteDisconnect(aAddr, aError);
+		iServer.RemoveConnection(aAddr, aError);
 		}
 	}
 

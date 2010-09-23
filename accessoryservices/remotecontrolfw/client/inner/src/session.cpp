@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -81,42 +81,23 @@ RRemCon::RRemCon(TRemConClientType aClientType)
 	LOG_FUNC
 	}
 
-EXPORT_C TVersion RRemCon::Version() const
-	{
-	LOG_FUNC
-	return(TVersion(	KRemConSrvMajorVersionNumber,
-						KRemConSrvMinorVersionNumber,
-						KRemConSrvBuildNumber
-					)
-			);
-	}
-
 EXPORT_C TInt RRemCon::Connect()
 	{
 	LOG_FUNC
 
 	TInt err = DoConnect();
-	if ( err == KErrNone )
-		{
-		err = SetClientType();
-		if ( err != KErrNone )
-			{
-			// For this API to be clean, we must clean up the session handle 
-			// already successfully created.
-			Close();
-			}
-		}
+
 	return err;
 	}
 
-EXPORT_C TInt RRemCon::Connect(const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName)
+EXPORT_C TInt RRemCon::Connect(const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName)
 	{
 	LOG_FUNC
 
 	TInt err = DoConnect();
 	if ( err == KErrNone )	
 		{
-		err = SetClientType(aClientType,aClientSubType,aName);
+		err = SetPlayerType(aPlayerType,aPlayerSubType,aName);
 		if ( err != KErrNone )
 			{
 			// For this API to be clean, we must clean up the session handle 
@@ -167,23 +148,16 @@ Does IPC with the server to set the type of the session from our member (set
 at construction time).
 @return Error.
 */
-TInt RRemCon::SetClientType()
-	{
-	LOG_FUNC
-	return SendReceive(ERemConSetClientType, TIpcArgs(iClientType));
-	}
-
-TInt RRemCon::SetClientType(const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName)
+TInt RRemCon::SetPlayerType(const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName)
 	{
 	LOG_FUNC
 	TIpcArgs args;
-	args.Set(0,iClientType);
-	iPlayerTypePckg().iPlayerType = aClientType;
-	iPlayerTypePckg().iPlayerSubType = aClientSubType;
+	// Message slot 0 is not currently used
+	iPlayerTypePckg().iPlayerType = aPlayerType;
+	iPlayerTypePckg().iPlayerSubType = aPlayerSubType;
 	args.Set(1,&iPlayerTypePckg);
-	args.Set(2,aName.Length());
-	args.Set(3, &aName);
-	return SendReceive(ERemConSetClientType, args);
+	args.Set(2, &aName);
+	return SendReceive(ERemConSetPlayerType, args);
 	}
 
 EXPORT_C TInt RRemCon::SendUnreliable(TUid aInterfaceUid, 
@@ -198,7 +172,7 @@ EXPORT_C TInt RRemCon::SendUnreliable(TUid aInterfaceUid,
 	
 	args.Set(0, aInterfaceUid.iUid);
 	args.Set(1, &iOpInfoPckg);
-	args.Set(2, &aData);
+	args.Set(3, &aData);
 	TInt err = SendReceive(ERemConSendUnreliable, args); 
 	return err;
 	}
@@ -495,9 +469,29 @@ EXPORT_C TInt RRemConController::DisconnectBearerCancel()
 	return KErrNone;
 	}
 
+TVersion RRemConController::Version() const
+	{
+	LOG_FUNC
+	return(TVersion(	KRemConSrvMajorVersionNumber,
+						KRemConSrvMinorVersionNumber,
+						KRemConSrvControllerSession
+					)
+			);
+	}
+
 EXPORT_C RRemConTarget::RRemConTarget()
 :	RRemCon(ERemConClientTypeTarget)
 	{
 	LOG_FUNC
+	}
+
+TVersion RRemConTarget::Version() const
+	{
+	LOG_FUNC
+	return(TVersion(	KRemConSrvMajorVersionNumber,
+						KRemConSrvMinorVersionNumber,
+						KRemConSrvTargetSession
+					)
+			);
 	}
 

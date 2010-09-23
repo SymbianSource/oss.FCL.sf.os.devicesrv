@@ -20,8 +20,8 @@
 #define CASYMAINSERVICEBASE_H
 
 // INCLUDES
-#include "asyproxytypes.h"
-#include <asycmdtypes.h>
+#include "AsyProxyTypes.h"
+#include <AsyCmdTypes.h>
 #include <e32std.h>
 #include <e32base.h>
 #include <ecom/ecom.h>

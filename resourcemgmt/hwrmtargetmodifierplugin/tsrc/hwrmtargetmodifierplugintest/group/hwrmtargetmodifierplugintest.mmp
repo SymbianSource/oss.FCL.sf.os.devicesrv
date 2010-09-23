@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:  ?Description
-*  %version:  bh1dsgas#5 %, % date_modified: % by %derived_by: sarakuma %
+*  %version:  bh1dsgas#6 %, % date_modified: % by %derived_by: deepmish %
 *
 */
 
@@ -36,6 +36,6 @@ OS_LAYER_SYSTEMINCLUDE
 
 LIBRARY     euser.lib
 LIBRARY     ecom.lib
-LIBRARY     stiftestinterface.lib
+LIBRARY     StifTestInterface.lib
 
 SMPSAFE

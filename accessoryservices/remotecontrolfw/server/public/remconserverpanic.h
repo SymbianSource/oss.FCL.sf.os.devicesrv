@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -144,6 +144,18 @@ enum TRemConClientPanic
 	The client is paniced for misusing this API.
 	*/
 	ERemConClientPanicRegisterInterestedOperationsInNonTargetSession	= 16,
+	
+	/** The client has not had their features set. */
+	ERemConClientPanicClientFeaturesNotSet								= 17,
+
+	/** The client has tried to register the same interface in multiple sessions. */
+	ERemConClientPanicClientInterfaceAlreadyRegistered					= 18,
+
+	/** The client has tried to register different player information in multiple sessions. 
+	 For example, this can happen if an application directly using the RemCon client side interfaces 
+	 also uses another component that itself uses the RemCon client interfaces, such as Qt Key Capture.
+	 */
+	ERemConClientPanicPlayerInfoAlreadySet								= 19,
 	};
 
 #endif // REMCONSERVERPANIC_H

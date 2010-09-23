@@ -170,7 +170,7 @@ START_TESTCASE DEVSRVS-HWRM-V-0014
 //!@SYMTestActions Attempt to start vibra with duration more than max duration and taking a negative value as duration, both return error in arguments
 //!@SYMTestExpectedResults Pass
 //!@SYMTestType CT
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestVibraOnWithDurationOutOfRangeL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestVibraOnWithDurationOutOfRangeL
 END_TESTCASE DEVSRVS-HWRM-V-0014
 
 START_TESTCASE DEVSRVS-HWRM-V-0015

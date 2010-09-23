@@ -24,6 +24,8 @@
 
 #include <e32base.h>
 #include <e32def.h>
+#include <AccessoryServer.h>
+#include <AccessoryControl.h>
 #include "tvoutconfig.h"
 #include "tvoutstubeventsender.h"
 
@@ -113,6 +115,9 @@ struct STvOutConfigSharedData
     
     TTvSettings iTvSettings;
     
+		TBool iCVideoConnected;
+		TInt iPreviousEvent;
+    
     // Let the following two be the last fields. It is used to 
     // check compatibility between creator of this chunk (structure)
     // and other users
@@ -120,8 +125,7 @@ struct STvOutConfigSharedData
         {
         TUint iSizeOfThisStruct;
         TUint8   iTag[ 10 ];
-        } iBinaryProtection;
-    
+        } iBinaryProtection;    
     };
 
 /**
@@ -186,6 +190,7 @@ class CTvOutConfigImp : public CTvOutConfig,
     private:
 
 		void EventHdmiCableConnect( const TInt aArg );
+		void EventAnalogCableConnect( const TInt aArg );
 
 	    void EventCopyProtectionStatus( const TInt aArg );
 	    
@@ -252,7 +257,21 @@ class CTvOutConfigImp : public CTvOutConfig,
 		RArray<TSupportedHdmiDviMode> iAllDviMode;
 		RArray<TSupportedHdmiDviMode> iSupportedMode;
 		
-    };
+	    /** Accessory server client */
+	    RAccessoryServer iAccServer;
+	    
+	    /** Accessory control */
+	    RAccessoryControl iAccControl;
+		
+	    /** C-Video accessory generic ID */
+	    TAccPolGenericID iCVideoGenericID;
+		
+		/**
+		 * Cable connection status listener
+		 *
+		 */
+		CTVOutStubEventListener* iAnalogCableConnectStatusListener;
+	};
 
 #endif //__TVOUTCONFIGIMP_H__
 

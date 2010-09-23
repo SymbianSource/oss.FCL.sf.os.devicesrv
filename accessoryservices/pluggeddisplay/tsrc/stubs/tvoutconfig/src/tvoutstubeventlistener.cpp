@@ -18,6 +18,7 @@
 #include "tvoutconfigstatuscontrol.h"
 #include "tvoutstubeventlistener.h"
 #include "tvoutstubeventsender.h"
+#include "trace.h"
 
 // ======== MEMBER FUNCTIONS ========
 
@@ -27,7 +28,7 @@
 //
 CTVOutStubEventListener::CTVOutStubEventListener( MTVOutStubEventSender& aSender )
   : CActive( EPriorityStandard ),
-    iSender( aSender )
+    iSender( aSender ), iPreviousValue(-1)
     {
     CActiveScheduler::Add( this );
     }
@@ -97,7 +98,21 @@ void CTVOutStubEventListener::RunL()
 
         if ( errorCode == KErrNone )
             {
-            iSender.SendEvent( iCategory, iKey, value );
+            	RProcess process;
+            	
+            	INFO_3("**EVENT received for 0x%x PREV=%d CURR=%d", (TUint32)process.SecureId(), iPreviousValue, value );
+            if( (iKey == KTVOutStatusControlCableConnect) || (iKey == KTVOutStatusControlAnalogCableConnect) )
+            	  {
+            	  	if( iPreviousValue != value )
+            	  		{
+            				iSender.SendEvent( iCategory, iKey, value );
+            			  }
+            	  }
+            else
+            	{
+            		iSender.SendEvent( iCategory, iKey, value );
+            	}
+            iPreviousValue = value;
             }
         }
 

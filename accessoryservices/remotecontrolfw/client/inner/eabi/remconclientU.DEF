@@ -38,5 +38,3 @@ EXPORTS
 	_ZN7RRemCon7ConnectEv @ 37 NONAME
 	_ZN7RRemCon7ReceiveER14TRequestStatusR27TRemConClientReceivePackageR5TDes8 @ 38 NONAME
 	_ZNK11RRemConBulk7VersionEv @ 39 NONAME
-	_ZNK7RRemCon7VersionEv @ 40 NONAME
-

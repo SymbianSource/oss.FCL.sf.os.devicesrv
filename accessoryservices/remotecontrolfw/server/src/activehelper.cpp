@@ -22,13 +22,13 @@
 
 #include <bluetooth/logger.h>
 #include "activehelper.h"
-#include "session.h"
+#include "controllersession.h"
 
 #ifdef __FLOG_ACTIVE
 _LIT8(KLogComponent, LOG_COMPONENT_REMCON_SERVER);
 #endif
 
-CActiveHelper::CActiveHelper(CRemConSession &aSession) : 
+CActiveHelper::CActiveHelper(CRemConControllerSession &aSession) : 
 	CActive(CActive::EPriorityStandard),
 	iSession(aSession)
 	{

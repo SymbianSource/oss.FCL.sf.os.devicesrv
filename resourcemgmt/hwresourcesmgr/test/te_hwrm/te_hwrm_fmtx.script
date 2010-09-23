@@ -401,7 +401,7 @@ START_TESTCASE DEVSRVS-HWRM-F-0035
 //!@SYMTestActions Open a FmTx session, enable,  set Audio Routing ON, set Audio Routing OFF, check that the power save state changes after the max period of innactivity is reached, and check the power save state after the accessory is connected.
 //!@SYMTestExpectedResults Pass
 //!@SYMTestType CT
-RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestFmTxPowerSaveOnInactivityStateL
+RUN_TEST_STEP 200 te_hwrm TEFUnit.CHWRMTest.TestFmTxPowerSaveOnInactivityStateL
 END_TESTCASE DEVSRVS-HWRM-F-0035
 
 START_TESTCASE DEVSRVS-HWRM-F-0036

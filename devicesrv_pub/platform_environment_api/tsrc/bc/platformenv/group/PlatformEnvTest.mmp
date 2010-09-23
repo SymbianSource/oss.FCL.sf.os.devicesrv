@@ -44,7 +44,7 @@ OS_LAYER_SYSTEMINCLUDE
 
 LIBRARY         euser.lib
 LIBRARY         efsrv.lib
-LIBRARY         stiftestinterface.lib
+LIBRARY         StifTestInterface.lib
 LIBRARY         PlatformEnv.lib
 LANG            SC
 

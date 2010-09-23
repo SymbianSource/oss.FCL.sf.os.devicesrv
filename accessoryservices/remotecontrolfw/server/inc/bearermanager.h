@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -72,13 +72,12 @@ public:
 	immediately. */
 	TInt Send(CRemConMessage& aMsg);
 	
-	/** called by the server when a client has set its type (controller/target)
-	calls back to server to see whether it needs to inform each bearer in turn */
-	void ClientTypeSet(TBool aController);
-	
 	/** called by the server when a target client has registered its available
 	interfaces and is ready to be used by a remote. */
 	void TargetClientAvailable(TRemConClientId aId, const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName);
+	
+	/** called by the server when a target client has updated its available interfaces*/
+	void TargetFeaturesUpdated(TRemConClientId aId, const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName);
 	
 	/** Called by the server when a controller client has registered its 
 	available interfaces.  

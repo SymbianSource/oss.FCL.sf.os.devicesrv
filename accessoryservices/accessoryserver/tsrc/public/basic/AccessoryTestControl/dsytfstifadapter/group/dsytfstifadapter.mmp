@@ -47,7 +47,7 @@ OS_LAYER_SYSTEMINCLUDE
 // Dependencies to system components
 LIBRARY         euser.lib
 LIBRARY         dsytfcore.lib
-LIBRARY         stiftestinterface.lib
+LIBRARY         StifTestInterface.lib
 
 //MACRO           COMPONENT_TRACE_FLAG
 

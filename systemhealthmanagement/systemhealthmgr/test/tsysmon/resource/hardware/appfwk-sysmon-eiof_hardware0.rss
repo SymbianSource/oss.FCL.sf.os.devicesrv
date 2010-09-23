@@ -18,8 +18,6 @@
 
 #include <ssm/ssmcmd.rh>
 #include <ssm/ssmsubstates.hrh>
-#include <ssm/cmdpersistreboots.rh>
-#include <ssm/cmdpersistreboots.hrh>
 #include "ssmsubstateext.hrh"
 
 UID2 KUidSsmCommandListResourceFile

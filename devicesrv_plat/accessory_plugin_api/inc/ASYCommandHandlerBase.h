@@ -20,12 +20,12 @@
 #define CASYCOMMANDHANDLERBASE_H
 
 //  INCLUDES
-#include <asycmdtypes.h>
+#include <AsyCmdTypes.h>
 #include <e32std.h>
 #include <e32base.h>
 #include <ecom/ecom.h>
-#include <accessorytypes.h>
-#include <asymainservicebase.h>
+#include <AccessoryTypes.h>
+#include <AsyMainServiceBase.h>
 
 // CONSTANTS
 

@@ -85,7 +85,9 @@ namespace HWRMPowerCommand
         EBatteryChargerUnKnown = 0, 
         EBatteryChargerDedicated = 1, 
         EBatteryChargerUsbDedicated = 2,
-        EBatteryChargerUsbHost = 3 
+        EBatteryChargerUsbHost = 3,
+        EBatteryChargerUsbHispeedHost = 4,
+        EBatteryChargerUsbAca = 5,
         };
 
     struct TBatteryChargerTypeData

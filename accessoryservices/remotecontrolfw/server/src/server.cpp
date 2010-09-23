@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,7 +26,9 @@
 #include <remcon/remconbearerinterface.h>
 #include <remcon/remconbearerbulkinterface.h>
 #include "server.h"
-#include "session.h"
+#include "targetclientprocess.h"
+#include "controllersession.h"
+#include "targetsession.h"
 #include "serversecuritypolicy.h"
 #include "utils.h"
 #include "bearermanager.h"
@@ -44,7 +46,8 @@ _LIT8(KLogComponent, LOG_COMPONENT_REMCON_SERVER);
 PANICCATEGORY("server");
 
 #ifdef __FLOG_ACTIVE
-#define LOGSESSIONS							LogSessions()
+#define LOGCONTROLLERSESSIONS				LogControllerSessions()
+#define LOGTARGETSESSIONS					LogTargetSessions()
 #define LOGREMOTES							LogRemotes()
 #define LOGCONNECTIONHISTORYANDINTEREST		LogConnectionHistoryAndInterest()
 #define LOGOUTGOINGCMDPENDINGTSP			LogOutgoingCmdPendingTsp()
@@ -58,7 +61,8 @@ PANICCATEGORY("server");
 #define LOGINCOMINGPENDINGDELIVERY			LogIncomingPendingDelivery()
 #define LOGINCOMINGDELIVERED				LogIncomingDelivered()
 #else
-#define LOGSESSIONS
+#define LOGCONTROLLERSESSIONS
+#define LOGTARGETSESSIONS
 #define LOGREMOTES
 #define LOGCONNECTIONHISTORYANDINTEREST
 #define LOGOUTGOINGCMDPENDINGTSP
@@ -74,6 +78,20 @@ PANICCATEGORY("server");
 #endif // __FLOG_ACTIVE
 
 TInt BulkMain(TAny* aParam);
+TBool ControllerSessionCompare(const TUint* aSessionId, const CRemConControllerSession& aSession)
+	{
+	return *aSessionId == aSession.Id();
+	}
+
+TBool TargetClientCompareUsingSessionId(const TUint* aClientId, const CRemConTargetClientProcess& aClient)
+	{
+	return *aClientId == aClient.Id();
+	}
+
+TBool TargetClientCompareUsingProcessId(const TProcessId* aProcessId, const CRemConTargetClientProcess& aClient)
+	{
+	return *aProcessId == aClient.ClientInfo().ProcessId();
+	}
 
 CRemConServer* CRemConServer::NewLC()
 	{
@@ -97,9 +115,11 @@ CRemConServer::~CRemConServer()
 	// There should be no watcher as there should be no bulk thread running
 	ASSERT_DEBUG(!iBulkThreadWatcher);
 
-	iSessionsLock.Wait();
-	iSessions.Close();
-	iSessionsLock.Close();
+	iControllerSessions.Close();
+
+	iTargetClientsLock.Wait();
+	iTargetClients.Close();
+	iTargetClientsLock.Close();
 
 	// Destroy TSP before iIncomingPendingAddress in case the TSP is 
 	// addressing a message on it at the time.
@@ -178,7 +198,7 @@ void CRemConServer::ConstructL()
 	LOG_FUNC;
 	// Open ECOM session.
 	iEcom = &(REComSession::OpenL());
-	LEAVEIFERRORL(iSessionsLock.CreateLocal());
+	LEAVEIFERRORL(iTargetClientsLock.CreateLocal());
 
 	iShutdownTimer = CPeriodic::NewL(CActive::EPriorityStandard);
 
@@ -230,29 +250,35 @@ CSession2* CRemConServer::NewSessionL(const TVersion& aVersion,
 	LOG3(_L("\taVersion = (%d,%d,%d)"), aVersion.iMajor, aVersion.iMinor, aVersion.iBuild);
 		
 	// Version number check...
-	TVersion v(KRemConSrvMajorVersionNumber,
-		KRemConSrvMinorVersionNumber,
-		KRemConSrvBuildNumber);
-
-	if ( !User::QueryVersionSupported(v, aVersion) )
+	if ( aVersion.iMajor != KRemConSrvMajorVersionNumber || aVersion.iMinor != KRemConSrvMinorVersionNumber )
 		{
 		LEAVEIFERRORL(KErrNotSupported);
 		}
 
+	// We need a non-const copy of ourself so that:
+	// (a) New target clients may be added to iTargetClients (controller sessions are added to 
+	// iControllerSessions when ControllerClientOpened() is invoked).
+	// (b) We may provide new sessions/clients with a non-const pointer to ourself.
 	CRemConServer* ncThis = const_cast<CRemConServer*>(this);
-	
+
 	CRemConSession* sess = NULL;
 	ASSERT_DEBUG(iBearerManager);
-	TRAPD(err, sess = CRemConSession::NewL(*ncThis, 
-				*iBearerManager, 
-				aMessage, 
-				(ncThis->iSessionId)++)
-			);
-	if ( err != KErrNone )
+
+	TInt err = KErrNotSupported;	
+	if (aVersion.iBuild == KRemConSrvControllerSession)
+		{
+		TRAP(err, sess = ncThis->CreateControllerSessionL(aMessage));
+		}
+	else if(aVersion.iBuild == KRemConSrvTargetSession)
+		{
+		TRAP(err, sess = ncThis->CreateTargetSessionL(aMessage));
+		}
+	
+	if ( err != KErrNone)
 		{
 		// Session creation might have failed- if it has we need to check if 
 		// we need to shut down again.
-		const_cast<CRemConServer*>(this)->StartShutdownTimerIfNoSessionsOrBulkThread();
+		const_cast<CRemConServer*>(this)->StartShutdownTimerIfNoClientsOrBulkThread();
 		LEAVEIFERRORL(err);
 		}
 
@@ -260,11 +286,85 @@ CSession2* CRemConServer::NewSessionL(const TVersion& aVersion,
 	return sess;
 	}
 
-void CRemConServer::StartShutdownTimerIfNoSessionsOrBulkThread()
+CRemConControllerSession* CRemConServer::CreateControllerSessionL(const RMessage2& aMessage)
 	{
 	LOG_FUNC;
-	iSessionsLock.Wait();
-	if ( iSessions.Count() == 0 && !iBulkThreadOpen)
+
+	CRemConControllerSession* sess=NULL;
+
+	// Obtain client process ID.
+	TClientInfo clientInfo;
+	ClientProcessAndSecureIdL(clientInfo, aMessage);
+
+	// Create the session and return
+	sess = CRemConControllerSession::NewL(*this, *iBearerManager, clientInfo, iSessionOrClientId++);
+	return sess;
+	}
+
+CRemConTargetSession* CRemConServer::CreateTargetSessionL(const RMessage2& aMessage)
+	{
+	LOG_FUNC;
+
+	CRemConTargetSession* sess=NULL;
+	
+	// Obtain client process ID and search for clients server-side process representation.
+	TClientInfo clientInfo;
+	ClientProcessAndSecureIdL(clientInfo, aMessage);
+
+	// We search for the client ourselves here as we need to know where it
+	// is in the array if we end up needing to destroy it.
+	iTargetClientsLock.Wait();	
+	CleanupSignalPushL(iTargetClientsLock);
+
+	TInt clientIndex = iTargetClients.Find(clientInfo.ProcessId(), TargetClientCompareUsingProcessId);
+
+	if (clientIndex == KErrNotFound)
+		{
+		// Client is new, create process representation for client and add to iTargetClients 
+		CRemConTargetClientProcess* newClient = CRemConTargetClientProcess::NewLC(clientInfo, iSessionOrClientId++, *this, *iBearerManager);
+
+		iTargetClients.AppendL(newClient);
+
+		// Set clientIndex to point to the new client.
+		clientIndex = iTargetClients.Count()-1;
+
+		CleanupStack::Pop(newClient);
+		}
+
+	// Create session on client and return.
+	// On error, remove the clients process representation if client has no other sessions.
+	TRAPD(err, sess = iTargetClients[clientIndex]->NewSessionL(iSessionOrClientId++));
+	if (err)
+		{
+		TryToDropClientProcess(clientIndex);
+		LEAVEL(err);
+		}
+
+	CleanupStack::PopAndDestroy(&iTargetClientsLock);
+
+	return sess;
+	}
+
+void CRemConServer::ClientProcessAndSecureIdL(TClientInfo& aClientInfo, const RMessage2& aMessage) const
+	{
+	LOG_FUNC;
+
+	RThread thread;
+	LEAVEIFERRORL(aMessage.Client(thread));
+	CleanupClosePushL(thread);
+	RProcess process;
+	LEAVEIFERRORL(thread.Process(process));
+	aClientInfo.ProcessId() = process.Id();
+	process.Close();
+	aClientInfo.SecureId() = thread.SecureId();
+	CleanupStack::PopAndDestroy(&thread);
+	}
+
+void CRemConServer::StartShutdownTimerIfNoClientsOrBulkThread()
+	{
+	LOG_FUNC;
+	iTargetClientsLock.Wait();
+	if ( iControllerSessions.Count() == 0 && iTargetClients.Count() == 0 && !iBulkThreadOpen)
 		{
 		LOG(_L("\tno remaining sessions- starting shutdown timer"));
 		// Should have been created during our construction.
@@ -291,12 +391,37 @@ void CRemConServer::StartShutdownTimerIfNoSessionsOrBulkThread()
 			LOG(_L("\tshutdown timer was already active"));
 			}
 		}
-	iSessionsLock.Signal();
+	iTargetClientsLock.Signal();
+	}
+
+void CRemConServer::CancelShutdownTimer()
+	{
+	// Should have been created during our construction.		
+	ASSERT_DEBUG(iShutdownTimer);
+	iShutdownTimer->Cancel();
+	}
+
+void CRemConServer::TryToDropClientProcess(TUint aClientIndex)
+	{
+	ASSERT_DEBUG(iTargetClients.Count() > aClientIndex);
+	
+	iTargetClientsLock.Wait();
+	
+	CRemConTargetClientProcess* client = iTargetClients[aClientIndex]; 
+	if (client->TargetSessionCount() == 0)
+		{
+		// No sessions held by this client process representation, OK to destroy.
+		// The destructor of CRemConTargetClientProcess will call back to us, after which we will
+		// handle the client close.
+		delete client;
+		}
+	
+	iTargetClientsLock.Signal();
 	}
 
 TInt CRemConServer::TimerFired(TAny* aThis)
 	{
-	LOG_STATIC_FUNC
+	LOG_STATIC_FUNC;
 	static_cast<void>(aThis);
 	
 #if defined(__FLOG_ACTIVE) || defined(_DEBUG)
@@ -316,7 +441,7 @@ TInt CRemConServer::TimerFired(TAny* aThis)
 
 void CRemConServer::InitialiseBulkServerThreadL()
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	// Set up the configuration of the thread
 	iBulkServerThread.SetPriority(EPriorityLess);
 	
@@ -361,7 +486,7 @@ void CRemConServer::InitialiseBulkServerThreadL()
 
 TInt CRemConServer::BulkServerRequired()
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	// If the bulk server is required then try to create it
 	TThreadFunction bulkServerThreadFunction(BulkMain);
 	_LIT(KBulkServerThreadName, "RemConBulkServerThread");
@@ -383,17 +508,16 @@ TInt CRemConServer::BulkServerRequired()
 	return err;
 	}
 
-TInt CRemConServer::ClientOpened(CRemConSession& aSession)
+TInt CRemConServer::ControllerClientOpened(CRemConControllerSession& aSession)
 	{
 	LOG_FUNC;
 	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 
 	// Register the session by appending it to our array, and also making an 
 	// item for it in the record of which points in the connection history 
 	// sessions are interested in.
-	iSessionsLock.Wait();
-	TInt ret = iSessions.Append(&aSession);
+	TInt ret = iControllerSessions.Append(&aSession);
 	if ( ret == KErrNone )
 		{
 		TSessionPointerToConnectionHistory item;
@@ -402,10 +526,9 @@ TInt CRemConServer::ClientOpened(CRemConSession& aSession)
 		ret = iSession2ConnHistory.Append(item);
 		if ( ret != KErrNone )
 			{
-			iSessions.Remove(iSessions.Count() - 1);
+			iControllerSessions.Remove(iControllerSessions.Count() - 1);
 			}
 		}
-	iSessionsLock.Signal();
 
 	if ( ret == KErrNone )
 		{
@@ -414,71 +537,74 @@ TInt CRemConServer::ClientOpened(CRemConSession& aSession)
 		iShutdownTimer->Cancel();
 		}
 
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 	LOG1(_L("\tret = %d"), ret);
 	return ret;
 	}
 
-// this function is called by the session when the session type is set
-void CRemConServer::ClientTypeSet(CRemConSession& aSession)
+TInt CRemConServer::RegisterTargetSessionPointerToConnHistory(const CRemConTargetSession& aSession)
 	{
 	LOG_FUNC;
-	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
 
-	/* When a client (session) has its type set (controller or target) then 
-	   it will still have a bearer uid of NullUid. In this case we want to 
-	   update any bearers which now have a controller or target count moving 
-	   (from 0) to 1. */
+	TSessionPointerToConnectionHistory item;
+	item.iSessionId = aSession.Id();
+	item.iIndex = 0; // there is always at least one item in the connection history
+	TInt ret = iSession2ConnHistory.Append(item);
 
-	/* tell the bearer manager that someones set a client type
-	   The bearer manager maintains controller and target counts for all bearers
-	   and will tell bearers when they need to know things have changed */
-	ASSERT_DEBUG(iBearerManager);
-	iBearerManager->ClientTypeSet(aSession.Type() == ERemConClientTypeController);
-
-	LOGSESSIONS;
+	return ret;
 	}
 
-// this function is called by the session when the client has registered its features
-void CRemConServer::TargetClientAvailable(CRemConSession& aSession)
+
+// this function is called by the client when it has registered its features
+void CRemConServer::TargetClientAvailable(const CRemConTargetClientProcess& aClient)
 	{
 	LOG_FUNC;
-	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
+	LOG1(_L("\t&aClient = 0x%08x"), &aClient);
+	LOGTARGETSESSIONS;
 
 	ASSERT_DEBUG(iBearerManager);
-	iBearerManager->TargetClientAvailable(aSession.Id(), aSession.PlayerType(), aSession.PlayerSubType(), aSession.Name());
+	iBearerManager->TargetClientAvailable(aClient.Id(), aClient.PlayerType(), aClient.PlayerSubType(), aClient.Name());
 	if(iTspIf5)
 		{
-		iTspIf5->TargetClientAvailable(aSession.ClientInfo());
+		iTspIf5->TargetClientAvailable(aClient.ClientInfo());
 		}
 
-	LOGSESSIONS;
+	LOGTARGETSESSIONS;
+	}
+
+void CRemConServer::TargetFeaturesUpdated(CRemConTargetClientProcess& aClient)
+	{
+	LOG_FUNC;
+	LOG1(_L("\t&aClient = 0x%08x"), &aClient);
+	LOGTARGETSESSIONS;
+
+	ASSERT_DEBUG(iBearerManager);
+	iBearerManager->TargetFeaturesUpdated(aClient.Id(), aClient.PlayerType(), aClient.PlayerSubType(), aClient.Name());
+
+	LOGTARGETSESSIONS;
 	}
 
 // this function is called by the session when the client has registered its features
 void CRemConServer::ControllerClientAvailable()
 	{
 	LOG_FUNC;
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 
 	ASSERT_DEBUG(iBearerManager);
 	iBearerManager->ControllerClientAvailable();
 	
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 	}
 
 // this function is called by the session when it goes connection oriented
-void CRemConServer::ClientGoConnectionOriented(CRemConSession& aSession, TUid aUid)
+void CRemConServer::ClientGoConnectionOriented(CRemConControllerSession& aSession, TUid aUid)
 	{
 	LOG_FUNC;
 	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 
-	(void)&aSession; // get rid of unused warning.
-	
-	ASSERT_DEBUG(aSession.Type() == ERemConClientTypeController);
+	(void)&aSession; // get rid of unused warning. We keep the param to enforce usage only
+					 // by controller sessions
 
 	/* now tell the bearer manager that someones went connection oriented
 	   The bearer manager maintains controller and target counts for all bearers
@@ -486,227 +612,306 @@ void CRemConServer::ClientGoConnectionOriented(CRemConSession& aSession, TUid aU
 	ASSERT_DEBUG(iBearerManager);
 	iBearerManager->ClientConnectionOriented(aUid);
 
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 	}
 
 // this is called by the session when the client goes connectionless
-void CRemConServer::ClientGoConnectionless(CRemConSession& aSession, TUid aUid)
+void CRemConServer::ClientGoConnectionless(CRemConControllerSession& aSession, TUid aUid)
 	{
 	LOG_FUNC;
 	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 
-	(void)&aSession; // get rid of unused warning.
-	
-	ASSERT_DEBUG(aSession.Type() == ERemConClientTypeController);
+	(void)&aSession; // get rid of unused warning. We keep the param to enforce usage only
+					 // by controller sessions
+
 	/* now tell the bearer manager that someones went connection less
 	   The bearer manager maintains controller and target counts for all bearers
 	   and will tell bearers when they need to know things have changed */
 	ASSERT_DEBUG(iBearerManager);
 	iBearerManager->ClientConnectionless(aUid);
 
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 	}
 
-// called by session when session is closed.
-void CRemConServer::ClientClosed(CRemConSession& aSession, TUid aUid)
+// called by controller session when closed.
+void CRemConServer::ControllerClientClosed(CRemConControllerSession& aSession, TUid aUid)
 	{
 	LOG_FUNC;
 	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
 
-	iSessionsLock.Wait();
 	// Find this session in the array and remove it (if it's there).
-	const TUint sessCount = iSessions.Count();
-	for ( TUint ii = 0 ; ii < sessCount ; ++ii )
+	TInt index = iControllerSessions.Find(&aSession);
+	if(index >= 0)
 		{
-		if ( iSessions[ii] == &aSession )
+		// We've found the session in our array.
+		// 1. Remove the session from our array.
+		iControllerSessions.Remove(index);
+		
+		// 2. Tell the bearers about the session going away, if it was the 
+		// last controller.
+		// If the session hasn't already set its type, then it doesn't 
+		// count (we won't have told the bearers about it to begin with).
+		// The bearer manager maintains controller and target counts for all bearers
+		// and will tell bearers when they need to know things have changed 
+		if (aSession.ClientAvailable())
 			{
-			// We've found the session in our array.
+			ASSERT_DEBUG(iBearerManager);
+			iBearerManager->ClientClosed(ETrue, aUid, aSession.Id());
+			}
 
-			// 1. Remove the session from our array.
-			iSessions.Remove(ii);
+		// 3. Remove queued messages belonging to this session that: 
+		// (a) are outgoing, awaiting access to the TSP 
+		// (OutgoingPendingTsp, OutgoingNotifyPendingTsp), 
+		// (b) are outgoing, awaiting a bearer connection 
+		// (OutgoingPendingSend), 
+		// (c) have been sent (OutgoingSent)
+		// (d) are pending delivery to this session 
+		// (IncomingPendingDelivery)
 
-			// 2a. Tell the TSP if the session that has gone away is a target
-			if((aSession.Type() == ERemConClientTypeTarget) && iTspIf5)
+		// (3)(a) Outgoing, waiting access to the TSP:
+		TSglQueIter<CRemConMessage>& cmdIter = OutgoingCmdPendingTsp().SetToFirst();
+		CRemConMessage* msg;
+		TBool first = ETrue;
+		while ( ( msg = cmdIter++ ) != NULL )
+			{
+			if ( msg->SessionId() == aSession.Id() )
 				{
-				iTspIf5->TargetClientUnavailable(aSession.ClientInfo());
-				}
-			
-			// 2b. Tell the bearers about the session going away, if it was the 
-			// last controller or last target.
-			// If the session hasn't already set its type, then it doesn't 
-			// count (we won't have told the bearers about it to begin with).
-			// The bearer manager maintains controller and target counts for all bearers
-			// and will tell bearers when they need to know things have changed */
-			if ( aSession.Type() != ERemConClientTypeUndefined )
-				{
-				ASSERT_DEBUG(iBearerManager);
-				iBearerManager->ClientClosed(aSession.Type() == ERemConClientTypeController, aUid, aSession.Id());
-				}
-
-			// 3. Remove queued messages belonging to this session that: 
-			// (a) are outgoing, awaiting access to the TSP 
-			// (OutgoingPendingTsp, OutgoingNotifyPendingTsp), 
-			// (b) are outgoing, awaiting a bearer connection 
-			// (OutgoingPendingSend), 
-			// (c) have been sent (OutgoingSent)
-			// (d) are pending delivery to this session 
-			// (IncomingPendingDelivery)
-			// (e) have been delivered to this session and are awaiting 
-			// responses (IncomingDelivered).
-			TSglQueIter<CRemConMessage>& cmdIter = OutgoingCmdPendingTsp().SetToFirst();
-			CRemConMessage* msg;
-			TBool first = ETrue;
-			while ( ( msg = cmdIter++ ) != NULL )
-				{
-				if ( msg->SessionId() == aSession.Id() )
+				// If the message is currently being worked on by the 
+				// TSP, cancel the TSP before destroying it.
+				if ( iTspHandlingOutgoingCommand && first )
 					{
-					// If the message is currently being worked on by the 
-					// TSP, cancel the TSP before destroying it.
-					if ( iTspHandlingOutgoingCommand && first )
-						{
-						ASSERT_DEBUG(iTspIf);
-						iTspIf->CancelOutgoingCommand();
-						iTspHandlingOutgoingCommand = EFalse;
-						}
-					OutgoingCmdPendingTsp().RemoveAndDestroy(*msg);
+					ASSERT_DEBUG(iTspIf);
+					iTspIf->CancelOutgoingCommand();
+					iTspHandlingOutgoingCommand = EFalse;
 					}
-				first = EFalse;
+				OutgoingCmdPendingTsp().RemoveAndDestroy(*msg);
 				}
-			
-			cmdIter = OutgoingNotifyCmdPendingTsp().SetToFirst();
-			first = ETrue;
-			while ( ( msg = cmdIter++ ) != NULL )
+			first = EFalse;
+			}
+		
+		cmdIter = OutgoingNotifyCmdPendingTsp().SetToFirst();
+		first = ETrue;
+		while ( ( msg = cmdIter++ ) != NULL )
+			{
+			if ( msg->SessionId() == aSession.Id() )
 				{
-				if ( msg->SessionId() == aSession.Id() )
+				// If the message is currently being worked on by the 
+				// TSP, cancel the TSP before destroying it.
+				if ( iTspHandlingOutgoingNotifyCommand && first )
 					{
-					// If the message is currently being worked on by the 
-					// TSP, cancel the TSP before destroying it.
-					if ( iTspHandlingOutgoingNotifyCommand && first )
-						{
-						ASSERT_DEBUG(iTspIf3);
-						iTspIf3->CancelOutgoingNotifyCommand();
-						iTspHandlingOutgoingNotifyCommand = EFalse;
-						}
-					OutgoingNotifyCmdPendingTsp().RemoveAndDestroy(*msg);
+					ASSERT_DEBUG(iTspIf3);
+					iTspIf3->CancelOutgoingNotifyCommand();
+					iTspHandlingOutgoingNotifyCommand = EFalse;
 					}
-				first = EFalse;
+				OutgoingNotifyCmdPendingTsp().RemoveAndDestroy(*msg);
 				}
+			first = EFalse;
+			}
 
-			if ( aSession.Type() == ERemConClientTypeTarget )
+		// (3)(b) Outgoing, awaiting a bearer connection:
+		TSglQueIter<CRemConMessage>& sendIter = OutgoingPendingSend().SetToFirst();
+		while ( ( msg = sendIter++ ) != NULL )
+			{
+			if ( msg->SessionId() == aSession.Id() )
 				{
-				// Remove the clients from the DeliveredMessageClients list
-				ASSERT_DEBUG(iMessageRecipientsList);
-				TSglQueIter<CMessageRecipients>& messageRecipientsIter = iMessageRecipientsList->Iter();
-				
-				messageRecipientsIter.SetToFirst();
-				CMessageRecipients* message;
-				while ((message = messageRecipientsIter++) != NULL)
-					{
-					message->RemoveAndDestroyClient(aSession.ClientInfo());
-					if (message->Clients().IsEmpty())
-						{
-						iMessageRecipientsList->Messages().Remove(*message);
-						// Inform bearer that it won't be getting a response
-						
-						// First we need to find the command - it could be in
-						// OutgoingRspPendingTsp, IncomingDelivered or IncomingPendingDelivery
-						
-						CRemConMessage* msg;
-						
-						msg = OutgoingRspPendingTsp().Message(message->TransactionId());
-						
-						if (!msg)
-							{
-							msg = IncomingDelivered().Message(message->TransactionId());
-							}
-						if (!msg)
-							{
-							msg = IncomingPendingDelivery().Message(message->TransactionId());
-							}
-						
-						if(msg)
-							{
-							// As this is the last message with this transaction ID, it should have this session ID
-							ASSERT_DEBUG(msg->SessionId() == aSession.Id());
-	
-							// Now we've found the message, we can pass the reject to the bearer
-							// Send reject to the bearer
-							SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
-							}
-						delete message;
-						}
-					TSglQueIter<CRemConMessage>& rspIter = OutgoingRspPendingTsp().SetToFirst();
-	
-					CRemConMessage* msg;
-					TBool first = ETrue;
-					while ( ( msg = rspIter++ ) != NULL )
-						{
-						if ( msg->SessionId() == aSession.Id() )
-							{
-							// If the message is currently being worked on by the 
-							// TSP, cancel the TSP before destroying it.
-							if (iTspIf2 && iTspHandlingOutgoingResponse && first )
-								{
-								iTspIf2->CancelOutgoingResponse();
-								iTspHandlingOutgoingResponse = EFalse;
-								}
-							OutgoingRspPendingTsp().RemoveAndDestroy(*msg);
-							}
-						first = EFalse;
-						}
-					
-					}
+				// Only commands are sent by controllers
+				ASSERT_DEBUG(msg->MsgType() == ERemConCommand || msg->MsgType() == ERemConNotifyCommand);
+				OutgoingPendingSend().RemoveAndDestroy(*msg);
 				}
+			}
 
-			TSglQueIter<CRemConMessage>& sendIter = OutgoingPendingSend().SetToFirst();
-			while ( ( msg = sendIter++ ) != NULL )
+		// (3)(c) Have been sent:
+		OutgoingSent().RemoveAndDestroy(aSession.Id());
+		
+		// (3)(d) Are pending delivery to this session:
+		TSglQueIter<CRemConMessage>& pendingDeliveryIter = IncomingPendingDelivery().SetToFirst();
+		while ( ( msg = pendingDeliveryIter++ ) != NULL )
+			{
+			if ( msg->SessionId() == aSession.Id() )
 				{
-				if ( msg->SessionId() == aSession.Id() )
-					{
-					if (msg->MsgType() == ERemConResponse)
-						{
-						SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
-						}
-					OutgoingPendingSend().RemoveAndDestroy(*msg);
-					}
+				// Only responses or rejects are received by controllers
+				ASSERT_DEBUG(msg->MsgType() == ERemConResponse || msg->MsgType() == ERemConReject);
+				IncomingPendingDelivery().RemoveAndDestroy(*msg);
 				}
+			}
 
-			OutgoingSent().RemoveAndDestroy(aSession.Id());
-			
-			TSglQueIter<CRemConMessage>& pendingDeliveryIter = IncomingPendingDelivery().SetToFirst();
-			while ( ( msg = pendingDeliveryIter++ ) != NULL )
+		// (3)(e) Have been delivered to this session and are awaiting responses:
+		TSglQueIter<CRemConMessage>& deliveredIter = IncomingDelivered().SetToFirst();
+		while ( ( msg = deliveredIter++ ) != NULL )
+			{
+			if ( msg->SessionId() == aSession.Id() )
 				{
-				if ( msg->SessionId() == aSession.Id() )
-					{
-					if (msg->MsgType() == ERemConNotifyCommand)
-						{
-						SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
-						}
-					IncomingPendingDelivery().RemoveAndDestroy(*msg);
-					}
+				// Only responses or rejects are received by controllers
+				ASSERT_DEBUG(msg->MsgType() == ERemConResponse || msg->MsgType() == ERemConReject);
+				IncomingDelivered().RemoveAndDestroy(*msg);
 				}
-
-			TSglQueIter<CRemConMessage>& deliveredIter = IncomingDelivered().SetToFirst();
-			while ( ( msg = deliveredIter++ ) != NULL )
-				{
-				if ( msg->SessionId() == aSession.Id() )
-					{
-					if (msg->MsgType() == ERemConNotifyCommand)
-						{
-						SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
-						}
-					IncomingDelivered().RemoveAndDestroy(*msg);
-					}
-				}
-					
-			break;
-			} // End found session in our array
+			}
 		}
-	iSessionsLock.Signal();
 
 	// Also remove its record from the connection history record.
+	RemoveSessionFromConnHistory(aSession);
+	
+	StartShutdownTimerIfNoClientsOrBulkThread();
+
+	LOGCONTROLLERSESSIONS;
+	}
+
+/**
+Called by CRemConTargetClientProcess when a session is closing.
+We have some work to do here as we need to remove the messages pertaining to
+that session.
+**/
+void CRemConServer::TargetSessionClosed(CRemConTargetClientProcess& aClient, CRemConTargetSession& aSession)
+	{
+	LOG_FUNC;
+	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
+	LOGTARGETSESSIONS;
+	
+	iTargetClientsLock.Wait();
+
+	// Find the client in our array (required for later removal)
+	TInt clientIndex = iTargetClients.Find(aClient.ClientInfo().ProcessId(), TargetClientCompareUsingProcessId);
+
+	// We should always find the client.
+	ASSERT_DEBUG(clientIndex > KErrNotFound);
+
+	// 1. Remove queued messages belonging to this session that:
+	// (a) are outgoing, awaiting access to the TSP 
+	// (OutgoingRspPendingTsp)
+	// (b) are outgoing, awaiting a bearer connection 
+	// (OutgoingPendingSend), 
+	// (c) have been sent (OutgoingSent)
+	// (d) are pending delivery to this session 
+	// (IncomingPendingDelivery)
+	// (e) have been delivered to this session and are awaiting 
+	// responses (IncomingDelivered).
+		
+	// (1)(a) Outgoing, awaiting access to the TSP
+	// First remove the client pertaining to this session from the message recipients list.
+	ASSERT_DEBUG(iMessageRecipientsList);
+	TSglQueIter<CMessageRecipients>& messageRecipientsIter = iMessageRecipientsList->Iter();
+	
+	messageRecipientsIter.SetToFirst();
+	CMessageRecipients* message;
+	while ((message = messageRecipientsIter++) != NULL)
+		{
+		// First we need to find the message - it could be in
+		// OutgoingRspPendingTsp, IncomingDelivered or IncomingPendingDelivery
+		CRemConMessage* msg;
+		msg = OutgoingRspPendingTsp().Message(message->TransactionId());
+			
+		if (!msg)
+			{
+			msg = IncomingDelivered().Message(message->TransactionId());
+			}
+		if (!msg)
+			{
+			msg = IncomingPendingDelivery().Message(message->TransactionId());
+			}
+			
+		if(msg)
+			{
+			// Try to remove this client from the message (this does nothing if we were not a recipient).
+			message->RemoveAndDestroyClient(aSession.ClientInfo());
+			if (message->Clients().IsEmpty())
+				{
+				iMessageRecipientsList->Messages().Remove(*message);
+				// Inform bearer that it won't be getting a response
+				SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
+
+				delete message;
+				}
+			}
+		}
+
+	TSglQueIter<CRemConMessage>& rspIter = OutgoingRspPendingTsp().SetToFirst();
+	CRemConMessage* msg;
+	TBool first = ETrue;
+	while ( ( msg = rspIter++ ) != NULL )
+		{
+		if ( aClient.Id() == msg->SessionId() && aSession.SupportedMessage(*msg) )
+			{
+			// If the message is currently being worked on by the 
+			// TSP, cancel the TSP before destroying it.
+			if (iTspIf2 && iTspHandlingOutgoingResponse && first )
+				{
+				iTspIf2->CancelOutgoingResponse();
+				iTspHandlingOutgoingResponse = EFalse;
+				}
+			OutgoingRspPendingTsp().RemoveAndDestroy(*msg);
+			}
+		first = EFalse;
+		}
+
+	// (1)(b) Outgoing, awaiting a bearer connection:
+	TSglQueIter<CRemConMessage>& sendIter = OutgoingPendingSend().SetToFirst();
+	while ( ( msg = sendIter++ ) != NULL )
+		{
+		if ( aClient.Id() == msg->SessionId() && aSession.SupportedMessage(*msg) )
+			{
+			if (msg->MsgType() == ERemConResponse)
+				{
+				SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
+				}
+			OutgoingPendingSend().RemoveAndDestroy(*msg);
+			}
+		}
+
+	// (1)(c) Have been sent:
+	TSglQueIter<CRemConMessage>& haveSentIter = OutgoingSent().SetToFirst();
+	while ( ( msg = haveSentIter++ ) != NULL)
+		{
+		if ( aClient.Id() == msg->SessionId() && aSession.SupportedMessage(*msg) )
+			{
+			OutgoingSent().RemoveAndDestroy(*msg);
+			}
+		}
+	
+	// (1)(d) Are pending delivery to this session:
+	TSglQueIter<CRemConMessage>& pendingDeliveryIter = IncomingPendingDelivery().SetToFirst();
+	while ( ( msg = pendingDeliveryIter++ ) != NULL )
+		{
+		if ( aClient.Id() == msg->SessionId() && aSession.SupportedMessage(*msg) )
+			{
+			if (msg->MsgType() == ERemConNotifyCommand)
+				{
+				SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
+				}
+			IncomingPendingDelivery().RemoveAndDestroy(*msg);
+			}
+		}
+
+	// (1)(e) Have been delivered to this session and are awaiting responses:
+	TSglQueIter<CRemConMessage>& deliveredIter = IncomingDelivered().SetToFirst();
+	while ( ( msg = deliveredIter++ ) != NULL )
+		{
+		if ( aClient.Id() == msg->SessionId() && aSession.SupportedMessage(*msg) )
+			{
+			if (msg->MsgType() == ERemConNotifyCommand)
+				{
+				SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
+				}
+			IncomingDelivered().RemoveAndDestroy(*msg);
+			}
+		}
+
+	// Remove the session's record from the connection history record.
+	RemoveSessionFromConnHistory(aSession);
+
+	// Finally, try to delete client process representation if it now has no sessions
+	TryToDropClientProcess(clientIndex);
+
+	iTargetClientsLock.Signal();
+	
+	LOGTARGETSESSIONS;
+	}
+
+void CRemConServer::RemoveSessionFromConnHistory(const CRemConSession& aSession)
+	{
+	LOG_FUNC;
+
 	const TUint count = iSession2ConnHistory.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
@@ -717,48 +922,93 @@ void CRemConServer::ClientClosed(CRemConSession& aSession, TUid aUid)
 			break;
 			}
 		}
-
-	StartShutdownTimerIfNoSessionsOrBulkThread();
-
-	LOGSESSIONS;
 	}
 
-TBool CRemConServer::TargetClientWithSameProcessId(TProcessId aProcId) const
+// called by client process representation on close.
+void CRemConServer::TargetClientClosed(CRemConTargetClientProcess& aClient)
 	{
 	LOG_FUNC;
-	LOG1(_L("\taProcId = %d"), static_cast<TUint>(aProcId));
+	LOG1(_L("\t&aClient = 0x%08x"), &aClient);
+	LOGTARGETSESSIONS;
 
-	TBool ret = EFalse;
-
-	const CRemConSession* const sess = TargetSession(aProcId);
-	if ( sess )
+	iTargetClientsLock.Wait();
+	// Find this client in the array and remove it (if it's there).
+	const TUint clientCount = iTargetClients.Count();
+	for ( TUint ii = 0 ; ii < clientCount ; ++ii )
 		{
-		ret = ETrue;
-		}
+		if ( iTargetClients[ii] == &aClient )
+			{
+			// We've found the client in our array.
 
-	LOG1(_L("\tret = %d"), ret);
-	return ret;
+			// 1. Remove the client from our array.
+			iTargetClients.Remove(ii);
+
+			// 2a. Tell the TSP the client has gone away 
+			if(iTspIf5)
+				{
+				iTspIf5->TargetClientUnavailable(aClient.ClientInfo());
+				}
+			
+			// 2b. Tell the bearers about the client going away, if it was the 
+			// last target.
+			// If the client hasn't already set its type, then it doesn't 
+			// count (we won't have told the bearers about it to begin with).
+			// The bearer manager maintains controller and target counts for all bearers
+			// and will tell bearers when they need to know things have changed 
+			if (aClient.ClientAvailable())
+				{
+				ASSERT_DEBUG(iBearerManager);
+				iBearerManager->ClientClosed(EFalse, KNullUid, aClient.Id());
+				}
+					
+			break;
+			} // End found session in our array
+		}
+	iTargetClientsLock.Signal();
+
+	StartShutdownTimerIfNoClientsOrBulkThread();
+
+	LOGTARGETSESSIONS;
 	}
 
 #ifdef __FLOG_ACTIVE
-void CRemConServer::LogSessions() const
+
+void CRemConServer::LogControllerSessions() const 
 	{
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
-	LOG1(_L("\tNumber of sessions = %d"), count);
+	const TUint count = iControllerSessions.Count();
+	LOG1(_L("\tNumber of controller sessions = %d"), count);
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		CRemConSession* const session = iSessions[ii];
+		CRemConSession* const session = iControllerSessions[ii];
 		ASSERT_DEBUG(session);
-		LOG5(_L("\t\tsession %d [0x%08x], Id = %d, Type = %d, ProcessId = %d"), 
+		LOG4(_L("\t\tsession %d [0x%08x], Id = %d, ProcessId = %d"), 
 			ii, 
 			session,
 			session->Id(),
-			session->Type(),
 			static_cast<TUint>(session->ClientInfo().ProcessId())
 			);
 		}
-	iSessionsLock.Signal();
+	}
+
+void CRemConServer::LogTargetSessions() const 
+	{
+	iTargetClientsLock.Wait();
+	
+	const TUint count = iTargetClients.Count();
+	LOG1(_L("\tNumber of target clients = %d"), count);
+	for ( TUint ii = 0 ; ii < count ; ++ii )
+		{
+		CRemConTargetClientProcess* const client = iTargetClients[ii];
+		ASSERT_DEBUG(client);
+		LOG5(_L("\t\tclient %d [0x%08x], Id = %d, ProcessId = %d, SessionCount = %d"), 
+			ii, 
+			client,
+			client->Id(),
+			static_cast<TUint>(client->ClientInfo().ProcessId()),
+			client->TargetSessionCount()
+			);
+		}
+	iTargetClientsLock.Signal();
 	}
 
 void CRemConServer::LogRemotes() const
@@ -807,17 +1057,15 @@ void CRemConServer::MrctspoDoOutgoingNotifyCommandAddressed(TRemConAddress* aCon
 
 	CRemConMessage& msg = OutgoingNotifyCmdPendingTsp().First();
 	ASSERT_DEBUG(msg.Addr().IsNull());
-	CRemConSession* const sess = Session(msg.SessionId());
+	MRemConMessageSendObserver* const observer = ControllerSession(msg.SessionId());
 	// Session closure removes messages from the outgoing queue and cancels 
-	// the TSP request if relevant. If sess is NULL here, then this processing 
+	// the TSP request if relevant. If observer is NULL here, then this processing 
 	// has gone wrong.
-	ASSERT_DEBUG(sess);
+	ASSERT_DEBUG(observer);
 	
-	sess->SendError() = KErrNone;
 	if ( (aError != KErrNone) || !aConnection)
 		{
-		sess->SendError() = aError;
-		sess->CompleteSendNotify();
+		observer->MrcmsoMessageSendResult(msg, aError);
 		}
 	else
 		{
@@ -828,8 +1076,7 @@ void CRemConServer::MrctspoDoOutgoingNotifyCommandAddressed(TRemConAddress* aCon
 			TRAPD(err, SendCmdToRemoteL(msg, *aConnection, sync));
 			if ( err || sync )
 				{
-				sess->SendError() = err;
-				sess->CompleteSendNotify();
+				observer->MrcmsoMessageSendResult(msg, err);
 				}
 			
 			delete aConnection;
@@ -888,18 +1135,19 @@ void CRemConServer::MrctspoDoOutgoingCommandAddressed(TInt aError)
 	// possible that the TSP has called OutgoingCommandAddressed in response 
 	// to a PermitOutgoingCommand request.
 	ASSERT_DEBUG(msg.Addr().IsNull());
-	CRemConSession* const sess = Session(msg.SessionId());
+	// The observer is the session which generated the message.
+	MRemConMessageSendObserver* const observer = ControllerSession(msg.SessionId());
 	// Session closure removes messages from the outgoing queue and cancels 
-	// the TSP request if relevant. If sess is NULL here, then this processing 
+	// the TSP request if relevant. If observer is NULL here, then this processing 
 	// has gone wrong.
-	ASSERT_DEBUG(sess);
-	// The number of remotes the command was sent to.
-	sess->NumRemotes() = 0;
-	sess->SendError() = KErrNone;
+	ASSERT_DEBUG(observer);
+
+	TInt numRemotesToTry = 0;
+
 	if ( aError != KErrNone )
 		{
-		sess->SendError() = aError;
-		sess->NumRemotesToTry() = 0;
+		// Error prevented message send attempt from being made.
+		observer->MrcmsoMessageSendOneOrMoreAttemptFailed(msg, aError);
 		}
 	else
 		{
@@ -908,8 +1156,10 @@ void CRemConServer::MrctspoDoOutgoingCommandAddressed(TInt aError)
 		TSglQueIter<TRemConAddress> iter(iTspConnections);
 		while ( iter++ )
 			{
-			++sess->NumRemotesToTry();
+			++numRemotesToTry;
 			}
+		// Notify session of send attempt.
+		observer->MrcmsoMessageSendOneOrMoreAttempt(msg, numRemotesToTry);
 		iter.SetToFirst();
 		// Try to connect and send a message to each specified remote.
 		TRemConAddress* conn;
@@ -918,8 +1168,8 @@ void CRemConServer::MrctspoDoOutgoingCommandAddressed(TInt aError)
 			LOG2(_L("\tsending message to remote [0x%08x] BearerUid = 0x%08x"), 
 				conn, conn->BearerUid());
 
-			// We send to as many of the remotes as we can. We remember 
-			// how many remotes got sent to successfully, and complete the 
+			// We send to as many of the remotes as we can. The observer remembers 
+			// how many remotes got sent to successfully, and completes the 
 			// client's request with either KErrNone or _one of_ the 
 			// errors that were raised. 
 			TBool sync = EFalse;
@@ -929,15 +1179,7 @@ void CRemConServer::MrctspoDoOutgoingCommandAddressed(TInt aError)
 				// We have finished trying to process this (copy of this) 
 				// message, so we can adjust our 'remotes' counter / 
 				// completion error.
-				if ( err == KErrNone )
-					{
-					++sess->NumRemotes();
-					}
-				else
-					{
-					sess->SendError() = err;
-					}
-				--sess->NumRemotesToTry();
+				observer->MrcmsoMessageSendOneOrMoreResult(msg, err);
 				}
 			// else we didn't actually make a send attempt because conn was 
 			// down. This particular message will undergo an actual 
@@ -949,10 +1191,6 @@ void CRemConServer::MrctspoDoOutgoingCommandAddressed(TInt aError)
 			delete conn;
 			} // End while 
 		} // End if TSP addressed command OK
-	if ( sess->NumRemotesToTry() == 0 )
-		{
-		sess->CompleteSend();
-		}
 
 	// We've now finished with the addressed message, so destroy it.
 	OutgoingCmdPendingTsp().RemoveAndDestroy(msg);
@@ -995,11 +1233,12 @@ void CRemConServer::MrctspoDoOutgoingCommandPermitted(TBool aIsPermitted)
 	// possible that the TSP has called OutgoingCommandPermitted in response 
 	// to a AddressOutgoingCommand request.
 	ASSERT_DEBUG(!msg.Addr().IsNull());
-	CRemConSession* const sess = Session(msg.SessionId());
+	// The session is the observer
+	MRemConMessageSendObserver* const observer = ControllerSession(msg.SessionId());
 	// Session closure removes messages from the outgoing queue and cancels 
-	// the TSP request if relevant. If sess is NULL here, then this processing 
+	// the TSP request if relevant. If observer is NULL here, then this processing 
 	// has gone wrong.
-	ASSERT_DEBUG(sess);
+	ASSERT_DEBUG(observer);
 	TInt err = KErrPermissionDenied;
 	if ( aIsPermitted )
 		{
@@ -1007,25 +1246,18 @@ void CRemConServer::MrctspoDoOutgoingCommandPermitted(TBool aIsPermitted)
 		TRAP(err, SendCmdToRemoteL(msg, msg.Addr(), sync));
 		if ( err || sync )
 			{
-			// We made a send attempt at the bearer level. Complete the 
-			// client's message according to err.
-			--sess->NumRemotesToTry();
-			sess->NumRemotes() = ( err == KErrNone ) ? 1 : 0;
-			sess->SendError() = err;
-			sess->CompleteSend();
+			// We made a send attempt at the bearer level, notify observer.
+			observer->MrcmsoMessageSendOneOrMoreResult(msg, err);
 			}
 		// else the message is waiting until a bearer-level connection 
 		// comes up. Only then can we complete the client's message.
 		}
 	else
 		{
-		// The send wasn't permitted, so complete the client's message.
-		// This was a connection-oriented send, so we know the number of 
-		// remotes it was sent to is 0.
-		--sess->NumRemotesToTry();
-		sess->NumRemotes() = 0;
-		sess->SendError() = KErrPermissionDenied;
-		sess->CompleteSend();
+		// The send wasn't permitted, notify observer.
+		// This should complete the client's message, as we're connection oriented
+		// (so only one remote to send to).
+		observer->MrcmsoMessageSendOneOrMoreResult(msg, KErrPermissionDenied);
 		}
 
 	// We've now finished with the message, so destroy it.
@@ -1069,11 +1301,11 @@ void CRemConServer::MrctspoDoOutgoingNotifyCommandPermitted(TBool aIsPermitted)
 	// possible that the TSP has called OutgoingCommandPermitted in response 
 	// to a AddressOutgoingCommand request.
 	ASSERT_DEBUG(!msg.Addr().IsNull());
-	CRemConSession* const sess = Session(msg.SessionId());
+	MRemConMessageSendObserver* const observer = ControllerSession(msg.SessionId());
 	// Session closure removes messages from the outgoing queue and cancels 
-	// the TSP request if relevant. If sess is NULL here, then this processing 
+	// the TSP request if relevant. If observer is NULL here, then this processing 
 	// has gone wrong.
-	ASSERT_DEBUG(sess);
+	ASSERT_DEBUG(observer);
 	TInt err = KErrPermissionDenied;
 	if ( aIsPermitted )
 		{
@@ -1081,16 +1313,14 @@ void CRemConServer::MrctspoDoOutgoingNotifyCommandPermitted(TBool aIsPermitted)
 		TRAP(err, SendCmdToRemoteL(msg, msg.Addr(), sync));
 		if ( err || sync )
 			{
-			sess->SendError() = err;
-			sess->CompleteSendNotify();
+			observer->MrcmsoMessageSendResult(msg, err);
 			}
 		// else the message is waiting until a bearer-level connection 
 		// comes up. Only then can we complete the client's message.
 		}
 	else
 		{
-		sess->SendError() = KErrPermissionDenied;
-		sess->CompleteSendNotify();
+		observer->MrcmsoMessageSendResult(msg, KErrPermissionDenied);
 		}
 
 	// We've now finished with the message, so destroy it.
@@ -1119,24 +1349,24 @@ void CRemConServer::MrctspoDoOutgoingResponsePermitted(TBool aIsPermitted)
 	
 	iOutgoingRspPendingTsp->Remove(msg);
 	
-	CRemConSession* const sess = Session(msg.SessionId());	
+	CRemConTargetClientProcess* const client = TargetClient(msg.SessionId());
 	// Session closure removes messages from the outgoing queue and cancels 
-	// the TSP request if relevant. If sess is NULL here, then this processing 
+	// the TSP request if relevant. If client is NULL here, then this processing 
 	// has gone wrong.
-	ASSERT_DEBUG(sess);
+	ASSERT_DEBUG(client);
 
 	if (aIsPermitted)
 		{
 		ASSERT_DEBUG(iMessageRecipientsList);
 		iMessageRecipientsList->RemoveAndDestroyMessage(msg.TransactionId());
-		CompleteSendResponse(msg, *sess); // Ownership of msg is always taken
+		CompleteSendResponse(msg, *client); // Ownership of msg is always taken
 		}
 	else
 		{
 		CMessageRecipients* messageClients = iMessageRecipientsList->Message(msg.TransactionId());
 		if (messageClients)
 			{
-			messageClients->RemoveAndDestroyClient(sess->ClientInfo()); // Remove the current client info from the list
+			messageClients->RemoveAndDestroyClient(client->ClientInfo()); // Remove the current client info from the list
 			if (messageClients->Clients().IsEmpty())
 				{
 				iMessageRecipientsList->RemoveAndDestroyMessage(msg.TransactionId());
@@ -1145,12 +1375,9 @@ void CRemConServer::MrctspoDoOutgoingResponsePermitted(TBool aIsPermitted)
 				SendReject(msg.Addr(), msg.InterfaceUid(), msg.OperationId(), msg.TransactionId());
 				}
 			}
-		--sess->NumRemotesToTry();
-		sess->SendError() = KErrNone;
-		if (sess->NumRemotesToTry() == 0)
-			{
-			sess->CompleteSend();
-			}
+
+		// Notify client that a send attempt to a remote was abandoned.
+		client->MrcmsoMessageSendOneOrMoreAbandoned(msg);
 		delete &msg;
 		}
 	if (!iOutgoingRspPendingTsp->IsEmpty())
@@ -1193,14 +1420,14 @@ void CRemConServer::MrctspoDoIncomingNotifyAddressed(TClientInfo* aClientInfo, T
 			if ( aError == KErrNone && aClientInfo)
 				{
 				LOG1(_L("\t\tprocess ID %d"), static_cast<TUint>(aClientInfo->ProcessId()));
-				// Get the corresponding session.
-				CRemConSession* const sess = TargetSession(aClientInfo->ProcessId());
-				// NB The set of open sessions may have changed while the request 
-				// was out on the TSP. If the TSP indicates a session that has 
-				// gone away, then ignore that session. 
-				if ( sess )
+				// Get the corresponding client.
+				CRemConTargetClientProcess* const client = TargetClient(aClientInfo->ProcessId());
+				// NB The set of open clients may have changed while the request 
+				// was out on the TSP. If the TSP indicates a client that has 
+				// gone away, then ignore that client. 
+				if ( client )
 					{
-					TRAPD(err, DeliverCmdToClientL(msg, *sess));
+					TRAPD(err, DeliverCmdToClientL(msg, *client));
 					if (err == KErrNone)
 						{
 						cmdDelivered = ETrue;
@@ -1239,11 +1466,11 @@ void CRemConServer::MrctspoDoIncomingNotifyAddressed(TClientInfo* aClientInfo, T
 			if(aError == KErrNone && aClientInfo)
 				{
 				LOG1(_L("\t\tprocess ID %d"), static_cast<TUint>(aClientInfo->ProcessId()));
-				// Get the corresponding session.
-				CRemConSession* const sess = TargetSession(aClientInfo->ProcessId());
-				if (sess)
+				// Get the corresponding client.
+				CRemConTargetClientProcess* const client = TargetClient(aClientInfo->ProcessId());
+				if (client)
 					{
-					if (sess->Id() == msg.SessionId())
+					if (client->Id() == msg.SessionId())
 						{
 						// Don't do anything - it's already on IncomingDelivered
 						}
@@ -1260,7 +1487,7 @@ void CRemConServer::MrctspoDoIncomingNotifyAddressed(TClientInfo* aClientInfo, T
 								// was being readdressed.
 								msg.MsgSubType() = deliveredMsg->MsgSubType();
 								// Deliver to the client
-								TRAPD(err, DeliverCmdToClientL(msg, *sess));
+								TRAPD(err, DeliverCmdToClientL(msg, *client));
 								if (err == KErrNone)
 									{
 									// Only remove the current message if the delivery to the new client suceeded.
@@ -1332,18 +1559,18 @@ void CRemConServer::MrctspoDoReAddressNotifies()
 
 void CRemConServer::MrctspoDoIncomingCommandPermitted(TBool aIsPermitted)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	
 	MrctspoDoIncomingCommandAddressed(aIsPermitted ? KErrNone : KErrAccessDenied);
 	}
 
 void CRemConServer::MrctspoDoIncomingNotifyPermitted(TBool aIsPermitted)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	
 	if(aIsPermitted)
 		{
-		TClientInfo* clientInfo = ClientIdToClientInfo(IncomingNotifyCmdPendingAddress().First().Client());
+		TClientInfo* clientInfo = TargetClientIdToClientInfo(IncomingNotifyCmdPendingAddress().First().Client());
 		MrctspoDoIncomingNotifyAddressed(clientInfo, KErrNone);
 		}
 	else
@@ -1367,7 +1594,7 @@ void CRemConServer::TspOutgoingCommand()
 	// The head item is at index 0. This function should only be called if the 
 	// queue is not empty.
 	CRemConMessage& msg = OutgoingCmdPendingTsp().First();
-	CRemConSession* const sess = Session(msg.SessionId());
+	CRemConControllerSession* const sess = ControllerSession(msg.SessionId());
 	// The session should exist- if it closed after asking to send this 
 	// message, then the message should have been removed from the outgoing 
 	// pending TSP queue at that time.
@@ -1390,7 +1617,7 @@ void CRemConServer::TspOutgoingCommand()
 	else
 		{
 		// Non-null address means it's awaiting permission to send.
-		sess->NumRemotesToTry() = 1;
+		sess->MrcmsoMessageSendOneOrMoreAttempt(msg, 1);
 		iTspIf->PermitOutgoingCommand(
 			msg.InterfaceUid(),
 			msg.OperationId(), 
@@ -1414,7 +1641,7 @@ void CRemConServer::TspOutgoingNotifyCommand()
 	// The head item is at index 0. This function should only be called if the 
 	// queue is not empty.
 	CRemConMessage& msg = OutgoingNotifyCmdPendingTsp().First();
-	CRemConSession* const sess = Session(msg.SessionId());
+	CRemConControllerSession* const sess = ControllerSession(msg.SessionId());
 	// The session should exist- if it closed after asking to send this 
 	// message, then the message should have been removed from the outgoing 
 	// pending TSP queue at that time.
@@ -1433,7 +1660,8 @@ void CRemConServer::TspOutgoingNotifyCommand()
 	else
 		{
 		// Non-null address means it's awaiting permission to send.
-		sess->NumRemotesToTry() = 1;
+		// As this is a notify command, we don't need to adjust NumRemotes() or 
+		// NumRemotesToTry() on the session.
 		iTspIf3->PermitOutgoingNotifyCommand(
 			msg.InterfaceUid(),
 			msg.OperationId(), 
@@ -1466,18 +1694,15 @@ void CRemConServer::AddressIncomingCommand()
 	if(msg.Client() == KNullClientId)
 		{
 		// Prepare the array of target process IDs for the TSP.
-		iSessionsLock.Wait();
-		const TUint count = iSessions.Count();
+		iTargetClientsLock.Wait();
+		const TUint count = iTargetClients.Count();
 		for ( TUint ii = 0 ; ii < count ; ++ii )
 			{
-			CRemConSession* const sess = iSessions[ii];
-			ASSERT_DEBUG(sess);
-			if ( sess->Type() == ERemConClientTypeTarget )
-				{
-				iTspIncomingCmdClients.AddLast(sess->ClientInfo());
-				}
+			CRemConTargetClientProcess* const client = iTargetClients[ii];
+			ASSERT_DEBUG(client);
+			iTspIncomingCmdClients.AddLast(client->ClientInfo());
 			}
-		iSessionsLock.Signal();
+		iTargetClientsLock.Signal();
 		
 		iTspIf->AddressIncomingCommand(
 			msg.InterfaceUid(),
@@ -1486,7 +1711,7 @@ void CRemConServer::AddressIncomingCommand()
 		}
 	else
 		{
-		iTspIncomingCmdClients.AddLast(*ClientIdToClientInfo(msg.Client()));
+		iTspIncomingCmdClients.AddLast(*TargetClientIdToClientInfo(msg.Client()));
 		ASSERT_DEBUG(iTspIf4);
 		iTspIf4->PermitIncomingCommand(
 			msg.InterfaceUid(),
@@ -1521,18 +1746,15 @@ void CRemConServer::AddressIncomingNotifyCommand()
 		if(msg.Client() == KNullClientId)
 			{
 			// Prepare the array of target process IDs for the TSP.
-			iSessionsLock.Wait();
-			const TUint count = iSessions.Count();
+			iTargetClientsLock.Wait();
+			const TUint count = iTargetClients.Count();
 			for ( TUint ii = 0 ; ii < count ; ++ii )
 				{
-				CRemConSession* const sess = iSessions[ii];
-				ASSERT_DEBUG(sess);
-				if ( sess->Type() == ERemConClientTypeTarget )
-					{
-					iTspIncomingNotifyCmdClients.AddLast(sess->ClientInfo());
-					}
+				CRemConTargetClientProcess* const client = iTargetClients[ii];
+				ASSERT_DEBUG(client);
+				iTspIncomingNotifyCmdClients.AddLast(client->ClientInfo());
 				}
-			iSessionsLock.Signal();
+			iTargetClientsLock.Signal();
 			
 			// Only send the notify to the TSP if there isn't an identical one on either incomingpendingdelivery or incomingdelivered
 			iTspIf2->AddressIncomingNotify(
@@ -1542,7 +1764,7 @@ void CRemConServer::AddressIncomingNotifyCommand()
 			}
 		else
 			{
-			iTspIncomingNotifyCmdClients.AddLast(*ClientIdToClientInfo(msg.Client()));
+			iTspIncomingNotifyCmdClients.AddLast(*TargetClientIdToClientInfo(msg.Client()));
 			ASSERT_DEBUG(iTspIf4);
 			iTspIf4->PermitIncomingNotify(
 				msg.InterfaceUid(),
@@ -1568,18 +1790,15 @@ void CRemConServer::ReAddressIncomingNotifyCommand()
 	// messages awaiting addressing).
 	// Prepare the array of target process IDs for the TSP.
 	iTspIncomingNotifyCmdClients.Reset();
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+	iTargetClientsLock.Wait();
+	const TUint count = iTargetClients.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		CRemConSession* const sess = iSessions[ii];
-		ASSERT_DEBUG(sess);
-		if ( sess->Type() == ERemConClientTypeTarget )
-			{
-			iTspIncomingNotifyCmdClients.AddLast(sess->ClientInfo());
-			}
+		CRemConTargetClientProcess* const client = iTargetClients[ii];
+		ASSERT_DEBUG(client);
+		iTspIncomingNotifyCmdClients.AddLast(client->ClientInfo());
 		}
-	iSessionsLock.Signal();
+	iTargetClientsLock.Signal();
 	
 	// This function should only be called if we know this queue is not 
 	// empty.
@@ -1601,11 +1820,11 @@ void CRemConServer::PermitOutgoingResponse()
 	while (!iTspHandlingOutgoingResponse && !OutgoingRspPendingTsp().IsEmpty())
 		{
 		CRemConMessage& msg = OutgoingRspPendingTsp().First();
-		CRemConSession* session = Session(msg.SessionId());
-		// The session should exist- if it closed after asking to send this 
+		CRemConTargetClientProcess* client = TargetClient(msg.SessionId());
+		// The client should exist- if it closed after asking to send this 
 		// message, then the message should have been removed from the outgoing 
 		// pending TSP queue at that time.		
-		ASSERT_DEBUG(session);
+		ASSERT_DEBUG(client);
 		ASSERT_DEBUG(iMessageRecipientsList);
 		CMessageRecipients* message = iMessageRecipientsList->Message(msg.TransactionId());
 
@@ -1617,7 +1836,7 @@ void CRemConServer::PermitOutgoingResponse()
 				iTspIf2->PermitOutgoingResponse(
 						msg.InterfaceUid(),
 						msg.OperationId(),
-						session->ClientInfo(),
+						client->ClientInfo(),
 						message->ConstIter()
 						);
 				}
@@ -1628,10 +1847,7 @@ void CRemConServer::PermitOutgoingResponse()
 			}
 		else
 			{
-			session->NumRemotes() = 0;
-			--session->NumRemotesToTry();
-			session->SendError() = KErrNone;
-			session->CompleteSend();
+			client->MrcmsoMessageSendOneOrMoreAbandoned(msg);
 			OutgoingRspPendingTsp().RemoveAndDestroy(msg);
 			}
 		}
@@ -1720,64 +1936,96 @@ void CRemConServer::SendCmdToRemoteL(const CRemConMessage& aMsg, const TRemConAd
 	LOG1(_L("\taSync = %d"), aSync);
 	}
 
-void CRemConServer::DeliverCmdToClientL(const CRemConMessage& aMsg, CRemConSession& aSess)
+void CRemConServer::DeliverCmdToClientL(const CRemConMessage& aMsg, CRemConTargetClientProcess& aClient)
 	{
 	LOG_FUNC;
 
 	ASSERT_DEBUG((aMsg.MsgType() == ERemConCommand) || (aMsg.MsgType() == ERemConNotifyCommand)); 
-	// Take a copy of the message and set the right session ID (important to 
-	// set the selected session's ID because this is how we match up the 
+	// Take a copy of the message and set the right client ID (important to 
+	// set the selected client's ID because this is how we match up the 
 	// client's response, if aMsg is a command). 
 	CRemConMessage* const newMsg = CRemConMessage::CopyL(aMsg);
-	newMsg->SessionId() = aSess.Id();
-	LEAVEIFERRORL(DeliverMessageToClient(*newMsg, aSess));
+	newMsg->SessionId() = aClient.Id();
+	LEAVEIFERRORL(DeliverMessageToClient(*newMsg, aClient));
 	}
 
-TInt CRemConServer::DeliverMessageToClient(CRemConMessage& aMsg, CRemConSession& aSess)
+TInt CRemConServer::DeliverMessageToClient(CRemConMessage& aMsg, CRemConControllerSession& aSess)
 	{
 	LOG_FUNC;
 	LOGINCOMINGPENDINGDELIVERY;
 	LOGINCOMINGDELIVERED;
+
+	// Controller clients only receive responses or rejects
+	ASSERT_DEBUG(aMsg.MsgType() == ERemConResponse || aMsg.MsgType() == ERemConReject);
+
 	TInt err = KErrNone;
 
 	// First off check if the client supports this
 	if(!aSess.SupportedMessage(aMsg))
-        {
-        err = KErrArgument;
+		{
+		err = KErrArgument;
         
-        // 'Take ownership' of it by destroying it- it's finished with.
-        delete &aMsg;
-        }
+		// 'Take ownership' of it by destroying it- it's finished with.
+		delete &aMsg;
+		}
 	else if ( aSess.CurrentReceiveMessage().Handle() )
 		{
-		// If the client can take the message now put it on the right queue.
-
 		err = aSess.WriteMessageToClient (aMsg);
-		// If the message was a command, and it was delivered with no error, 
-		// then put it in the 'incoming delivered' log. Otherwise, delete it 
-		// because it's finished with.
-		if ((aMsg.MsgType() == ERemConCommand) || (aMsg.MsgType() == ERemConNotifyCommand))
-			{
-			if (err == KErrNone )
-				{
-				// We'll need to remember it for the response coming back.
-				IncomingDelivered().Append(aMsg); 
-				}
-			else
-				{
-				// 'Take ownership' of it by destroying it- it's finished with.
-				delete &aMsg;
-				}
-			}
-		else
-			{
-			// 'Take ownership' of it by destroying it- it's finished with.			
-			delete &aMsg;
-			}
+
+		// 'Take ownership' of it by destroying it- it's finished with.			
+		delete &aMsg;
 		}
 	else
 		{
 		IncomingPendingDelivery().Append(aMsg);
+		}
+	
+	LOGINCOMINGPENDINGDELIVERY;
+	LOGINCOMINGDELIVERED;
+	return err;
+	}
+
+TInt CRemConServer::DeliverMessageToClient(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient)
+	{
+	LOG_FUNC;
+	LOGINCOMINGPENDINGDELIVERY;
+	LOGINCOMINGDELIVERED;
+
+	TInt err = KErrNone;
+
+	// Target clients only receive commands
+	ASSERT_DEBUG(aMsg.MsgType() == ERemConCommand || aMsg.MsgType() == ERemConNotifyCommand);
+
+	// Pass message to client
+	err = aClient.ReceiveMessage(aMsg);
+
+	if (err == KErrArgument)
+		{
+		// Message not supported.
+		// 'Take ownership' of it by destroying it- it's finished with.
+		delete &aMsg;
+		}
+	else if (err == KErrNotReady)
+		{
+		err = KErrNone;
+		// Client cannot receive this message at the moment.
+		IncomingPendingDelivery().Append(aMsg);	
+		}
+	else 
+		{
+		// If the message was delivered with no error, 
+		// then put it in the 'incoming delivered' log. Otherwise, delete it 
+		// because it's finished with.
+		if (err == KErrNone)
+			{
+			// We'll need to remember it for the response coming back.
+			IncomingDelivered().Append(aMsg); 
+			}
+		else
+			{
+			// 'Take ownership' of it by destroying it- it's finished with.
+			delete &aMsg;
+			}
 		}
 	
 	LOGINCOMINGPENDINGDELIVERY;
@@ -1837,12 +2085,12 @@ void CRemConServer::MrctspoDoIncomingCommandAddressed(TInt aError)
 				while ( ( procId = iter++ ) != NULL )
 					{
 					LOG1(_L("\t\tprocess ID %d"), static_cast<TUint>(procId->ProcessId()));
-					// Get the corresponding session.
-					CRemConSession* const sess = TargetSession(procId->ProcessId());
-					// NB The set of open sessions may have changed while the request 
-					// was out on the TSP. If the TSP indicates a session that has 
-					// gone away, then ignore that session. 
-					if ( sess )
+					// Get the corresponding client.
+					CRemConTargetClientProcess* const client = TargetClient(procId->ProcessId());
+					// NB The set of open clients may have changed while the request 
+					// was out on the TSP. If the TSP indicates a client that has 
+					// gone away, then ignore that client. 
+					if ( client )
 						{
 						TInt err = KErrNone;
 						TClientInfo* clientInfo = NULL;
@@ -1850,7 +2098,7 @@ void CRemConServer::MrctspoDoIncomingCommandAddressed(TInt aError)
 						if (err == KErrNone)
 							{
 							// If we didn't manage to create the TClientInfo, we shouldn't deliver to the client
-							TRAP(err, DeliverCmdToClientL(msg, *sess));
+							TRAP(err, DeliverCmdToClientL(msg, *client));
 							}
 						if (err == KErrNone)
 							{
@@ -1935,19 +2183,19 @@ TInt CRemConServer::MrctspoSetLocalAddressedClient(const TUid& aBearerUid, const
 	LOG_FUNC;
 	
 	TRemConClientId id = KNullClientId;
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+	iTargetClientsLock.Wait();
+	const TUint count = iTargetClients.Count();
 	for(TUint i=0; i<count; i++)
 		{
-		CRemConSession* const sess = iSessions[i];
-		ASSERT_DEBUG(sess);
-		if(sess->ClientInfo().ProcessId() == aClientInfo.ProcessId())
+		CRemConTargetClientProcess* const client = iTargetClients[i];
+		ASSERT_DEBUG(client);
+		if(client->ClientInfo().ProcessId() == aClientInfo.ProcessId())
 			{
-			id = sess->Id();
+			id = client->Id();
 			break;
 			}
 		}
-	iSessionsLock.Signal();
+	iTargetClientsLock.Signal();
 	
 	if(id != KNullClientId)
 		{
@@ -2057,7 +2305,7 @@ void CRemConServer::SendCommand(CRemConMessage& aMsg)
 			}
 		else
 			{
-			CRemConSession* const sess = Session(aMsg.SessionId());
+			CRemConControllerSession* const sess = ControllerSession(aMsg.SessionId());
 			delete &aMsg;
 			ASSERT_DEBUG(sess);
 			sess->SendError() = KErrNotSupported;
@@ -2067,7 +2315,7 @@ void CRemConServer::SendCommand(CRemConMessage& aMsg)
 	
 	}
 
-void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
+void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient)
 	{
 	LOG_FUNC;
 	LOGINCOMINGDELIVERED;
@@ -2084,9 +2332,10 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 	TSglQueIter<CRemConMessage>& iter = IncomingDelivered().SetToFirst();
 	CRemConMessage* msg;
 	TBool found = EFalse;
+	
 	while ( ( msg = iter++ ) != NULL )
 		{
-		if (	msg->SessionId() == aSess.Id()
+		if (	msg->SessionId() == aClient.Id()
 			&&	msg->InterfaceUid() == response->InterfaceUid()
 			&&	msg->OperationId() == response->OperationId()
 			&&  (
@@ -2098,7 +2347,6 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 			{
 			LOG1(_L("\tfound a matching item in the incoming delivered commands log: [0x%08x]"), msg);
 			found = ETrue;
-			++aSess.NumRemotesToTry();
 
 			// Set the right address and transaction id in the outgoing message
 			response->Addr() = msg->Addr();
@@ -2106,6 +2354,9 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 			
 			if(msg->MsgType() == ERemConCommand)
 				{
+				// Notify client (this shall go to one remote)
+				aClient.MrcmsoMessageSendOneOrMoreAttempt(*response, 1);
+			
 				// Check the normal command and response have the default subtype set
 				ASSERT_DEBUG(msg->MsgSubType() == ERemConMessageDefault && response->MsgSubType() == ERemConMessageDefault);
 
@@ -2124,6 +2375,9 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 				}
 			else
 				{
+				// Notify client (this may be a series of messages to remotes)
+				aClient.MrcmsoMessageSendOneOrMoreIncremental(*msg, 1);
+
 				// Check the command is a notify command
 				ASSERT_DEBUG(msg->MsgType() == ERemConNotifyCommand);
 				
@@ -2173,7 +2427,7 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 	while ((msg = rspIter++) != NULL)
 		{
 		OutgoingRspPendingSend().Remove(*msg);
-		CompleteSendResponse(*msg, aSess);
+		CompleteSendResponse(*msg, aClient);
 		}
 
 	
@@ -2184,25 +2438,19 @@ void CRemConServer::SendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
 	// Just drop the message.
 	if ( !found )
 		{
-		// Complete the message with KErrNone.  We have done all we can with
-		// it.  Any other error may encourage retries from the application,
-		// which would be useless in this situation.
-		aSess.NumRemotes() = 0;
-		aSess.SendError() = KErrNone;
+		// Inform client that message should be completed with KErrNone We 
+		// have done all we can with it.  Any other error may encourage 
+		// retries from the application, which would be useless in this situation.
+		aClient.MrcmsoMessageSendOneOrMoreAttemptFailed(aMsg, KErrNone);
 		delete &aMsg;
 		}
 	
-	if (aSess.NumRemotesToTry() == 0)
-		{
-		aSess.CompleteSend();
-		}
-
 	LOGOUTGOINGRSPPENDINGTSP;
 	LOGINCOMINGDELIVERED;
 	LOGOUTGOINGPENDINGSEND;
 	}
 
-void CRemConServer::CompleteSendResponse(CRemConMessage& aMsg, CRemConSession& aSess)
+void CRemConServer::CompleteSendResponse(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient)
 	{
 	LOG_FUNC;
 	LOGOUTGOINGPENDINGSEND;
@@ -2221,19 +2469,12 @@ void CRemConServer::CompleteSendResponse(CRemConMessage& aMsg, CRemConSession& a
 			// We're already connected
 			// If the bearer couldn't send, we need to error the client.
 			TInt err = iBearerManager->Send(aMsg);
-			// Complete client's message. Bearer-level error means the 
-			// response got sent to zero remotes- bearer-level success 
-			// means it got sent to precisely 1.
-			--aSess.NumRemotesToTry();
-			if (err == KErrNone)
-				{
-				++aSess.NumRemotes();
-				}
-			aSess.SendError() = err;
-			if (aSess.NumRemotesToTry() == 0)
-				{
-				aSess.CompleteSend();
-				}
+			
+			// Inform client that message should be completed with err. 
+			// Bearer-level error means the response got sent to zero remotes- 
+			// bearer-level success means it got sent to precisely 1.
+			aClient.MrcmsoMessageSendOneOrMoreResult(aMsg, err);
+
 			// We've now finished with the response.
 			delete &aMsg;
 			break;
@@ -2248,11 +2489,8 @@ void CRemConServer::CompleteSendResponse(CRemConMessage& aMsg, CRemConSession& a
 			TInt err = iBearerManager->Connect(aMsg.Addr());
 			if ( err != KErrNone )
 				{
+				aClient.MrcmsoMessageSendOneOrMoreResult(aMsg, err);
 				OutgoingPendingSend().RemoveAndDestroy(aMsg);
-				aSess.NumRemotes() = 0;
-				--aSess.NumRemotesToTry();
-				aSess.SendError() = err;
-				aSess.CompleteSend();
 				}
 			break;
 			}
@@ -2349,7 +2587,7 @@ void CRemConServer::SendReject(TRemConAddress aAddr, TUid aInterfaceUid, TUint a
 	LOGOUTGOINGPENDINGSEND;
 	}
 
-void CRemConServer::SendCancel(CRemConSession& aSess)
+void CRemConServer::SendCancel(CRemConControllerSession& aSess)
 	{
 	LOG_FUNC;
 	LOGOUTGOINGCMDPENDINGTSP;
@@ -2359,7 +2597,7 @@ void CRemConServer::SendCancel(CRemConSession& aSess)
 	TBool first = ETrue;
 	while ( ( msg = iter++ ) != NULL )
 		{
-		// A client can only have one send outstanding at once, so there can 
+		// A session can only have one send outstanding at once, so there can 
 		// only be one message on the queue belonging to it.
 		if ( msg->SessionId() == aSess.Id() )
 			{
@@ -2409,7 +2647,7 @@ void CRemConServer::NewResponse(CRemConMessage& aMsg)
 			{
 			LOG1(_L("\tfound a matching item in the sent commands log: [0x%08x]"), cmd);
 			sentCommandFound = ETrue;
-			CRemConSession* const session = Session(cmd->SessionId());
+			CRemConControllerSession* const session = ControllerSession(cmd->SessionId());
 			// When sessions close, their messages are removed from the logs, 
 			// so the session here _should_ exist.
 			ASSERT_DEBUG(session);
@@ -2462,7 +2700,7 @@ void CRemConServer::NewNotifyResponse(CRemConMessage& aMsg)
 			{
 			LOG1(_L("\tfound a matching item in the sent commands log: [0x%08x]"), cmd);
 			sentCommandFound = ETrue;
-			CRemConSession* const session = Session(cmd->SessionId());
+			CRemConControllerSession* const session = ControllerSession(cmd->SessionId());
 			// When sessions close, their messages are removed from the logs, 
 			// so the session here _should_ exist.
 			ASSERT_DEBUG(session);
@@ -2595,47 +2833,60 @@ void CRemConServer::LogIncomingDelivered() const
 	}
 #endif // __FLOG_ACTIVE
 
-CRemConSession* CRemConServer::Session(TUint aSessionId) const
+CRemConControllerSession* CRemConServer::ControllerSession(TUint aSessionId) const
 	{
-	CRemConSession* sess = NULL;
+	LOG_FUNC;
 
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
+	CRemConControllerSession* sess = NULL;
+	
+	TInt index = iControllerSessions.Find(aSessionId, ControllerSessionCompare);
+	
+	if(index >= 0)
 		{
-		CRemConSession* const temp = iSessions[ii];
-		ASSERT_DEBUG(temp);
-		if ( temp->Id() == aSessionId )
-			{
-			sess = temp;
-			break;
-			}
+		sess = iControllerSessions[index];
 		}
-	iSessionsLock.Signal();
 
 	return sess;
 	}
 
-CRemConSession* CRemConServer::TargetSession(TProcessId aProcessId) const
+CRemConTargetClientProcess* CRemConServer::TargetClient(TUint aClientId) const
 	{
-	CRemConSession* sess = NULL;
+	LOG_FUNC;
 
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
+	CRemConTargetClientProcess* client = NULL;
+
+	iTargetClientsLock.Wait();
+	
+	TInt index = iTargetClients.Find(aClientId, TargetClientCompareUsingSessionId);
+	
+	if(index >= 0)
 		{
-		CRemConSession* const temp = iSessions[ii];
-		ASSERT_DEBUG(temp);
-		if (	temp->ClientInfo().ProcessId() == aProcessId 
-			&&	temp->Type() == ERemConClientTypeTarget )
-			{
-			sess = temp;
-			break;
-			}
+		client = iTargetClients[index];
 		}
-	iSessionsLock.Signal();
 
-	return sess;
+	iTargetClientsLock.Signal();
+
+	return client;
+	}
+
+CRemConTargetClientProcess* CRemConServer::TargetClient(TProcessId aProcessId) const
+	{
+	LOG_FUNC;
+
+	CRemConTargetClientProcess* client = NULL;
+
+	iTargetClientsLock.Wait();
+	
+	TInt index = iTargetClients.Find(aProcessId, TargetClientCompareUsingProcessId);
+	
+	if(index >= 0)
+		{
+		client = iTargetClients[index];
+		}
+	
+	iTargetClientsLock.Signal();
+
+	return client;
 	}
 
 MRemConConverterInterface* CRemConServer::Converter(TUid aInterfaceUid, 
@@ -2652,7 +2903,7 @@ MRemConConverterInterface* CRemConServer::Converter(const TDesC8& aInterfaceData
 	return iConverterManager->Converter(aInterfaceData, aBearerUid);
 	}
 
-void CRemConServer::ReceiveRequest(CRemConSession& aSession)
+void CRemConServer::ReceiveRequest(CRemConControllerSession& aSession)
 	{
 	LOG_FUNC;
 	LOGINCOMINGPENDINGDELIVERY;
@@ -2665,10 +2916,61 @@ void CRemConServer::ReceiveRequest(CRemConSession& aSession)
 		{
 		if ( msg->SessionId() == aSession.Id() )
 			{
+			// Controllers receive responses or rejects only.
+			ASSERT_DEBUG(msg->MsgType() == ERemConResponse || msg->MsgType() == ERemConReject);
+
 			TInt err = aSession.WriteMessageToClient(*msg);
 			IncomingPendingDelivery().Remove(*msg);
-			if ( msg->MsgType() == ERemConCommand || msg->MsgType() == ERemConNotifyCommand)
+			
+			// 'Take ownership' of it by destroying it- it's finished with.
+			delete msg;				
+			
+			break;
+			}
+		}
+
+	LOGINCOMINGPENDINGDELIVERY;
+	LOGINCOMINGDELIVERED;
+	}
+
+void CRemConServer::ReceiveRequest(CRemConTargetClientProcess& aClient)
+	{
+	LOG_FUNC;
+	LOGINCOMINGPENDINGDELIVERY;
+	LOGINCOMINGDELIVERED;
+
+	// Messages are addressed to the client. Ask client to deliver any pending
+	// messages. For each delivered message, update ourselves accordingly.
+	
+	// Find the first message in IncomingPendingDelivery for this session.
+	TSglQueIter<CRemConMessage>& iter = IncomingPendingDelivery().SetToFirst();
+	CRemConMessage* msg;
+	while ( ( msg = iter++ ) != NULL )
+		{
+		if (msg->SessionId() == aClient.Id())
+			{
+			// Targets receive commands only.
+			ASSERT_DEBUG(msg->MsgType() == ERemConCommand || msg->MsgType() == ERemConNotifyCommand);
+
+			TInt err = aClient.ReceiveMessage(*msg);
+
+			if (err == KErrArgument)
 				{
+				// Message not supported by this client.
+				// 'Take ownership' of it by destroying it- it's finished with.
+				IncomingPendingDelivery().Remove(*msg);
+				delete msg;
+				}
+			else if (err == KErrNotReady)
+				{
+				// Client cannot receive this message at the moment, skip for now
+				// (message is already on the pemding queue).
+				}
+			else 
+				{
+				// Message delivered, remove from pending queue.
+				IncomingPendingDelivery().Remove(*msg);
+				
 				if (err == KErrNone )
 					{
 					// We'll need to remember it for the response coming back.
@@ -2682,7 +2984,7 @@ void CRemConServer::ReceiveRequest(CRemConSession& aSession)
 					// If we aren't returned a client list, this means that the message has been delivered elsewhere
 					if (messageRecipients)
 						{
-						messageRecipients->RemoveAndDestroyClient (aSession.ClientInfo ());
+						messageRecipients->RemoveAndDestroyClient (aClient.ClientInfo ());
 
 						if ( messageRecipients->Clients().IsEmpty ())
 							{
@@ -2692,21 +2994,14 @@ void CRemConServer::ReceiveRequest(CRemConSession& aSession)
 							SendReject(msg->Addr(), msg->InterfaceUid(), msg->OperationId(), msg->TransactionId());
 							}
 						}
-					
+
 					// 'Take ownership' of it by destroying it- it's finished with.
 					delete msg;
 					}
 				}
-			else
-				{
-				// 'Take ownership' of it by destroying it- it's finished with.
-				delete msg;				
-				}
-			
-			break;
 			}
 		}
-
+	
 	LOGINCOMINGPENDINGDELIVERY;
 	LOGINCOMINGDELIVERED;
 	}
@@ -2769,32 +3064,29 @@ Collect all supported interfaces of controller clients.
 */
 TInt CRemConServer::ControllerSupportedInterfaces(RArray<TUid>& aSupportedInterfaces)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	ASSERT_DEBUG(aSupportedInterfaces.Count() == 0);
 	
 	TLinearOrder<TUid> uidCompare(&UidCompare);
 	RArray<TUid> sessionFeatures;
 	TInt err = KErrNone;
-	for(TInt i=0; i<iSessions.Count(); i++)
+	for(TInt i=0; i<iControllerSessions.Count(); i++)
 		{
-		ASSERT_DEBUG(iSessions[i]);
-		if(iSessions[i]->Type() == ERemConClientTypeController)
+		ASSERT_DEBUG(iControllerSessions[i]);
+		err = iControllerSessions[i]->SupportedInterfaces(sessionFeatures);
+		ASSERT_DEBUG(err == KErrNone || err == KErrNoMemory);
+		
+		if(!err)
 			{
-			err = iSessions[i]->SupportedInterfaces(sessionFeatures);
-			ASSERT_DEBUG(err == KErrNone || err == KErrNoMemory);
-			
-			if(!err)
+			for(TInt j=0; j<sessionFeatures.Count(); j++)
 				{
-				for(TInt j=0; j<sessionFeatures.Count(); j++)
-					{
-					// Ignore failure here, we're trying this best effort
-					// InsertInOrder is used rather than just bunging the
-					// interface on the end as we want no duplicates 
-					(void)aSupportedInterfaces.InsertInOrder(sessionFeatures[j], uidCompare);
-					}
+				// Ignore failure here, we're trying this best effort
+				// InsertInOrder is used rather than just bunging the
+				// interface on the end as we want no duplicates 
+				(void)aSupportedInterfaces.InsertInOrder(sessionFeatures[j], uidCompare);
 				}
-			sessionFeatures.Reset();
 			}
+		sessionFeatures.Reset();
 		}
 	
 	if(aSupportedInterfaces.Count() > 0)
@@ -2935,14 +3227,21 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 	// now KErrNone. In this case, sessions' notifications need completing.
 	if ( aError == KErrNone )
 		{
-		iSessionsLock.Wait();
-		const TUint count = iSessions.Count();
+		TUint count = iControllerSessions.Count();
 		for ( TUint ii = 0 ; ii < count ; ++ii )
 			{
-			ASSERT_DEBUG(iSessions[ii]);
-			iSessions[ii]->ConnectionsChanged();
+			ASSERT_DEBUG(iControllerSessions[ii]);
+			iControllerSessions[ii]->ConnectionsChanged();
 			}
-		iSessionsLock.Signal();
+		
+		iTargetClientsLock.Wait();
+		count = iTargetClients.Count();
+		for ( TUint ii = 0 ; ii < count ; ++ii )
+			{
+			ASSERT_DEBUG(iTargetClients[ii]);
+			iTargetClients[ii]->ConnectionsChanged();
+			}
+		iTargetClientsLock.Signal();
 		}
 
 	// Complete the specific client request(s) that caused a ConnectRequest on 
@@ -2950,11 +3249,11 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 	// connect to, and will filter on the address we give them. NB This 
 	// function is called by ConnectIndicate as well as by ConnectConfirm, but 
 	// the client doesn't care which end brought the connection up. 
-	const TUint count = Sessions().Count();
+	const TUint count = iControllerSessions.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		ASSERT_DEBUG(Sessions()[ii]);
-		Sessions()[ii]->CompleteConnect(aAddr, aError);
+		ASSERT_DEBUG(iControllerSessions[ii]);
+		iControllerSessions[ii]->CompleteConnect(aAddr, aError);
 		}
 
 	// Any messages waiting on OutgoingPendingSend for this connection need to 
@@ -2966,13 +3265,26 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 		{
 		if ( msg->Addr() == aAddr )
 			{
-			CRemConSession* const sess = Session(msg->SessionId());
-			// The session should exist- if it doesn't then this message 
+			MRemConMessageSendObserver* observer  = TargetClient(msg->SessionId());
+			if(!observer)
+				{
+				observer = ControllerSession(msg->SessionId());
+				}
+#ifdef __DEBUG
+			else
+				{
+				// Message has matched to a target session, so it should not also match
+				// a controller session (we know the vice-versa is already true).
+				ASSERT_DEBUG(!ControllerSession(msg->SessionId()));
+				}
+#endif
+
+			// The session or client should exist- if it doesn't then this message 
 			// wasn't cleaned from OutgoingPendingSend correctly when the 
 			// session closed. The exceptions are Reject, which can be put
 			// on the queue without a session, and notify changed responses when they are being
 			// delivered to multiple controllers
-			ASSERT_DEBUG(sess || msg->MsgType() == ERemConReject || msg->MsgSubType() == ERemConNotifyResponseChanged);
+			ASSERT_DEBUG(observer || msg->MsgType() == ERemConReject || msg->MsgSubType() == ERemConNotifyResponseChanged);
 
 			if ( aError == KErrNone)
 				{
@@ -2987,46 +3299,20 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 					// deleted because we've finished with it.
 					moveToSent = ETrue;
 					}
-				if ( sess)
+				if ( observer && msg->MsgType() != ERemConReject )
 					{
-					if ( err == KErrNone)
-						{
-						++sess->NumRemotes();
-						}
-					else
-						{
-						sess->SendError ()= err;
-						}
+					observer->MrcmsoMessageSendOneOrMoreResult(*msg, err);
 					}
 				}
 			else
 				{
 				// No connection, remember the error.
-				if ( sess)
+				if ( observer )
 					{
-					sess->SendError ()= aError;
-					}
-				}
-			if ( sess)
-				{
-				--sess->NumRemotesToTry();
-
-				// If we have now dealt with all the messages on the 
-				// OutgoingPendingSend queue for this session, we can complete 
-				// their send. In this case we should by now have collected the 
-				// number of remotes and the send error. (NB A client can only 
-				// have one send outstanding at any one time; a client may have 
-				// more than one message on the 'pending send' queue if the TSP 
-				// said to send to more than one remote.)
-				// If the message is a notify then it can only have been sent to
-				// one Remote so the NumRemotesToTry is not used
-				if(msg->MsgType() == ERemConNotifyCommand)
-					{
-					sess->CompleteSendNotify();
-					}
-				else if ( sess->NumRemotesToTry ()== 0)
-					{
-					sess->CompleteSend ();
+					if (msg->MsgType() != ERemConReject)
+						{
+						observer->MrcmsoMessageSendOneOrMoreResult(*msg, aError);
+						}
 					}
 				}
 
@@ -3049,55 +3335,78 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 	return aError;
 	}
 
-void CRemConServer::RemoveConnection(const TRemConAddress& aAddr)
+void CRemConServer::RemoveConnection(const TRemConAddress& aAddr, TInt aError)
 	{
 	LOG_FUNC;
 	LOG1(_L("\taAddr.BearerUid = 0x%08x"), aAddr.BearerUid());
 	LOGREMOTES;
+	
+	if(aError == KErrNone)
+		{
+		// The connection has gone away
 
-	// We make a new item in the connection history and inform the sessions so 
-	// they can complete outstanding connection status notifications.
+		// We make a new item in the connection history and inform the sessions so 
+		// they can complete outstanding connection status notifications.
+	
+		ASSERT_DEBUG(iConnectionHistory);
+		iConnectionHistory->Disconnection(aAddr);
 
-	ASSERT_DEBUG(iConnectionHistory);
-	iConnectionHistory->Disconnection(aAddr);
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+		TUint count = iControllerSessions.Count();
+		for ( TUint ii = 0 ; ii < count ; ++ii )
+			{
+			ASSERT_DEBUG(iControllerSessions[ii]);
+			iControllerSessions[ii]->ConnectionsChanged();
+			}
+		
+		iTargetClientsLock.Wait();
+		count = iTargetClients.Count();
+		for ( TUint ii = 0 ; ii < count ; ++ii )
+			{
+			ASSERT_DEBUG(iTargetClients[ii]);
+			iTargetClients[ii]->ConnectionsChanged();
+			}
+		iTargetClientsLock.Signal();
+		
+		// If there are any messages waiting on OutgoingPendingSend for this connection,
+		// we re-connect it - they'll be picked up in HandleConnection above.
+	
+		TSglQueIter<CRemConMessage> iter = OutgoingPendingSend().SetToFirst();
+		CRemConMessage* msg;
+		TBool needToReconnect = false;
+		while ( ( msg = iter++ ) != NULL )
+			{
+			if (msg->Addr() == aAddr)
+				{
+				needToReconnect = true;
+				break;
+				}
+			}
+		
+		if (needToReconnect)
+			{
+			ASSERT_DEBUG(iBearerManager);
+			TInt err = iBearerManager->Connect(aAddr);
+			if ( err != KErrNone )
+				{
+				// This fails if:
+				// 1. we're already connecting (in which case, we don't care)
+				// 2. we can't add aAddr to the connecting list
+				// The semantics of this observer don't let us return an error or leave, so
+				// we can't do much about it here. Log it, and the next command will
+				// invoke Connect from a better situation.
+				LOG1(_L("\tFailed to re-connect bearer after connection removed: %d"), err);
+				}
+			}
+		}
+	
+	// Complete the specific request(s) that caused a DisconnectRequest on the 
+	// bearer. Tell all sessions- they remember the address they wanted to 
+	// connect to, and will filter on the address we give them.
+	TInt count = iControllerSessions.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		ASSERT_DEBUG(iSessions[ii]);
-		iSessions[ii]->ConnectionsChanged();
-		}
-	iSessionsLock.Signal();
-	
-	// If there are any messages waiting on OutgoingPendingSend for this connection,
-	// we re-connect it - they'll be picked up in HandleConnection above.
-
-	TSglQueIter<CRemConMessage> iter = OutgoingPendingSend().SetToFirst();
-	CRemConMessage* msg;
-	TBool needToReconnect = false;
-	while ( ( msg = iter++ ) != NULL )
-		{
-		if (msg->Addr() == aAddr)
-			{
-			needToReconnect = true;
-			break;
-			}
-		}
-	
-	if (needToReconnect)
-		{
-		ASSERT_DEBUG(iBearerManager);
-		TInt err = iBearerManager->Connect(aAddr);
-		if ( err != KErrNone )
-			{
-			// This fails if:
-			// 1. we're already connecting (in which case, we don't care)
-			// 2. we can't add aAddr to the connecting list
-			// The semantics of this observer don't let us return an error or leave, so
-			// we can't do much about it here. Log it, and the next command will
-			// invoke Connect from a better situation.
-			LOG1(_L("\tFailed to re-connect bearer after connection removed: %d"), err);
-			}
+		ASSERT_DEBUG(iControllerSessions[ii]);
+		iControllerSessions[ii]->CompleteDisconnect(aAddr, aError);
 		}
 
 	LOGREMOTES;
@@ -3107,7 +3416,8 @@ void CRemConServer::SetConnectionHistoryPointer(TUint aSessionId)
 	{
 	LOG_FUNC;
 	LOG1(_L("\taSessionId = %d"), aSessionId);
-	LOGSESSIONS;
+	LOGCONTROLLERSESSIONS;
+	LOGTARGETSESSIONS;
 	LOGCONNECTIONHISTORYANDINTEREST;
 
 	// Update the record for this session.
@@ -3328,70 +3638,92 @@ void CRemConServer::CommandExpired(TUint aTransactionId)
 	iMessageRecipientsList->RemoveAndDestroyMessage(aTransactionId);
 	}
 
-TClientInfo* CRemConServer::ClientIdToClientInfo(TRemConClientId aId)
+TClientInfo* CRemConServer::TargetClientIdToClientInfo(TRemConClientId aId)
 	{
 	TClientInfo* clientInfo = NULL;
 	
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+	iTargetClientsLock.Wait();
+	const TUint count = iTargetClients.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		CRemConSession* const sess = iSessions[ii];
-		ASSERT_DEBUG(sess);
-		if (sess->Id() == aId)
+		CRemConTargetClientProcess * const client = iTargetClients[ii];
+		ASSERT_DEBUG(client);
+		if (client->Id() == aId)
 			{
-			clientInfo = &sess->ClientInfo();
+			clientInfo = &client->ClientInfo();
 			break;
 			}
 		}
-	iSessionsLock.Signal();
+	iTargetClientsLock.Signal();
 	
 	return clientInfo;
 	}
 
 TInt CRemConServer::SupportedInterfaces(const TRemConClientId& aId, RArray<TUid>& aUids)
 	{
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+	TUint count = iControllerSessions.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		CRemConSession* const sess = iSessions[ii];
+		CRemConSession* const sess = iControllerSessions[ii];
 		ASSERT_DEBUG(sess);
 		if (sess->Id() == aId)
 			{
-			iSessionsLock.Signal();
 			return sess->SupportedInterfaces(aUids);
 			}
 		}
-	iSessionsLock.Signal();
+	
+	iTargetClientsLock.Wait();
+	count = iTargetClients.Count();
+	for ( TUint ii = 0 ; ii < count ; ++ii )
+		{
+		CRemConTargetClientProcess* const client = iTargetClients[ii];
+		ASSERT_DEBUG(client);
+		if (client->Id() == aId)
+			{
+			iTargetClientsLock.Signal();
+			return client->SupportedInterfaces(aUids);
+			}
+		}
+	iTargetClientsLock.Signal();
 	
 	return KErrNotFound;
 	}
 
 TInt CRemConServer::SupportedOperations(const TRemConClientId& aId, TUid aInterfaceUid, RArray<TUint>& aOperations)
 	{
-	iSessionsLock.Wait();
-	const TUint count = iSessions.Count();
+	iTargetClientsLock.Wait();
+	TUint count = iTargetClients.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
 		{
-		CRemConSession* const sess = iSessions[ii];
+		CRemConTargetClientProcess* const client = iTargetClients[ii];
+		ASSERT_DEBUG(client);
+		if (client->Id() == aId)
+			{
+			iTargetClientsLock.Signal();
+			return client->SupportedOperations(aInterfaceUid, aOperations);
+			}
+		}
+	iTargetClientsLock.Signal();
+
+	count = iControllerSessions.Count();
+	for ( TUint ii = 0 ; ii < count ; ++ii )
+		{
+		CRemConControllerSession* const sess = iControllerSessions[ii];
 		ASSERT_DEBUG(sess);
 		if (sess->Id() == aId)
 			{
-			iSessionsLock.Signal();
 			return sess->SupportedOperations(aInterfaceUid, aOperations);
 			}
 		}
-	iSessionsLock.Signal();
 	
 	return KErrNotFound;
 	}
 
 void CRemConServer::SetRemoteAddressedClient(const TUid& aBearerUid, const TRemConClientId& aId)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	
-	TClientInfo* clientInfo = ClientIdToClientInfo(aId);
+	TClientInfo* clientInfo = TargetClientIdToClientInfo(aId);
 	// Bearer must supply valid client id
 	ASSERT_DEBUG(clientInfo);
 
@@ -3411,30 +3743,30 @@ TInt CRemConServer::UnregisterLocalAddressedClientObserver(const TUid& aBearerUi
 
 TRemConClientId CRemConServer::ClientIdByProcessId(TProcessId aProcessId)
 	{
-	LOG_FUNC
+	LOG_FUNC;
 	TRemConClientId ret = KNullClientId;
-	iSessionsLock.Wait();
-	CRemConSession* session = TargetSession(aProcessId);
-	if(session)
+	iTargetClientsLock.Wait();
+	CRemConTargetClientProcess* client = TargetClient(aProcessId);
+	if(client)
 		{
-		ret = session->Id();
+		ret = client->Id();
 		}
-	iSessionsLock.Signal();
+	iTargetClientsLock.Signal();
 	return ret;
 	}
 
 void CRemConServer::BulkInterfacesForClientL(TRemConClientId aId, RArray<TUid>& aUids)
 	{
-	LOG_FUNC
-	iSessionsLock.Wait();
-	CleanupSignalPushL(iSessionsLock);
-	CRemConSession* session = Session(aId);
-	if(!session)
+	LOG_FUNC;
+	iTargetClientsLock.Wait();
+	CleanupSignalPushL(iTargetClientsLock);
+	CRemConTargetClientProcess* client = TargetClient(aId);
+	if(!client)
 		{
 		LEAVEL(KErrNotFound);
 		}
-	LEAVEIFERRORL(session->SupportedBulkInterfaces(aUids));
-	CleanupStack::PopAndDestroy(&iSessionsLock);
+	LEAVEIFERRORL(client->SupportedBulkInterfaces(aUids));
+	CleanupStack::PopAndDestroy(&iTargetClientsLock);
 	}
 
 
@@ -3481,7 +3813,7 @@ void CBulkThreadWatcher::RunL()
 	// Thread is dead so kill handle.
 	iServer.iBulkServerThread.Close();
 	iServer.iBulkThreadOpen = EFalse;
-	iServer.StartShutdownTimerIfNoSessionsOrBulkThread();
+	iServer.StartShutdownTimerIfNoClientsOrBulkThread();
 	iServer.iBulkThreadWatcher = NULL;
 	delete this; // end...
 	}

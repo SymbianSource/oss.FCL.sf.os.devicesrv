@@ -136,13 +136,22 @@ public:
         EBatteryChargerUnKnown = 0, 
         EBatteryChargerDedicated = 1, 
         EBatteryChargerUsbDedicated = 2,
-        EBatteryChargerUsbHost = 3 
+        EBatteryChargerUsbHost = 3,
+      	// Hi-speed USB host
+				EBatteryChargerUsbHispeedHost 		= 4,
+				// USB host with accessory charger adapter
+				EBatteryChargerUsbAca 			= 5,
         };
 
     /* The current charging status of the device. */
     enum TBatteryChargingStatus
         {
-        EChargingStatusError              = -1, 
+        EChargingStatusError                    = -1,
+        EChargingStatusIllegalChargerError      = -2,
+        EChargingStatusChargerUnderVoltageError = -3,
+        EChargingStatusChargerOverVoltageError  = -4,
+        EChargingStatusTempTooHotError          = -5,
+        EChargingStatusTempTooColdError         = -6,
         EChargingStatusNotConnected       = 0,  
         EChargingStatusCharging           = 1,  
         EChargingStatusNotCharging        = 2,  

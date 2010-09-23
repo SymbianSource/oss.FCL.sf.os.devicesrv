@@ -19,7 +19,7 @@
 #include <platform_paths.hrh>
 #include <data_caging_paths.hrh>
 
-TARGET              tvoutconfig.dll
+TARGET              tvoutconfig_stub.dll
 TARGETTYPE          dll
 
 UID                 0x1000008D 0x101F6E00
@@ -37,3 +37,10 @@ USERINCLUDE         ../inc
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY         euser.lib
+LIBRARY			acccontrol.lib
+LIBRARY			accpolicy.lib
+LIBRARY			accsrvutil.lib
+LIBRARY			accclient.lib
+
+
+SMPSAFE

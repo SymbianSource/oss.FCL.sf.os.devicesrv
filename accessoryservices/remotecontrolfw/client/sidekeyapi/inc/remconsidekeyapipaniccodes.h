@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -13,10 +13,15 @@
 // Description:
 //
 
-#include <e32std.h>
+#ifndef REMCONSIDEKEYAPIPANICCODES_H
+#define REMCONSIDEKEYAPIPANICCODES_H
 
-/**
- * patchable const data values defined in ssmmaxbootattempts_patch.h
- */
-EXPORT_C extern const TInt KSsmMaxBootAttempts = 3;
+enum TSideKeyApiPanicCat
+	{
+	ESideKeyMissingButtonData,
+	ESideKeyInvalidOperationId,
+	};
 
+_LIT(KSideKeyPanicCat,"RemconSideKeyApi");
+
+#endif // REMCONSIDEKEYAPIPANICCODES_H

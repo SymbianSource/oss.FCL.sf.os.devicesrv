@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -21,7 +21,6 @@
 
 #include "tcmncustomcmd_server.h"
 #include "tcmncustomcmd_step_rendezvouswithestart.h"
-#include "tcmncustomcmd_step_persistreboots.h"
 #include "tcmncustomcmd_step_cancelmonitoring.h"
 
 _LIT(KCustomCmdTestServerName, "tcmncustomcmd_server");
@@ -84,11 +83,7 @@ CTestStep* CCmdTestServer::CreateTestStep(const TDesC& aStepName)
 		{
 		testStep = new CCustomCmdTestRendezvousWithEStart();
 		}
-	else if (aStepName == KTCCustomCmdTestPersistReboots)
-		{
-		testStep = new CCustomCmdTestPersistReboots();
-		}	
-    else if (aStepName == KTCCustomCmdTestCancelMonitoring)
+	else if (aStepName == KTCCustomCmdTestCancelMonitoring)
         {
         testStep = new CCustomCmdTestCancelMonitoring();
         }   

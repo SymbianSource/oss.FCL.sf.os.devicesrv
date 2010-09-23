@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -26,13 +26,13 @@
 #include <remconaddress.h>
 #include <remcon/clientinfo.h>
 #include <remcon/clienttype.h>
+#include <remcon/messagetype.h>
 #include <remcon/playertype.h>
 #include <remcon/clientid.h>
 
 class CRemConServer;
 class CBearerManager;
 class CRemConMessage;
-class CActiveHelper;
 class CMessageQueue;
 class CRemConInterfaceDetailsArray;
 class CRemConInterfaceDetails;
@@ -43,20 +43,6 @@ Rem Con session.
 NONSHARABLE_CLASS(CRemConSession) : public CSession2
 	{
 public:
-	/**
-	Factory method.
-	@param aServer The server.
-	@param aBearerManager The bearer manager.
-	@param aMessage Handle on the client message triggering this session creation.
-	@param aId The unique ID of the new session.
-	@return Ownership of a new session.
-	*/
-	static CRemConSession* NewL(CRemConServer& aServer,
-		CBearerManager& aBearerManager,
-		const RMessage2& aMessage,
-		TUint aId);
-
-	/** Destructor. */
 	~CRemConSession();
 
 public: // called by the server
@@ -87,11 +73,6 @@ public: // called by the server
 	inline const TClientInfo& ClientInfo() const;
 
 	/**
-	@return This session's type.
-	*/
-	inline TRemConClientType Type() const;
-
-	/**
 	@return This session's unique identifier.
 	*/
 	inline TUint Id() const;
@@ -111,7 +92,7 @@ public: // called by the server
 	Checks if this message is supported by the session
 	@return ETrue if it is, EFalse otherwise
 	*/
-	TBool SupportedMessage(const CRemConMessage& aMsg);
+	virtual TBool SupportedMessage(const CRemConMessage& aMsg) const = 0;
 
 	/**
 	Writes aMsg to the client's Receive message (NB RMessage2::Write may fail) 
@@ -132,43 +113,24 @@ public: // called by the server
 	@return Handle to client's receive message.
 	*/
 	inline const RMessage2& CurrentReceiveMessage() const;
-
-	inline const TPlayerType& PlayerType() const;
-	inline const TPlayerSubType& PlayerSubType() const;
-	
-	inline const TDesC8& Name() const;
 	
 	TInt SupportedInterfaces(RArray<TUid>& aUids);
+	TInt AppendSupportedInterfaces(RArray<TUid>& aUids);
 	TInt SupportedBulkInterfaces(RArray<TUid>& aUids);
+	TInt AppendSupportedBulkInterfaces(RArray<TUid>& aUids);
 	TInt SupportedOperations(TUid aInterfaceUid, RArray<TUint>& aOperations);
 
 	/**
 	Panics the client's current Send message with the given code.
 	*/
 	void PanicSend(TRemConClientPanic aCode);
-
-public: // called by the bearer manager
+	
 	/**
-	Indicates that a connect request has been completed. The request was not 
-	necessarily from this session- the session must check that the connected 
-	address is one it has asked to be connected. If it is, and we have a 
-	connect request outstanding, the connect request should be completed.
-	@param aAddr The connected address.
-	@param aError The error with which the connection attempt was completed.
+	Checks whether this session is fully initialised and available for use
+	by bearers.
+	@return ETrue if session can be used by bearers, EFalse otherwise
 	*/
-	void CompleteConnect(const TRemConAddress& aAddr, TInt aError);
-
-	/**
-	Indicates that a disconnect request has been completed. The request was 
-	not necessarily from this session- the session must check that the 
-	disconnected address is one it has asked to be disconnected. If it is, and 
-	we have a disconnect request outstanding, the disconnect request should be 
-	completed.
-	@param aAddr The disconnected address.
-	@param aError The error with which the disconnection attempt was 
-	completed.
-	*/
-	void CompleteDisconnect(const TRemConAddress& aAddr, TInt aError);
+	inline TBool ClientAvailable() const;
 
 	/**
 	Indicates that a connection has come up or down. If the session has a 
@@ -179,57 +141,26 @@ public: // called by the bearer manager
 	*/
 	void ConnectionsChanged();
 	
-public: // called by the active helper
-	/**
-	Process pending messages.
-	*/
-	void ProcessPendingMsgL();
-	
-private:
-	/**
-	Constructor.
-	@param aServer The server.
-	@param aBearerManager The bearer manager.
-	@param aId The unique ID of the new session.
-	*/
-	CRemConSession(CRemConServer& aServer, 
-		CBearerManager& aBearerManager,
-		TUint aId);
+protected:
+    /**
+    Constructor.
+    @param aServer The server.
+    @param aBearerManager The bearer manager.
+    @param aId The unique ID of the new session.
+    */
+    CRemConSession(CRemConServer& aServer, 
+        CBearerManager& aBearerManager,
+        TUint aId);
+    
+    /**
+    2nd-phase construction.
+    @param aMessage The message received from the client.
+    */
+    void BaseConstructL(const TClientInfo& aClientInfo);
 
-	/**
-	2nd-phase construction.
-	@param aMessage The message received from the client.
-	*/
-	void ConstructL(const RMessage2& aMessage);
-		
-private: // from CSession2
-	/**
-	Called when a message is received from the client.
-	@param aMessage Message received from the client.
-	*/
-	void ServiceL(const RMessage2& aMessage);
-
-private: // utility- IPC command handlers
-	void SetClientType(const RMessage2& aMessage);
-	void GoConnectionOriented(const RMessage2& aMessage);
-	void GoConnectionless(const RMessage2& aMessage);
-	void ConnectBearer(const RMessage2& aMessage);
-	void ConnectBearerCancel(const RMessage2& aMessage);
-	void DisconnectBearer(const RMessage2& aMessage);
-	void DisconnectBearerCancel(const RMessage2& aMessage);
-	void Send(const RMessage2& aMessage);
-	void SendNotify(const RMessage2& aMessage);
-	void SendUnreliable(const RMessage2& aMessage);
-	void SendCancel(const RMessage2& aMessage);
-	void Receive(const RMessage2& aMessage);
-	void ReceiveCancel(const RMessage2& aMessage);
-	void GetConnectionCount(const RMessage2& aMessage);
-	void GetConnections(const RMessage2& aMessage);
-	void NotifyConnectionsChange(const RMessage2& aMessage);
-	void NotifyConnectionsChangeCancel(const RMessage2& aMessage);
-	void RegisterInterestedAPIs(const RMessage2& aMessage);
 	
-private: // utility
+protected: 		
+
 	/**
 	Utility to complete the given message with the given error code.
 	@param aMessage Message to complete.
@@ -237,51 +168,90 @@ private: // utility
 	*/
 	void CompleteClient(const RMessage2& aMessage, TInt aError);
 
-	void DoSendL(const RMessage2& aMessage);
-	void DoSendNotifyL(const RMessage2& aMessage);
-	CRemConMessage* DoCreateUnreliableMessageL(const RMessage2& aMessage);
-	void DoRegisterInterestedAPIsL(const RMessage2& aMessage);
-	void DoSetClientTypeL(const RMessage2& aMessage);
-	void DoSendCancel();
+	CRemConInterfaceDetailsArray* ExtractInterestedAPIsL(const RMessage2& aMessage);
 	
-	CRemConInterfaceDetails* FindInterfaceByUid(TUid aUid) const;
-
-	void SendToServer(CRemConMessage& aMsg);
+	/**
+	Gets the information needed to send from the RMessage.
 	
-	void CheckForPendingMsg() const; 
-
-	static TInt SendNextCb(TAny* aThis);
-
-	void DoSendNext();
+	@param aMessage The message containing the info.
+	@param aInterfaceUid The uid of the interface to send on
+	@param aOperationId The operation id to send
+	@param aMessageSubType The sub type of hte message
+	@param aSendDes The operation data to send.  Ownership is passed
+					to the caller and aSendDes is placed on the cleanup
+					stack when this function completes successfully.
+	@leave If the data was not successfully read. Note: if the message is invalid
+	       this function will not leave, but rather panic the message and return
+	       EFalse. This function will only leave if there's a system error, such
+	       as out of memory.
+	@return ETrue if the message information was successfully retrieved,
+			or EFalse if the message is invalid, in which case it got panicked.
+			If this function returns EFalse, aSendDes is not left on the cleanup stack.
+	 */
+	TBool DoGetSendInfoLC(const RMessage2& aMessage, 
+			TUid& aInterfaceUid,
+			TUint& aOperationId,
+			TRemConMessageSubType& aMessageSubType,
+			RBuf8& aSendDes);
+			
 	
-	void EmptySendQueue();
+protected: // from CSession2
+	/**
+	Called when a message is received from the client.
+	
+	Also used from the session, where a session has stored
+	a message for later	processing.
+	
+	@param aMessage Message received from the client.
+	*/
+	void ServiceL(const RMessage2& aMessage);
 
+private: // utility- IPC command handlers
+	virtual void SetPlayerType(const RMessage2& aMessage)=0;
+	virtual void SendUnreliable(const RMessage2& aMessage) = 0;
+	virtual void SendCancel(const RMessage2& aMessage);
+	virtual void Receive(const RMessage2& aMessage);
+	virtual void ReceiveCancel(const RMessage2& aMessage);
+	virtual void GetConnectionCount(const RMessage2& aMessage);
+	virtual void GetConnections(const RMessage2& aMessage);
+	virtual void NotifyConnectionsChange(const RMessage2& aMessage);
+	virtual void NotifyConnectionsChangeCancel(const RMessage2& aMessage);
+	virtual void RegisterInterestedAPIs(const RMessage2& aMessage) = 0;
+	virtual void GoConnectionOriented(const RMessage2& aMessage);
+	virtual void GoConnectionless(const RMessage2& aMessage);
+	virtual void ConnectBearer(const RMessage2& aMessage);
+	virtual void ConnectBearerCancel(const RMessage2& aMessage);
+	virtual void DisconnectBearer(const RMessage2& aMessage);
+	virtual void DisconnectBearerCancel(const RMessage2& aMessage);
+	virtual void SendNotify(const RMessage2& aMessage);
+	void Send(const RMessage2& aMessage);
+
+private: // utility
+	virtual CRemConMessage* DoPrepareSendMessageL(const RMessage2& aMessage)=0;
+	virtual void DoSendCancel()=0;
+	virtual void DoReceive()=0;
 	void WriteMessageToClientL(const CRemConMessage& aMsg);
+	virtual void SendToServer(CRemConMessage& aMsg)=0;
+	static TInt SendNextCb(TAny* aThis);
+	void DoSendNext();
+
+protected:
+	void DoSendL(const RMessage2& aMessage);
+	void GetPlayerTypeAndNameL(const RMessage2& aMessage, TPlayerTypeInformation& aPlayerType, RBuf8& aPlayerName);
+	CRemConInterfaceDetails* FindInterfaceByUid(TUid aUid) const;
 	
-private: // unowned
+protected: // unowned
 	CRemConServer& iServer;
 	CBearerManager& iBearerManager;
 
-private: // message handles for asynchronous IPC requests
-	RMessage2 iConnectBearerMsg;
-	RMessage2 iDisconnectBearerMsg;
+protected: // message handles for asynchronous IPC requests
 	RMessage2 iSendMsg;
 	RMessage2 iReceiveMsg;
 	RMessage2 iNotifyConnectionsChangeMsg;
-	// Stores pending connect/disconnect request
-	// There can be only one pending request at any time
-	RMessage2 iPendingMsg;
-	
+
 	CMessageQueue* iSendQueue;
 	
-private: // owned
-	// Address of remote device associated with this session (only relevant 
-	// for controllers). A null remote address indicates a connectionless 
-	// controller; a non-null UID indicates a connection-oriented controller.
-	TRemConAddress iRemoteAddress;
-
-	TRemConClientType iType;
-
+protected: // owned
 	// The client's process ID, secure ID and caps.
 	TClientInfo iClientInfo;
 
@@ -297,9 +267,8 @@ private: // owned
 	// While processing outgoing commands to multiple remotes, 
 	// iNumRemotesToTry is decremented each time we finish trying to address a 
 	// remote. This may be at the connection stage or the actual send stage.
-	// -1 means that the client's send has been completed already. This is 
-	// useful due to the potentially recursive processing of multiple 
-	// connections.
+	// On return to 0, the client is completed with either the result of the send
+	// or KErrCancel.
 	TInt iNumRemotesToTry;
 	// For completion of the current send request. NB A send may be completed 
 	// only after numerous asynchronous stages.
@@ -307,13 +276,6 @@ private: // owned
 	TInt iSendError;
 	
 	CRemConInterfaceDetailsArray* iInterestedAPIs;
-	// the player type information
-	TPlayerTypeInformation iPlayerType;
-	//the player name 
-	RBuf8 iPlayerName;
-
-	// Helps with session's async connect/disconnect requests
-	CActiveHelper *iPendingMsgProcessor;
 	
 	CAsyncCallBack* iSendNextCallBack;
 	
@@ -325,7 +287,6 @@ private: // owned
 		};
 	
 	TRemConSessionSending iSending;
-	
 	};
 
 // Inlines
@@ -355,11 +316,6 @@ const TClientInfo& CRemConSession::ClientInfo() const
 	return iClientInfo;
 	}
 
-TRemConClientType CRemConSession::Type() const
-	{
-	return iType;
-	}
-
 TUint CRemConSession::Id() const
 	{
 	return iId;
@@ -375,19 +331,11 @@ const RMessage2& CRemConSession::CurrentReceiveMessage() const
 	return iReceiveMsg;
 	}
 
-const TPlayerType& CRemConSession::PlayerType() const
+TBool CRemConSession::ClientAvailable() const
 	{
-	return iPlayerType.iPlayerType;
-	}
-
-const TPlayerSubType& CRemConSession::PlayerSubType() const
-	{
-	return iPlayerType.iPlayerSubType;
-	}
-
-const TDesC8& CRemConSession::Name() const
-	{
-	return iPlayerName;
+	// Client is available as soon as it has registered the APIs
+	// it is interested in.
+	return iInterestedAPIs ? ETrue : EFalse;
 	}
 
 #endif // REMCONSESSION_H

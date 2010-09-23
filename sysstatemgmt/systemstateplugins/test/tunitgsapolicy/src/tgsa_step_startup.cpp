@@ -75,6 +75,8 @@ TSsmCommandType ArrNonCriticalStartUp[] = { ESsmCmdCustomCommand,       //r_cmd_
                                             ESsmCmdLoadSup,             //r_cmd_loadregion
                                             ESsmCmdLoadSup,             //r_cmd_loaduilanguage
                                             ESsmCmdCustomCommand,       //r_cmd_aknstart
+                                            ESsmCmdStartProcess,        //r_cmd_devicedialog
+                                            ESsmCmdStartProcess,         //r_cmd_hbthemeserver
                                             ESsmCmdWaitForApparcInit,   //r_cmd_apparc_init
                                             ESsmCmdCustomCommand        //r_cmd_rfspostui
                                             };

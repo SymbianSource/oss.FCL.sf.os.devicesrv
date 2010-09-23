@@ -415,7 +415,7 @@ TInt CHWRMPowerImpl::DoNotifyAverageChargingCurrent(TRequestStatus& aStatus, con
     err = DoGetBatteryChargingStatus(chargingStatus);
     
     if((err != KErrNone) || 
-       (chargingStatus == CHWRMPower::EChargingStatusError) || 
+       (chargingStatus <= CHWRMPower::EChargingStatusError) || 
        (chargingStatus == CHWRMPower::EChargingStatusNotConnected) || 
        (chargingStatus == CHWRMPower::EChargingStatusNotCharging))
         {
@@ -467,7 +467,7 @@ TInt CHWRMPowerImpl::DoNotifyBatteryFullChargingTime(TRequestStatus& aStatus)
     err = DoGetBatteryChargingStatus(chargingStatus);
     
     if((err != KErrNone) || 
-       (chargingStatus == CHWRMPower::EChargingStatusError) || 
+       (chargingStatus <= CHWRMPower::EChargingStatusError) ||
        (chargingStatus == CHWRMPower::EChargingStatusNotConnected) || 
        (chargingStatus == CHWRMPower::EChargingStatusNotCharging))
         {
@@ -556,7 +556,7 @@ void CHWRMPowerImpl::ChargingStatusChange(TInt aErrCode,CHWRMPower::TBatteryChar
         
         //Stop charging notifications, if charger is not connected.
         if((aErrCode != KErrNone) || 
-           (aChrgStatus == CHWRMPower::EChargingStatusError) || 
+           (aChrgStatus <= CHWRMPower::EChargingStatusError) ||
            (aChrgStatus == CHWRMPower::EChargingStatusNotConnected) || 
            (aChrgStatus == CHWRMPower::EChargingStatusNotCharging))
             {

@@ -64,7 +64,7 @@ void CHWRMChargingStatusObs::ConstructL()
     {
     COMPONENT_TRACE1(_L( "HWRM CHWRMChargingStatusObs - CHWRMChargingStatusObs::ConstructL()"));
     
-    iChargingPsObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMChargingStatus, *this);    
+    iChargingPsObserver = CPsPropertyObserver::NewL(KPSUidHWRMPowerState, KHWRMExtendedChargingStatus, *this);    
     
     COMPONENT_TRACE1(_L( "HWRM CHWRMChargingStatusObs - CHWRMChargingStatusObs::ConstructL() - return"));    
     }
@@ -72,7 +72,7 @@ void CHWRMChargingStatusObs::ConstructL()
 
 void CHWRMChargingStatusObs::PsPropertyChanged(TInt aKey, TInt aValue, TInt aError)
     {
-    if((aKey == KHWRMChargingStatus)&&(iChargingStatusObserver)&&
+    if((aKey == KHWRMExtendedChargingStatus)&&(iChargingStatusObserver)&&
         (iChargingStatus != aValue))
         {
         iChargingStatus = aValue;

@@ -48,3 +48,6 @@ LIBRARY         euser.lib
 LIBRARY			ecom.lib
 LIBRARY			asyproxy.lib
 LIBRARY			pluggeddisplayengine.lib
+
+
+SMPSAFE

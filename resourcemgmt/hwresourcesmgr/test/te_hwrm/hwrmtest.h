@@ -122,6 +122,9 @@ public:
 	
 	// Power State tests
 	void TestPowerStatesL();
+	void TestPowerExtendedBatteryStatusL();
+	void TestPowerBatteryStatusL();
+	void TestPowerChargingStatusL();
 	
 	// Extended Lights
 	void TestExtendedLightSessionsL();
@@ -458,9 +461,37 @@ private:
 	void OpenFlipL();
 		
 	void PowerStateOpenL();
+	void ExpectLegacyBatteryStatusL();
+    void ExpectLegacyChargingStatusL();
+    void ExpectNewBatteryStatusL();
+    void ExpectNewChargingStatusL();
 	void BatteryLevelL();
 	void BatteryStateL();
-	void ChargingStatusL();	
+	void BatteryStateUnknownErrorL();
+	void BatteryStateUnsupportedL();
+	void BatteryStateAuthErrorL();
+	void BatteryStateStatusOkL();
+	void BatteryStateStatusLowL();
+	void BatteryStateStatusEmptyL();
+	void ExtendedBatteryStateUnknownErrorL();
+	void ExtendedBatteryStateUnsupportedL();
+	void ExtendedBatteryStateAuthErrorL();
+	void ExtendedBatteryStateStatusOkL();
+	void ExtendedBatteryStateStatusLowL();
+	void ExtendedBatteryStateStatusEmptyL();
+	void ChargingStatusL();
+	void ChargingStatusNotConnectedL();
+	void ChargingStatusChargingOkL();
+	void ChargingStatusNotChargingL();
+	void ChargingStatusAlmostCompleteL();
+	void ChargingStatusCompletedChargingL();
+	void ChargingStatusChargingContinuesL();
+	void ChargingStatusErrorL();
+	void ChargingStatusIllegalErrorL();
+	void ChargingStatusUnderVoltageErrorL();
+	void ChargingStatusOverVoltageErrorL();
+	void ChargingStatusTooHotErrorL();
+	void ChargingStatusTooColdErrorL();
 
 	void DisableNotificationCheckingL();
 	void EnableNotificationCheckingL();
@@ -495,6 +526,11 @@ private:
 	void PowerAndPowerStateOpenL();
 	void PowerAndPowerState3SessionsOpenL();
 	void PowerChargingStatusErrorL();
+	void PowerChargingStatusIllegalErrorL();
+	void PowerChargingStatusUnderVoltageErrorL();
+	void PowerChargingStatusOverVoltageErrorL();
+	void PowerChargingStatusTooHotErrorL();
+	void PowerChargingStatusTooColdErrorL();	
 	void PowerChargingStatusNotConnectedL();
 	void PowerChargingStatusChargingL();
 	void PowerChargingStatusNotChargingL();
@@ -502,6 +538,11 @@ private:
 	void PowerChargingStatusCompleteL();	
 	void PowerChargingStatusContinuedL();	
 	void PowerChargingStatusError3L();
+	void PowerChargingStatusIllegalError3L();
+	void PowerChargingStatusUnderVoltageError3L();
+	void PowerChargingStatusOverVoltageError3L();
+	void PowerChargingStatusTooHotError3L();
+	void PowerChargingStatusTooColdError3L();	
 	void PowerChargingStatusNotConnected3L();
 	void PowerChargingStatusCharging3L();
 	void PowerChargingStatusNotCharging3L();
@@ -551,6 +592,10 @@ private:
 	void GetBatteryChargerTypeNoChargerMulticlientL();
 	void GetBatteryChargerTypeACMainMulticlientL();
 	void GetBatteryChargerTypeUSBMulticlientL();
+	void GetBatteryChargerTypeUSBHispeedHost();
+	void GetBatteryChargerTypeUSBHispeedHostMulticlientL();
+	void GetBatteryChargerTypeUSBAca();
+	void GetBatteryChargerTypeUSBAcaMulticlientL();	
 	void GetBatteryChargerTypeWithPluginErrorL();
 	void ChargingCurrentMaxPeriodReachedL();
 	void StartChargingCurrentSameIntervalL();

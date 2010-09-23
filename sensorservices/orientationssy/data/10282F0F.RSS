@@ -37,6 +37,7 @@ RESOURCE REGISTRY_INFO OrientationSsy
                     version_no         = 1;
                     display_name       = "ORIENTATIONSSY";
                     default_data       = {
+#if 0
                                          // Orientation channel
                                          0x1, // ChannelInfoVersion
                                          0x27, //  ChannelInfoLength
@@ -48,7 +49,7 @@ RESOURCE REGISTRY_INFO OrientationSsy
                                          0x05, 0x4e, 0x6f, 0x6b, 0x69, 0x61, // VendorId: Nokia
                                          0x88, 0x50, 0x20, 0x10, // ChannelDataTypeId
                                          0x01, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, // ChannelSecurityPolicy
-                                         
+#endif
                                          // Rotation channel
                                          0x1, // ChannelInfoVersion
                                          0x27, //  ChannelInfoLength

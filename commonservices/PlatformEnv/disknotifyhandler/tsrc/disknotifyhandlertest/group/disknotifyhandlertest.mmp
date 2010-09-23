@@ -34,7 +34,7 @@ OS_LAYER_SYSTEMINCLUDE
 MW_LAYER_SYSTEMINCLUDE
 
 LIBRARY     euser.lib
-LIBRARY     stiftestinterface.lib
+LIBRARY     StifTestInterface.lib
 LIBRARY     disknotifyhandler.lib
 LIBRARY     efsrv.lib
 LIBRARY     bafl.lib

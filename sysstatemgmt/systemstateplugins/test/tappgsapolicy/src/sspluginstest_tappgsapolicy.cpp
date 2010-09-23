@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,12 +22,12 @@
 #include <eikstart.h> 
 #include <eikapp.h>
 #include <bautils.h>
+#include <centralrepository.h>
 #include "sspluginstest_tappgsapolicy.h"
+#include "ssmpolicypluginsprivatecrkeys.h"
 
 //Fail to execute this exe for KDontRvBootCount times
 const TInt KDontRvBootCount = 3;
-_LIT(KBootUpFolder, ":\\private\\2000d75b\\bootupinfo\\");
-_LIT(KBootUpFile, "bootupcount.bin");
 
 /**
 Standard DLL entry point function.
@@ -127,12 +127,10 @@ void CTestAppUi::ConstructL()
  
  This particular test case can be used to test following
  1.Transitions to fail 
- 	To test above need to set KDontRvBootCount to KSsmMaxBootAttempts+1.
+ 	To test above need to set KDontRvBootCount to KSsmStartupErrorResetLimit+1.
  2.Persisted number of consecutive failed device start-ups
- 	To test above feature need set KDontRvBootCount to KSsmMaxBootAttempts
- 3.Transitions to restart to infinite times.
- 	To test above feature set KDontRvBootCount and KSsmMaxBootAttempts to 0xFFFFFFFF      	
-*/
+ 	To test above feature need set KDontRvBootCount to KSsmStartupErrorResetLimit
+ */
 void DoFrameworkCallsRendezvousL();
 
 TBool CTestAppUi::FrameworkCallsRendezvous() const
@@ -143,35 +141,15 @@ TBool CTestAppUi::FrameworkCallsRendezvous() const
 
 void DoFrameworkCallsRendezvousL()
 	{
-	RFs fs;
-	User::LeaveIfError(fs.Connect());
-	CleanupClosePushL(fs);
-	RBuf bootupInfoPath;
-	CleanupClosePushL( bootupInfoPath );
-	const TChar drive = RFs::GetSystemDriveChar();
-	TInt length = KBootUpFolder().Length() + KBootUpFile().Length() + 1 /* for RFs::GetSystemDriveChar() */;
-	bootupInfoPath.CreateL(length);
-	bootupInfoPath.Append(drive);
-	bootupInfoPath.Append(KBootUpFolder());
-	bootupInfoPath.Append(KBootUpFile());
-	
-	TBool found = BaflUtils::FileExists(fs, bootupInfoPath);
-	TInt bootCount = 0;
-	if(found)
-		{
-		RFileReadStream file;
-		CleanupClosePushL(file);
-		User::LeaveIfError(file.Open(fs, bootupInfoPath, EFileRead));
-		bootCount = file.ReadUint8L();
-		RDebug::Printf("--- CTestAppUi::FrameworkCallsRendezvous() bootcount %d", bootCount);
-		CleanupStack::PopAndDestroy( &file );
-		}
-	CleanupStack::PopAndDestroy( &bootupInfoPath );
-	CleanupStack::PopAndDestroy( &fs );
-	if( bootCount < KDontRvBootCount )
+	CRepository* repository = CRepository::NewLC( KCRUidSsmStartupPolicy );
+	TInt Resetlimit;
+	User::LeaveIfError( repository->Get( KSsmStartupErrorResetLimit, Resetlimit ) );
+	CleanupStack::Pop(repository);
+	if( Resetlimit < KDontRvBootCount )
 		{
 		_LIT(KMainErrorStatement, "*** Program error in Starting sspluginstest_tappgsapolicy.exe: %d");
 		RDebug::Print(KMainErrorStatement, KErrNone);
 	   	User::Panic(KMainErrorStatement,KErrNone);
 		}
+
 	}

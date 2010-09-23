@@ -529,4 +529,38 @@ START_TESTCASE DEVSRVS-HWRM-P-0033
 //!@SYMTestType CT
 RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerNotify_All_AdjustReportingPeriod_NegativeValueL
 END_TESTCASE DEVSRVS-HWRM-P-0033
+
+START_TESTCASE DEVSRVS-HWRM-B-0034
+//!@SYMTestCaseID DEVSRVS-HWRM-B-0034
+//!@SYMComponent telephony_hwrm
+//!@SYMTestCaseDesc Checking all extended battery states
+//!@SYMTestPriority High
+//!@SYMTestActions open power state sessions and check extended battery states 
+//!@SYMTestExpectedResults Pass
+//!@SYMTestType CT
+RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerExtendedBatteryStatusL
+END_TESTCASE DEVSRVS-HWRM-B-0034
+
+START_TESTCASE DEVSRVS-HWRM-B-0035
+//!@SYMTestCaseID DEVSRVS-HWRM-B-0035
+//!@SYMComponent telephony_hwrm
+//!@SYMTestCaseDesc Checking all battery states
+//!@SYMTestPriority High
+//!@SYMTestActions open power state sessions and check legacy battery states, also checks new states are mapped and states recieved correctly
+//!@SYMTestExpectedResults Pass
+//!@SYMTestType CT
+RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerBatteryStatusL
+END_TESTCASE DEVSRVS-HWRM-B-0035
+
+START_TESTCASE DEVSRVS-HWRM-B-0036
+//!@SYMTestCaseID DEVSRVS-HWRM-B-0036
+//!@SYMComponent telephony_hwrm
+//!@SYMTestCaseDesc Checking all charging states
+//!@SYMTestPriority High
+//!@SYMTestActions open power state sessions and check legacy charging states, also checks new states are mapped and states recieved correctly
+//!@SYMTestExpectedResults Pass
+//!@SYMTestType CT
+RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestPowerChargingStatusL
+END_TESTCASE DEVSRVS-HWRM-B-0036
+
 PRINT Completed te_hwrm_power tests

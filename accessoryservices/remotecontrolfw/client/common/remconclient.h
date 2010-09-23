@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -34,7 +34,7 @@ class TRemConAddress;
 /**
 The abstract base class for RemCon session handles.
 */
-class RRemCon : public RSessionBase
+NONSHARABLE_CLASS(RRemCon) : public RSessionBase
 	{
 public:
 	/**
@@ -47,17 +47,17 @@ public:
 	/**
 	Connect the handle to the server.
 	Must be called before all other methods (except Version and Close).
-	@param aClientType  The type of client player
-	@param aClientSubType The sub-type of the client player
+	@param aPlayerType  The type of client player
+	@param aPlayerSubType The sub-type of the client player
 	@param aName The name of client player
 	@return Error.
 	*/
-	IMPORT_C TInt Connect(const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName);
+	IMPORT_C TInt Connect(const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName);
 	/**
 	Getter for the version of the server.
 	@return Version of the server.
 	*/
-	IMPORT_C TVersion Version() const;
+	virtual TVersion Version() const = 0;
 
 	/**
 	Sends a message (command or response) to the remote device.
@@ -203,8 +203,7 @@ protected:
 
 private: // utility
 	TInt DoConnect();
-	TInt SetClientType();
-	TInt SetClientType(const TPlayerType& aClientType, const TPlayerSubType& aClientSubType, const TDesC8& aName);
+	TInt SetPlayerType(const TPlayerType& aPlayerType, const TPlayerSubType& aPlayerSubType, const TDesC8& aName);
 
 private: // owned
 	const TRemConClientType iClientType;
@@ -251,7 +250,7 @@ corresponding request. They do not change the state of the system, bearers,
 connections, or member data in any other way. They operate as pure Symbian OS 
 asynchronous cancel methods.
 */
-class RRemConController : public RRemCon
+NONSHARABLE_CLASS(RRemConController) : public RRemCon
 	{
 public:
 	IMPORT_C RRemConController();
@@ -299,15 +298,25 @@ public:
 	@return KErrNone.
 	*/
 	IMPORT_C TInt DisconnectBearerCancel();
+
+	/** Returns the version of the RemCon server interface this session supports.
+	@return Supported version
+	*/
+	TVersion Version() const;
 	};
 
 /**
 The concrete session class for RemCon targets.
 */
-class RRemConTarget : public RRemCon
+NONSHARABLE_CLASS(RRemConTarget) : public RRemCon
 	{
 public:
 	IMPORT_C RRemConTarget();
+	
+	/** Returns the version of the RemCon server interface this session supports.
+	@return Supported version
+	*/
+	TVersion Version() const;
 	};
 
 #endif // REMCONCLIENT_H

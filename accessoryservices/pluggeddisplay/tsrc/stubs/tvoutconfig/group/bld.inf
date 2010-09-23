@@ -23,6 +23,7 @@ DEFAULT
 
 PRJ_TESTEXPORTS
 ../inc/tvoutconfigstatuscontrol.h	OS_LAYER_PLATFORM_EXPORT_PATH( tvoutconfigstatuscontrol.h )
+../rom/tvoutconfig_stub.iby                    CORE_OS_LAYER_IBY_EXPORT_PATH(tvoutconfig_stub.iby)
 
 PRJ_TESTMMPFILES
 tvoutconfig.mmp

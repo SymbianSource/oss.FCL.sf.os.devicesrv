@@ -93,11 +93,22 @@ void CHWRMPowerStatePluginHandler::ConstructL()
                                                 KHWRMBatteryStatus ) );
     // Charging status
     User::LeaveIfError( RProperty::Define( KPSUidHWRMPowerState,
+                                               KHWRMExtendedBatteryStatus, RProperty::EInt,
+                                               KNoCapability, KHWRMSidOnlyPolicy ) );
+    User::LeaveIfError( iExtendedBattStatusProp.Attach( KPSUidHWRMPowerState,
+                                                KHWRMExtendedBatteryStatus ) );
+    // Charging status
+    User::LeaveIfError( RProperty::Define( KPSUidHWRMPowerState,
                                            KHWRMChargingStatus, RProperty::EInt,
                                            KNoCapability, KHWRMSidOnlyPolicy ) );
     User::LeaveIfError( iChargingStatusProp.Attach( KPSUidHWRMPowerState,
                                                     KHWRMChargingStatus ) );
-    
+    User::LeaveIfError( RProperty::Define( KPSUidHWRMPowerState,
+                                               KHWRMExtendedChargingStatus, RProperty::EInt,
+                                               KNoCapability, KHWRMSidOnlyPolicy ) );
+    User::LeaveIfError( iExtendedChargingStatusProp.Attach( KPSUidHWRMPowerState,
+                                                    KHWRMExtendedChargingStatus ) );
+
     // Get plugin instance
     iPlugin = CHWRMPowerStatePlugin::NewL( this );
 
@@ -140,7 +151,9 @@ CHWRMPowerStatePluginHandler::~CHWRMPowerStatePluginHandler()
     iBattLevelProp.Close();
     iBattStatusProp.Close();
     iChargingStatusProp.Close();
-
+    iExtendedBattStatusProp.Close();
+    iExtendedChargingStatusProp.Close();
+        
     COMPONENT_TRACE1(_L("HWRM Server - CHWRMPowerStatePluginHandler::~CHWRMPowerStatePluginHandler - return ") );
     }
 
@@ -163,16 +176,43 @@ void CHWRMPowerStatePluginHandler::NotifyStateChange( const TUint32 aKey,
             iBattLevelProp.Set( aValue );
             break;
             }
-        case KHWRMBatteryStatus:
+        case KHWRMExtendedBatteryStatus:
+        case KHWRMBatteryStatus: // Just for the sake of Integration TestCode, shall be removed once legacy things are deprecated completely
             {
-            COMPONENT_TRACE2(_L("HWRM Server - KHWRMBatteryStatus key value=%d"), aValue );
-            iBattStatusProp.Set( aValue );
+            COMPONENT_TRACE2(_L("HWRM Server - KHWRMExtendedBatteryStatus key value=%d"), aValue );
+            
+            if ( aValue == EBatteryStatusNotSupported ||
+            		 aValue == EBatteryStatusDbiAuthFailed )
+                {
+                iBattStatusProp.Set( EBatteryStatusUnknown );
+                }
+            else
+                {
+                iBattStatusProp.Set( aValue );
+                }
+                
+            iExtendedBattStatusProp.Set( aValue );
+            
             break;
-            }
-        case KHWRMChargingStatus:
+            }        
+        case KHWRMExtendedChargingStatus:
+        case KHWRMChargingStatus: // Just for the sake of Integration TestCode, shall be removed once legacy things are deprecated completely
             {
-            COMPONENT_TRACE2(_L("HWRM Server - KHWRMChargingStatus key value=%d"), aValue );
-            iChargingStatusProp.Set( aValue );                        
+            COMPONENT_TRACE2(_L("HWRM Server - KHWRMExtendedChargingStatus key value=%d"), aValue );
+                             
+            if ( aValue == EChargingStatusIllegalChargerError ||
+                 aValue == EChargingStatusChargerUnderVoltageError ||
+                 aValue == EChargingStatusChargerOverVoltageError ||
+                 aValue == EChargingStatusTempTooHotError ||
+                 aValue == EChargingStatusTempTooColdError)
+                {
+                iChargingStatusProp.Set ( EChargingStatusError );
+                }
+            else
+                {
+                iChargingStatusProp.Set( aValue );
+                }
+            
             if ( iChargerBlockVibra || iChargerBlockVibraFeedback )
                 {
                 if ( aValue == EChargingStatusCharging ||
@@ -188,6 +228,9 @@ void CHWRMPowerStatePluginHandler::NotifyStateChange( const TUint32 aKey,
                     RProperty::Set(KPSUidHWRMPrivate, KHWRMInternalVibraBlocked, EFalse);
                     }
                 }
+                
+            iExtendedChargingStatusProp.Set( aValue );
+            
             break;
             }
         default:

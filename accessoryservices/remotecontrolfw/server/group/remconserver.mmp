@@ -51,6 +51,9 @@ SOURCE			bulkserver.cpp
 SOURCE			bulksession.cpp
 SOURCE			bulkmain.cpp
 SOURCE			bulkbearerinterface.cpp
+SOURCE			controllersession.cpp 
+SOURCE			targetsession.cpp
+SOURCE			targetclientprocess.cpp
 
 SOURCEPATH		../../common
 SOURCE			utils.cpp

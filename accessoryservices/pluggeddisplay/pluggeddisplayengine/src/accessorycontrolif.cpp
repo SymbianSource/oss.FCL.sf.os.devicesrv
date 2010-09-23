@@ -81,7 +81,7 @@ void CAccessoryControlIf::ConnectAccessoryL( TBool aCopyProtectionStatus )
         CAccConfigFileParser* accConfigFileParser =
             CAccConfigFileParser::NewL( _L("Configuration file") );
         CleanupStack::PushL( accConfigFileParser );
-        if ( !iGenericIDPtr )
+        if ( iGenericIDPtr )
             {
             delete iGenericIDPtr;
             iGenericIDPtr = NULL;
@@ -369,6 +369,7 @@ CAccessoryControlIf::CAccessoryControlIf(
     iFSM( aFSM )
     {
     FUNC_LOG;
+    iGenericIDPtr = NULL;
     }
 
 // ---------------------------------------------------------

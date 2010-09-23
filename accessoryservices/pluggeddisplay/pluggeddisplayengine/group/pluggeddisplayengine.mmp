@@ -20,6 +20,7 @@
 #include <data_caging_paths.hrh>
 
 #include "../inc/traceconfiguration.hrh"
+#include "pluggeddisplayengine.mmh"
 
 TARGET                  pluggeddisplayengine.dll
 TARGETTYPE              dll
@@ -55,8 +56,6 @@ OS_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE       	/epoc32/include/platform/mw
 
 LIBRARY                 euser.lib
-LIBRARY         		tvoutconfig.lib
-LIBRARY					ddc_access.lib
 LIBRARY					accpolaudiodevicetopology.lib
 LIBRARY					accpolicy.lib
 LIBRARY					accsrvutil.lib
@@ -68,7 +67,18 @@ LIBRARY					efsrv.lib
 LIBRARY					fbscli.lib
 LIBRARY					sysutil.lib
 
+#ifndef PDE_USE_HWSTUBS
+LIBRARY         		TvOutConfig.lib
+LIBRARY					ddc_access.lib
+#else
+LIBRARY         		tvoutconfig_stub.lib
+LIBRARY					ddc_access_stub.lib
+#endif
+
 #ifdef TRACE_INTO_FILE
 LIBRARY					flogger.lib
 #endif
 
+
+
+SMPSAFE

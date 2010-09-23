@@ -101,6 +101,8 @@ class CHWRMPowerStatePluginHandler : public CBase,
 	    RProperty iBattLevelProp;
 	    RProperty iBattStatusProp;
 	    RProperty iChargingStatusProp;
+	    RProperty iExtendedBattStatusProp;
+        RProperty iExtendedChargingStatusProp;
 	    
 	    // If ETrue, connecting charger blocks vibra
 	    TBool iChargerBlockVibra;

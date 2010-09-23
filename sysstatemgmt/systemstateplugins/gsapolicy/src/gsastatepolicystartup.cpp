@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
 #include <e32uid.h>
 #include <e32std.h>
 #include <bautils.h>
+#include <centralrepository.h>
 
 #include <ssm/ssmcmd.hrh>
 #include <ssm/ssmsubstates.hrh>
@@ -29,19 +30,12 @@
 
 #include <ssm/ssmstatetransition.h>
 #include <ssm/ssmcommandlistresourcereader.h>
-#include <ssm/ssmmaxbootattempts_patch.h>
 
 #include "gsastatepolicystartup.h"
 #include "ssmdebug.h"
 #include "ssmpanic.h" 
 #include "s32file.h" 
-
-_LIT(KBootUpFile, ":\\private\\2000d75b\\bootupinfo\\bootupcount.bin");
-
-/**
- Attempt to reboot the device (forever) on boot failure. Used when KSsmMaxBootAttempts is set to '0xFFFFFFFF'.
-*/
-const TInt KSsmAttemptRebootForever = 0xFFFFFFFF;
+#include "ssmpolicypluginsprivatecrkeys.h"
 
 /**
 Panic used by Startup policy plug-in when resource reader is invalid.
@@ -294,24 +288,16 @@ TBool CGsaStatePolicyStartup::GetNextState(TSsmState aCurrentTransition, TInt /*
 			}
 #else	// on hardware/device
 			{
-			aNextState = TSsmState(ESsmFail, ESsmFailSubStateRestart);
-			if (KSsmAttemptRebootForever != KSsmMaxBootAttempts)
+			TInt resetLimit = -1;
+			TInt bootCount = -1;
+			TRAPD( err, GetStartupCountAndMaxbootLimitL(bootCount, resetLimit) );
+			if (bootCount < resetLimit && KErrNone == err)
 				{
-				// Get number of boot attempts made till now from bootup log file
-				TInt bootCount = -1;
-				TRAPD(err, bootCount = GetBootupCountL());	// ignore failure and restart the device, we should get the value next time.
-				if (err!=KErrNone)
-					{
-					DEBUGPRINT2(_L("Startup Policy : GetBootupCountL() failed with (error: %d), error is deliberately ignored."), aError);
-					}
-				if (bootCount < KSsmMaxBootAttempts)
-					{
-					aNextState = TSsmState(ESsmFail, ESsmFailSubStateRestart);
-					}
-				else	// Maximum allowed boot attempts has been made. Device needs a poweroff. Probable candidate for a reset/reflash.
-					{
-					aNextState = TSsmState(ESsmFail, ESsmFailSubStatePowerOff);
-					}
+				aNextState = TSsmState(ESsmFail, ESsmFailSubStateRestart);
+				}
+			else	// Maximum allowed boot attempts has been made. Device needs a poweroff. Probable candidate for a reset/reflash.
+				{
+				aNextState = TSsmState(ESsmFail, ESsmFailSubStatePowerOff);
 				}
 	#ifdef _DEBUG
 			TSsmStateName name = aNextState.Name();
@@ -452,29 +438,15 @@ void CGsaStatePolicyStartup::GetCommandListPath(TUint aBootMode, TDes& aCmdListP
 	}
 
 /*
-Helper function to get the boot count
+Helper function to get the startup boot count and maximum boot attempts limit 
+from the central repository
 */
-TInt CGsaStatePolicyStartup::GetBootupCountL()
+void CGsaStatePolicyStartup::GetStartupCountAndMaxbootLimitL(TInt &aBootcount, TInt &aResetLimit)
 	{
-	RBuf bootupInfoPath;
-	CleanupClosePushL(bootupInfoPath);
-	const TChar drive = RFs::GetSystemDriveChar();
-	TInt length = KBootUpFile().Length() + 1; /* for RFs::GetSystemDriveChar() */
-	bootupInfoPath.CreateL(length);
-	bootupInfoPath.Append(drive);
-	bootupInfoPath.Append(KBootUpFile());
-	TBool found = BaflUtils::FileExists(iFs, bootupInfoPath);
- 	if(!found)
- 		{
-		User::Leave(EBootupCountFileNotFound);
-		}
-
-	RFileReadStream file;
-	CleanupClosePushL(file);
-	User::LeaveIfError(file.Open(iFs, bootupInfoPath, EFileRead));
-	TInt bootCount = file.ReadUint8L();
-	CleanupStack::PopAndDestroy(&file);
-	CleanupStack::PopAndDestroy(&bootupInfoPath);
-	return bootCount;
+	CRepository* repository = CRepository::NewLC( KCRUidSsmStartupPolicy );
+	User::LeaveIfError( repository->Get( KSsmStartupErrorResetLimit, aResetLimit ) );
+	DEBUGPRINT2( _L("Reset limit is %d"), aResetLimit );
+	User::LeaveIfError( repository->Get( KSsmStartupErrorResetCounter, aBootcount ) );
+	DEBUGPRINT2( _L("Reset count is %d"), aBootcount );
+	CleanupStack::Pop(repository);
 	}
-	

@@ -39,7 +39,7 @@ LIBRARY     euser.lib
 LIBRARY 	sysversioninfo.lib
 LIBRARY		CommonEngine.lib
 LIBRARY		efsrv.lib
-LIBRARY     stiftestinterface.lib
+LIBRARY     StifTestInterface.lib
 
 epocstacksize 0x4000
 

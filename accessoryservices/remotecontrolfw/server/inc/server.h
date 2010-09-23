@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -34,7 +34,10 @@
 class REComSession;
 class CBearerManager;	
 class CConverterManager;
+class CRemConTargetClientProcess;
 class CRemConSession;
+class CRemConTargetSession;
+class CRemConControllerSession;
 class CMessageQueue;
 class CRemConTargetSelectorPlugin;
 class CRemConMessage;
@@ -66,51 +69,120 @@ public:
 	*/
 	static CRemConServer* NewLC();
 
-	/** Destructor. */
 	~CRemConServer();
 
-public: // called by session objects 
-	/** Called by a session when a client session is created. Cancels the 
-	shutdown timer in accordance with transient server design. */
-	TInt ClientOpened(CRemConSession& aSession);
+public: // called by controller session objects 
 
-	/** Called by a session when it has had its client type set (i.e. becomes 
-	a controller or a target). Uses the bearer manager to inform bearers as appropriate.
-	*/
-	void ClientTypeSet(CRemConSession& aSession);
-	
-	/** Called by a target session when it has had its features registered. */
-	void TargetClientAvailable(CRemConSession& aSession);
-	
+	/** Called by a controller session when created. Cancels the 
+	shutdown timer in accordance with transient server design. */
+	TInt ControllerClientOpened(CRemConControllerSession& aSession);
+		
 	/** Called by a controller session when it has had its features registered. */
 	void ControllerClientAvailable();
 
-	/** Called by a session when it has had its client goes connection oriented
+	/** Called by a controller session when it has had its client go connection oriented
 	Uses the bearer manager to inform bearers as appropriate
 	aUid is the uid of the bearer we are going connection oriented on.
 	*/
-	void ClientGoConnectionOriented(CRemConSession& aSession, TUid aUid);
+	void ClientGoConnectionOriented(CRemConControllerSession& aSession, TUid aUid);
 	
-	/** Called by a session when it has had its client go connection less.
+	/** Called by a controller session when it has had its client go connection less.
 	 Uses the bearer manager to inform bearers as appropriate.
 	 aUid is the uid of the bearer we were connection oriented on,
 	*/
-	void ClientGoConnectionless(CRemConSession& aSession, TUid aUid);
+	void ClientGoConnectionless(CRemConControllerSession& aSession, TUid aUid);
 
-	/** Called by a session when a client session is destroyed. Starts the 
+	/** Called by a controller session it is destroyed. Starts the 
 	shutdown timer if necessary in accordance with transient server design. 
 	Does not assume that the session successfully registered itself with the 
 	server to begin with.
 	aUid is the bearer uid the session was on for connection oriented sessions,
 	if KNullUid the session was connectionless, 
 	*/
-	void ClientClosed(CRemConSession& aSession, TUid aUid);
+	void ControllerClientClosed(CRemConControllerSession& aSession, TUid aUid);
 
 	/**
-	@return ETrue if there's already a session of target type with process ID 
-	aProcId, EFalse otherwise.
+	Sends a command.
+	Puts the command on the 'pending TSP' queue so the TSP can either address 
+	it or give it permission to send.
+	Always takes ownership of aMsg. 
 	*/
-	TBool TargetClientWithSameProcessId(TProcessId aProcId) const;
+	void SendCommand(CRemConMessage& aMsg);
+
+	/**
+	Removes any current message from this controller session from the 'outgoing pending 
+	TSP' queue. If the message is that currently being dealt with by the TSP, 
+	then cancels the TSP's operation.
+	*/
+	void SendCancel(CRemConControllerSession& aSess);
+
+	/**
+	Tries to complete a Receive request for a controller session.
+	Called by controller sessions when a Receive request is posted. The 'incoming pending 
+	delivery' queue is checked for commands waiting to be delivered to 
+	aSession. The controller session's request is completed with the first such found.
+	*/
+	void ReceiveRequest(CRemConControllerSession& aSession);
+	
+public:	// Called by target client objects (either CRemConTargetClientProcess or CRemConTargetSession)
+
+	/** 
+	Called by CRemConTargetClientProcess to cancel the servers shutdown timer when a new
+	target session has been opened.
+	*/
+	void CancelShutdownTimer();
+
+	/** Called by CRemConTargetClientProcess to notify the server that it is available.
+	This is done when the client has registered one or more interfaces. */
+	void TargetClientAvailable(const CRemConTargetClientProcess& aClient);
+
+	/** Called by CRemConTargetClientProcess to notify the server that it has registered
+	additional intefaces. */
+	void TargetFeaturesUpdated(CRemConTargetClientProcess& aClient);
+
+	/** Called by CRemConTargetClientProcess to notify the server that a target session
+	has closed. */
+	void TargetSessionClosed(CRemConTargetClientProcess& aClient, CRemConTargetSession& aSession);
+
+	/** Called by CRemConTargetClientProcess to notify the server that a client session is closing.
+	Starts the shutdown timer if necessary in accordance with transient server design. 
+	Does not assume that the session successfully registered itself with the 
+	server to begin with.
+	*/
+	void TargetClientClosed(CRemConTargetClientProcess& aClient);
+
+	/** Called by a client instance when a session is created. Makes an item 
+	for the session in the record of which points in the connection history 
+	sessions are interested in. */
+	TInt RegisterTargetSessionPointerToConnHistory(const CRemConTargetSession& aSession);
+
+	/**
+	Starts the process of sending a response, via the TSP
+	Completes the client's send message with a bearer-level error.
+	Always takes ownership of aMsg. 
+	*/
+	void SendResponse(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient);
+
+	/** Finishes the process of sending a response, after the TSP
+	has permitted the response
+	Always takes onwership of aMsg.
+	*/
+	void CompleteSendResponse(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient);
+
+	/**
+	Sends a reject back to the bearer.
+	*/
+	void SendReject (TRemConAddress aAddr, TUid aInterfaceUid, TUint aOperationId, TUint aTransactionId);
+
+	/**
+	Tries to complete a Receive request for a target client.
+	Called by clients when a Receive request is posted. The 'incoming pending 
+	delivery' queue is checked for commands waiting to be delivered to 
+	the client. A delivery attempt is made for each pending message.
+	*/
+	void ReceiveRequest(CRemConTargetClientProcess& aClient);
+
+public:	// called by controller and target sessions
 
 	/** Returns the current bearer-level connection state of the system. */
 	CConnections& Connections();
@@ -131,47 +203,6 @@ public: // called by session objects
 	TBool ConnectionHistoryPointerAtLatest(TUint aSessionId) const;
 
 	/**
-	Sends a command.
-	Puts the command on the 'pending TSP' queue so the TSP can either address 
-	it or give it permission to send.
-	Always takes ownership of aMsg. 
-	*/
-	void SendCommand(CRemConMessage& aMsg);
-
-	/**
-	Starts the process of sending a response, via the TSP
-	Completes the client's send message with a bearer-level error.
-	Always takes ownership of aMsg. 
-	*/
-	void SendResponse(CRemConMessage& aMsg, CRemConSession& aSess);
-
-	/** Finishes the process of sending a response, after the TSP
-	has permitted the response
-	Always takes onwership of aMsg.
-	*/
-	void CompleteSendResponse(CRemConMessage& aMsg, CRemConSession& aSess);
-	
-	/**
-	Sends a reject back to the bearer.
-	*/
-	void SendReject (TRemConAddress aAddr, TUid aInterfaceUid, TUint aOperationId, TUint aTransactionId);
-		
-	/**
-	Removes any current message from this session from the 'outgoing pending 
-	TSP' queue. If the message is that currently being dealt with by the TSP, 
-	then cancels the TSP's operation.
-	*/
-	void SendCancel(CRemConSession& aSess);
-
-	/**
-	Tries to complete a Receive request.
-	Called by sessions when a Receive request is posted. The 'incoming pending 
-	delivery' queue is checked for commands waiting to be delivered to 
-	aSession. The session's request is completed with the first such found.
-	*/
-	void ReceiveRequest(CRemConSession& aSession);
-
-	/**
 	Determines a state of a connection to the given remote address.
 	@param - aAddr, remote address of a connection
 	@return - connection state 
@@ -182,10 +213,9 @@ public: // called by session objects
 	Informs RemCon server that one of the interfaces being used by the calling
 	session requires the use of the bulk server.
 	*/
-	TInt BulkServerRequired();
+	TInt BulkServerRequired();	
 	
 public: // called by the bearer manager 
-	inline RPointerArray<CRemConSession>& Sessions();
 
 	/** This function is called when a ConnectIndicate is handled by the 
 	bearer manager (in which case aError will be KErrNone) and when 
@@ -199,7 +229,7 @@ public: // called by the bearer manager
 
 	/** This function is called when a connection goes away, either by 
 	indication (from the remote end) or confirmation (from our end). */
-	void RemoveConnection(const TRemConAddress& aAddr);
+	void RemoveConnection(const TRemConAddress& aAddr, TInt aError);
 
 	/** 
 	Handles a new incoming response. 
@@ -295,19 +325,32 @@ private: // from MRemConTargetSelectorPluginObserver
 	TInt MrctspoSetLocalAddressedClient(const TUid& aBearerUid, const TClientInfo& aClientInfo);
 
 private: // utility
+	CRemConControllerSession* CreateControllerSessionL(const RMessage2& aMessage);
+	CRemConTargetSession* CreateTargetSessionL(const RMessage2& aMessage);
+
+	/** Extracts a client's process ID and secure ID from a given RMessage2 and stores
+	in a given TClientInfo. */
+	void ClientProcessAndSecureIdL(TClientInfo& aClientInfo, const RMessage2& aMessage) const;
+
+	void RemoveSessionFromConnHistory(const CRemConSession& aSession);
+
 	/** Removes connection history records which are no longer interesting and 
 	updates the indices in iSession2ConnHistory accordingly. */
 	void UpdateConnectionHistoryAndPointers();
 
-	CRemConSession* Session(TUint aSessionId) const;
+	CRemConControllerSession* ControllerSession(TUint aSessionId) const;
+	CRemConTargetClientProcess* TargetClient(TUint aClientId) const;
+	CRemConTargetClientProcess* TargetClient(TProcessId aProcessId) const;
 	
-	void StartShutdownTimerIfNoSessionsOrBulkThread();
+	void StartShutdownTimerIfNoClientsOrBulkThread();
+	void TryToDropClientProcess(TUint aClientIndex);
 	void LoadTspL();
 	
 	TBool FindDuplicateNotify(CRemConMessage& aMsg);
 	
 #ifdef __FLOG_ACTIVE
-	void LogSessions() const;
+	void LogControllerSessions() const;
+	void LogTargetSessions() const;
 	void LogRemotes() const;
 	void LogConnectionHistoryAndInterest() const;
 	void LogOutgoingCmdPendingTsp() const;
@@ -360,20 +403,32 @@ private: // utility
 	putting it on the correct queue. 
 	Does not take ownership of aMsg.
 	*/
-	void DeliverCmdToClientL(const CRemConMessage& aMsg, CRemConSession& aSess);
+	void DeliverCmdToClientL(const CRemConMessage& aMsg, CRemConTargetClientProcess& aClient);
 
 	/** 
-	Utility for delivering a single message to a client session.
+	Utility for delivering a single message to a controller client session.
 	If the session aSess has an outstanding Receive request, completes the 
-	request with aMsg and (if aMsg is a command) puts aMsg the 'incoming 
-	delivered' queue. Otherwise, puts aMsg in the 'incoming pending delivery' 
+	request with aMsg. Otherwise, puts aMsg in the 'incoming pending delivery' 
 	queue. 
 	Always takes ownership of aMsg.
 	@return KErrNone if the message was successfully delivered or put on the
 	incoming pending delivered queue, otherwise one of the system wide error codes
 	Ownership of aMsg will be taken regardless of the error.
 	*/
-	TInt DeliverMessageToClient(CRemConMessage& aMsg, CRemConSession& aSess);
+	TInt DeliverMessageToClient(CRemConMessage& aMsg, CRemConControllerSession& aSess);
+
+	/** 
+	Utility for delivering a single message to a target client.
+	If the client aClient has an outstanding Receive request, completes the 
+	request with aMsg and puts aMsg the 'incoming delivered' queue (since it
+	shall be a command). Otherwise, puts aMsg in the 'incoming pending delivery' 
+	queue. 
+	Always takes ownership of aMsg.
+	@return KErrNone if the message was successfully delivered or put on the
+	incoming pending delivered queue, otherwise one of the system wide error codes
+	Ownership of aMsg will be taken regardless of the error.
+	*/
+	TInt DeliverMessageToClient(CRemConMessage& aMsg, CRemConTargetClientProcess& aClient);
 
 	/** Gives the head outgoing command to the TSP for (a) addressing to 
 	remote target(s), if its address is null, or (b) permission to send, if it 
@@ -398,9 +453,7 @@ private: // utility
 	/** Gives the head outgoing response to the TSP for permission to send */
 	void PermitOutgoingResponse();
 	
-	CRemConSession* TargetSession(TProcessId aProcessId) const;
-	
-	TClientInfo* ClientIdToClientInfo(TRemConClientId aId);
+	TClientInfo* TargetClientIdToClientInfo(TRemConClientId aId);
 	
 	void InitialiseBulkServerThreadL();
 
@@ -431,11 +484,13 @@ private: // owned
 	CBearerManager* iBearerManager;
 	CConverterManager* iConverterManager;
 
-	// Unique identifier seed for sessions.
-	TUint iSessionId;
+	// Unique identifier seed for sessions and clients.
+	// Controller sessions, target clients and target sessions all need a unique ID.
+	TUint iSessionOrClientId;
 
-	RPointerArray<CRemConSession> iSessions;
-	mutable RNestableLock iSessionsLock;
+	RPointerArray<CRemConControllerSession> iControllerSessions;
+	RPointerArray<CRemConTargetClientProcess> iTargetClients;
+	mutable RNestableLock iTargetClientsLock; 
 
 	// In the following discussion, mark carefully the difference between a 
 	// QUEUE of items awaiting serialised access to a resource, and a LOG of 
@@ -573,11 +628,6 @@ private: // owned
 	};
 
 // Inlines
-
-RPointerArray<CRemConSession>& CRemConServer::Sessions()
-	{
-	return iSessions;
-	}
 
 NONSHARABLE_CLASS(CBulkThreadWatcher)
 	: public CActive

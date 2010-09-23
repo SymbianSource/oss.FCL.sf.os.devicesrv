@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -307,6 +307,17 @@ public:
 				irrespective of how many controller sessions support that interface.
 	*/
 	virtual void ControllerFeaturesUpdated(RArray<TUid>& aSupportedInterfaces) = 0;
+	
+	/**
+	Called by RemCon when a target client registers new interfaces after being made available.
+
+	@param aId The target client that has regitered new interfaces.
+	@param aPlayerType The basic type of this client after registration of new interfaces.
+	@param aPlayerSubType More detailed type information on this client after registration of new interfaces.
+	@param aName The name of this client in UTF-8. This remains valid until ClientNotAvailable 
+				 is called for this player.
+	*/
+	virtual void TargetFeaturesUpdated(const TRemConClientId& aId, TPlayerType aPlayerType, TPlayerSubType aPlayerSubType, const TDesC8& aName) = 0;
 	};
 
 #endif // REMCONBEARERINTERFACE_H

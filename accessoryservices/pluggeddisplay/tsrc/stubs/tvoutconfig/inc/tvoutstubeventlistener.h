@@ -104,6 +104,8 @@ private: // data
     TUid iCategory;
     
     TUint iKey;
+    
+    TInt iPreviousValue;
 
     };
 

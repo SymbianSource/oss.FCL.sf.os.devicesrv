@@ -86,6 +86,7 @@ class TSSyChannelProperties
  */
 const TSSsyChannelInfo KSSsyChannelInfo[] =
     {
+#if 0
         {       
             0,                                   // iChannelId
             ESensrvContextTypeUser,                  // iContextType
@@ -96,7 +97,7 @@ const TSSsyChannelInfo KSSsyChannelInfo[] =
             sizeof(TSensrvOrientationData),      // iDataItemSize
             TSensrvOrientationData::KDataTypeId  // iDataTypeId
         },
-
+#endif
         {       
             0,                                   // iChannelId
             ESensrvContextTypeUser,                  // iContextType

@@ -43,7 +43,7 @@ USERINCLUDE     ../../../inc/util
 OS_LAYER_SYSTEMINCLUDE
 
 LIBRARY         euser.lib
-LIBRARY         stiftestinterface.lib
+LIBRARY         StifTestInterface.lib
 LIBRARY         psmclient.lib
 LIBRARY         centralrepository.lib
 

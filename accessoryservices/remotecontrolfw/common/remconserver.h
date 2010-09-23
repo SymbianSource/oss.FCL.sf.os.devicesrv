@@ -1,4 +1,4 @@
-// Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2004-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -33,9 +33,10 @@ _LIT(KRemConServerImg, "z:\\sys\\bin\\remconserver.exe");
 _LIT(KRemConServerName, "!RemConSrv");
 
 /** Version numbers for the RemCon server. */
-const TInt8 KRemConSrvMajorVersionNumber = 1;
-const TInt8 KRemConSrvMinorVersionNumber = 1;
-const TInt16 KRemConSrvBuildNumber = 0;
+const TInt8 KRemConSrvMajorVersionNumber = 2;
+const TInt8 KRemConSrvMinorVersionNumber = 0;
+const TInt16 KRemConSrvControllerSession = 1;
+const TInt16 KRemConSrvTargetSession = 2;
 
 /** IPC messages supported by the RemCon server. */
 enum TRemConIpc
@@ -44,7 +45,7 @@ enum TRemConIpc
 	ERemConDbgCheckHeap 					= 1,
 	ERemConDbgMarkEnd						= 2,
 	ERemConDbgFailNext						= 3,
-	ERemConSetClientType					= 4,
+	ERemConSetPlayerType					= 4,
 	ERemConGoConnectionOriented 			= 5,
 	ERemConGoConnectionless 				= 6,
 	ERemConConnectBearer					= 7,

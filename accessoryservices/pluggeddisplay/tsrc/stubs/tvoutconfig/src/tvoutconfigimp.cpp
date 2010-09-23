@@ -22,6 +22,10 @@
 #include "tvoutstubeventlistener.h"
 
 #include <e32std.h>
+#include <AccPolGenericIdDefinitions.h>
+#include <AccPolCommonNameValuePairs.h>
+#include <AccConfigFileParser.h>
+#include <AccConGenericID.h>
 #include "trace.h"
 
 //- External Data -----------------------------------------------------------
@@ -50,7 +54,6 @@ CTvOutConfigImp::CTvOutConfigImp() :
     CTvOutConfig(), iHdmiCableListenerStatus( NULL )
     {
     FUNC_LOG;
-
     }
 
 //---------------------------------------------------------------------------
@@ -60,9 +63,14 @@ CTvOutConfigImp::CTvOutConfigImp() :
 CTvOutConfigImp::~CTvOutConfigImp()
     {
     FUNC_LOG;
+	
+    iAccControl.CloseSubSession();
+    iAccServer.Close();
+	
     iConfigurationChunk.Close();
     iConfigSemaphore.Close();
     delete iCableConnectStatusListener;
+	delete iAnalogCableConnectStatusListener;
     delete iCopyProtectStatusListener;
     delete iSettingChangeListener;
 	iAllDviMode.Reset();
@@ -136,6 +144,12 @@ void CTvOutConfigImp::ConstructL()
         KTVOutStatusControlCableConnect,
         RProperty::EInt );
     RProperty::Define( KTVOutStatusControlCategory,
+        KTVOutStatusControlAnalogCableConnect,
+        RProperty::EInt );
+    RProperty::Define( KTVOutStatusControlCategory,
+        KTVOutStatusControlCableConnect,
+        RProperty::EInt );
+    RProperty::Define( KTVOutStatusControlCategory,
         KTVOutStatusControlConfigChange,
         RProperty::EInt );
     
@@ -167,6 +181,9 @@ void CTvOutConfigImp::ConstructL()
         KTVOutStatusControlCableConnect,
         0 );
     RProperty::Set( KTVOutStatusControlCategory,
+        KTVOutStatusControlAnalogCableConnect,
+        0 );
+    RProperty::Set( KTVOutStatusControlCategory,
         KTVOutStatusControlConfigChange,
         0 ); 
     RProperty::Set( KTVOutStatusControlCategory,
@@ -182,6 +199,9 @@ void CTvOutConfigImp::ConstructL()
     iCableConnectStatusListener = CTVOutStubEventListener::NewL( *this,
         KTVOutStatusControlCategory,
         KTVOutStatusControlCableConnect );
+    iAnalogCableConnectStatusListener = CTVOutStubEventListener::NewL( *this,
+        KTVOutStatusControlCategory,
+        KTVOutStatusControlAnalogCableConnect );
     iCopyProtectStatusListener = CTVOutStubEventListener::NewL( *this,
         KTVOutStatusControlCategory,
         KTVOutStatusControlCopyProtect );
@@ -209,6 +229,11 @@ void CTvOutConfigImp::ConstructL()
 		mode.iStandardMode = i;
 		iAllDviMode.Append( mode );
 		}
+
+    err = iAccServer.Connect();
+	User::LeaveIfError( err );
+	err = iAccControl.CreateSubSession( iAccServer );
+	User::LeaveIfError( err );
     }
 
 //---------------------------------------------------------------------------
@@ -850,7 +875,14 @@ void CTvOutConfigImp::SendEvent( const TUid aCategory,
     const TInt aArg )
     {
     FUNC_LOG;
-    if( KTVOutStatusControlCategory == aCategory )
+    /*TInt previousevent = KErrNone;
+    
+    iConfigSemaphore.Wait();
+    previousevent = iConfig->iPreviousEvent;
+    iConfig->iPreviousEvent = aEvent;
+    iConfigSemaphore.Signal();*/
+    
+    if( (KTVOutStatusControlCategory == aCategory) ) //&& (previousevent != aEvent) )
         {
         if( KTVOutStatusControlCableConnect == aEvent )
             {
@@ -864,7 +896,11 @@ void CTvOutConfigImp::SendEvent( const TUid aCategory,
             {
             EventSettingChange( aArg );       
             }
-        }
+		else if( KTVOutStatusControlAnalogCableConnect == aEvent )
+			{
+			EventAnalogCableConnect( aArg );
+			}
+        }        
     }
 
 //---------------------------------------------------------------------------
@@ -890,6 +926,137 @@ void CTvOutConfigImp::EventHdmiCableConnect( const TInt aArg )
         User::RequestComplete( iHdmiCableListenerStatus, KErrNone );
 		iHdmiCableListenerStatus = NULL;
 		}
+	}
+
+//---------------------------------------------------------------------------
+/**
+ Process Analog cable connect event
+
+ */
+
+void CTvOutConfigImp::EventAnalogCableConnect( const TInt aArg )
+	{
+    FUNC_LOG;
+    TBool cvideoconnected = EFalse;
+    
+    RProcess process;
+    TSecureId KRequiredSecureId((TUint32)0x10205030);
+
+    if( process.SecureId() != KRequiredSecureId )
+    	{
+    		INFO_1("***************It is NOT Accessory server thread - 0x%x", (TUint32)process.SecureId());
+    		return;
+    	}
+ 		INFO_1("*************It is Accessory server thread - 0x%x", (TUint32)process.SecureId());
+        
+/*   TSecureId accid((TUint32)0x10205030);
+    TSecureId secid = User::CreatorSecureId();
+    
+    if( secid != accid )
+    	{
+    		INFO_1("***************It is NOT Accessory server thread - 0x%x", (TUint32)secid);
+    		return;
+    	}
+ 		INFO_1("*************It is Accessory server thread - 0x%x", (TUint32)secid);
+ 		*/
+    	
+    iConfigSemaphore.Wait();
+    cvideoconnected = iConfig->iCVideoConnected;
+    
+    if( aArg && (!cvideoconnected) )
+        {
+        // Connected
+		TInt err = KErrNone;
+		
+		CAccConfigFileParser* accConfigFileParser = CAccConfigFileParser::NewL(
+			_L("Configuration file") );
+		CleanupStack::PushL( accConfigFileParser );
+		
+		CAccConGenericID* genericID = CAccConGenericID::NewL();
+		CleanupStack::PushL( genericID );
+		
+		RArray<TAccPolNameValueRecord> nameValueArray;
+		CleanupClosePushL( nameValueArray );
+		TBuf<KHWModelIDMaxLength> hwModelID( _L("c-video") );
+		TAccPolNameRecord nameRecord;
+		TAccPolValueRecord valueRecord;
+		
+		TBuf<KHWModelIDMaxLength> HWModelID( _L("c-video") );
+		
+		//Set GenericID header
+		TAccPolGIDHeader genericIdHeader;
+		genericIdHeader.iAccessoryDeviceType = KDTAVDevice;
+		genericIdHeader.iPhysicalConnection = KPCWired;
+		genericIdHeader.iApplicationProtocol = 0x0;
+		genericIdHeader.iCapabilitiesSubblocks = KSBAudioSubblock | KSBVideoSubblock;
+		genericIdHeader.iHWModelID = hwModelID;
+		genericIdHeader.iHWDeviceID = 0x0;
+		
+		//Set "Audio Output Type" capability
+		TAccPolNameValueRecord
+			nameValueRecordAudioOutputType( KAccAudioOutputType,
+				EAccAudioOutPutTypePublic,
+				EAPVInt,
+				EAPVPolicy );
+		nameValueArray.AppendL( nameValueRecordAudioOutputType );
+		
+		//Set "Audio stereo" capability
+		TAccPolNameValueRecord nameValueRecordAudioStereo( KAccStereoAudio,
+			EAccAudioOutPutTypePublic,
+			EAPVInt,
+			EAPVPolicy );
+		nameValueArray.AppendL( nameValueRecordAudioStereo );
+		
+		//Set "Line out Type" capability
+		TAccPolNameValueRecord nameValueRecordAudioOut( KAccAudioOut,
+			TAccAudioOutLineout,
+			EAPVInt,
+			EAPVPolicy );
+		nameValueArray.AppendL( nameValueRecordAudioOut );
+		
+		//Set "Video Output Type" capability
+		TAccPolNameValueRecord nameValueRecordVideoOut( KAccVideoOut,
+			EAccVideoOutCVideo,
+			EAPVInt,
+			EAPVPolicy );
+		nameValueArray.AppendL( nameValueRecordVideoOut );
+		
+		accConfigFileParser->ParseGenericIDL( genericID,
+			genericIdHeader,
+			nameValueArray );
+		
+    //iConfigSemaphore.Wait();
+    iConfig->iCVideoConnected = ETrue;
+    //iConfigSemaphore.Signal();
+    
+		TRequestStatus status;
+		iAccControl.ConnectAccessory( status, genericID, EFalse );
+		User::WaitForRequest( status );
+		err = status.Int();
+
+		if( KErrNone == err )
+			{
+			iCVideoGenericID = genericID->GenericID();
+			}
+			
+			// Cleanup
+			CleanupStack::PopAndDestroy( &nameValueArray );
+			CleanupStack::PopAndDestroy( genericID );
+			CleanupStack::PopAndDestroy( accConfigFileParser );
+        }
+    else if( (!aArg) && cvideoconnected )
+        {
+        // Disconnected
+    //iConfigSemaphore.Wait();
+    iConfig->iCVideoConnected = EFalse;
+    //iConfigSemaphore.Signal();
+    
+	    TRequestStatus status;
+	    iAccControl.DisconnectAccessory( status, iCVideoGenericID );
+	    User::WaitForRequest( status );
+		}
+    iConfigSemaphore.Signal();
+
 	}
 
 //---------------------------------------------------------------------------
