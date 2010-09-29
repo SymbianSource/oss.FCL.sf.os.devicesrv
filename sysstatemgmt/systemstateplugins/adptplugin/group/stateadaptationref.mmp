@@ -22,6 +22,12 @@ vendorid 	0x70000001
 
 capability 	PowerMgmt ReadDeviceData WriteDeviceData ProtServ SwEvent ReadUserData WriteUserData
 
+// If SYMBIAN_INCLUDE_APP_CENTRIC macro is defined then CommDD capability is required along with the capability
+// list described in the above line.
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC 
+capability 		CommDD
+#endif	//SYMBIAN_INCLUDE_APP_CENTRIC
+
 NOEXPORTLIBRARY /* Has a fixed interface stateadaptationref.def */
 
 userinclude	../inc
