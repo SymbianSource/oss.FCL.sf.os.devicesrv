@@ -219,7 +219,8 @@ void CCustomCmdDeviceSecurityCheck::LockPhoneDeviceRespReceivedL()
         }
     else
         {
-        CompleteClientRequest(iStatus.Int());
+            DEBUGPRINT2A("iStatus.Int is %d", iStatus.Int());
+            CompleteClientRequest(KErrNone/*iStatus.Int()*/);
         }
     }
 
