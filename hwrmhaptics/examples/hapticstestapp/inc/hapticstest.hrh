@@ -1,0 +1,166 @@
+/*
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Defines options menu commands.
+*
+*/
+
+
+#ifndef __hapticstest_HRH__
+#define __hapticstest_HRH__
+
+/** hapticstest enumerate command codes */
+enum THapticsTestIds
+    {
+    EHapticsTestOpenHaptics = 1,  // start value must not be 0
+    EHapticsTestAutoInit,
+    EHapticsTestSupportedActuators,
+    EHapticsTestOpenActuator, // for submenu
+    EHapticsTestOpenActuatorAny,
+    EHapticsTestOpenActuatorDevice,
+    EHapticsTestOpenActuatorPrimaryDisplay,
+    EHapticsTestOpenActuatorSecondaryDisplay,
+    EHapticsTestOpenActuatorGame,
+    EHapticsTestOpenActuatorGameLeft,
+    EHapticsTestOpenActuatorGameRight,
+    EHapticsTestOpenActuatorExternalVibra,
+    EHapticsTestLoadIVTFile, // for submenu
+    EHapticsTestLoadIVTFileNoneFound,
+    EHapticsTestLoadIVTFileSelected,
+    EHapticsTestGeneralPlayEffect, // for submenu
+    EHapticsTestPlayEffect, // for submenu
+    EHapticsTestPlayEffectNoneFound,
+    EHapticsTestPlayEffectSelected,
+    EHapticsTestPlayEffectRepeat, // for submenu
+    EHapticsTestPlayEffectRepeatNoneFound,
+    EHapticsTestPlayEffectRepeatSelected,
+    EHapticsTestPlayEffectManual, // for submenu
+    EHapticsTestPlayEffectManualMagSweep,
+    EHapticsTestPlayEffectManualMagSweepInf,
+    EHapticsTestPlayEffectManualMagSweepInfMod,
+    EHapticsTestPlayEffectManualPeriodic,
+    EHapticsTestPlayEffectManualPeriodicInf,
+    EHapticsTestPlayEffectManualPeriodicInfMod,
+    EHapticsTestPlayEffectManualRepeat,
+    EHapticsTestChangeState, // submenu
+    EHapticsTestChangeStateNoneFound,
+    EHapticsTestChangeStatePause,
+    EHapticsTestChangeStateResume,
+    EHapticsTestChangeStateStop,
+    EHapticsTestChangeStateStopAll,
+    EHapticsTestModifyEffect, // submenu
+    EHapticsTestModifyEffectDuration1,
+    EHapticsTestModifyEffectDuration5,
+    EHapticsTestModifyEffectDuration10,
+    EHapticsTestModifyEffectDuration30,
+    EHapticsTestModifyEffectDuration60,
+    EHapticsTestModifyEffectMagnitudeMin,
+    EHapticsTestModifyEffectMagnitude25,
+    EHapticsTestModifyEffectMagnitude50,
+    EHapticsTestModifyEffectMagnitude75,
+    EHapticsTestModifyEffectMagnitudeMax,
+    EHapticsTestModifyEffectStyleSmooth,
+    EHapticsTestModifyEffectStyleStrong,
+    EHapticsTestModifyEffectStyleSharp,
+    EHapticsTestModifyEffectAttackMin,
+    EHapticsTestModifyEffectAttack25,
+    EHapticsTestModifyEffectAttack50,
+    EHapticsTestModifyEffectAttack75,
+    EHapticsTestModifyEffectAttackMax,
+    EHapticsTestModifyEffectFadeMin,
+    EHapticsTestModifyEffectFade25,
+    EHapticsTestModifyEffectFade50,
+    EHapticsTestModifyEffectFade75,
+    EHapticsTestModifyEffectFadeMax,
+    EHapticsTestModifyEffectAttackTime02,
+    EHapticsTestModifyEffectAttackTime1,
+    EHapticsTestModifyEffectAttackTime5,
+    EHapticsTestModifyEffectAttackTime10,
+    EHapticsTestModifyEffectAttackTime30,
+    EHapticsTestModifyEffectAttackTime60,
+    EHapticsTestModifyEffectFadeTime02,
+    EHapticsTestModifyEffectFadeTime1,
+    EHapticsTestModifyEffectFadeTime5,
+    EHapticsTestModifyEffectFadeTime10,
+    EHapticsTestModifyEffectFadeTime30,
+    EHapticsTestModifyEffectFadeTime60,
+    EHapticsTestModifyEffectPeriod50,
+    EHapticsTestModifyEffectPeriod100,
+    EHapticsTestModifyEffectPeriod300,
+    EHapticsTestModifyEffectPeriod600,
+    EHapticsTestModifyEffectPeriod1000,
+    EHapticsTestModifyEffectPeriod3000,
+    EHapticsTestSynchronousCalls,
+    EHapticsTestAsynchronousCalls,
+    EHapticsTestUsingFileHandle,
+    EHapticsTestNotUsingFileHandle,
+    EHapticsTestShowEffectInfo,
+    EHapticsTestHideEffectInfo,
+    EHapticsTestDeleteIVTData,  // for submenu
+    EHapticsTestDeleteIVTDataNoneFound,
+    EHapticsTestDeleteIVTDataSelected,
+    EHapticsTestDeleteAllIVTData,
+    EHapticsTestReserve,
+    EHapticsTestReserveNotTrusted,
+    EHapticsTestReserveTrusted,
+    EHapticsTestReserveNotTrustedTemp,
+    EHapticsTestRelease,
+    EHapticsTestReleaseTemp,
+    EHapticsTestCloseHaptics,
+    EHapticsTestClearOutput,
+    EHapticsTestConstGetters,
+    EHapticsTestGetStatus,
+
+    EHapticsTestPropertiesSubmenu,
+    EHapticsTestCapabilitiesSubmenu,
+
+    EHapticsTestSetPropertyPriorityMin,
+    EHapticsTestSetPropertyPriorityDefault,
+    EHapticsTestSetPropertyPriorityMax,
+    EHapticsTestSetPropertyDisableEffectsTrue,
+    EHapticsTestSetPropertyDisableEffectsFalse,
+    EHapticsTestSetPropertyStrengthMute,
+    EHapticsTestSetPropertyStrengthHalf,
+    EHapticsTestSetPropertyStrengthFull,
+    
+    
+    EHapticsTestGetPropertyPriority,
+    EHapticsTestGetPropertyDisableEffects,
+    EHapticsTestGetPropertyStrength,
+    
+    EHapticsTestGetCapabilityDeviceCategory,
+    EHapticsTestGetCapabilityMaxNestedRepeats,
+    EHapticsTestGetCapabilityNumActuators,
+    EHapticsTestGetCapabilityActuatorType,
+    EHapticsTestGetCapabilityNumEffectSlots,
+    EHapticsTestGetCapabilityNumEffectStyles,
+    EHapticsTestGetCapabilityMinPeriod,
+    EHapticsTestGetCapabilityMaxPeriod,
+    EHapticsTestGetCapabilityMaxEffectDuration,
+    EHapticsTestGetCapabilitySupportedEffects,
+    EHapticsTestGetCapabilityDeviceName,
+    EHapticsTestGetCapabilityMaxEnvelopeTime, 
+    EHapticsTestGetCapabilityAPIVersionNumber,
+    EHapticsTestGetCapabilityMaxIVTSize,
+    EHapticsTestPanic,
+
+    EHapticsTestInit,
+    EHapticsToggle,
+    EHapticsTestStreaming,
+    EHapticsTestPlayStreamSample,
+    EHapticsTestNextStreamSample,
+    EHapticsTestPlayAllSamples,
+    EHapticsTestStopStreaming
+    };
+
+#endif // __hapticstest_HRH__

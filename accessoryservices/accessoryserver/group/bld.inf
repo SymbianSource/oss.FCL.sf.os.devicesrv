@@ -39,7 +39,6 @@ PRJ_EXPORTS
 //Accessory Control
 
 ../data/hwdevices.ini                            /epoc32/winscw/c/private/1020504a/hwdevices.ini
-../inc/Common/accessoryservicesinternalpskeys.h  |../../../inc/accessoryservicesinternalpskeys.h
 
 
 PRJ_MMPFILES

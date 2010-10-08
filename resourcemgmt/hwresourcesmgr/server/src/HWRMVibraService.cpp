@@ -522,10 +522,11 @@ void CHWRMVibraService::StartVibraL(const TTimeIntervalMicroSeconds32& aDuration
             CHWRMGenericTimer* timer = 
                 CHWRMGenericTimer::NewL(*this, iVibraCommonData.MaximumOnTime(), count );                                
             iActiveTimerId = count;
+            CleanupStack::PushL( timer );
             CPulseData* pulseData = CPulseData::NewL(*timer, iLastIntensity, aIntensity, iActiveTimerId );
             CleanupStack::PushL( pulseData );
             iPulseData.AppendL( pulseData );
-            CleanupStack::Pop( pulseData );
+            CleanupStack::Pop( 2, timer );
             iPulseData[count]->Timer().Set(aDuration);
             }
 

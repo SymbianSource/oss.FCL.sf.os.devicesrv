@@ -11,14 +11,14 @@
 *
 * Contributors:
 *
-* Description:  Internal Publish&Subscribe definitions of the
+* Description:  Publish&Subscribe definitions of the
 *                Accessory Services
 *
 */
 
 
-#ifndef ACCESSORYSERVICESINTERNALPSKEYS_H
-#define ACCESSORYSERVICESINTERNALPSKEYS_H
+#ifndef ACCESSORYSERVICESPSKEYS_H
+#define ACCESSORYSERVICESPSKEYS_H
 
 #include <e32cmn.h>
 
@@ -41,4 +41,4 @@ enum TAccSrvcsWiredConnection
     };
 
 
-#endif ACCESSORYSERVICESINTERNALPSKEYS_H
+#endif ACCESSORYSERVICESPSKEYS_H

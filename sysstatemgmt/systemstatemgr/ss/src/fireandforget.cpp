@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -16,6 +16,8 @@
 #include "fireandforget.h"
 #include "timeoutwaiter.h"
 #include "ssmdebug.h"
+
+#include <f32file.h>
 
 _LIT(KApStartDLL, "apstart.dll");
 _LIT( KSysMonProxyDLL, "loadsysmon.dll" );
@@ -75,7 +77,7 @@ TBool CFireAndForget::GoodStart()
 		TFullName searchTerm(iStartupProperties->FileName());
 		_LIT(KSearchAny, "*");
 		searchTerm += KSearchAny;
- 	    TFindProcess find(searchTerm);
+ 	    TFindProcess find(TParsePtrC(searchTerm).NameAndExt());
 		TFullName name;
 		err = find.Next(name);
 		if(err == KErrNone)

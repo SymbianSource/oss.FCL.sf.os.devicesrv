@@ -80,6 +80,8 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 #ifdef  FF_MOBILITY_MANAGEMENT_ERRORS
 	,r_cmd_item_nwnotifier
 #endif // FF_MOBILITY_MANAGEMENT_ERRORS
+	// prio 0x7EEA
+	,r_cmd_logs //PMES-83ZD5M
         };
     }
 
@@ -129,7 +131,18 @@ RESOURCE SSM_START_APP_INFO r_cmd_devencstarter
     timeout = 10000;
     background = 1; // To background
     } 
-	
+
+// ---------------------------------------------------------------------------
+// r_cmd_logs
+// ---------------------------------------------------------------------------
+//	
+RESOURCE SSM_START_PROCESS_INFO r_cmd_logs
+    {
+    priority = 0x7EEA;
+    name = "logs.exe";
+    execution_behaviour = ESsmFireAndForget;
+    args = "-logsbootup";
+    }
 	
 // ---------------------------------------------------------------------------
 // r_cmd_provisioning

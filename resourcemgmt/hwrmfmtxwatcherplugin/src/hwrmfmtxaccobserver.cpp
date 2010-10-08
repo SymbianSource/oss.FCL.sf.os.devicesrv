@@ -17,7 +17,7 @@
 
 
 // INCLUDE FILES
-#include <accessoryservicesinternalpskeys.h>
+#include <accessoryservicespskeys.h>
 #include "hwrmfmtxaccobserver.h"
 #include "trace.h"
 

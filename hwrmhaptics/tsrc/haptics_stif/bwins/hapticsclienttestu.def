@@ -1,0 +1,3 @@
+EXPORTS
+	?LibEntryL@@YAPAVCHapticsClientTest@@AAVCTestModuleIf@@@Z @ 1 NONAME ; class CHapticsClientTest * LibEntryL(class CTestModuleIf &)
+

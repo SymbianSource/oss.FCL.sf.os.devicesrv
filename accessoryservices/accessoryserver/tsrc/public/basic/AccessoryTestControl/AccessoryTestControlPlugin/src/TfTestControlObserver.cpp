@@ -689,7 +689,9 @@ void CTFTestControlObserver::ConnectAccessory( TAccPolGenericID& aGenericId,
     TBuf<KHWModelIDMaxLength> aHWModelID;
     aHWModelID.Num( aHWDeviceID );
 
+		CleanupStack::PushL( accConfigFileParser );
     accConfigFileParser->FindL( aGenericId, aHWDeviceID, aHWModelID );
+    CleanupStack::Pop( accConfigFileParser );
 
     if( !IsActive() )
         {

@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -31,6 +31,8 @@
 const TInt KThrottleTime = 15000000; //15s
 const TInt KStartMonStopperTimeout = 5000000; // Could (probably) be shaved.
 
+_LIT(KTestProcGoodFullPath, "z:\\sys\\bin\\ssmtestprocgood1.exe");
+_LIT(KTestProcName, "ssmtestprocgood1.exe");
      
 TVerdict CSsTestStepProcStartMon::doTestStepL( void )
 	{
@@ -41,10 +43,14 @@ TVerdict CSsTestStepProcStartMon::doTestStepL( void )
 		
 	__UHEAP_MARK;
 	
-	TRAP(err, DoTestMonForAlreadyStartedProcL());
+	TRAP(err, DoTestMonForAlreadyStartedProcL(KTestProcGoodFullPath, KTestProcName));
 	TEST(err == KErrNone);
-	INFO_PRINTF2(_L("DoTestMonForAlreadyStartedProcL completed with err = %d"), err);
+	INFO_PRINTF2(_L("DoTestMonForAlreadyStartedProcL using exe name with full path completed with err = %d"), err);
 	
+	TRAP(err, DoTestMonForAlreadyStartedProcL(KTestProcGood, KTestProcGood));
+	TEST(err == KErrNone);
+	INFO_PRINTF2(_L("DoTestMonForAlreadyStartedProcL using only exe name[without path] completed with err = %d"), err);
+
 	TRAP(err, DoTestMonSyncL());
 	TEST(err == KErrNone);
 	INFO_PRINTF2(_L("DoTestMonSyncL completed with err = %d"), err);
@@ -121,13 +127,13 @@ void CSsTestStepProcStartMon::DoTestMonSyncL()
 	CleanupStack::PopAndDestroy( 4, startupProperties );
 	}
 
-void CSsTestStepProcStartMon::DoTestMonForAlreadyStartedProcL()
+void CSsTestStepProcStartMon::DoTestMonForAlreadyStartedProcL(const TDesC& aFileNameWithPath, const TDesC& aProcName)
 	{
 	INFO_PRINTF1( _L("Performing Process-monitor test for already started process") );
 	
 	RProcess process;
 	CleanupClosePushL(process);
-	User::LeaveIfError(process.Create(KTestProcGood, KLaunchServerCommandLineOption));
+	User::LeaveIfError(process.Create(aProcName, KLaunchServerCommandLineOption));
 	
 	TRequestStatus status;
 	process.Rendezvous(status);
@@ -151,7 +157,7 @@ void CSsTestStepProcStartMon::DoTestMonForAlreadyStartedProcL()
 	CleanupStack::PushL( startupProperties );
 	
 	// Need to start testprocess as a server so that we can tell it to stop being monitored.
-	startupProperties->SetFileParamsL(KTestProcGood, KLaunchServerCommandLineOption);
+	startupProperties->SetFileParamsL(aFileNameWithPath, KLaunchServerCommandLineOption);
 	startupProperties->SetCommandTypeL(ESsmCmdStartProcess);
 	startupProperties->SetExecutionBehaviour(ESsmWaitForSignal);
 	
@@ -201,7 +207,8 @@ void CSsTestStepProcStartMon::DoTestMonForAlreadyStartedProcL()
 		testProcServerSession.CancelMonitor();
 		testProcServerSession.Close();
 		}
-	TEST(1 == FindAndKill(KTestProcGood));
+	TEST(1 == FindAndKill(aProcName));
+
 	CleanupStack::PopAndDestroy(3, &process);
 	}
 

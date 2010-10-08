@@ -47,6 +47,11 @@ private:
 	void doTestRConnectL();
 	void StartThread(TInt aOption);
 	void doTestCSsmStateAwareSessionL();
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+	void doTestCSsmDeferralMonitorL();
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
 	
 	RArray<TSsmState> iStateChanges;
 	

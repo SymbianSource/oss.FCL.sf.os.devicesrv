@@ -15,7 +15,7 @@
 *
 */
 // global headers
-#include <accessoryservicesinternalpskeys.h>
+#include <accessoryservicespskeys.h>
 #include <autoaudiopskeys.h>
 
 // local headers

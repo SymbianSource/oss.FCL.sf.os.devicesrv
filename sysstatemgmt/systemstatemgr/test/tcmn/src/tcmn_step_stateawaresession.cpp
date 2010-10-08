@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -24,12 +24,21 @@
 #include <e32property.h>
 #include <ssm/ssmstatemanager.h>
 #include <ssm/ssmstate.h>
+#include <ssm/ssmsubstates.hrh>
+#include <ssm/startupreason.h>
 #include "ssmdebug.h"
 #include "cmnpanic.h"
 #include "ssmatest_utils.h"
 #include "tcmn_step_stateawaresession.h"
 #include "tssm_ssmclient.h"
 #include "tssm_startserver.h"
+    
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+#include "ssmstatemonitor.h"
+#include "t_stateawaresession2.h"
+#endif //SYMBIAN_INCLUDE_APP_CENTRIC
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
 
 
 
@@ -275,6 +284,34 @@ void CCmnStateAwareSessionTest::doTestCSsmStateAwareSessionL()
 	__UHEAP_MARKEND;
 	}
 
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+//This test is written for coverAGE purposes to call CSsmDeferralMonitor::DoCancel() API. 
+//The test is deemed to be successful if it completes without any panic.
+void CCmnStateAwareSessionTest::doTestCSsmDeferralMonitorL()
+    {
+	//Create an active scheduler
+    CActiveScheduler* sched = new(ELeave) CActiveScheduler;
+    CleanupStack::PushL(sched);
+    CActiveScheduler::Install(sched);
+	//Create a CSsmDeferralMonitor object and call DeferNotification()
+    RSsmStateAwareSession rSas;
+    rSas.Connect(KTestDdmDomain);
+    CleanupClosePushL(rSas);
+    CTestCStateAwareSession* tSas = new (ELeave) CTestCStateAwareSession();
+    CleanupStack::PushL(tSas);
+    CSsmStateAwareSession2 *cSas = CSsmStateAwareSession2::NewL(KTestDdmDomain, *tSas);
+    CleanupStack::PushL(cSas);
+    CSsmDeferralMonitor* aDm = new (ELeave) CSsmDeferralMonitor(rSas, *cSas);
+    CleanupStack::PushL(aDm);
+	//Call DeferNotification() so the active object becomes active
+    aDm->DeferNotification();
+	//Destroy all objects. This will call the DoCancel() method of CSsmDeferralMonitor, which is what is intended here.
+    CleanupStack::PopAndDestroy(5);    
+    }
+#endif //SYMBIAN_INCLUDE_APP_CENTRIC
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
+
 //----------------------------------------------------------------
 
 
@@ -311,6 +348,11 @@ TVerdict CCmnStateAwareSessionTest::doTestStepL()
 	__UHEAP_MARK;
 	doTestCSsmStateAwareSessionL();
 	doTestForMemoryLeaksL();
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+	doTestCSsmDeferralMonitorL();
+#endif //SYMBIAN_INCLUDE_APP_CENTRIC
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
 	__UHEAP_MARKEND;
 
 	INFO_PRINTF1(_L("....CCmnStateAwareSessionTest completed!"));

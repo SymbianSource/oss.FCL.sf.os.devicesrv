@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -110,3 +110,81 @@ TSsmState CSsmStateMonitor::State() const
 	{
 	return iState;
 	}
+
+
+CSsmDeferralMonitor::CSsmDeferralMonitor(RSsmStateAwareSession& aStateAwareSession, CSsmStateAwareSession2& aOwnerActiveObject)
+    : CActive(CActive::EPriorityHigh), iSsmStateAwareSession(aStateAwareSession), iOwnerActiveObject(aOwnerActiveObject), iCeaseDeferral(EFalse)
+    {
+    CActiveScheduler::Add(this);
+    }
+
+CSsmDeferralMonitor::~CSsmDeferralMonitor()
+    {
+    Cancel();
+    }
+
+/**
+ * Defers the Acknowledgement.
+ */
+void CSsmDeferralMonitor::DeferNotification()
+    {
+    __ASSERT_ALWAYS(!IsActive(), User::Panic(KPanicSsmCmn, ECmnErrDeferNotif)); 
+    iSsmStateAwareSession.DeferAcknowledgement(iStatus);
+    SetActive();
+    }
+
+/**
+Informs the object that the state transition has
+been _successfully_ acknowledged
+*/
+void CSsmDeferralMonitor::NotifyOfAcknowledgement()
+    {
+    if (IsActive())
+        {
+        iCeaseDeferral = ETrue;
+        }
+    }
+
+void CSsmDeferralMonitor::RunL()
+    {
+    const TInt error = iStatus.Int();
+    TBool ceaseDeferral = iCeaseDeferral;
+    iCeaseDeferral = EFalse;
+    // We are leaving with error after resetting iCeaseDeferral. This is because
+    // we might again RequestStateNotification() in HandleDeferralError(), in which case 
+    // we need to reset iCeaseDeferral to EFalse so that deferral may happen again.
+    User::LeaveIfError(error);
+
+    if(!ceaseDeferral)
+        {
+        DeferNotification();
+        }
+	else
+        {
+        // At this point we know error == KErrNone
+        // However, we return the error code KErrCompletion, as this
+        // is what would have happened, had the acknowledgment come in
+        // a little earlier,
+        // whilst the deferral was still outstanding on the server.
+        User::Leave(KErrCompletion);
+        }
+    }
+
+/**
+ Handle errors thrown from RunL() - call HandleDeferralErrror()    
+*/
+TInt CSsmDeferralMonitor::RunError(TInt aError)
+    {
+    DEBUGPRINT2A("CSsmDeferralMonitor::RunError: %d", aError);
+    return iOwnerActiveObject.HandleDeferralError(aError);
+    }
+
+/**
+ * Cancels the outstanding deferral request.
+ */
+void CSsmDeferralMonitor::DoCancel()
+    {
+    iSsmStateAwareSession.CancelDeferral();
+    }
+
+

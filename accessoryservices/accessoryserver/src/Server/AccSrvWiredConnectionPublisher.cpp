@@ -16,7 +16,7 @@
 */
 
 
-#include <accessoryservicesinternalpskeys.h>
+#include <accessoryservicespskeys.h>
 #include "AccSrvWiredConnectionPublisher.h"
 #include "acc_debug.h"
 

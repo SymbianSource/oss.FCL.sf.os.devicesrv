@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -20,7 +20,8 @@
 #include "rvobservernotification.h"
 #include "ssconst.h"
 #include "ssmdebug.h"
-	
+
+#include <f32file.h>
 /**
  We are either starting for the first time, or an app or process has rendezvouzed.
  If the latter, check if it has done so without error and behave as appropriate.
@@ -187,7 +188,7 @@ TBool CRvObserver::GoodStart()
 		TFullName searchTerm(iStartupProperties->FileName());
 		_LIT(KSearchAny, "*");
 		searchTerm += KSearchAny;
- 	    TFindProcess find(searchTerm);
+ 	    TFindProcess find(TParsePtrC(searchTerm).NameAndExt());
 		TFullName name;
 		err = find.Next(name);
 		if(err == KErrNone)

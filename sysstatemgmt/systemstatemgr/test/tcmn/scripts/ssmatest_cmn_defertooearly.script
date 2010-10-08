@@ -1,0 +1,47 @@
+// Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description: Testing for Transition Monitoring feature implemented as part of Staged Shutdown REQ for AppCentric architecture. This feature allows clients to defer acknowledgement to state change notifications during shutdown.
+//
+
+//!		@file			
+//!		@SYMTestSuiteName		DVS-SSMA-CMN-0012
+//!		@SYMScriptTestEnvironment   	Details as in below:-
+//!								1. testexecute framework(TEF3.0).
+//!								For the testing purpose define macro TEST_SSM_GRACEFUL_SHUTDOWN(For power off request feature) and SYMBIAN_INCLUDE_APP_CENTRIC(for transition monitoring feature).
+//!		@SYMScriptPurpose		Test if deferring before receiving a state change notification returns with appropriate error.
+//!		@SYMScriptCreationDate		18/08/2010
+
+LOAD_SUITE  tcmn_transitionmonitor
+
+START_TESTCASE			DVS-SSMA-CMN-0012
+//! @SYMTestCaseID		DVS-SSMA-CMN-0012
+//! @SYMPREQ 			SUB 405-5490
+//! @SYMTestType		CIT
+//! @SYMTestPriority		Critical
+//! @SYMTestStatus 		Implemented
+//! @SYMTestCaseDesc		Test the behaviour of a server which defers acknowledgement to shutdown state change even before the state has changed
+//! @SYMTestActions		1.Create a thread and connect to the server with a domain Id
+//!				2.Defer acknowledgement to shutdown state change even before the state change notification is received
+//! @SYMTestExpectedResults 	The call to defer returns with KErrNotReady
+		
+START_TEST_BLOCK  100	tcmn_transitionmonitor	z:\ssmatest\ssmatest_cmn_transitionmonitor.ini
+	CREATE_OBJECT	RSsmStateAwareSession1  RSsmStateAwareSession1	
+	COMMAND		RSsmStateAwareSession1	NewL
+	COMMAND		RSsmStateAwareSession1	Connect	 		Domain
+	COMMAND		RSsmStateAwareSession1	ReadIniData		DeferTooEarly
+	COMMAND		!AsyncError=-18		RSsmStateAwareSession1	DeferAcknowledgement
+	OUTSTANDING
+	COMMAND		RSsmStateAwareSession1	Close
+	COMMAND		RSsmStateAwareSession1	~
+END_TEST_BLOCK	
+END_TESTCASE			DVS-SSMA-CMN-0012

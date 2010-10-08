@@ -1,0 +1,57 @@
+// Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description: Testing for Transition Monitoring feature implemented as part of Staged Shutdown REQ for AppCentric architecture. This feature allows clients to defer acknowledgement to state change notifications during shutdown.
+//
+
+//!		@file			
+//!		@SYMTestSuiteName		DVS-SSMA-CMN-0016
+//!		@SYMScriptTestEnvironment   	Details as in below:-
+//!								1. testexecute framework(TEF3.0).
+//!								For the testing purpose define macro TEST_SSM_GRACEFUL_SHUTDOWN(For power off request feature) and SYMBIAN_INCLUDE_APP_CENTRIC(for transition monitoring feature).
+//!								Note: The system is going to be in shutdown state after executing this test and can not be restored to normal for executing other tests.
+//!								So this test has to be executed separately or at the end on overnight build machines. 
+//!		@SYMScriptPurpose		Test whether acknowledging state change notification without waiting for the deferral to complete succeeds.
+//!		@SYMScriptCreationDate		18/08/2010
+
+LOAD_SUITE  tcmn_transitionmonitor
+
+START_TESTCASE			DVS-SSMA-CMN-0016
+//! @SYMTestCaseID		DVS-SSMA-CMN-0016
+//! @SYMPREQ 			SUB 405-5490
+//! @SYMTestType		CIT
+//! @SYMTestPriority		Critical
+//! @SYMTestStatus 		Implemented
+//! @SYMTestCaseDesc		Test the behaviour of a server which defers acknowledgement first after receiving shutdown state change notificcation and acknowledges immediately
+//! @SYMTestActions		1.Create a thread and connect to the server with a domain Id and request for shutdown state change notification  
+//!				2.Request state change to ESsmShutdown
+/!				3.Defer acknowledgement upon receiving state change notification to shutdown state
+//!				4.Acknowledge state change notification without waiting for the deferral to complete
+//! @SYMTestExpectedResults 	The call to defer completes with KErrCompletion
+		
+START_TEST_BLOCK  100	tcmn_transitionmonitor	z:\ssmatest\ssmatest_cmn_transitionmonitor.ini
+	CREATE_OBJECT	RSsmStateAwareSession1  RSsmStateAwareSession1	
+	CREATE_OBJECT   RSsmStateManager	RSsmStateManager
+	COMMAND		RSsmStateAwareSession1	NewL
+	COMMAND		RSsmStateManager	NewL
+	COMMAND		RSsmStateAwareSession1	Connect	 		Domain
+	COMMAND		RSsmStateManager	Connect
+	COMMAND		RSsmStateAwareSession1	ReadIniData		AckLastState
+	COMMAND		!AsyncError=-17		RSsmStateAwareSession1	RequestStateNotification
+	COMMAND		RSsmStateManager	RequestStateTransition  ShutdownTransitionCriticalSubState
+	OUTSTANDING
+	COMMAND		RSsmStateAwareSession1	Close
+	COMMAND		RSsmStateManager	Close
+	COMMAND		RSsmStateAwareSession1	~
+	COMMAND		RSsmStateManager	~
+END_TEST_BLOCK	
+END_TESTCASE			DVS-SSMA-CMN-0016

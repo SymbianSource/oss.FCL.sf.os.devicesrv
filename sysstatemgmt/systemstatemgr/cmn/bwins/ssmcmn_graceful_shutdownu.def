@@ -99,4 +99,13 @@ EXPORTS
 	?IsSsmGracefulOffline@@YAKXZ @ 98 NONAME ; unsigned long IsSsmGracefulOffline(void)
 	?KSsmGracefulOffline@@3KB @ 99 NONAME ; unsigned long const KSsmGracefulOffline
 	?KSsmInvalidSim@@3KB @ 100 NONAME ; unsigned long const KSsmInvalidSim
+	?RequestStateNotificationCancel@CSsmStateAwareSession2@@QAEXXZ @ 101 NONAME ; void CSsmStateAwareSession2::RequestStateNotificationCancel(void)
+	?AcknowledgeAndRequestStateNotification@CSsmStateAwareSession2@@QAEXH@Z @ 102 NONAME ; void CSsmStateAwareSession2::AcknowledgeAndRequestStateNotification(int)
+	?GetState@CSsmStateAwareSession2@@QAE?AVTSsmState@@XZ @ 103 NONAME ; class TSsmState CSsmStateAwareSession2::GetState(void)
+	?CancelDeferral@RSsmStateAwareSession@@QAEXXZ @ 104 NONAME ; void RSsmStateAwareSession::CancelDeferral(void)
+	?NewL@CSsmStateAwareSession2@@SAPAV1@GAAVMStateChangeNotificationSubscriber2@@@Z @ 105 NONAME ; class CSsmStateAwareSession2 * CSsmStateAwareSession2::NewL(unsigned short, class MStateChangeNotificationSubscriber2 &)
+	?DeferAcknowledgement@RSsmStateAwareSession@@QAEXAAVTRequestStatus@@@Z @ 106 NONAME ; void RSsmStateAwareSession::DeferAcknowledgement(class TRequestStatus &)
+	?AcknowledgeStateNotification@CSsmStateAwareSession2@@QAEXH@Z @ 107 NONAME ; void CSsmStateAwareSession2::AcknowledgeStateNotification(int)
+	?RequestStateNotification@CSsmStateAwareSession2@@QAEXXZ @ 108 NONAME ; void CSsmStateAwareSession2::RequestStateNotification(void)
+	??1CSsmStateAwareSession2@@UAE@XZ @ 109 NONAME ; CSsmStateAwareSession2::~CSsmStateAwareSession2(void)
 

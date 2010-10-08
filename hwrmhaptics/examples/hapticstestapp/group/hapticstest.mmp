@@ -1,0 +1,100 @@
+/*
+* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  MMP-file for the hapticstest application.
+*
+*/
+
+
+#include <platform_paths.hrh>
+
+CAPABILITY ReadDeviceData
+
+VENDORID        VID_DEFAULT
+
+
+#ifdef __UI_FRAMEWORKS_V2__
+TARGETPATH  /sys/bin
+#if defined(EKA2) || !defined(WINS)
+TARGET          hapticstest.exe
+TARGETTYPE exe
+#else // EKA1 WINS
+TARGET          hapticstest.app
+TARGETTYPE exedll
+deffile /epoc32/release/wins/hapticstest.def
+#endif
+#else // __UI_FRAMEWORKS_V2__
+TARGET          hapticstest.app
+TARGETPATH      /system/apps/hapticstest
+TARGETTYPE app
+#endif
+
+UID               0x100039CE 0x0AD0595A
+
+LANG              SC
+
+SOURCEPATH        ../src
+SOURCE            hapticstest.cpp
+SOURCE            hapticstestapplication.cpp 
+SOURCE            hapticstestappview.cpp
+SOURCE            hapticstestappUi.cpp
+SOURCE            hapticstestdocument.cpp 
+SOURCE            hapticstesteffectdatahandler.cpp
+SOURCE            hapticstestasyncplaysender.cpp
+
+SOURCEPATH        ../group
+
+
+USERINCLUDE       ../inc
+APP_LAYER_SYSTEMINCLUDE
+
+LIBRARY           euser.lib
+LIBRARY           apparc.lib
+LIBRARY           cone.lib 
+LIBRARY           eikcore.lib  
+LIBRARY           avkon.lib  
+LIBRARY           eikcoctl.lib
+LIBRARY           eikctl.lib
+LIBRARY           etext.lib
+LIBRARY           ws32.lib
+LIBRARY           gdi.lib
+LIBRARY           egul.lib
+LIBRARY           efsrv.lib
+LIBRARY           hwrmhapticsclient.lib
+LIBRARY           charconv.lib // CnvUtfConverter
+
+
+#ifdef __UI_FRAMEWORKS_V2__
+START RESOURCE  hapticstest.RSS
+HEADER
+targetpath  /resource/apps
+lang        sc
+end
+#else
+RESOURCE        hapticstest.RSS 
+#endif
+
+#ifdef __UI_FRAMEWORKS_V2__
+sourcepath      .
+START RESOURCE  hapticstest_reg.rss
+TARGETPATH  /private/10003a3f/import/apps
+END
+   
+start resource hapticstest_loc.RSS
+targetpath /resource/apps
+lang sc
+end
+#endif
+
+SMPSAFE
+

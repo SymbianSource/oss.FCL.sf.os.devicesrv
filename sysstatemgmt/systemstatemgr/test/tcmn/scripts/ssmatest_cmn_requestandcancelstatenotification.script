@@ -1,0 +1,45 @@
+// Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description: Testing for Transition Monitoring feature implemented as part of Staged Shutdown REQ for AppCentric architecture. This feature allows clients to defer acknowledgement to state change notifications during shutdown.
+//
+
+//!		@file			
+//!		@SYMTestSuiteName		DVS-SSMA-CMN-0022
+//!		@SYMScriptTestEnvironment   	Details as in below:-
+//!								1. testexecute framework(TEF3.0).
+//!								For the testing purpose define macro TEST_SSM_GRACEFUL_SHUTDOWN(For power off request feature) and SYMBIAN_INCLUDE_APP_CENTRIC(for transition monitoring feature).
+//!		@SYMScriptPurpose		Test if the client keeps deferring acknowledgement automatically
+//!		@SYMScriptCreationDate		18/08/2010
+
+LOAD_SUITE  tcmn_transitionmonitor
+
+START_TESTCASE			DVS-SSMA-CMN-0022
+//! @SYMTestCaseID		DVS-SSMA-CMN-0022
+//! @SYMPREQ 			SUB 405-5490
+//! @SYMTestType		CIT
+//! @SYMTestPriority		Critical
+//! @SYMTestStatus 		Implemented
+//! @SYMTestCaseDesc		Test the behaviour of a server which automatically defers acknowledgement to shutdown state change
+//! @SYMTestActions		1.Create a thread and connect to the server with a domain Id and request for shutdown state change notification  
+//!				2.Delete the object, which automatically cancels the state change notification
+//!				3.Check whether the test completes without any error
+//! @SYMTestExpectedResults 	The test completes with error code, KErrNone
+		
+START_TEST_BLOCK  100	tcmn_transitionmonitor	z:\ssmatest\ssmatest_cmn_transitionmonitor.ini
+	CREATE_OBJECT	CSsmStateAwareSession2  CSsmStateAwareSession2
+	COMMAND		CSsmStateAwareSession2	NewL
+	COMMAND		CSsmStateAwareSession2	ReadIniData		RequestAndCancel
+	COMMAND		!AsyncError=0		CSsmStateAwareSession2	RequestStateNotification
+	COMMAND		CSsmStateAwareSession2	~
+END_TEST_BLOCK	
+END_TESTCASE			DVS-SSMA-CMN-0022

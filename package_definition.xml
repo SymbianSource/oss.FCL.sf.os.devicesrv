@@ -141,6 +141,9 @@
     <meta rel="Api" href="devicesrv_plat/accessory_policy_utility_api/accessory_policy_utility_api.metaxml"/>
     <unit bldFile="devicesrv_plat/accessory_policy_utility_api/group"/>
    </component>
+   <component id="common_accessory_plugin_api" name="Common Accessory Plugin API" class="api" filter="s60">    
+    <unit bldFile="devicesrv_plat/common_accessory_plugin_api/group"/>
+   </component>
    <component id="common_dsy_plugin_api" name="Common DSY Plugin API" class="api" filter="s60">
     <meta rel="Api" href="devicesrv_plat/common_dsy_plugin_api/common_dsy_plugin_api.metaxml"/>
     <unit bldFile="devicesrv_plat/common_dsy_plugin_api/group"/>

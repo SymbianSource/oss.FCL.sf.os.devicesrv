@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -22,9 +22,15 @@
 // test server
 data=ABI_DIR\DEBUG_DIR\tcmn_server.exe				sys\bin\tcmn_server.exe
 
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+data=ABI_DIR\DEBUG_DIR\tcmn_transitionmonitor.exe			sys\bin\tcmn_transitionmonitor.exe
+#endif // TEST_SSM_GRACEFUL_SHUTDOWN
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC
+
 #ifdef TEST_SSM_GRACEFUL_OFFLINE
 data=ABI_DIR\DEBUG_DIR\tcmn_gracefulnotify.exe			sys\bin\tcmn_gracefulnotify.exe
-#endif
+#endif // TEST_SSM_GRACEFUL_OFFLINE
 
 // script files
 data=DATAZ_\ssmatest\ssmatest_cmn_run.bat					\ssmatest_cmn_run.bat
@@ -38,6 +44,27 @@ data=DATAZ_\ssmatest\ssmatest_cmn_gracefulofflinestatenotify.script	\ssmatest\ss
 data=DATAZ_\ssmatest\ssmatest_cmn_gracefulofflinestatenotify.ini	\ssmatest\ssmatest_cmn_gracefulofflinestatenotify.ini
 // rsc file
 data=EPOCROOT##epoc32\data\z\private\2000d75b\startup\0\tgracefulofflinepatch.rsc		private\2000d75b\startup\0\tgracefulofflinepatch.rsc
-#endif
+#endif // TEST_SSM_GRACEFUL_OFFLINE
 
-#endif
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+data=DATAZ_\ssmatest\ssmatest_cmn_canceldeferral.script				\ssmatest\ssmatest_cmn_canceldeferral.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferackn.script				\ssmatest\ssmatest_cmn_deferackn.script
+data=DATAZ_\ssmatest\ssmatest_cmn_noackn.script					\ssmatest\ssmatest_cmn_noackn.script
+data=DATAZ_\ssmatest\ssmatest_cmn_acklaststate.script				\ssmatest\ssmatest_cmn_acklaststate.script
+data=DATAZ_\ssmatest\ssmatest_cmn_maxdefer.script				\ssmatest\ssmatest_cmn_maxdefer.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferwocap.script				\ssmatest\ssmatest_cmn_deferwocap.script
+data=DATAZ_\ssmatest\ssmatest_cmn_defertwice.script				\ssmatest\ssmatest_cmn_defertwice.script
+data=DATAZ_\ssmatest\ssmatest_cmn_defertooearly.script				\ssmatest\ssmatest_cmn_defertooearly.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferautomatic.script				\ssmatest\ssmatest_cmn_deferautomatic.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferautomaticwocap.script			\ssmatest\ssmatest_cmn_deferautomaticwocap.script
+data=DATAZ_\ssmatest\ssmatest_cmn_maxautomaticdefer.script			\ssmatest\ssmatest_cmn_maxautomaticdefer.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferackn_anysubstate.script			\ssmatest\ssmatest_cmn_deferackn_anysubstate.script
+data=DATAZ_\ssmatest\ssmatest_cmn_deferackn_failstate.script			\ssmatest\ssmatest_cmn_deferackn_failstate.script
+data=DATAZ_\ssmatest\ssmatest_cmn_requestandcancelstatenotification.script	\ssmatest\ssmatest_cmn_requestandcancelstatenotification.script
+
+data=DATAZ_\ssmatest\ssmatest_cmn_transitionmonitor.ini				\ssmatest\ssmatest_cmn_transitionmonitor.ini
+#endif // TEST_SSM_GRACEFUL_SHUTDOWN
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC
+
+#endif // __SSMATEST_CMN_IBY__

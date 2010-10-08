@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -39,6 +39,12 @@ USERINCLUDE		../../../ssm/inc
 USERINCLUDE		../../../localinc
 USERINCLUDE		../../../cmd/inc
 
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+USERINCLUDE		../../../../inc
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
+
 
 SOURCEPATH		../../../cmn/src
 SOURCE			ssmstatemanager.cpp
@@ -58,6 +64,12 @@ SOURCE			tcmn_step_state.cpp
 SOURCE			tcmn_step_swpvalue.cpp
 SOURCE			tcmn_step_stateawaresession.cpp
 SOURCE			tcmn_step_systemwideproperty.cpp
+
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+SOURCE			t_stateawaresession2.cpp
+#endif //TEST_SSM_GRACEFUL_SHUTDOWN
+#endif //SYMBIAN_INCLUDE_APP_CENTRIC
 
 SOURCEPATH		../../testutils/src
 SOURCE			ssmatest_utils.cpp

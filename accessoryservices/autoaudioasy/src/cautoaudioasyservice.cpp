@@ -20,7 +20,7 @@
 #include <accpolnamevaluerecord.h>
 #include <accconfigfileparser.h>
 #include <accpolcommonnamevaluepairs.h>
-#include <accessoryservicesinternalpskeys.h>
+#include <accessoryservicespskeys.h>
 #include <autoaudiopskeys.h>
 
 #include "cautoaudioasyservice.h"

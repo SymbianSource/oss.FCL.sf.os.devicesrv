@@ -1224,7 +1224,8 @@ TInt CSensrvTest::ConditionUnitTestL( CStifItemParser& /*aItem*/ )
                                                   ESensrvOperatorLessThanOrEquals,
                                                   3,
                                                   dataBufX);
-
+		
+	CleanupStack::PushL(testCondition);
     TPckgBuf<TSensrvAccelerometerAxisData> getBuf;
     User::LeaveIfError(testCondition->GetConditionValue(getBuf));
     TSensrvAccelerometerAxisData getItem1 = getBuf();
@@ -1298,6 +1299,8 @@ TInt CSensrvTest::ConditionUnitTestL( CStifItemParser& /*aItem*/ )
     RDebug::Print( _L("CSensrvTestCases::ConditionUnitTestL - Overall time for %d ConditionValue %d microseconds"), i, overallTime2.Int64() );
 
     RDebug::Print( _L("CSensrvTest::ConditionUnitTestL - Completed: %d"), err );
+    	
+    CleanupStack::PopAndDestroy(testCondition);	
 
     return err;
     }

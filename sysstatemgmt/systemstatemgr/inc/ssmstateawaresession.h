@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -18,10 +18,13 @@
 
 #include <e32base.h>
 #include <domaindefs.h>
+#include <domainmember.h>
 
 #include <ssm/ssmstate.h>
 
 class CSsmStateMonitor;
+class CSsmDeferralMonitor;
+
 
 /**
 Read-only client interface to receive notifications when the
@@ -44,6 +47,9 @@ public:
 	IMPORT_C void RequestStateNotificationCancel();
 	IMPORT_C void AcknowledgeStateNotification(TInt aError);
 	IMPORT_C void AcknowledgeAndRequestStateNotification(TInt aError, TRequestStatus& aStatus);
+	IMPORT_C void DeferAcknowledgement(TRequestStatus& aStatus);
+	IMPORT_C void CancelDeferral();
+
 private:
 	RSsmStateAwareSession(const RSsmStateAwareSession& aState);
 	
@@ -102,6 +108,77 @@ private:
 	RPointerArray<MStateChangeNotificationSubscriber> iSubscribers; // Elements of the array are not owned.
 	CSsmStateMonitor* iMonitor;
 	TInt iSpare[4];
+	};
+
+
+/**
+Interface to implement for clients that want to use the @c CExtendedSsmStateAwareSession 
+utility class.
+
+@publishedPartner
+@released
+*/
+class MStateChangeNotificationSubscriber2
+    {
+public:
+    /*HandleTransition() will be called when the transition notification
+    comes in. Thereafter, the active object will contineouslly defer the transition.
+    
+    The implementation of this function should be used first to call
+    RequestTransitionNotification() again if required, and then to initiate the
+    response to the transition. It should be kept as quick as possible.
+    
+    Once the Domain Member's transition operations are complete, it should call
+    AcknowledgeLastState() on this active object, to indicate it is ready to be
+    transitioned*/
+    
+    virtual void HandleTransition(TInt aError) = 0;
+    
+    virtual TInt HandleDeferralError(TInt aError) = 0;
+    };
+
+/**
+This class automatically deferrs transitions as long as possible after the original notification
+is received.
+
+To make use of this class, one has to implement the implement the HandleTransition()
+in MStateChangeNotificationSubscriber2. HandleTransition() will be called when the transition notification
+comes in. Thereafter, the active object will continually defer the transition.
+
+This object is intended to simplify the handling of notifications and
+deferrals. The member must ensure that other active objects do not block or
+have long-running RunL()s; this is to ensure that the Active Scheduler will
+remain responsive to the completion of deadline deferrals.
+
+The capabilities needed are the same as those needed for RDmDomain::DeferAcknowledgement()
+@capability WriteDeviceData
+@capability ProtServ
+@see 
+*/
+NONSHARABLE_CLASS(CSsmStateAwareSession2):public CActive 
+	{
+public:	
+	IMPORT_C static CSsmStateAwareSession2* NewL(TDmDomainId aDomainId, MStateChangeNotificationSubscriber2& aSubscriber );
+	IMPORT_C ~CSsmStateAwareSession2();
+	IMPORT_C void RequestStateNotification();
+    IMPORT_C void RequestStateNotificationCancel();
+    IMPORT_C void AcknowledgeStateNotification(TInt aError);
+    IMPORT_C void AcknowledgeAndRequestStateNotification(TInt aError);	  
+	IMPORT_C TSsmState GetState();    
+	TInt HandleDeferralError(TInt aError);
+    
+private:
+	CSsmStateAwareSession2(MStateChangeNotificationSubscriber2& aSubscriber);
+    void RunL();
+    void DoCancel();
+	void ConstructL(TDmDomainId aDomainId);  
+	
+	
+private:
+	RSsmStateAwareSession iSsmStateAwareSession;
+	//For deferring the notification.
+	CSsmDeferralMonitor* iDeferNotification;	
+	MStateChangeNotificationSubscriber2* iSubscriber;
 	};
 	
 #endif

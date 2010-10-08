@@ -117,4 +117,15 @@ EXPORTS
 	KSsmGracefulOffline @ 116 NONAME DATA 4
 	_Z20IsSsmGracefulOfflinev @ 117 NONAME
 	KSsmInvalidSim @ 118 NONAME DATA 4
+	_ZN21RSsmStateAwareSession14CancelDeferralEv @ 119 NONAME
+	_ZN21RSsmStateAwareSession20DeferAcknowledgementER14TRequestStatus @ 120 NONAME
+	_ZN22CSsmStateAwareSession224RequestStateNotificationEv @ 121 NONAME
+	_ZN22CSsmStateAwareSession228AcknowledgeStateNotificationEi @ 122 NONAME
+	_ZN22CSsmStateAwareSession230RequestStateNotificationCancelEv @ 123 NONAME
+	_ZN22CSsmStateAwareSession238AcknowledgeAndRequestStateNotificationEi @ 124 NONAME
+	_ZN22CSsmStateAwareSession24NewLEtR35MStateChangeNotificationSubscriber2 @ 125 NONAME
+	_ZN22CSsmStateAwareSession28GetStateEv @ 126 NONAME
+	_ZN22CSsmStateAwareSession2D0Ev @ 127 NONAME
+	_ZN22CSsmStateAwareSession2D1Ev @ 128 NONAME
+	_ZN22CSsmStateAwareSession2D2Ev @ 129 NONAME
 

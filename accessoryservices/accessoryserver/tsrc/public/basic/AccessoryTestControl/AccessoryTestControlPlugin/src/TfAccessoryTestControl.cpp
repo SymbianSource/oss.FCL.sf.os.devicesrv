@@ -4466,9 +4466,10 @@ void CTFAccessoryTestControl::CheckConnectedAccessory( TInt* aRetval )
         TAccPolGIDHeader            iGenericIDHeaderConnected;              // Header of the connected GID
         TAccPolGenericIDArray       genericIdArray;                         // Array of connected generic ID's
         CAccConGenericID*           aGenericID = CAccConGenericID::NewL();  // This might be needed for capabilities 
-        CAccPolSubblockNameArray*   nameArrayConnected = CAccPolSubblockNameArray::NewL();
         
         CleanupStack::PushL( aGenericID );                        
+        CAccPolSubblockNameArray*   nameArrayConnected = CAccPolSubblockNameArray::NewL();
+        
         CleanupStack::PushL( nameArrayConnected );
         
         TAccPolGenericID genericID = aGenericID->GenericID();

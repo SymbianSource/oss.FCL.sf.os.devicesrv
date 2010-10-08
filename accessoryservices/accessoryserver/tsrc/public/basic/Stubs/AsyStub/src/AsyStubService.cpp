@@ -27,7 +27,7 @@
 #include <accpolobjecttypes.h>
 #include <s32mem.h>
 #include <accpolhdmiobjectcon.h>
-#include <accessoryservicesinternalpskeys.h>
+#include <accessoryservicespskeys.h>
 #ifdef FF_AUTOMOTIVESTACK
 #include <autoaudiopskeys.h>
 #endif
@@ -107,6 +107,7 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             TBuf<12> HWModelID;
             HWModelID.Num( aParam1 );
+            CleanupStack::PushL( accConfigFileParser );
             __UHEAP_MARK;
             CAccConGenericID* genericID = CAccConGenericID::NewL();
             CleanupStack::PushL( genericID );
@@ -121,7 +122,7 @@ void CASYStubService::Service( TInt aTestCaseID,
             iGenericId = genericID->GenericID();
             CleanupStack::PopAndDestroy( genericID );
             __UHEAP_MARKEND;
-            delete accConfigFileParser;
+            CleanupStack::PopAndDestroy( accConfigFileParser );
             __UHEAP_MARKEND;
             }
             break;
@@ -137,7 +138,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -183,12 +186,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Connect status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             break;
 
@@ -198,7 +200,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -262,12 +266,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             break;
 
@@ -277,7 +280,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -324,12 +329,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             break;
 
@@ -339,7 +343,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -390,12 +396,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             break;
 
@@ -405,7 +410,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -475,12 +482,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             break;
 
@@ -596,7 +602,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -664,12 +672,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status for USB %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             ;
             break;
@@ -680,7 +687,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -773,15 +782,14 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status for USB %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( audioStream2 );//			
             CleanupStack::PopAndDestroy( audioStream1 );//			
             CleanupStack::PopAndDestroy( stream );//
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
             }
             ;
             break;
@@ -791,7 +799,9 @@ void CASYStubService::Service( TInt aTestCaseID,
 
             CAccConfigFileParser* accConfigFileParser =
                 CAccConfigFileParser::NewL( _L("Configuration file") );
+            CleanupStack::PushL( accConfigFileParser );
             CAccConGenericID* genericID = CAccConGenericID::NewL();
+            CleanupStack::PushL( genericID );
 
             RArray<TAccPolNameValueRecord> nameValueArray;
             CleanupClosePushL( nameValueArray );
@@ -845,12 +855,11 @@ void CASYStubService::Service( TInt aTestCaseID,
             TInt retval = status.Int();
 
             COMPONENT_TRACE( ( _L( "ASYSTUB - CASYStubService::Service - Update status %d" ), retval) );
-            delete accConfigFileParser;
 
             iGenericId = genericID->GenericID();
 
-            delete genericID;
             CleanupStack::PopAndDestroy( &nameValueArray );//nameValueArray.Close() is called;
+            CleanupStack::PopAndDestroy( 2, accConfigFileParser );
 
             break;
             }

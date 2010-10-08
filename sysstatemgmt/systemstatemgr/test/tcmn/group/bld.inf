@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -34,6 +34,12 @@ PRJ_MMPFILES
 PRJ_TESTMMPFILES
 tcmn_server.mmp
 
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+tcmn_transitionmonitor_server.mmp
+#endif // TEST_SSM_GRACEFUL_SHUTDOWN
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC
+
 //Define TEST_SSM_GRACEFUL_OFFLINE only when patchable constant KSsmGracefulOffline is enabled
 #ifdef TEST_SSM_GRACEFUL_OFFLINE
 tcmn_gracefulnotify_server.mmp
@@ -53,6 +59,28 @@ ssmatest_cmn.iby			/epoc32/rom/include/ssmatest_cmn.iby
 ../scripts/ssmatest_cmn_swpvalue.script					z:/ssmatest/ssmatest_cmn_swpvalue.script
 ../scripts/ssmatest_cmn_systemwideproperty.script		z:/ssmatest/ssmatest_cmn_systemwideproperty.script
 ../scripts/ssmatest_cmn_stateawaresession.script		z:/ssmatest/ssmatest_cmn_stateawaresession.script
+
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+#ifdef TEST_SSM_GRACEFUL_SHUTDOWN
+../scripts/ssmatest_cmn_canceldeferral.script			z:/ssmatest/ssmatest_cmn_canceldeferral.script
+../scripts/ssmatest_cmn_deferackn.script			z:/ssmatest/ssmatest_cmn_deferackn.script
+../scripts/ssmatest_cmn_noackn.script				z:/ssmatest/ssmatest_cmn_noackn.script
+../scripts/ssmatest_cmn_acklaststate.script			z:/ssmatest/ssmatest_cmn_acklaststate.script
+../scripts/ssmatest_cmn_maxdefer.script				z:/ssmatest/ssmatest_cmn_maxdefer.script
+../scripts/ssmatest_cmn_deferwocap.script			z:/ssmatest/ssmatest_cmn_deferwocap.script
+../scripts/ssmatest_cmn_defertwice.script			z:/ssmatest/ssmatest_cmn_defertwice.script
+../scripts/ssmatest_cmn_defertooearly.script			z:/ssmatest/ssmatest_cmn_defertooearly.script
+../scripts/ssmatest_cmn_deferautomatic.script			z:/ssmatest/ssmatest_cmn_deferautomatic.script
+../scripts/ssmatest_cmn_deferautomaticwocap.script		z:/ssmatest/ssmatest_cmn_deferautomaticwocap.script
+../scripts/ssmatest_cmn_maxautomaticdefer.script		z:/ssmatest/ssmatest_cmn_maxautomaticdefer.script
+../scripts/ssmatest_cmn_deferackn_anysubstate.script		z:/ssmatest/ssmatest_cmn_deferackn_anysubstate.script
+../scripts/ssmatest_cmn_deferackn_failstate.script		z:/ssmatest/ssmatest_cmn_deferackn_failstate.script
+../scripts/ssmatest_cmn_requestandcancelstatenotification.script	z:/ssmatest/ssmatest_cmn_requestandcancelstatenotification.script
+
+../testdata/ssmatest_cmn_transitionmonitor.ini		z:/ssmatest/ssmatest_cmn_transitionmonitor.ini
+#endif // TEST_SSM_GRACEFUL_SHUTDOWN
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC
+
 #ifdef TEST_SSM_GRACEFUL_OFFLINE
 ../scripts/ssmatest_cmn_gracefulofflinestatenotify.script		z:/ssmatest/ssmatest_cmn_gracefulofflinestatenotify.script
 ../testdata/ssmatest_cmn_gracefulofflinestatenotify.ini			z:/ssmatest/ssmatest_cmn_gracefulofflinestatenotify.ini

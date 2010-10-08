@@ -249,6 +249,7 @@ void CASYStubCmdHandlerBase::ProcessCommandL( const TProcessCmdId aCommand,
                 //get capabilities
                 CAccPolSubblockNameArray* iNameArray =
                     CAccPolSubblockNameArray::NewL();
+                CleanupStack::PushL( iNameArray );
 
                 RAccessoryServer server;
                 server.Connect();
@@ -281,7 +282,7 @@ void CASYStubCmdHandlerBase::ProcessCommandL( const TProcessCmdId aCommand,
                 connectionBase.CloseSubSession();
                 server.Close();
 
-                delete iNameArray;
+                CleanupStack::PopAndDestroy( iNameArray );
 
                 // If everything is ok
                 if( everyThing )

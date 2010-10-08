@@ -1,0 +1,694 @@
+/*
+* Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:  Application resource file.
+*
+*/
+
+
+NAME HAPT
+
+#include <eikon.rh>
+#include <eikon.rsg>
+#include <avkon.rh>
+#include <avkon.rsg>
+
+#include "hapticstest.hrh"
+
+
+// ---------------------------------------------------------
+//   
+//    Define the resource file signature 
+//    This resource should be empty.
+//
+// ---------------------------------------------------------
+//
+RESOURCE RSS_SIGNATURE { }
+
+// ---------------------------------------------------------
+//   
+//    Default Document Name
+//
+// ---------------------------------------------------------
+//
+RESOURCE TBUF r_default_document_name { buf=""; }
+
+// ---------------------------------------------------------
+//   
+//    Define default menu and CBA key.
+//
+// ---------------------------------------------------------
+//
+RESOURCE EIK_APP_INFO
+    {
+    menubar = r_hapticstest_menubar;
+    cba = R_AVKON_SOFTKEYS_OPTIONS_EXIT;
+    }
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_menubar
+//   Menubar for hapticstest example
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_BAR r_hapticstest_menubar
+    {
+    titles =
+        {
+        MENU_TITLE {menu_pane = r_hapticstest_menu;}
+        };
+    }
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_menu
+//   Menu for "Options"
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_menu
+    {
+    items = 
+        {
+        MENU_ITEM {cascade = r_hapticstest_init_submenu; command = EHapticsTestInit; txt = "Initialize";},
+        MENU_ITEM {cascade = r_hapticstest_reserve_submenu; command = EHapticsTestReserve; txt = "Reserve/Release";},
+        MENU_ITEM {cascade = r_hapticstest_ivtfiles_submenu; command = EHapticsTestLoadIVTFile; txt = "Load IVT-file";},
+        MENU_ITEM {cascade = r_hapticstest_generalplay_submenu; command = EHapticsTestGeneralPlayEffect; txt = "Play Effect";},
+        MENU_ITEM {cascade = r_hapticstest_changestate_submenu; command = EHapticsTestChangeState; txt = "Pause/Resume/Stop";},
+        MENU_ITEM {cascade = r_hapticstest_modify_submenu; command = EHapticsTestModifyEffect; txt = "Modify Effect";},
+        MENU_ITEM {cascade = r_hapticstest_deleteivtdata_submenu; command = EHapticsTestDeleteIVTData; txt = "Delete IVT data";},
+        MENU_ITEM {cascade = r_hapticstest_toggle_submenu; command = EHapticsToggle; txt = "Toggle conf";},
+        MENU_ITEM {cascade = r_hapticstest_properties_submenu; command=EHapticsTestPropertiesSubmenu; txt = "Properties";},
+        MENU_ITEM {cascade = r_hapticstest_capabilities_submenu; command=EHapticsTestCapabilitiesSubmenu; txt = "Capabilities";},
+        MENU_ITEM {command = EHapticsTestGetStatus;  txt = "Print haptics status";},
+        MENU_ITEM {command = EHapticsTestStreaming;  txt = "Start streaming";},
+        MENU_ITEM {command = EHapticsTestPlayStreamSample;  txt = "Play sample";},
+        MENU_ITEM {command = EHapticsTestNextStreamSample;  txt = "Next sample";},
+        MENU_ITEM {command = EHapticsTestPlayAllSamples;  txt = "Play whole effect";},
+        MENU_ITEM {command = EHapticsTestStopStreaming;  txt = "Stop streaming";},
+        MENU_ITEM {command = EHapticsTestDeleteAllIVTData; txt = "Delete all IVT data";},
+        MENU_ITEM {command = EHapticsTestConstGetters; txt = "Const getters";},
+        MENU_ITEM {command = EHapticsTestClearOutput;  txt = "Clear output";},
+        MENU_ITEM {command = EHapticsTestPanic;  txt = "Panic!";},
+        MENU_ITEM {command = EAknSoftkeyExit; txt = "Exit";}
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_init_submenu
+//   Submenu for initializing haptics.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_init_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {cascade = r_hapticstest_openclose_submenu; txt = "Open/Close";},
+        MENU_ITEM {cascade = r_hapticstest_actuators_submenu; command = EHapticsTestOpenActuator; txt = "Open Actuator";},
+        MENU_ITEM {command = EHapticsTestSupportedActuators;  txt = "Supported Actuators";},
+        MENU_ITEM {command = EHapticsTestAutoInit;  txt = "AutoInit";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_openclose_submenu
+//   Submenu for opening and closing a haptics client.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_openclose_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestOpenHaptics; txt = "Open client";},
+        MENU_ITEM {command = EHapticsTestCloseHaptics; txt = "Close client";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_actuators_submenu
+//   Submenu for opening an actuator.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_actuators_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestOpenActuatorAny; txt = "Any";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorDevice; txt = "Device";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorPrimaryDisplay; txt = "Primary Display";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorSecondaryDisplay; txt = "Secondary Display";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorGame; txt = "Game";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorGameLeft; txt = "Game Left";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorGameRight; txt = "Game Right";},
+        MENU_ITEM {command = EHapticsTestOpenActuatorExternalVibra; txt = "External Vibra";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_ivtfiles_submenu
+//   Submenu for loading an ivt-file.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_ivtfiles_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestLoadIVTFileNoneFound; txt = "<No IVT-files found>";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_deleteivtdata_submenu
+//   Submenu for deleting loaded ivt-files from haptics
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_deleteivtdata_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestDeleteIVTDataNoneFound; txt = "<No IVT-files found>";}
+        };
+    }
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_generalplay_submenu
+//   Submenu for playing effects (ivt, repeat, manual).
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_generalplay_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {cascade = r_hapticstest_playeffect_submenu; command = EHapticsTestPlayEffect; txt = "Play";},
+        MENU_ITEM {cascade = r_hapticstest_playeffectrepeat_submenu; command = EHapticsTestPlayEffectRepeat; txt = "Repeat";},
+        MENU_ITEM {cascade = r_hapticstest_playeffectdef_submenu; command = EHapticsTestPlayEffectManual; txt = "Manual";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_playeffect_submenu
+//   Submenu for playing an effect using IVT-data.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_playeffect_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestPlayEffectNoneFound; txt = "<No effects found>";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_repeateffect_submenu
+//   Submenu for repeating an effect using IVT-data.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_playeffectrepeat_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestPlayEffectRepeatNoneFound; txt = "<No effects found>";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_playeffectdef_submenu
+//   Submenu for playing manual effect (magsweep/periodic/repeat).
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_playeffectdef_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestPlayEffectManualMagSweep; txt = "MagSweep (1 sec)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualMagSweepInf; txt = "MagSweep (inf)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualMagSweepInfMod; txt = "MagSweep (mod)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualPeriodic; txt = "Periodic (1 sec)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualPeriodicInf; txt = "Periodic (inf)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualPeriodicInfMod; txt = "Periodic (mod)";},
+        MENU_ITEM {command = EHapticsTestPlayEffectManualRepeat; txt = "Repeat";}
+        };
+    }
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_changestate_submenu
+//   Submenu for pause, resume and stop effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_changestate_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {cascade = r_hapticstest_pause_submenu; txt = "Pause";},
+        MENU_ITEM {cascade = r_hapticstest_resume_submenu; txt = "Resume";},
+        MENU_ITEM {cascade = r_hapticstest_stop_submenu; txt = "Stop";},
+        MENU_ITEM {command = EHapticsTestChangeStateStopAll; txt = "Stop all effects";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_pause_submenu
+//   Submenu for pause.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_pause_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestChangeStateNoneFound; txt = "<No effects found>";}
+        };
+    }    
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_resume_submenu
+//   Submenu for resume.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_resume_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestChangeStateNoneFound; txt = "<No effects found>";}
+        };
+    }    
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_stop_submenu
+//   Submenu for stop.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_stop_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestChangeStateNoneFound; txt = "<No effects found>";}
+        };
+    }    
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modify_submenu
+//   Submenu for modifying an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modify_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {cascade = r_hapticstest_modifyduration_submenu; txt = "Duration";},
+        MENU_ITEM {cascade = r_hapticstest_modifymagnitude_submenu; txt = "Magnitude";},
+        MENU_ITEM {cascade = r_hapticstest_modifystyle_submenu; txt = "Style";},
+        MENU_ITEM {cascade = r_hapticstest_modifyattack_submenu; txt = "Attack level";},
+        MENU_ITEM {cascade = r_hapticstest_modifyfade_submenu; txt = "Fade level";},
+        MENU_ITEM {cascade = r_hapticstest_modifyattacktime_submenu; txt = "Attack time";},
+        MENU_ITEM {cascade = r_hapticstest_modifyfadetime_submenu; txt = "Fade time";},
+        MENU_ITEM {cascade = r_hapticstest_modifyperiod_submenu; txt = "Period";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyduration_submenu
+//   Submenu for modifying duration of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyduration_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectDuration1; txt = "1s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectDuration5; txt = "5s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectDuration10; txt = "10s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectDuration30; txt = "30s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectDuration60; txt = "60s"; flags = EEikMenuItemCheckBox;}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifymagnitude_submenu
+//   Submenu for modifying magnitude of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifymagnitude_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectMagnitudeMin; txt = "Min"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectMagnitude25; txt = "25%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectMagnitude50; txt = "50%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectMagnitude75; txt = "75%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectMagnitudeMax; txt = "Max"; flags = EEikMenuItemCheckBox;}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifystyle_submenu
+//   Submenu for modifying the style of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifystyle_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectStyleSmooth; txt = "Smooth"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectStyleStrong; txt = "Strong"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectStyleSharp; txt = "Sharp"; flags = EEikMenuItemCheckBox;}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyattack_submenu
+//   Submenu for modifying attack level of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyattack_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackMin; txt = "Min"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttack25; txt = "25%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttack50; txt = "50%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttack75; txt = "75%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackMax; txt = "Max"; flags = EEikMenuItemCheckBox;}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyfade_submenu
+//   Submenu for modifying fadelevel of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyfade_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeMin; txt = "Min"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFade25; txt = "25%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFade50; txt = "50%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFade75; txt = "75%"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeMax; txt = "Max"; flags = EEikMenuItemCheckBox;}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyattacktime_submenu
+//   Submenu for modifying attack time of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyattacktime_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime02; txt = "0.2s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime1; txt = "1s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime5; txt = "5s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime10; txt = "10s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime30; txt = "30s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectAttackTime60; txt = "60s"; flags = EEikMenuItemCheckBox;}
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyfadetime_submenu
+//   Submenu for modifying fade time of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyfadetime_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime02; txt = "0.2s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime1; txt = "1s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime5; txt = "5s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime10; txt = "10s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime30; txt = "30s"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectFadeTime60; txt = "60s"; flags = EEikMenuItemCheckBox;}
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_modifyperiod_submenu
+//   Submenu for modifying period of an effect.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_modifyperiod_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod50; txt = "50ms"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod100; txt = "100ms"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod300; txt = "300ms"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod600; txt = "600ms"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod1000; txt = "1000ms"; flags = EEikMenuItemCheckBox;},
+        MENU_ITEM {command = EHapticsTestModifyEffectPeriod3000; txt = "3000ms"; flags = EEikMenuItemCheckBox;}
+        };
+    }
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_reserve_submenu
+//   Submenu for reserving haptics.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_reserve_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestReserveNotTrusted; txt = "Reserve untrusted";},
+        MENU_ITEM {command = EHapticsTestReserveTrusted; txt = "Reserve trusted";},
+        MENU_ITEM {command = EHapticsTestRelease; txt = "Release haptics"; },
+        MENU_ITEM {command = EHapticsTestReserveNotTrustedTemp; txt = "Reserve temporary";},
+        MENU_ITEM {command = EHapticsTestReleaseTemp; txt = "Release temporary"; }
+        };
+    }    
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_toggle_submenu
+//   Submenu for toggling configuration.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_toggle_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestSynchronousCalls;  txt = "Synchronous methods";},
+        MENU_ITEM {command = EHapticsTestAsynchronousCalls;  txt = "Asynchronous methods";},
+        MENU_ITEM {command = EHapticsTestUsingFileHandle;  txt = "Use file handle";},
+        MENU_ITEM {command = EHapticsTestNotUsingFileHandle;  txt = "Use data buffer";},
+        MENU_ITEM {command = EHapticsTestShowEffectInfo;  txt = "Show played effect info";},
+        MENU_ITEM {command = EHapticsTestHideEffectInfo;  txt = "Don't show effect info";}
+        };
+    }    
+
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_properties_submenu
+//   Submenu for properties.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_properties_submenu
+    {
+    items = 
+        {
+        //getters
+        MENU_ITEM {command = EHapticsTestGetPropertyPriority;  txt = "Get Priority";},
+        MENU_ITEM {command = EHapticsTestGetPropertyDisableEffects;  txt = "Check Disable effects";},
+        MENU_ITEM {command = EHapticsTestGetPropertyStrength;  txt = "Get Strength";},
+        //setters
+        MENU_ITEM {cascade = r_hapticstest_properties_set__priority_submenu; txt = "Priority";},
+        MENU_ITEM {cascade = r_hapticstest_properties_set__disableeffects_submenu; txt = "DisableEffects";},
+        MENU_ITEM {cascade = r_hapticstest_properties_set__strength_submenu; txt = "Strength";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_properties_set__priority_submenu
+//   Submenu for setting priority property
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_properties_set__priority_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestSetPropertyPriorityMin;  txt = "Min";},
+        MENU_ITEM {command = EHapticsTestSetPropertyPriorityDefault;  txt = "Default";},
+        MENU_ITEM {command = EHapticsTestSetPropertyPriorityMax;  txt = "Max";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_properties_set__disableeffects_submenu
+//   Submenu for setting disable effects property.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_properties_set__disableeffects_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestSetPropertyDisableEffectsTrue;  txt = "True";},
+        MENU_ITEM {command = EHapticsTestSetPropertyDisableEffectsFalse;  txt = "False";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_properties_set__strength_submenu
+//   Submenu for setting strength property.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_properties_set__strength_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestSetPropertyStrengthMute;  txt = "Mute";},
+        MENU_ITEM {command = EHapticsTestSetPropertyStrengthHalf;  txt = "Half";},
+        MENU_ITEM {command = EHapticsTestSetPropertyStrengthFull;  txt = "Full";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//   
+//   r_hapticstest_getcapabilities_submenu
+//   Submenu for capabilities.
+//
+// ---------------------------------------------------------
+//
+RESOURCE MENU_PANE r_hapticstest_capabilities_submenu
+    {
+    items = 
+        {
+        MENU_ITEM {command = EHapticsTestGetCapabilityDeviceCategory;  txt = "Device Category";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityMaxNestedRepeats;    txt = "Max nested actuators";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityNumActuators;    txt = "Number of actuators";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityActuatorType;    txt = "Actuator type";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityNumEffectSlots;    txt = "Effect slots";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityNumEffectStyles;    txt = "Effect styles";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityMinPeriod;    txt = "Min period";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityMaxPeriod;    txt = "Max period";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityMaxEffectDuration;    txt = "Max effectt duration";},
+        MENU_ITEM {command = EHapticsTestGetCapabilitySupportedEffects;    txt = "Supported effects";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityDeviceName;      txt = "Device Name";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityAPIVersionNumber;txt = "API version number";},
+        MENU_ITEM {command = EHapticsTestGetCapabilityMaxIVTSize;txt = "Max IVT file size";}
+        };
+    }    
+
+// ---------------------------------------------------------
+//
+// Array of selections for number of repeats in "repeat effect"
+// cases..
+// 
+// ---------------------------------------------------------
+//
+RESOURCE ARRAY r_haptics_repeateffect_repeats_list
+    {
+    items = 
+        {
+        LBUF {txt = "0 repeats"; },
+        LBUF {txt = "1 repeat"; },
+        LBUF {txt = "2 repeats"; },
+        LBUF {txt = "3 repeats"; },
+        LBUF {txt = "7 repeats"; },
+        LBUF {txt = "Inf repeats"; }
+        };
+    }
+
+// ---------------------------------------------------------
+//
+// List query resource for number of repeats in "repeat effect"
+// cases..
+// 
+// ---------------------------------------------------------
+//
+RESOURCE AVKON_LIST_QUERY r_haptics_repeateffect_repeats_query
+    {
+    softkeys = R_AVKON_SOFTKEYS_OK_CANCEL;    
+
+    items = 
+        {
+        AVKON_LIST_QUERY_DLG_LINE
+            {
+            control = AVKON_LIST_QUERY_CONTROL
+                {
+                listtype = EAknCtSinglePopupMenuListBox;
+                listbox = AVKON_LIST_QUERY_LIST
+                    {
+                    array_id = r_haptics_repeateffect_repeats_list;
+                    };
+                heading = "Repeats";
+                };
+            }
+        };
+    }
+
+            

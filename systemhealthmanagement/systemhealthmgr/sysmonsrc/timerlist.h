@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -43,14 +43,14 @@ public:
 	TInt32 AddL(const TTime& aTime, const TCallBack& aCallBack);
 	void Remove(TInt32 aTimer);
 
-protected:
 	class TTimerInfo
 		{
 	public:
 		TTime iTime;
 		TCallBack iCallBack;
 		};
-
+		
+protected:
 	void RunL();
 	void ConstructL();
 	TInt RunError(TInt aError);

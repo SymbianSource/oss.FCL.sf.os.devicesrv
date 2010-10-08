@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -47,29 +47,36 @@ void CTimerList::ConstructL()
 	{
 	CTimer::ConstructL();
 	}
-
+	
+static void DoCleanUp(TAny* aTimerInfo)
+    {
+    CTimerList::TTimerInfo* timerInfo = static_cast<CTimerList::TTimerInfo*>(aTimerInfo);    
+    delete timerInfo;
+	timerInfo = NULL;
+    }
+	
 TInt32 CTimerList::AddL(const TTimeIntervalMicroSeconds32& aInterval, const TCallBack& aCallBack)
 	{
 	TTimerInfo* info = new(ELeave) TTimerInfo;
-	
+	CleanupStack::PushL(TCleanupItem(DoCleanUp, info));
 	info->iCallBack = aCallBack;
 	info->iTime.UniversalTime();
 	info->iTime += TTimeIntervalMicroSeconds32(aInterval);
 	
 	AddL(info);
-	
+	CleanupStack::Pop(info);
 	return reinterpret_cast<TInt32>(info);
 	}
 
 TInt32 CTimerList::AddL(const TTime& aTime, const TCallBack& aCallBack)
 	{
 	TTimerInfo* info = new(ELeave) TTimerInfo;
-	
+	CleanupStack::PushL(TCleanupItem(DoCleanUp, info));
 	info->iCallBack = aCallBack;
 	info->iTime = aTime;
 
 	AddL(info);
-	
+	CleanupStack::Pop(info);
 	return reinterpret_cast<TInt32>(info);
 	}
 

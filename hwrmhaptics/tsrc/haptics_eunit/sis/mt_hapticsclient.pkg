@@ -1,0 +1,18 @@
+
+;Languages
+&EN
+
+;Header
+#{"EUnit: MT_HapticsClient"},(0x01700000),1,0,0
+
+(0x101F7961), 0, 0, 0, {"Series60ProductID"}
+
+;Localised Vendor name
+%{"SysOpen Digia Plc"}
+
+;Unique vendor name
+:"SysOpen Digia"
+
+;Files
+
+"MT_HapticsClient.dll"-"!:\sys\bin\MT_HapticsClient.dll"

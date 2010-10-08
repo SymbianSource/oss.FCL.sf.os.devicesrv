@@ -53,9 +53,13 @@ CSensrvSession* CSensrvSession::NewL( CSensrvServer& aServer,
 
     CSensrvSession* self = new( ELeave ) CSensrvSession(aServer, aProxyManager, aSecureId);
     
+    CleanupStack::PushL(self);
+    
     self->ConstructL();
     
     COMPONENT_TRACE( ( _L( "Sensor Server - CSensrvSession::NewL - return 0x%x" ), self ) );
+    
+    CleanupStack::Pop(self);
 
     return self;
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -278,7 +278,7 @@ void CTestRSsmStateManager::RunL(CActive* aActive, TInt aIndex)
     INFO_PRINTF1(_L("RSsmStateManager->RunL()is called")); 
     if (aActive == iActiveNotifyOnChange)
         {
-        TInt    err=iActiveNotifyOnChange->iStatus.Int();
+        TInt err=iActiveNotifyOnChange->iStatus.Int();
         if ( err != KErrNone )
             {
             ERR_PRINTF2(_L("RunL Error %d"), err);
@@ -364,7 +364,31 @@ TBool CTestRSsmStateManager::MapToSubState( TPtrC& aGetSubState, TUint16& aSubSt
     else if(!(aGetSubState.Compare(_L("ESsmNormalRfOnSubState"))))
         {
         aSubState = ESsmNormalRfOnSubState;
-        }    
+        }
+    else if(!(aGetSubState.Compare(_L("ESsmShutdownSubStateCritical"))))
+        {
+        aSubState = ESsmShutdownSubStateCritical;
+        }
+    else if(!(aGetSubState.Compare(_L("ESsmShutdownSubStateNonCritical"))))
+        {
+        aSubState = ESsmShutdownSubStateNonCritical;
+        }
+    else if(!(aGetSubState.Compare(_L("ESsmShutdownSubStatePowerOff"))))
+        {
+        aSubState = ESsmShutdownSubStatePowerOff;
+        }
+    else if(!(aGetSubState.Compare(_L("ESsmShutdownSubStateReStart"))))
+        {
+        aSubState = ESsmShutdownSubStateReStart;
+        }
+    else if(!(aGetSubState.Compare(_L("ESsmFailSubStatePowerOff"))))
+        {
+        aSubState = ESsmFailSubStatePowerOff;
+        }
+    else if(!(aGetSubState.Compare(_L("KSsmAnySubState"))))
+        {
+        aSubState = KSsmAnySubState;
+        }
     else
         {
         ret = EFalse;
