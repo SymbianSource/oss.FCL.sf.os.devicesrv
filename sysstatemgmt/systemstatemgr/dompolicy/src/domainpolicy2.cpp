@@ -128,23 +128,21 @@ This should be present in the oridinal4 of the domainpolicy def file.
 @param aPtr  Will have the state specification structure used in the array .
 @param aNumElements Will hold the number of elements in the array.
 
-@return will return the version of the domain policy if the feature is enabled or else returns KErrNotSupported.
- */
+@return will return the version of the domain policy if the feature is enabled or else returns KErrNone.
+*/
 #ifdef SYMBIAN_INCLUDE_APP_CENTRIC
 EXPORT_C  TInt DmPolicy::GetStateSpec(TAny*& aPtr, TUint& aNumElements)
-    {
-    TInt version = KErrNotSupported;
+    {    
     aPtr = (TAny*) StateSpecification;
     aNumElements = sizeof(StateSpecification)/sizeof(SDmStateSpecV1);    
-    version = KSDmStateSpecV1;
-    return version;    
+    return KSDmStateSpecV1;    
     }
 #else
 EXPORT_C  TInt DmPolicy::GetStateSpec(TAny*& aPtr, TUint& aNumElements)
     {
     aPtr = NULL;
     aNumElements = 0;
-    return KErrNotSupported;  
+    return KErrNone;  
     }
 #endif //SYMBIAN_INCLUDE_APP_CENTRIC
 
