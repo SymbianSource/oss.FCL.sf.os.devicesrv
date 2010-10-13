@@ -121,10 +121,8 @@ void CASYProxyCommsStack::AddL( CASYProxyCommandObserver* aASYProxyCommandObserv
         }
 
     CASYProxyTRRecord* asyProxyTRRecord = CASYProxyTRRecord::NewL( aASYProxyCommandObserver );
-    CleanupStack::PushL ( asyProxyTRRecord );
-    iTRRecordArray.AppendL( asyProxyTRRecord );
-	CleanupStack::Pop(1);
-			
+    iTRRecordArray.Append( asyProxyTRRecord );
+
     aASYProxyCommandObserver->InitializeRef( asyProxyTRRecord );
     aASYProxyCommandObserver->IssueRequestL();
 

@@ -233,7 +233,7 @@ NONSHARABLE_CLASS( CAccSrvSettingsHandler ) : public CBase
         /**
         * Returns all static keys for accessory mode.
         */
-        void GetStaticKeysL( const TAccMode aAccMode,
+        void GetStaticKeys( const TAccMode aAccMode,
                    RArray< TUint32 >& aArray ) const;
 
     public:     // Data

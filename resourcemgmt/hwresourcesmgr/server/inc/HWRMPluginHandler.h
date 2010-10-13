@@ -148,7 +148,7 @@ class CHWRMPluginHandler : public CBase,
 		*
 		* @param aCallback  The indication handler to be registered
 		*/
-        void RegisterForIndicationsL(MHWRMIndicationHandler* aCallback);
+        void RegisterForIndications(MHWRMIndicationHandler* aCallback);
         
         /**
 		* Deregisters handlers for receiving HWRM plug-in indications

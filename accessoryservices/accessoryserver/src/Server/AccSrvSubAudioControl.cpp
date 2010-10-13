@@ -121,12 +121,12 @@ CAccSrvSubAudioControl::~CAccSrvSubAudioControl()
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpenedL
+// CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpened
 // -----------------------------------------------------------------------------
 //
-void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpenedL( const RMessage2& aMessage )
+void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpened( const RMessage2& aMessage )
     {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpenedL()" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpened()" );
 
     iConnectionController->NotificationQueue().RegisterControlMessage( EAccessoryAudioLinkOpened,
                                                                        this );
@@ -136,24 +136,24 @@ void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpenedL( const RMessage2& a
     // If message is null, there is no pending request and no filtering needed
     if ( !iAccessoryAudioLinkOpenMsg.IsNull() )
         {
-        //NotifyAccessoryAudioLinkOpenedL() notification is filtered
+        //NotifyAccessoryAudioLinkOpened() notification is filtered
         //for AccessoryAudioLinkOpen() caller thread.
-        //In this case NotifyAccessoryAudioLinkOpenedL() notification
+        //In this case NotifyAccessoryAudioLinkOpened() notification
         //is ordered after AccessoryAudioLinkOpen() is sent.
-        iConnectionController->ServerModel().SetMsgThreadIDFilterL( iCallerThreadID,
+        iConnectionController->ServerModel().SetMsgThreadIDFilter( iCallerThreadID,
                                                                    EAccessoryAudioLinkOpened );
         }
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpenedL - return void" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkOpened - return void" );
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosedL
+// CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosed
 // -----------------------------------------------------------------------------
 //
-void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosedL( const RMessage2& aMessage )
+void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosed( const RMessage2& aMessage )
     {
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosedL()" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosed()" );
 
     iConnectionController->NotificationQueue().RegisterControlMessage( EAccessoryAudioLinkClosed,
                                                                        this );
@@ -162,15 +162,15 @@ void CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosedL( const RMessage2& a
     // If message is null, there is no pending request and no filtering needed
     if ( !iAccessoryAudioLinkCloseMsg.IsNull() )
         {
-        //NotifyAccessoryAudioLinkClosedL() notification is filtered
+        //NotifyAccessoryAudioLinkClosed() notification is filtered
         //for AccessoryAudioLinkClose() caller thread.
-        //In this case NotifyAccessoryAudioLinkClosedL() notification
+        //In this case NotifyAccessoryAudioLinkClosed() notification
         //is ordered after AccessoryAudioLinkClose() is sent.
-        iConnectionController->ServerModel().SetMsgThreadIDFilterL( iCallerThreadID,
+        iConnectionController->ServerModel().SetMsgThreadIDFilter( iCallerThreadID,
                                                                    EAccessoryAudioLinkClosed );
         }
 
-    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosedL - return void" );
+    COM_TRACE_( "[AccFW:AccServer] CAccSrvSubAudioControl::NotifyAccessoryAudioLinkClosed - return void" );
     }
 
 // -----------------------------------------------------------------------------
@@ -219,9 +219,9 @@ void CAccSrvSubAudioControl::AccessoryAudioLinkOpenL( const RMessage2& aMessage 
     // If message is null, there is no pending request and no filtering needed
     if ( !iNotifyAccessoryAudioLinkOpenedMsg.IsNull() )
         {
-        //NotifyAccessoryAudioLinkOpenedL notification() is filtered
+        //NotifyAccessoryAudioLinkOpened notification() is filtered
         //for AccessoryAudioLinkOpen() caller thread
-        iConnectionController->ServerModel().SetMsgThreadIDFilterL( iCallerThreadID,
+        iConnectionController->ServerModel().SetMsgThreadIDFilter( iCallerThreadID,
                                                                    EAccessoryAudioLinkOpened );
         }
 
@@ -263,9 +263,9 @@ void CAccSrvSubAudioControl::AccessoryAudioLinkCloseL( const RMessage2& aMessage
     // If message is null, there is no pending request and no filtering needed
     if ( !iNotifyAccessoryAudioLinkClosedMsg.IsNull() )
         {
-        //NotifyAccessoryAudioLinkClosedL() notification is filtered
+        //NotifyAccessoryAudioLinkClosed() notification is filtered
         //for AccessoryAudioLinkClose() caller thread
-        iConnectionController->ServerModel().SetMsgThreadIDFilterL( 
+        iConnectionController->ServerModel().SetMsgThreadIDFilter( 
                                                     iCallerThreadID,
                                                     EAccessoryAudioLinkClosed );
         }
@@ -311,7 +311,7 @@ void CAccSrvSubAudioControl::CancelAccessoryAudioLinkOpen(
                                                     this );
 
         //AccessoryAudioLinkOpen() request is cancelled
-        //-> NO filtering needed for NotifyAccessoryAudioLinkOpenedL()
+        //-> NO filtering needed for NotifyAccessoryAudioLinkOpened()
         iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter( 
                                                     iCallerThreadID, 
                                                     EAccessoryAudioLinkOpened );
@@ -340,7 +340,7 @@ void CAccSrvSubAudioControl::CancelAccessoryAudioLinkClose(
                                                                          this );
 
         //AccessoryAudioLinkClose() request is cancelled
-        //-> NO filtering needed for NotifyAccessoryAudioLinkClosedL()
+        //-> NO filtering needed for NotifyAccessoryAudioLinkClosed()
         iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter(
             iCallerThreadID, EAccessoryAudioLinkClosed );
 
@@ -367,7 +367,7 @@ void CAccSrvSubAudioControl::CancelNotifyAccessoryAudioLinkOpened(
         iConnectionController->NotificationQueue().CancelControlMessage( 
             EAccessoryAudioLinkOpened, this );
 
-        //NotifyAccessoryAudioLinkOpenedL() notification order is cancelled
+        //NotifyAccessoryAudioLinkOpened() notification order is cancelled
         //-> NO filtering needed for that message
         iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter( 
             iCallerThreadID, EAccessoryAudioLinkOpened );
@@ -394,7 +394,7 @@ void CAccSrvSubAudioControl::CancelNotifyAccessoryAudioLinkClosed(
         iConnectionController->NotificationQueue().CancelControlMessage( 
             EAccessoryAudioLinkClosed, this );
 
-        //NotifyAccessoryAudioLinkClosedL() notification order is cancelled
+        //NotifyAccessoryAudioLinkClosed() notification order is cancelled
         //-> NO filtering needed for that message
         iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter(
             iCallerThreadID, EAccessoryAudioLinkClosed );
@@ -422,12 +422,12 @@ void CAccSrvSubAudioControl::DispatchMessageL( const RMessage2& aMessage )
         {
         case EAccSrvNotifyAccessoryAudioLinkOpened:
             {
-            NotifyAccessoryAudioLinkOpenedL( aMessage );
+            NotifyAccessoryAudioLinkOpened( aMessage );
             break;
             }
         case EAccSrvNotifyAccessoryAudioLinkClosed:
             {
-            NotifyAccessoryAudioLinkClosedL( aMessage );
+            NotifyAccessoryAudioLinkClosed( aMessage );
             break;
             }
         case EAccSrvAccessoryAudioLinkOpen:
@@ -494,7 +494,7 @@ TBool CAccSrvSubAudioControl::CompleteMessageL( TMsgID aMsgID,
             {
             if( KErrNone != aErrorCode )
                 {
-                //Release NotifyAccessoryAudioLinkOpenedL() filtering in error case.
+                //Release NotifyAccessoryAudioLinkOpened() filtering in error case.
                 //BluetoothAudioLinkOpenedNotify() message is never sent in error case
                 iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter(
                                                                     iCallerThreadID,
@@ -511,7 +511,7 @@ TBool CAccSrvSubAudioControl::CompleteMessageL( TMsgID aMsgID,
             {
             if( KErrNone != aErrorCode )
                 {
-                //Release NotifyAccessoryAudioLinkClosedL() filtering in error case.
+                //Release NotifyAccessoryAudioLinkClosed() filtering in error case.
                 //BluetoothAudioLinkClosedNotify() message is never sent in error case
                 iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter(
                                                                     iCallerThreadID,
@@ -526,13 +526,13 @@ TBool CAccSrvSubAudioControl::CompleteMessageL( TMsgID aMsgID,
 
         case EAccessoryAudioLinkOpened:
             {
-            // Nothing is done here if filter is set, i.e. NotifyAccessoryAudioLinkOpenedL()
+            // Nothing is done here if filter is set, i.e. NotifyAccessoryAudioLinkOpened()
             // notification was ordered from the same thread that AccessoryAudioLinkOpen() was called
             if ( !iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter( 
                                                                     iCallerThreadID, 
                                                                     EAccessoryAudioLinkOpened ) )
                 {
-                //Complete outstanding NotifyAccessoryAudioLinkOpenedL request
+                //Complete outstanding NotifyAccessoryAudioLinkOpened request
                 //Notice, This works for single client (Server model can store only one value)
                 TAccAudioType    audioType( iConnectionController->ServerModel().AudioType() );
                 TAccPolGenericID genericID;
@@ -555,13 +555,13 @@ TBool CAccSrvSubAudioControl::CompleteMessageL( TMsgID aMsgID,
 
         case EAccessoryAudioLinkClosed:
             {
-            // Nothing is done here if filter is set, i.e. NotifyAccessoryAudioLinkClosedL() 
+            // Nothing is done here if filter is set, i.e. NotifyAccessoryAudioLinkClosed() 
             // notification was ordered from the same thread that AccessoryAudioLinkClose() was called
             if ( !iConnectionController->ServerModel().FindAndDeleteMsgThreadIDFilter(
                                                                     iCallerThreadID,
                                                                     EAccessoryAudioLinkClosed ) )
                 {
-                //Complete outstanding NotifyAccessoryAudioLinkClosedL request
+                //Complete outstanding NotifyAccessoryAudioLinkClosed request
                 //Notice, This works for single client (Server model can store only one value)
                 TAccAudioType    audioType( iConnectionController->ServerModel().AudioType() );
                 TAccPolGenericID genericID;

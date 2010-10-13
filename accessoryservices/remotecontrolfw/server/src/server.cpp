@@ -2562,20 +2562,20 @@ void CRemConServer::LogOutgoingCmdPendingTsp() const
 
 void CRemConServer::LogOutgoingRspPendingTsp() const
 	{
-	LOG(_L("Logging outgoing pending TSP commands"));
+	LOG(_L("Logging outgoing pending TSP responses"));
 	FTRACE(const_cast<CRemConServer*>(this)->OutgoingRspPendingTsp().LogQueue();)
 	}
 
 
 void CRemConServer::LogOutgoingPendingSend() const
 	{
-	LOG(_L("Logging outgoing pending send commands"));
+	LOG(_L("Logging outgoing pending send"));
 	FTRACE(const_cast<CRemConServer*>(this)->OutgoingPendingSend().LogQueue();)
 	}
 
 void CRemConServer::LogOutgoingSent() const
 	{
-	LOG(_L("Logging outgoing sent commands"));
+	LOG(_L("Logging outgoing sent"));
 	FTRACE(const_cast<CRemConServer*>(this)->OutgoingSent().LogQueue();)
 	}
 
@@ -2587,25 +2587,25 @@ void CRemConServer::LogIncomingCmdPendingAddress() const
 
 void CRemConServer::LogIncomingNotifyCmdPendingAddress() const
 	{
-	LOG(_L("Logging incoming pending address commands"));
+	LOG(_L("Logging incoming pending address notify commands"));
 	FTRACE(const_cast<CRemConServer*>(this)->IncomingNotifyCmdPendingAddress().LogQueue();)
 	}
 
 void CRemConServer::LogIncomingNotifyCmdPendingReAddress() const
 	{
-	LOG(_L("Logging incoming pending address commands"));
+	LOG(_L("Logging incoming pending readdress notify commands"));
 	FTRACE(const_cast<CRemConServer*>(this)->IncomingNotifyCmdPendingReAddress().LogQueue();)
 	}
 
 void CRemConServer::LogIncomingPendingDelivery() const
 	{
-	LOG(_L("Logging incoming pending delivery messages"));
+	LOG(_L("Logging incoming pending delivery"));
 	FTRACE(const_cast<CRemConServer*>(this)->IncomingPendingDelivery().LogQueue();)
 	}
 
 void CRemConServer::LogIncomingDelivered() const
 	{
-	LOG(_L("Logging incoming delivered commands"));
+	LOG(_L("Logging incoming delivered"));
 	FTRACE(const_cast<CRemConServer*>(this)->IncomingDelivered().LogQueue();)
 	}
 #endif // __FLOG_ACTIVE

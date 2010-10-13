@@ -68,46 +68,46 @@ RESOURCE SSM_COMMAND_LIST r_noncriticalphase_commands
         {
         // prio 0xFFF1
         r_cmd_publishswp,
-        // prio 0x7FF2
-        r_cmd_activitymonscreensaver,	//RSHI-85E4P2
-        // prio 0x7FF1
-        r_cmd_screensaver,	//RSHI-85E4P2
         // prio 0x7EFF
-        r_cmd_activitymonlogs,
+        r_cmd_activitymonitor1,
         // prio 0x7EFE
         r_cmd_logs,
         // prio 0x7EFD
-        r_cmd_activitymonpbk2,
+        r_cmd_activitymonitor2,
         // prio 0x7EFC
         r_cmd_pbk2,
         // prio 0x7EFB
-        r_cmd_activitymonmce,
+        r_cmd_activitymonitor3,
         // prio 0x7EFA
         r_cmd_mce,
         // prio 0x7EF9
-        r_cmd_activitymonclock,
+        r_cmd_activitymonitor4,
         // prio 0x7EF8
         r_cmd_clock,	//ESLT-842J9W
         // prio 0x7EF7
-        r_cmd_activitymonvideocenter,
+        r_cmd_activitymonitor5,
         // prio 0x7EF6
         r_cmd_videocenter,
         // prio 0x7EF5
-        r_cmd_activitymoniaupdatebg,
+        r_cmd_activitymonitor6,
         // prio 0x7EF4
         r_cmd_iaupdatebg,
+        // prio 0x7EF3
+        r_cmd_activitymonitor7,
+        // prio 0x7EF2
+        r_cmd_screensaver,
         // prio 0x7EEF
-        r_cmd_activitymonautosync,
+        r_cmd_activitymonitor8,
         // prio 0x7EEE
         r_cmd_autosync
 #ifdef FF_ATT_ADDRESS_BK
         //prio 0x7EEA
-        ,r_cmd_activitymonaab,
+        ,r_cmd_activitymonitor9,
         //prio 0x7EE9
         r_cmd_aab
 #endif
 		// prio 0x7EE8
-		,r_cmd_activitymoncalendar,
+		,r_cmd_activitymonitor10,
 		// prio 0x7EE7
 		r_cmd_calendar //CR:MMUN-82ZHAD
     	};
@@ -129,10 +129,10 @@ RESOURCE SSM_START_APP_INFO r_cmd_aab
 #endif
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonlogs
+// r_cmd_activitymonitor1
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonlogs
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor1
     {
     priority = 0x7EFF;
     severity = ECmdCriticalSeverity;
@@ -144,10 +144,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonlogs
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonpbk2
+// r_cmd_activitymonitor2
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonpbk2
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor2
     {
     priority = 0x7EFD;
     severity = ECmdCriticalSeverity;
@@ -159,10 +159,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonpbk2
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonmce
+// r_cmd_activitymonitor3
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonmce
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor3
     {
     priority = 0x7EFB;
     severity = ECmdCriticalSeverity;
@@ -174,10 +174,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonmce
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonclock
+// r_cmd_activitymonitor4
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonclock
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor4
     {
     priority = 0x7EF9;
     severity = ECmdCriticalSeverity;
@@ -189,10 +189,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonclock
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonvideocenter
+// r_cmd_activitymonitor5
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonvideocenter
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor5
     {
     priority = 0x7EF7;
     severity = ECmdCriticalSeverity;
@@ -204,10 +204,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonvideocenter
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymoniaupdatebg
+// r_cmd_activitymonitor6
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymoniaupdatebg
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor6
     {
     priority = 0x7EF5;
     severity = ECmdCriticalSeverity;
@@ -219,12 +219,12 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymoniaupdatebg
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonscreensaver
+// r_cmd_activitymonitor7
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonscreensaver
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor7
     {
-    priority = 0x7FF2;
+    priority = 0x7EF3;
     severity = ECmdCriticalSeverity;
     execution_behaviour = ESsmWaitForSignal;
     dllname = "ssmactivitycmd.dll";
@@ -234,10 +234,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonscreensaver
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonautosync
+// r_cmd_activitymonitor8
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonautosync
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor8
     {
     priority = 0x7EEF;
     severity = ECmdCriticalSeverity;
@@ -249,11 +249,11 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonautosync
     }
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymonaab
+// r_cmd_activitymonitor9
 // ---------------------------------------------------------------------------
 //
 #ifdef FF_ATT_ADDRESS_BK
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonaab
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor9
     {
     priority = 0x7EEA;
     severity = ECmdCriticalSeverity;
@@ -266,10 +266,10 @@ RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonaab
 #endif
 
 // ---------------------------------------------------------------------------
-// r_cmd_activitymoncalendar
+// r_cmd_activitymonitor10
 // ---------------------------------------------------------------------------
 //
-RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymoncalendar
+RESOURCE SSM_START_CUSTOM_COMMAND r_cmd_activitymonitor10
     {
     priority = 0x7EE8;
     severity = ECmdCriticalSeverity;
@@ -386,7 +386,7 @@ RESOURCE SSM_START_APP_INFO r_cmd_logs
 //
 RESOURCE SSM_START_APP_INFO r_cmd_screensaver
     {
-    priority = 0x7FF1;
+    priority = 0x7EF2;
     name = "z:\\sys\\bin\\screensaver.exe";
     background = 1; // To background
     execution_behaviour = ESsmWaitForSignal;

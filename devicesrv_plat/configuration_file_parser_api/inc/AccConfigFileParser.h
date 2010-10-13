@@ -143,12 +143,12 @@ class CAccConfigFileParser : public CBase
         * Detect all subblock capabilities and append them to the given
         * array.
         */
-        void ParseSubblocksL( const TUint64& aVal, RArray<TUint64>& aCaps );
+        void ParseSubblocks( const TUint64& aVal, RArray<TUint64>& aCaps );
 
         /**
         * Detect all subblock names and append them to the given array.
         */
-        void ParseNamesL( const TUint32& aVal, RArray<TUint32>& aNames );
+        void ParseNames( const TUint32& aVal, RArray<TUint32>& aNames );
         
         /**
         * Find a bit number from bitmask.

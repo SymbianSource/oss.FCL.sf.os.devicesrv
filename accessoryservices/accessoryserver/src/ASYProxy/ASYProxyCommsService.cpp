@@ -149,9 +149,6 @@ CASYProxyCommsService::~CASYProxyCommsService()
         iAsyProxyCommsStack = 0;
         }
 
-	iAsyComms.CloseSubSession();
-	iServer.Disconnect();
-	iServer.Close();
     COM_TRACE_( "[AccFW:AsyProxy] CASYProxyCommsService::~CASYProxyCommsService" );
     }
 

@@ -921,7 +921,7 @@ void CSSYOrientation::CloseChannelL()
         {
         User::Leave( KErrNotFound );
         }
-
+    iCurrentOrientationState.iDeviceOrientation = TSensrvOrientationData::EOrientationUndefined;
     iSensorChannel->CloseChannel();
     iChannel = NULL;
 
@@ -962,7 +962,7 @@ void CSSYOrientation::StopListeningL()
         {
         User::Leave( KErrNotFound );
         }
-
+    iCurrentOrientationState.iDeviceOrientation = TSensrvOrientationData::EOrientationUndefined;
     iSensorChannel->StopDataListening();
     iChannel = NULL;
 

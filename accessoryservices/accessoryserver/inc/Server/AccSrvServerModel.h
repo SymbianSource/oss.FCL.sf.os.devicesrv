@@ -379,7 +379,7 @@ NONSHARABLE_CLASS( CAccSrvServerModel ) : public CBase
         * @param aThreadID ASYs thread ID to be stored.
         * @return void
         */
-        void AddASYThreadIdL( TUint aThreadID );
+        void AddASYThreadId( TUint aThreadID );
 
         /**
         * Creates mapping between Generic ID and ASY.
@@ -391,7 +391,7 @@ NONSHARABLE_CLASS( CAccSrvServerModel ) : public CBase
         * @param aUniqueID Unique identifier of a Generic ID.
         * @return void
         */
-        void StoreASYThreadIDL( TUint aThreadID, TInt aUniqueID );
+        void StoreASYThreadID( TUint aThreadID, TInt aUniqueID );
 
         /**
         * Removes mapping between Generic ID and ASY.
@@ -428,7 +428,7 @@ NONSHARABLE_CLASS( CAccSrvServerModel ) : public CBase
         * @return void
         * @see FindAndDeleteMsgThreadIDFilter()
         */
-        void SetMsgThreadIDFilterL( TUint aThreadID, TMsgID aMsgID );
+        void SetMsgThreadIDFilter( TUint aThreadID, TMsgID aMsgID );
 
         /**
         * Find and delete a Thread Id/message filter.

@@ -328,6 +328,7 @@ private: // owned
 	
 	TRemConSessionSending iSending;
 	
+	TBool iInGetConnectionsProcedure;
 	};
 
 // Inlines

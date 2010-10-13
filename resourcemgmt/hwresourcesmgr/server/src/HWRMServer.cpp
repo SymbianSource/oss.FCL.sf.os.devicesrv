@@ -737,12 +737,12 @@ void CHWRMServer::InitFmTxL()
             iFmTxCommonData = NULL;
 			iFmTxCommonData = CHWRMFmTxCommonData::NewL();		
 			
-			iFmTxPluginHandler->RegisterForIndicationsL(iFmTxCommonData);
+			iFmTxPluginHandler->RegisterForIndications(iFmTxCommonData);
 			
 			iFmTxStateUtility = CHWRMFmTxStateUtility::NewL(iFmTxPluginHandler, 
 			         iFmTxWatcherPluginHandler, iFmTxReservationHandler, iFmTxCommonData);
 
-			iFmTxWatcherPluginHandler->RegisterForIndicationsL(iFmTxStateUtility);
+			iFmTxWatcherPluginHandler->RegisterForIndications(iFmTxStateUtility);
             }
         else
             {

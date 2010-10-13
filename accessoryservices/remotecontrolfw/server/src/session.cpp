@@ -1351,6 +1351,7 @@ void CRemConSession::GetConnectionCount(const RMessage2& aMessage)
 	if ( err == KErrNone )
 		{
 		iServer.SetConnectionHistoryPointer(Id());
+		iInGetConnectionsProcedure = ETrue;
 		}
 	CompleteClient(aMessage, err);
 	}
@@ -1367,6 +1368,8 @@ void CRemConSession::GetConnections(const RMessage2& aMessage)
 		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicClientTypeNotSet);
 		return;
 		}
+
+	iInGetConnectionsProcedure = EFalse;
 
 	// Get the array of connections at the point in the history we're 
 	// interested in and write it back to the client. NB This is not 
@@ -1569,13 +1572,17 @@ void CRemConSession::CompleteDisconnect(const TRemConAddress& aAddr, TInt aError
 void CRemConSession::ConnectionsChanged()
 	{
 	LOG_FUNC;
-
+	
+	LOG1(_L("\tiInGetConnectionsProcedure = %d"), iInGetConnectionsProcedure);
+	// Only update the connections history pointer if we're not in the middle 
+	// of a 'GetConnections' procedure. 
+	if ( !iInGetConnectionsProcedure )
+		{
+		iServer.SetConnectionHistoryPointer(Id());
+		}
 	LOG1(_L("\tiNotifyConnectionsChangeMsg.Handle = %d"), iNotifyConnectionsChangeMsg.Handle());
 	if ( iNotifyConnectionsChangeMsg.Handle() )
 		{
-		// Set the connection history pointer to point to the latest item and then complete the 
-		// NotifyConnectionChange request of the client.
-		iServer.SetConnectionHistoryPointer(Id());
 		CompleteClient(iNotifyConnectionsChangeMsg, KErrNone);
 		}
 	}

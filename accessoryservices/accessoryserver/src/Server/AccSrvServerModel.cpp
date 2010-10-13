@@ -719,17 +719,17 @@ TAccValueTypeObject CAccSrvServerModel::ValueDataObject() const
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvServerModel::AddASYThreadIdL
+// CAccSrvServerModel::AddASYThreadId
 // -----------------------------------------------------------------------------
 //
-void CAccSrvServerModel::AddASYThreadIdL( TUint aThreadID )
+void CAccSrvServerModel::AddASYThreadId( TUint aThreadID )
     {
-    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::AddASYThreadIdL(%d)", aThreadID );
-    iRegisteredASYs.AppendL( aThreadID );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::AddASYThreadId(%d)", aThreadID );
+    iRegisteredASYs.Append( aThreadID );
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvServerModel::StoreASYThreadIDL
+// CAccSrvServerModel::StoreASYThreadID
 //
 // If aThreadID can be found from connected ASYs table (iRegisteredASYs),
 // mapping between aUniqueID and aThreadID can be made.
@@ -737,17 +737,17 @@ void CAccSrvServerModel::AddASYThreadIdL( TUint aThreadID )
 // all request for that gineric ID.
 // -----------------------------------------------------------------------------
 //
-void CAccSrvServerModel::StoreASYThreadIDL( TUint aThreadID, TInt aUniqueID )
+void CAccSrvServerModel::StoreASYThreadID( TUint aThreadID, TInt aUniqueID )
     {
-    COM_TRACE_2( "[AccFW:AccServer] CAccSrvServerModel::StoreASYThreadIDL(%d %d)", aThreadID, aUniqueID );
+    COM_TRACE_2( "[AccFW:AccServer] CAccSrvServerModel::StoreASYThreadID(%d %d)", aThreadID, aUniqueID );
     if ( KErrNotFound == iRegisteredASYs.Find( aThreadID ) )
         {
-        COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::StoreASYThreadIDL - Thread ID is not ASYs" );
+        COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::StoreASYThreadID - Thread ID is not ASYs" );
         }
     else
         {
-        iASYThreadID.AppendL( aThreadID );
-        iASYUniqueID.AppendL( aUniqueID );
+        iASYThreadID.Append( aThreadID );
+        iASYUniqueID.Append( aUniqueID );
         }
     }
 
@@ -760,7 +760,7 @@ void CAccSrvServerModel::RemoveASYThreadID( TInt aUniqueID )
     COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::RemoveASYThreadID(%d)", aUniqueID );
     TInt index( iASYUniqueID.Find( aUniqueID ) );
 
-    //If index is KErrNotFound, threadIDs are never stored in CAccSrvServerModel::StoreASYThreadIDL()
+    //If index is KErrNotFound, threadIDs are never stored in CAccSrvServerModel::StoreASYThreadID()
     if ( KErrNotFound != index )
         {
         iASYThreadID.Remove( index );
@@ -798,20 +798,20 @@ TBool CAccSrvServerModel::IsMyRequest( TUint aThreadID, TInt aUniqueID )
     }
 
 // -----------------------------------------------------------------------------
-// CAccSrvServerModel::SetMsgThreadIDFilterL
+// CAccSrvServerModel::SetMsgThreadIDFilter
 // -----------------------------------------------------------------------------
 //
-void CAccSrvServerModel::SetMsgThreadIDFilterL( TUint aThreadID, TMsgID aMsgID )
+void CAccSrvServerModel::SetMsgThreadIDFilter( TUint aThreadID, TMsgID aMsgID )
     {
-    COM_TRACE_2( "[AccFW:AccServer] CAccSrvServerModel::SetMsgThreadIDFilterL(%d %d)", aThreadID, aMsgID );
+    COM_TRACE_2( "[AccFW:AccServer] CAccSrvServerModel::SetMsgThreadIDFilter(%d %d)", aThreadID, aMsgID );
 
     TAccSrvThreadIDFilter threadIDFilter;
     threadIDFilter.iThreadID = aThreadID;
     threadIDFilter.iMsgID = aMsgID;
 
-    iThreadIDFilterArray.AppendL( threadIDFilter );
+    iThreadIDFilterArray.Append( threadIDFilter );
 
-    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::SetMsgThreadIDFilterL - count=%d - return void", iThreadIDFilterArray.Count() );
+    COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::SetMsgThreadIDFilter - count=%d - return void", iThreadIDFilterArray.Count() );
     }
 
 // -----------------------------------------------------------------------------
@@ -863,7 +863,7 @@ void CAccSrvServerModel::SetCancelledConnectAccessoryL( TInt aUniqueID )
     else
         {
         COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::SetCancelledConnectAccessoryL - handling index %d", index );
-        iCancelledConnectAccessory.AppendL( genericIDArray.GetGenericIDL( index ).UniqueID() );
+        iCancelledConnectAccessory.Append( genericIDArray.GetGenericIDL( index ).UniqueID() );
         }
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::SetCancelledConnectAccessoryL - return void" );
@@ -894,7 +894,7 @@ void CAccSrvServerModel::SetCancelledConnectAccessoryL( TUint64 aDeviceAddress )
     else
         {
         COM_TRACE_1( "[AccFW:AccServer] CAccSrvServerModel::SetCancelledConnectAccessoryL - handling index %d", index );
-        iCancelledConnectAccessory.AppendL( genericIDArray.GetGenericIDL( index ).UniqueID() );
+        iCancelledConnectAccessory.Append( genericIDArray.GetGenericIDL( index ).UniqueID() );
         }
 
     COM_TRACE_( "[AccFW:AccServer] CAccSrvServerModel::SetCancelledConnectAccessoryL - DeviceAddress - return void" );
