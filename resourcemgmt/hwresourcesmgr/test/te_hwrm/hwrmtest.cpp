@@ -288,6 +288,8 @@ CTestSuite* CHWRMTest::CreateSuiteL(const TDesC& aName)
 	ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestFmTxEnableDuringPowersaveL);
 	
 #endif // INSECURE_AUDIO_POLICY_KEYS
+    ADD_TEST_STEP_ISO_CPP(CHWRMTest, TestFmTxGetNextClearFrequencyWithoutEnableL);
+
 
 	END_SUITE;
 	}
@@ -4407,7 +4409,7 @@ void CHWRMTest::TestFmTxGetNextClearFrequencyArrayL()
 	INFO_PRINTF1(_L("Start test step: TestFmTxGetNextClearFrequencyArrayL"));
 	
 	AddTestStateL(this, &CHWRMTest::FmTxOpenL, KTwoTimeUnits);
-	AddTestStateL(this, &CHWRMTest::FmTxGetNextClearFrequencyArrayWhileDisabledL, KOneTimeUnit);
+	//AddTestStateL(this, &CHWRMTest::FmTxGetNextClearFrequencyArrayWhileDisabledL, KOneTimeUnit);
 	AddTestStateL(this, &CHWRMTest::FmTxEnableL, KTwoTimeUnits);
 	AddTestStateL(this, &CHWRMTest::FmTxGetNextClearFrequencyArrayErrArgumentMinL, KOneTimeUnit);
 	AddTestStateL(this, &CHWRMTest::FmTxGetNextClearFrequencyArrayErrArgumentMaxL, KOneTimeUnit);
@@ -4638,6 +4640,17 @@ void CHWRMTest::TestFmTxEnableDuringPowersaveL()
 	}
 
 #endif // INSECURE_AUDIO_POLICY_KEYS
+
+void CHWRMTest::TestFmTxGetNextClearFrequencyWithoutEnableL()
+	{
+	INFO_PRINTF1(_L("Start test step: TestFmTxGetNextClearFrequencyWithoutEnableL"));
+	
+	AddTestStateL(this, &CHWRMTest::FmTxOpenL, KTwoTimeUnits);
+	AddTestStateL(this, &CHWRMTest::FmTxGetNextClearFrequencyWithoutEnableL, KTwoTimeUnits);	
+	
+    ExecuteTestL();
+	}
+
 
 void CHWRMTest::InvalidSessionLightL()
 	{
@@ -8695,6 +8708,28 @@ void CHWRMTest::SetAudioRoutedFlagL(TBool aFlag)
 	User::LeaveIfError(iAudioRoutedProperty.Set((TInt)aFlag));
 	}	
 #endif // INSECURE_AUDIO_POLICY_KEYS	
+
+
+
+void CHWRMTest::FmTxGetNextClearFrequencyWithoutEnableL()
+	{
+	INFO_PRINTF1(_L("Step state: FmTxGetNextClearFrequencyWithoutEnableL"));
+	
+	CHWRMFmTx& fmTx = GetFmTxSessionWithCallbackRegisteredL();
+
+    ExpectFmTxStatusNotificationL(EFmTxStateOff, EFmTxStateInactive); 
+    ExpectFmTxStatusNotificationL(EFmTxStateInactive, EFmTxStateOff);
+		
+	TInt clearFrequency;
+	fmTx.GetNextClearFrequencyL(clearFrequency);
+	
+	// the frequency that is returned is hard coded in the cmockfmtxengine
+	if (clearFrequency != 89000)
+		{
+		User::Leave(KErrGeneral);
+		}
+	}
+
 
 
 //

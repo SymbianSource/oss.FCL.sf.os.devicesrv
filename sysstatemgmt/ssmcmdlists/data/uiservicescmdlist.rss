@@ -94,8 +94,11 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_devicedialog,     //CR:KJLN-7WBEGU   
         // prio 0xFF77
         r_cmd_apparc_init,      // Init application framework
-        // prio 0xFF75
         r_cmd_rfspostui        // Restore factory settings - after UI framework is up
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+	// prio 0xFF76
+	,r_cmd_emcore		//JHOI-889FRH
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC        
         };
     }
 
@@ -151,6 +154,22 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_devicedialog
     name = "Z:\\sys\\bin\\hbdevicedialogappserver.exe";    
     execution_behaviour = ESsmWaitForSignal;
     }    
+
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+// ---------------------------------------------------------------------------
+// r_cmd_emcore
+// ---------------------------------------------------------------------------
+//
+RESOURCE SSM_START_PROCESS_INFO r_cmd_emcore
+    {
+    priority = 0xFF76;
+    severity = ECmdCriticalSeverity;
+    name = "Z:\\sys\\bin\\emcore.exe";
+    execution_behaviour = ESsmWaitForSignal;
+    retries = 5;
+    monitor_info = r_mon_3_restarts_reset;
+    }	
+#endif	// SYMBIAN_INCLUDE_APP_CENTRIC
 
 // ---------------------------------------------------------------------------
 // r_cmd_hbthemeserver

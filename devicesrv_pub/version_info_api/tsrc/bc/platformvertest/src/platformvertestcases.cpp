@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -51,7 +51,7 @@
 
 // ============================= LOCAL FUNCTIONS ===============================
 
-_LIT( KS60ProductIDFiles, "z:\\system\\install\\series60v*.sis" );
+_LIT( KS60ProductIDFiles, "z:\\system\\install\\Symbianv*.sis" );
 
 
 // -----------------------------------------------------------------------------

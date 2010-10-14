@@ -41,7 +41,8 @@ CHWRMFmTxService::CHWRMFmTxService(CHWRMPluginHandler& aWatcherPluginHandler,
                                    CHWRMFmTxRdsTextConverter& aRdsTextConverter)
     : iWatcherPluginHandler(aWatcherPluginHandler),
       iFmTxCommonData(aFmTxCommonData), 
-      iRdsTextConverter(aRdsTextConverter)
+      iRdsTextConverter(aRdsTextConverter),
+      iScanRequestType(EFmTxScanTypeNone)
     {
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::CHWRMFmTxService()" ));
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::CHWRMFmTxService - return" ));
@@ -234,6 +235,7 @@ TBool CHWRMFmTxService::ExecuteMessageL( const RMessage2& aMessage )
             {
             COMPONENT_TRACE1( _L("HWRM Server - CHWRMFmTxService::ExecuteMessageL - EHWRMFmTxCancelGetNextClearFreq") );
 
+            ResetScanRequest();
             CancelPluginCommandL( HWRMFmTxCommand::ETxScanRequestCmdId );
             completeMessage = ETrue; // no responses from plugin cancel commands
             }
@@ -252,6 +254,7 @@ TBool CHWRMFmTxService::ExecuteMessageL( const RMessage2& aMessage )
             {
             COMPONENT_TRACE1( _L("HWRM Server - CHWRMFmTxService::ExecuteMessageL - EHWRMFmTxCancelSetNextClearFreq") );
 
+            ResetScanRequest();
             // no hope of cancelling the ESetTxFrequencyCmdId part, so try the ETxScanRequestCmdId
             CancelPluginCommandL( HWRMFmTxCommand::ETxScanRequestCmdId );
             completeMessage = ETrue; // no responses from plugin cancel commands
@@ -379,6 +382,7 @@ void CHWRMFmTxService::EnableL(const RMessage2& aMessage)
     COMPONENT_TRACE2( _L( "HWRM Server - CHWRMFmTxService::EnableL(0x%x)" ), aMessage.Int0() );
 
     LeaveIfOtherReservationL();
+    ResetScanRequest( iFmTxCommonData.IsFmTxHardwareOn() ); 
 
     // We cannot enable from "power save" state
     if ( iFmTxCommonData.IsAccessoryPowerSaveOn() )
@@ -414,6 +418,7 @@ TBool CHWRMFmTxService::DisableL(const RMessage2& aMessage)
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::DisableL" ) );
 
     LeaveIfOtherReservationL();
+    ResetScanRequest(); 
 
     // We don't need to disable HW from some states
 	if ( !iFmTxCommonData.IsFmTxHardwareOn() )
@@ -486,12 +491,18 @@ void CHWRMFmTxService::GetNextClearFrequencyL(const RMessage2& aMessage,
 
     LeaveIfOtherReservationL();
 
-    LeaveIfTransmitterOffL();
-
-    // package up the request
-    HWRMFmTxCommand::TScanRequestPackage pckg(aClearFreqsRequired);
-
-    ExecutePluginCommandL(aMessage, HWRMFmTxCommand::ETxScanRequestCmdId, EFalse/*not split*/, pckg );
+    if ( !iFmTxCommonData.IsFmTxHardwareOn() )
+        {
+        EnsureTransmitterOnL( aMessage );
+        iScanRequestType = EFmTxScanTypeGet;
+        iClearFreqsRequired = aClearFreqsRequired;
+        }
+    else
+        {
+        // package up the request
+        HWRMFmTxCommand::TScanRequestPackage pckg( aClearFreqsRequired );
+        ExecutePluginCommandL(aMessage, HWRMFmTxCommand::ETxScanRequestCmdId, EFalse/*not split*/, pckg );
+        }
 
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::GetClearFrequencyL - return" ) ); 
     }
@@ -508,13 +519,19 @@ void CHWRMFmTxService::SetNextClearFrequencyL(const RMessage2& aMessage,
 
     LeaveIfOtherReservationL();
 
-    LeaveIfTransmitterOffL();
-
-    // package up the request
-    HWRMFmTxCommand::TScanRequestPackage pckg(aClearFreqsRequired);
-
-    ExecutePluginCommandL(aMessage, HWRMFmTxCommand::ETxScanRequestCmdId, ETrue/*split*/, pckg );
-    // wait until response before calling SetFrequencyL
+    if ( !iFmTxCommonData.IsFmTxHardwareOn() )
+        {
+        EnsureTransmitterOnL( aMessage );
+        iScanRequestType = EFmTxScanTypeSet;
+        iClearFreqsRequired = aClearFreqsRequired;
+        }
+    else
+        {
+        // package up the request
+        HWRMFmTxCommand::TScanRequestPackage pckg( aClearFreqsRequired );
+        ExecutePluginCommandL(aMessage, HWRMFmTxCommand::ETxScanRequestCmdId, ETrue/*split*/, pckg );
+        // wait until response before calling SetFrequencyL
+        }
 
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::SetNextClearFrequencyL - return" ) ); 
     }
@@ -792,10 +809,20 @@ void CHWRMFmTxService::ProcessResponseL( TInt aCommandId,  TUint8 aTransId, TDes
                                                                                      EFalse ) );
                     if(data)
                     	{
+                        COMPONENT_TRACE2( _L( "HWRM Server - CHWRMFmTxService::ProcessResponseL, EStartObservingCmdId scan type = %d" ), 
+                            iScanRequestType );
+
+                    	TBool split( ( iScanRequestType != EFmTxScanTypeNone ) ? ETrue : EFalse );
                     	TRAP( pluginErr, ExecutePluginCommandL( data->iRequestMessage,
                     			HWRMFmTxCommand::ETxOnCmdId,
-                    			EFalse/*not split*/,
+                    			split,
                     			pckg ) );
+                    	
+                    	if( !pluginErr && iScanRequestType != EFmTxScanTypeNone )
+                    	    {
+                    	    // Temporarily prevent audio routing.
+                    	    iFmTxCommonData.EnableAudioRouting( EFalse );
+                    	    }
                     	}
                     else
                     	{
@@ -813,16 +840,30 @@ void CHWRMFmTxService::ProcessResponseL( TInt aCommandId,  TUint8 aTransId, TDes
                 errPckg.Copy(aData);
                 pluginErr = errPckg();
 
-                COMPONENT_TRACE2( _L( "HWRM Server - CHWRMFmTxService::ProcessResponseL, ETxOnCmdId pluginErr = %d" ), pluginErr );
+                COMPONENT_TRACE3( _L( "HWRM Server - CHWRMFmTxService::ProcessResponseL, ETxOnCmdId pluginErr = %d, scan type = %d" ), 
+                    pluginErr, iScanRequestType );
 
                 if ( pluginErr == KErrNone || pluginErr == KErrInUse )
                     {
                     pluginErr = KErrNone; // If already enabled, complete client request with KErrNone
+
                     // Update common data power save
                     iFmTxCommonData.UpdatePowerSaveState( 
                                         CHWRMFmTxCommonData::EHWRMFmTxPowerSaveOff );
                     // Store the new status
                     iFmTxCommonData.UpdateStatus(CHWRMFmTxCommonData::EFmTxStateTransOn);
+
+                    // Proceed with scan command if needed.
+                    if( iScanRequestType != EFmTxScanTypeNone )
+                        {
+                        THWRMPluginRequestData* data = static_cast<THWRMPluginRequestData*>(iTransactionList->FindTransaction(aTransId, EFalse));
+                        if( data )
+                            {
+                            HWRMFmTxCommand::TScanRequestPackage pckg( iClearFreqsRequired );
+                            TBool split( ( iScanRequestType == EFmTxScanTypeSet ) ? ETrue : EFalse );
+                            ExecutePluginCommandL( data->iRequestMessage, HWRMFmTxCommand::ETxScanRequestCmdId, split, pckg );
+                            }
+                        }
                     }
                 }
                 break;              
@@ -926,7 +967,7 @@ void CHWRMFmTxService::ProcessResponseL( TInt aCommandId,  TUint8 aTransId, TDes
                 scanPckg.Copy(aData);
                 HWRMFmTxCommand::TScanResponseData scanResp = scanPckg();               
                 COMPONENT_TRACE3( _L( "HWRM Server - CHWRMFmTxService::ProcessResponseL, ETxScanRequestCmdId error = %d, found = %d" ), scanResp.iErrorCode, scanResp.iFrequenciesFound );
-                                
+                
                 if ( scanResp.iErrorCode != KErrNone ||
                      scanResp.iFrequenciesFound == 0 ||
                      scanResp.iFrequenciesFound > KClearFrequencyArrayMax ) 
@@ -957,7 +998,20 @@ void CHWRMFmTxService::ProcessResponseL( TInt aCommandId,  TUint8 aTransId, TDes
                         pluginErr = data->iRequestMessage.Write(0,clientClearFreqPckg);
                         }
 
-                    if ( pluginErr == KErrNone &&
+                    // Disable transmitter if scan state is still get or set (i.e. transmitter not enabled 
+                    // or disabled explicitly during scan neither accessory connected during scan).
+                    // If scan state is set, we can still just disable transmitter because frequency is 
+                    // being set upon next transmitter enabling.
+                    if ( pluginErr == KErrNone && iScanRequestType != EFmTxScanTypeNone )
+                        {
+                        ExecutePluginCommand(HWRMFmTxCommand::ETxOffCmdId);
+                        if ( iScanRequestType == EFmTxScanTypeSet )
+                            {
+                            // Store the new frequency, which is used when next time enabling transmitter
+                            iFmTxCommonData.UpdateFrequency( firstClearFreq );
+                            }
+                        }
+                    else if ( pluginErr == KErrNone &&
                          data->iRequestMessage.Function() == EHWRMFmTxSetNextClearFreq )
                         {
                         // Continue split command
@@ -1450,6 +1504,44 @@ void CHWRMFmTxService::CancelPluginCommandL(HWRMFmTxCommand::TFmTxCmd aCommandId
         }
 
     COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::CancelPluginCommandL - return" ) );     
+    }
+
+// -----------------------------------------------------------------------------
+// CHWRMFmTxService::EnsureTransmitterOnL
+// Enables transmitter for being able to scan and set free frequencies.
+// -----------------------------------------------------------------------------
+//
+void CHWRMFmTxService::EnsureTransmitterOnL( const RMessage2& aMessage )
+    {
+    COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::EnsureTransmitterOnL" ) );
+
+    // Enable transmitter if not in "power save" state
+    if ( iFmTxCommonData.IsAccessoryPowerSaveOn() )
+        {
+		// We cannot enable during "power save" due to mutually exclusive accessory connection.			
+        COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::EnableL - not ready in \"power save\" state" ) );
+        User::Leave( KErrNotReady );
+        }
+    else
+        {
+        //start observing       
+        ExecutePluginCommandL( aMessage, HWRMFmTxCommand::EStartObservingCmdId, EFalse/*not split*/ );
+        }
+
+    COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::EnsureTransmitterOnL - return" ) );     
+    }
+
+// -----------------------------------------------------------------------------
+// CHWRMFmTxService::ResetScanRequest
+// Resets scan request and enables audio routing.
+// -----------------------------------------------------------------------------
+//
+void CHWRMFmTxService::ResetScanRequest( TBool aNotifyAudioPolicy )
+    {
+    COMPONENT_TRACE1( _L( "HWRM Server - CHWRMFmTxService::ResetScanRequest" ) );
+
+    iFmTxCommonData.EnableAudioRouting( ETrue, aNotifyAudioPolicy );
+    iScanRequestType = EFmTxScanTypeNone;
     }
     
 // ========================== OTHER EXPORTED FUNCTIONS =========================

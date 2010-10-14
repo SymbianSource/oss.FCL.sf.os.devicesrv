@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+// Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 // All rights reserved.
 // This component and the accompanying materials are made available
 // under the terms of "Eclipse Public License v1.0"
@@ -59,6 +59,9 @@ RESOURCE SSM_COMMAND_LIST r_critical_static_commands
 		, r_command_sysmon
 		, r_command_sysagt2svr
 		, r_command_ewsrv
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+		,r_cmd_emcore		//JHOI-889FRH
+#endif // SYMBIAN_INCLUDE_APP_CENTRIC
 		};
 	}
 
@@ -122,4 +125,21 @@ RESOURCE SSM_START_AMA_STARTER r_command_ama_starter
 	dsc_id = 0x2000836D;		// removing this id will cause a rcomp failure unless dsc_id is #defined in ssmcmd.rh file.
 	}
 
+#ifdef SYMBIAN_INCLUDE_APP_CENTRIC
+RESOURCE SSM_START_PROCESS_INFO r_cmd_emcore
+    {
+    severity = ECmdCriticalSeverity;
+    name = "Z:\\sys\\bin\\emcore.exe";
+    execution_behaviour = ESsmWaitForSignal;
+    retries = 5;
+    monitor_info = r_mon_3_restarts_reset;
+    }
 
+RESOURCE SSM_MONITOR_INFO r_mon_3_restarts_reset
+    {
+    restart_policy = ESsmRestartOS;
+    restart_mode = 0;
+    retries = 3;
+    }
+
+#endif	// SYMBIAN_INCLUDE_APP_CENTRIC

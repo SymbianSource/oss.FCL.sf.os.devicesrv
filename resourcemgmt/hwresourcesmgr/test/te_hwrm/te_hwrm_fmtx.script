@@ -426,4 +426,15 @@ START_TESTCASE DEVSRVS-HWRM-F-0037
 RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestFmTxEnableDuringPowersaveL
 END_TESTCASE DEVSRVS-HWRM-F-0037
 
+START_TESTCASE DEVSRVS-HWRM-F-0038
+//!@SYMTestCaseID DEVSRVS-HWRM-F-0038
+//!@SYMComponent telephony_hwrm
+//!@SYMTestCaseDesc Test scan during fmtx off
+//!@SYMTestPriority High
+//!@SYMTestActions Open a FmTx session, scan with fmtxoff.
+//!@SYMTestExpectedResults Pass
+//!@SYMTestType CT
+RUN_TEST_STEP 100 te_hwrm TEFUnit.CHWRMTest.TestFmTxGetNextClearFrequencyWithoutEnableL
+END_TESTCASE DEVSRVS-HWRM-F-0038
+
 PRINT Completed te_hwrm_fmtx tests

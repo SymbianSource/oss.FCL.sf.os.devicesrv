@@ -179,7 +179,8 @@ class CHWRMFmTx : public CBase
         * @exception KErrInUse if reserved by another client
         *            KErrNotSupported if RSSI scanning is unsupported
         *            KErrGeneral if there is a hardware error
-        *            KErrNotReady if FM Tx is not enabled
+    	*            KErrNotReady if there is a wired accessory conflict. Some  
+    	*            accessories are mutually exclusive with FM Tx. 
         */ 
         virtual void GetNextClearFrequencyL(TInt& aClearFrequency) = 0;
 
@@ -198,7 +199,8 @@ class CHWRMFmTx : public CBase
         *            KErrArgument  If aCount is out of range
         *            KErrNotSupported if RSSI scanning is unsupported
         *            KErrGeneral if there is a hardware error
-        *            KErrNotReady if FM Tx is not enabled
+    	*            KErrNotReady if there is a wired accessory conflict. Some  
+    	*            accessories are mutually exclusive with FM Tx. 
         */ 
         virtual void GetNextClearFrequencyL(TClearFrequencyArray& aClearFrequencyArray, TUint& aCount) = 0;
 
@@ -247,7 +249,8 @@ class CHWRMFmTx : public CBase
         * @exception KErrInUse if reserved by another client.
         *            KErrNotSupported if RSSI scanning is unsupported
         *            KErrGeneral if there is a hardware error.
-        *            KErrNotReady if FM Tx is not enabled
+    	*            KErrNotReady if there is a wired accessory conflict. Some  
+    	*            accessories are mutually exclusive with FM Tx. 
         */
         virtual void SetNextClearFrequencyL(TInt& aClearFrequency) = 0;
    

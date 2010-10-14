@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -23,8 +23,8 @@
 #include "platformverdebug.h"
 
 // CONSTANTS
-_LIT( KS60ProductIDFiles, "z:\\system\\install\\series60v*.sis" );
-const TInt KS60ProductIDPos = 9; // Length of 'series60v'
+_LIT( KS60ProductIDFiles, "z:\\system\\install\\Symbianv*.sis" );
+const TInt KS60ProductIDPos = 8; // Length of 'Symbianv'
 _LIT( KS60ProductIDSplitMark, "." ); // For splitting 'XX.YY' to 'XX' and 'YY'
 
 

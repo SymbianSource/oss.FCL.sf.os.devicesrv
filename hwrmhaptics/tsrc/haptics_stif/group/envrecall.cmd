@@ -19,8 +19,7 @@ REM
 
 @echo Cleaning Haptics Test stubs...
 pushd ..\..\hapticstestplugins\group\
-call sbs -c armv5.test reallyclean
-call sbs -c winscw.test reallyclean
+call sbs reallyclean
 popd
 @echo Cleaning Haptics Test stubs... Finished
 

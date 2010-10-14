@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description:  ?Description
-*  %version:  bh1dsgas#3 %, % date_modified: % by %derived_by: ravindrr %
+*  %version:  bh1dsgas#4 %, % date_modified: % by %derived_by: sarakuma %
 *
 */
 
@@ -101,11 +101,11 @@ const TCaseInfo CHwrmTargetModifierPluginTests::Case ( const TInt aCaseNumber ) 
         {
 		// To add new test cases, add new items to this array
 		{ (TText*) L"HWRM Target Modifier Plugin [CreateAndDestroy]",
-		        GETPTR CHwrmTargetModifierPluginTests::CreateAndDestroy },
+		        GETPTR &CHwrmTargetModifierPluginTests::CreateAndDestroy },
 		{ (TText*) L"HWRM Target Modifier Plugin [GetFullSystemTarget]",
-		        GETPTR CHwrmTargetModifierPluginTests::GetFullSystemTarget },
+		        GETPTR &CHwrmTargetModifierPluginTests::GetFullSystemTarget },
 		{ (TText*) L"HWRM Target Modifier Plugin [ModifyTarget]",
-		        GETPTR CHwrmTargetModifierPluginTests::ModifyTarget }
+		        GETPTR &CHwrmTargetModifierPluginTests::ModifyTarget }
         };
 
     // Verify that case number is valid

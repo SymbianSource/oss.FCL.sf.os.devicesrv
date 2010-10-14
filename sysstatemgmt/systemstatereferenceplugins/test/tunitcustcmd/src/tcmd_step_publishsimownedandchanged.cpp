@@ -23,7 +23,7 @@
 #include "ssmcustomcmdfactory.h"
 
 // class under test
-#include "cmdpublishSimOwnedAndChanged.h"
+#include "cmdpublishsimownedandchanged.h"
 
 // helper class
 #include "activestopper.h"

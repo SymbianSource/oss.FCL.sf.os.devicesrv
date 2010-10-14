@@ -262,6 +262,7 @@ public:
 	void TestFmTxPowerSaveOnOffStateL();
 	void TestFmTxPowerSaveOffL();	
 #endif // INSECURE_AUDIO_POLICY_KEYS  	
+    void TestFmTxGetNextClearFrequencyWithoutEnableL();
 
 private:
 	//
@@ -752,6 +753,8 @@ private:
 	void SetWatcherPluginConnectedStatusL(TBool aStatus );
 	void SetAudioRoutedFlagL(TBool aFlag);
 #endif // INSECURE_AUDIO_POLICY_KEYS  		
+
+    void FmTxGetNextClearFrequencyWithoutEnableL();
 	
 	// Test case utilities
 	void IncrementFrequency(TInt &aFrequency);

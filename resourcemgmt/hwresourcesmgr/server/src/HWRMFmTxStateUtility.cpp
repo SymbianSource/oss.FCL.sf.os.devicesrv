@@ -258,6 +258,8 @@ void CHWRMFmTxStateUtility::ProcessIndicationL( const TUint32 aId, TDesC8&  aDat
 			// transition from EFmTxStatePowerSaveAccessory to EFmTxStateOff must occur.
 			iFmTxService->ExecutePluginCommand(HWRMFmTxCommand::ETxOffCmdId);
 			// Don't change iFmTxState until power down completes
+			// Enable audio routing (which may have been disabled by scan request)
+			iFmTxCommonData->EnableAudioRouting( ETrue );
             }
             break;
 

@@ -87,6 +87,18 @@ class THWRMFmTxPluginRequestData : public THWRMPluginRequestData
 */
 class CHWRMFmTxService : public CHWRMService
     {
+    private:  // Enumerations
+    
+        /**
+        * Private enumeration to identify scan type
+        */
+        enum TFmTxScanType
+            {
+            EFmTxScanTypeNone = 0,
+            EFmTxScanTypeGet,
+            EFmTxScanTypeSet
+            };
+
     public: // Constructors and Destructor
     
         /**
@@ -311,6 +323,20 @@ class CHWRMFmTxService : public CHWRMService
         */
         void CancelPluginCommandL(HWRMFmTxCommand::TFmTxCmd aCommandId);
 
+        /**
+        * Enables transmitter for being able to scan and set free frequencies
+        * without need to explicitly enable transmitter.
+        *
+        */
+        void EnsureTransmitterOnL( const RMessage2& aMessage );
+
+        /**
+        * Resets scan request state and audio policing.
+        *
+        * @param aNotifyAudioPolicy ETrue if audio policy should be notified instantly.  
+        */
+        void ResetScanRequest( TBool aNotifyAudioPolicy = EFalse );
+
     private:  // data
 
         CHWRMPluginHandler& iWatcherPluginHandler;  // Reference to watcher plugin handler.
@@ -320,6 +346,8 @@ class CHWRMFmTxService : public CHWRMService
 
         TBool iSuspended; // Flag to indicate if this session is suspended.
         TBool iReserved;  // Flag to indicate if this session is reserved.
+        TFmTxScanType iScanRequestType;
+        TUint iClearFreqsRequired;
     };
 
 #endif  // HWRMFMTXSERVICE_H

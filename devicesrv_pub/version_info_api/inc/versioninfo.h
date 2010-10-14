@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Nokia Corporation and/or its subsidiary(-ies). 
+* Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies). 
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of "Eclipse Public License v1.0"
@@ -83,7 +83,7 @@ public:
 
     /**
     * Class TPlatformVersion stores platform version information.
-    * The class is used as parameter in GetVersionInfo() methods.
+    * The class is used as parameter in GetVersion() methods.
     * @since S60 3.2
     */
     class TPlatformVersion : public TVersionBase
@@ -95,10 +95,10 @@ public:
         inline TPlatformVersion();
 
     public:
-        /**  Contains the major version. For example 3 if S60 3.2 */
+        /**  Contains the major version. For example 4 for Symbian^4 */
         TUint16 iMajorVersion;
 
-        /**  Contains the minor version. For example 2 if S60 3.2 */
+        /**  Contains the minor version. For example 0 for Symbian^4 */
         TUint16 iMinorVersion;
         };
 

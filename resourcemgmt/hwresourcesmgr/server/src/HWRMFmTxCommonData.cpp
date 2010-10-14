@@ -278,13 +278,20 @@ void CHWRMFmTxCommonData::UpdateStatus(TFmTxStateTransition aEvent)
         THWRMFmTxAvailableFlag nowAvailable = FmTxAvailableState(newState);
         THWRMFmTxAvailableFlag wasAvailable = FmTxAvailableState(iFmTxState);
 
+        COMPONENT_TRACE3( _L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - nowAvailable: %d, wasAvailable: %d"), 
+            nowAvailable, wasAvailable ); 
         if ( nowAvailable != wasAvailable )
             {
-            COMPONENT_TRACE2(_L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - Audio Policy notification: %d"), nowAvailable );
-            TInt err = iFmTxIsAvailableProperty.Set(nowAvailable);      
-            if ( err != KErrNone )
+            COMPONENT_TRACE2( _L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - iAudioRoutingEnabled: %d"), 
+                iAudioRoutingEnabled ); 
+            if ( iAudioRoutingEnabled )
                 {
-                COMPONENT_TRACE2( _L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - Audio Policy notification failed: %d"), err );
+                COMPONENT_TRACE2(_L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - Audio Policy notification: %d"), nowAvailable );
+                TInt err = iFmTxIsAvailableProperty.Set(nowAvailable);      
+                if ( err != KErrNone )
+                    {
+                    COMPONENT_TRACE2( _L("HWRM Server - CHWRMFmTxCommonData::UpdateStatus - Audio Policy notification failed: %d"), err );
+                    }
                 }
             
             // Update power save status if Fm Tx is available
@@ -530,6 +537,26 @@ void CHWRMFmTxCommonData::UpdateRdsLanguageId(const TRdsLanguageIdType aLanguage
             }
             
         iRdsData.iLanguageId = aLanguageId;         
+        }
+    }
+    
+// -----------------------------------------------------------------------------
+// CHWRMFmTxCommonData::EnableAudioRouting
+// Enables or disables audio routing
+// -----------------------------------------------------------------------------
+//
+void CHWRMFmTxCommonData::EnableAudioRouting(TBool aEnable, TBool aNotifyAudioPolicy)
+    {
+    COMPONENT_TRACE3( _L("HWRM Server - CHWRMFmTxCommonData::EnableAudioRouting %d, %d"), 
+            aEnable, aNotifyAudioPolicy );
+    iAudioRoutingEnabled = aEnable;
+    if ( aNotifyAudioPolicy )
+        {
+        TInt err = iFmTxIsAvailableProperty.Set( aEnable );      
+        if ( err != KErrNone )
+            {
+            COMPONENT_TRACE2( _L("HWRM Server - CHWRMFmTxCommonData::EnableAudioRouting - Audio Policy notification failed: %d"), err );
+            }
         }
     }
     

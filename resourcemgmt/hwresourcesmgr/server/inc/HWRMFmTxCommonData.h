@@ -263,6 +263,14 @@ class CHWRMFmTxCommonData : public CBase,
         */          
         void UpdateRdsLanguageId(const TRdsLanguageIdType aLanguageId);   
             
+        /**
+        * Setter for indicating whether audio policy should be notified.
+        *
+        * @param aEnable Enable status
+        * @param aNotifyAudioPolicy ETrue if audio policy should be notified instantly.
+        */          
+        void EnableAudioRouting(TBool aEnable, TBool aNotifyAudioPolicy = EFalse);
+            
     private:
     
         /**
@@ -315,6 +323,7 @@ class CHWRMFmTxCommonData : public CBase,
         TFmTxRdsData               iRdsData;          // RDS settings
         HWRMFmTxCommand::TRdsPs    iRdsConvertedPs;   // Text converted into 8bit RDS format
         HWRMFmTxCommand::TRdsPtyn  iRdsConvertedPtyn; // Text converted into 8bit RDS format
+        TBool                   iAudioRoutingEnabled;
         
     public: // Friend classes
     
