@@ -18,14 +18,14 @@
 PRJ_PLATFORMS
 DEFAULT
 
-PRJ_EXPORTS
+PRJ_TESTEXPORTS
 ../init/hwrmhapticsuid.ini 		/epoc32/release/winscw/udeb/z/private/200184b9/hwrmhapticsuid.ini
 ../init/hwrmhapticsuid.ini 		/epoc32/data/z/private/200184b9/hwrmhapticsuid.ini
 ../init/hapticsclienttest.ini   	/epoc32/winscw/c/TestFramework/hapticsclienttest.ini
 ../conf/hapticsclienttest.cfg    /epoc32/winscw/c/TestFramework/hapticsclienttest.cfg
 
 
-PRJ_MMPFILES
+PRJ_TESTMMPFILES
 hapticsclienttest.mmp
 
 // End of file

@@ -1007,13 +1007,18 @@ void CClientsData::RecalculatePluginInterval(TUint &aIntervalMultiple)
 	iClientsQueIter.SetToFirst();
 	
 	clientData = iClientsQueIter++;
-	TUint newGCD = clientData->iPowerMeasurementsClientData.iRequestedIntervalMultiple;
 	
-	while((clientData = iClientsQueIter++) != NULL)
-		{
-	    newGCD = CalculateGCD(clientData->iPowerMeasurementsClientData.iRequestedIntervalMultiple,newGCD);
-		}
-	aIntervalMultiple = newGCD;
+	aIntervalMultiple = 0;
+	if( clientData )
+	  {
+	  TUint newGCD = clientData->iPowerMeasurementsClientData.iRequestedIntervalMultiple;
+	
+	  while((clientData = iClientsQueIter++) != NULL)
+		  {
+	      newGCD = CalculateGCD(clientData->iPowerMeasurementsClientData.iRequestedIntervalMultiple,newGCD);
+		  }
+	  aIntervalMultiple = newGCD;
+	  }
 	
 	COMPONENT_TRACE1(_L( "HWRM Server - CClientsData::RecalculatePluginInterval - return" ) );
 	}		

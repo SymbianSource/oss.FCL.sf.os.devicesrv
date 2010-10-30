@@ -18,10 +18,10 @@
 PRJ_PLATFORMS
 ARMV5 WINSCW
 
-PRJ_EXPORTS
+PRJ_TESTEXPORTS
 ../data/hwrmhapticsuid.ini /epoc32/release/winscw/udeb/z/private/200184b9/hwrmhapticsuid.ini
 
-PRJ_MMPFILES
+PRJ_TESTMMPFILES
 MT_HapticsClient.mmp
 
 // End of file

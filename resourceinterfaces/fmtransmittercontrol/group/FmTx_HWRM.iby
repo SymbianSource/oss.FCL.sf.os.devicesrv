@@ -21,9 +21,7 @@
 
 #include <featreg.iby> // Feature Registry (featreg.dll)
 
-#ifdef FF_FMTX
 file=ABI_DIR\DEBUG_DIR\HWRMFmTxClient.dll 	 SYSTEM_BINDIR\HWRMFmTxClient.dll
-#endif
 
 #endif // __FMTX_HWRESOURCEMANAGER_IBY__
 

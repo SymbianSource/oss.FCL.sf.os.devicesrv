@@ -226,7 +226,8 @@ enum TAccServerError
     EAccServerErrorCreateServer         = 1,
     EAccServerErrorCreateTrapCleanup    = 2,
     EAccServerErrorBadDescriptor        = 3,
-    EAccServerErrorNotSupported         = 4
+    EAccServerErrorLoadASY              = 4,
+    EAccServerErrorNotSupported         = 5
     };
 
 // For CAccPolAccessoryPolicy::IsValidConnection to tell connection type

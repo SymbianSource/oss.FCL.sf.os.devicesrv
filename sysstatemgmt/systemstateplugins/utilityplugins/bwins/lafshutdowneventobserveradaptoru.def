@@ -1,3 +1,0 @@
-EXPORTS
-	?NewL@CLafShutdownEventObserverAdaptor@@SAPAVMSsmUtility@@XZ @ 1 NONAME ; class MSsmUtility * CLafShutdownEventObserverAdaptor::NewL(void)
-

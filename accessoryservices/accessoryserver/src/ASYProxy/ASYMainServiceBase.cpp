@@ -91,6 +91,13 @@ CASYMainServiceBase* CASYMainServiceBase::NewL(
     TRAP( err, tmpEcom = REComSession::CreateImplementationL(
                          aImplementationUidAsyService,
                          _FOFF( CASYMainServiceBase, iDtor_ID_Key ) ) );
+    
+    if( KErrNone != err )
+        {
+        COM_TRACE_1( "[AccFW:AsyProxy] CASYMainServiceBase::NewL - AccServer Panic (0x%x)", EAccServerErrorLoadASY );
+        COM_TRACE_1( "[AccFW:AsyProxy] CASYMainServiceBase::::NewL - Implementation UID 0x%x failed to load", aImplementationUidAsyService.iUid );
+        User::Panic( KAccServerName, EAccServerErrorLoadASY );        
+        }
 
     COM_TRACE_1( "[AccFW:AsyProxy] CASYMainServiceBase::NewL - After REComSession::CreateImplementationL - err == %d", err );
 
@@ -99,6 +106,12 @@ CASYMainServiceBase* CASYMainServiceBase::NewL(
                                         tmpEcom );
 
     COM_TRACE_1( "[AccFW:AsyProxy] CASYMainServiceBase::::NewL - theChosenOne == 0x%x", theChosenOne );
+    
+    if( (theChosenOne == NULL) || (tmpEcom == NULL) )
+        {
+        COM_TRACE_1( "[AccFW:AsyProxy] CASYMainServiceBase::::NewL - Implementation UID 0x%x failed to load", aImplementationUidAsyService.iUid );
+        User::Panic( KAccServerName, EAccServerErrorLoadASY );
+        }
 
     theChosenOne->ConstructL( aCommsService );
 

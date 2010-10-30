@@ -26,8 +26,8 @@ PRJ_TESTEXPORTS
 ../data/AccPolCapRules.ini                /epoc32/winscw/c/private/1020504A/AccPolCapRules.ini
 ../data/rules.dat                         /epoc32/winscw/c/private/1020504A/rules.dat
 
-../data/DBS_10205030_accpolicydb.db       /epoc32/RELEASE/winscw/UDEB/Z/private/100012a5/DBS_10205030_accpolicydb.db
-../data/DBS_10205030_accpolicydb.db       /epoc32/RELEASE/winscw/UREL/Z/private/100012a5/DBS_10205030_accpolicydb.db
+../data/DBS_10205030_accpolicydb.db       /epoc32/release/winscw/udeb/z/private/100012a5/DBS_10205030_accpolicydb.db
+../data/DBS_10205030_accpolicydb.db       /epoc32/release/winscw/urel/z/private/100012a5/DBS_10205030_accpolicydb.db
 ../data/DBS_10205030_accpolicydb.db       /epoc32/data/z/private/100012a5/DBS_10205030_accpolicydb.db
 
 

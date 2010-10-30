@@ -52,7 +52,6 @@
 #include "../accessory_bluetooth_control_api/group/bld.inf"
 #include "../extended_version_info_api/group/bld.inf"
 #include "../mediator_event_provider_api/group/bld.inf"
-#include "../tv_out_config_api/group/bld.inf"
 #include "../tspclientmapper_api/group/bld.inf"
 #include "../powersave_api/group/bld.inf"
 #include "../powersave_definitions_api/group/bld.inf"

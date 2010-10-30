@@ -52,7 +52,7 @@ END
 
 LIBRARY euser.lib 
 LIBRARY estor.lib
-LIBRARY ASYProxy.lib
+LIBRARY asyproxy.lib
 LIBRARY accclient.lib
 LIBRARY acccontrol.lib
 LIBRARY accpolicy.lib

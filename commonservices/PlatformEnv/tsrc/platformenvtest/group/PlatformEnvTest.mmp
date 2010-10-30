@@ -24,9 +24,6 @@ UID             0x1000008D 0x101FB3E7
 
 CAPABILITY      ALL -TCB
 
-//TARGETPATH      ?target_path
-DEFFILE         PlatformEnvTest.def
-
 SOURCEPATH      ../src
 SOURCE          PlatformEnvTest.cpp
 SOURCE          PlatformEnvTestCases.cpp

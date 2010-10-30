@@ -73,6 +73,25 @@ EXPORT_C CTestModuleBase* LibEntryL( void )
     }
     
     
+EXPORT_C TInt SetRequirements( CTestModuleParam*& aTestModuleParam, 
+                                TUint32& aParameterValid )
+{
+	aParameterValid = KStifTestModuleParameterChanged;
+	
+  CTestModuleParamVer01* param = CTestModuleParamVer01::NewL();
+
+	// Stack size
+	param->iTestThreadStackSize= 65536; // 64K stack
+
+	// Heap sizes
+	param->iTestThreadMinHeap = 4096;   // 4K heap min
+	param->iTestThreadMaxHeap = 1260480;// 1.2M heap max
+
+	aTestModuleParam = param;
+	return KErrNone;	
+} 
+
+    
 // -----------------------------------------------------------------------------
 // CTFAStifEntryPoint::NewL
 // -----------------------------------------------------------------------------

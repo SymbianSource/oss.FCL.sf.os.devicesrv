@@ -19,7 +19,9 @@ REM
 
 echo Cleaning up mediatorstub...
 pushd ..\stub\group
-call bldmake bldfiles
-call abld test reallyclean
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
 popd
 @echo Cleaning up mediatorstub... Finished

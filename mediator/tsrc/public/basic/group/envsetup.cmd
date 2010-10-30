@@ -19,9 +19,13 @@ REM
 
 echo Setting up mediatorstub...
 pushd ..\stub\group
-call bldmake bldfiles
-call abld test reallyclean
-call abld test build
+REM call bldmake bldfiles
+REM call abld test reallyclean
+call sbs -c armv5.test REALLYCLEAN
+call sbs -c winscw.test REALLYCLEAN
+REM call abld test build
+call sbs -c armv5.test
+call sbs -c winscw.test
 popd
 @echo Setting up mediatorstub... Finished
 

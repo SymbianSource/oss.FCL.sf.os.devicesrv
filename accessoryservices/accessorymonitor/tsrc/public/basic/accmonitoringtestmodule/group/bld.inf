@@ -28,12 +28,12 @@ PRJ_TESTEXPORTS
 ../../AccMonTestTimer/inc/AccMonTestTimer.h                     OS_LAYER_PLATFORM_EXPORT_PATH( AccMonTestTimer.h )
 
 // Following files are needed to get stif tests run without capabilities
-../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/data/Z/private/10205030/accMonitoringTestModule_exe.cfg
-../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/RELEASE/winscw/UDEB/Z/private/10205030/accMonitoringTestModule_exe.cfg
-../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/RELEASE/winscw/UREL/Z/private/10205030/accMonitoringTestModule_exe.cfg
-../tests/init/accMonitoringTestModule_exe.ini           /epoc32/data/Z/private/10205030/accMonitoringTestModule_exe.ini
-../tests/init/accMonitoringTestModule_exe.ini           /epoc32/RELEASE/winscw/UDEB/Z/private/10205030/accMonitoringTestModule_exe.ini
-../tests/init/accMonitoringTestModule_exe.ini           /epoc32/RELEASE/winscw/UREL/Z/private/10205030/accMonitoringTestModule_exe.ini
+../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/data/z/private/10205030/accMonitoringTestModule_exe.cfg
+../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/release/winscw/udeb/z/private/10205030/accMonitoringTestModule_exe.cfg
+../tests/conf/accMonitoringTestModule_exe.cfg           /epoc32/release/winscw/urel/z/private/10205030/accMonitoringTestModule_exe.cfg
+../tests/init/accMonitoringTestModule_exe.ini           /epoc32/data/z/private/10205030/accMonitoringTestModule_exe.ini
+../tests/init/accMonitoringTestModule_exe.ini           /epoc32/release/winscw/udeb/z/private/10205030/accMonitoringTestModule_exe.ini
+../tests/init/accMonitoringTestModule_exe.ini           /epoc32/release/winscw/urel/z/private/10205030/accMonitoringTestModule_exe.ini
 
 
 PRJ_TESTMMPFILES

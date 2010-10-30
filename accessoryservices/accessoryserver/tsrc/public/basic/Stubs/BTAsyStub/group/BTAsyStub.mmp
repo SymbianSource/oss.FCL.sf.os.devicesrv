@@ -50,7 +50,7 @@ TARGET          BTAsyStub.rsc
 END
 
 LIBRARY      	euser.lib 
-LIBRARY         ASYProxy.lib
+LIBRARY         asyproxy.lib
 LIBRARY         accclient.lib
 LIBRARY         accbtcontrol.lib
 LIBRARY         acccontrol.lib

@@ -179,6 +179,7 @@ TInt CHWRMService::CompleteRequest(TUint8 aTransId, TInt aCompletionCode,
         if(data->iSplitCommandData)
             {
             COMPONENT_TRACE3( ( _L( "HWRM Server - CHWRMService::CompleteRequest Deleting iSplitCommandData(0x%x) for Id(0x%x)" ) ), data->iSplitCommandData, data->iSplitCommandId );
+            //coverity[delete_void]
             delete data->iSplitCommandData;
             }
         delete data;

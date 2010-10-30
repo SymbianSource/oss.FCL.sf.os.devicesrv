@@ -1,0 +1,40 @@
+Scope:
+This application allows to test functionality of Haptics available in the Symbian OS as part of the HWRMHaptics component within DeviceServices Package.
+
+
+Features:
+1) A complete UI based app which allows to test public API available with "hatpics_api"
+2) For every public API there is an UI interface.
+3) Can be used by developers to test any functionality change in the S/W components.
+4) An immediate tool to check the route-cause when an error is raised.
+5) IVT (Immersion VibeTonz) files composed using TouchSense Studio can be loaded and tested with this app. (More Info, refer to section How to Load IVT Files)
+
+
+Build:
+It was quite simple to build this app, as it makes use of complete product code components and functionality(Ofcourse it has to do this way!!)
+You can find this appln. source code @ sf\os\devicesrv\hwrmhaptics\examples\hapticstestapp\
+Just build at the group.
+V:sf\os\devicesrv\hwrmhaptics\examples\hapticstestapp\group>sbs -c armv5
+
+
+Deploy:
+This appln. has support to be included in rom build as well as package installataion. Either of the method can be adopted to delpoy it.
+1) Package Installation Method:-
+	Run "createandsign.cmd" @ hapticstestapp\sis
+	Install hapticstest.sisx on the phone
+2) Alernate Method:- use the default rom build command, for e.g. imaker default
+
+
+Test:
+Installed hapticstest appln can be launched from Application folder under the phone Main Menu.
+Make use of "init" from options menu, which will make the device ready to play haptics effects.
+
+How to Load IVT Files:
+Using Touchsense studio IVT files can be created and exported to a file whose extension will be .ivt
+These IVT files can be played on Nokia Hardware using Haptics test application.
+Load the .ivt files to E:\others folder. During application launch, searches the respective drive and loads them to play with the player.
+If no files were found, it warns the app user with a message telling couldnt find any IVT files to load. 
+
+
+Open Issues:
+1) Currently this app is developed on Symbian Avkon Framework. So it may not work with MCL release based on Direct UI i.e. Qt.

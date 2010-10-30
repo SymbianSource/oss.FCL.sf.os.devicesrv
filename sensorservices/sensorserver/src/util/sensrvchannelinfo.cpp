@@ -27,7 +27,7 @@ TBuf<KSensrvLocationLength> location;\
 location.Copy(iLocation);\
 TBuf<KSensrvVendorIdLength> vendor;\
 vendor.Copy(iVendorId);\
-API_TRACE(( _L("Sensor Util - TSensrvChannelInfo::TSensrvChannelInfo - iChannelId=%d, iContextType=%d, iQuantity=%d, iChannelType=%d, iLocation=%S, iVendorId=%S, iDataItemSize=%d, iChannelDataTypeId=%d, iReserved=%d"),iChannelId,iContextType,iQuantity,iChannelType,&location,&vendor,iDataItemSize,iChannelDataTypeId,iReserved)); 
+//API_TRACE(( _L("Sensor Util - TSensrvChannelInfo::TSensrvChannelInfo - iChannelId=%d, iContextType=%d, iQuantity=%d, iChannelType=%d, iLocation=%S, iVendorId=%S, iDataItemSize=%d, iChannelDataTypeId=%d, iReserved=%d"),iChannelId,iContextType,iQuantity,iChannelType,&location,&vendor,iDataItemSize,iChannelDataTypeId,iReserved)); 
 #else
 #define _TRACE_CHANNEL_INFO_
 #endif

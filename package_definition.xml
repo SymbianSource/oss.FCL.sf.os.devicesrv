@@ -188,10 +188,6 @@
     <meta rel="Api" href="devicesrv_plat/mediator_event_provider_api/mediator_event_provider_api.metaxml"/>
     <unit bldFile="devicesrv_plat/mediator_event_provider_api/group"/>
    </component>
-   <component id="tv_out_config_api" name="TV Out Config API" class="api" filter="s60">
-    <meta rel="Api" href="devicesrv_plat/tv_out_config_api/tv_out_config_api.metaxml"/>
-    <unit bldFile="devicesrv_plat/tv_out_config_api/group"/>
-   </component>
    <component id="tspclientmapper_api" name="TSP Client Mapper API" class="api" filter="s60">
     <meta rel="Api" href="devicesrv_plat/tspclientmapper_api/tspclientmapper_api.metaxml"/>
     <unit bldFile="devicesrv_plat/tspclientmapper_api/group"/>

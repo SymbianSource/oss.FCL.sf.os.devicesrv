@@ -52,9 +52,9 @@ PRJ_TESTEXPORTS
 
 
 // CenRep files
-../cenrep/10200EE3.txt                 /epoc32/RELEASE/winscw/UDEB/Z/private/10202BE9/10200EE3.txt
-../cenrep/10200EE3.txt                 /epoc32/RELEASE/winscw/UREL/Z/private/10202BE9/10200EE3.txt
-../cenrep/10200EE3.txt                 /epoc32/data/Z/private/10202BE9/10200EE3.txt
+../cenrep/10200EE3.txt                 /epoc32/release/winscw/udeb/z/private/10202BE9/10200EE3.txt
+../cenrep/10200EE3.txt                 /epoc32/release/winscw/urel/z/private/10202BE9/10200EE3.txt
+../cenrep/10200EE3.txt                 /epoc32/data/z/private/10202BE9/10200EE3.txt
 
 // CenRep config files
 10200EE3.xml  /epoc32/release/winscw/urel/z/private/2000B187/cenrep/10200EE3.xml

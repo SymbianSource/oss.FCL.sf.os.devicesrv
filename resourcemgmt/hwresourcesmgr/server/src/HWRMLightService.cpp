@@ -1773,6 +1773,7 @@ TBool CHWRMLightService::SetColorL(TInt aTarget, TUint aColor, const RMessage2& 
             COMPONENT_TRACE1(_L( "HWRM Server - CHWRMLightService::SetColorL Deleting allocated aSplitCommandData"));
             //Release the data that is allocated, as there will not be ProcessResponseL  
             //coverity[freed_arg]
+            //coverity[delete_void]
             delete aSplitCommandData;
             }
         }
