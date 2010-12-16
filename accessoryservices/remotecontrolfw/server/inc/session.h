@@ -36,6 +36,7 @@ class CActiveHelper;
 class CMessageQueue;
 class CRemConInterfaceDetailsArray;
 class CRemConInterfaceDetails;
+class CConnections;
 
 /**
 Rem Con session.
@@ -245,6 +246,7 @@ private: // utility
 	void DoRegisterInterestedAPIsL(const RMessage2& aMessage);
 	void DoSetClientTypeL(const RMessage2& aMessage);
 	void DoSendCancel();
+	CConnections* DoGetConnectionCountL(const RMessage2& aMessage);
 	
 	CRemConInterfaceDetails* FindInterfaceByUid(TUid aUid) const;
 
@@ -328,7 +330,20 @@ private: // owned
 	
 	TRemConSessionSending iSending;
 	
-	TBool iInGetConnectionsProcedure;
+	// To support the 2-phase GetConnections API.
+	// iTempCopyOfConnections holds an owned copy of the connection state of 
+	// the system because the state held centrally in the server may change 
+	// between the client's 1st IPC to get the number of connections and the 
+	// client's 2nd IPC to get the actual connection data. 
+	// There are panics of the client side to enforce that the call scenario 
+	// goes:
+	// (a) one successful call to GetConnectionCount, then a call to 
+	// GetConnections, or
+	// (b) an unsuccessful call to GetConnectionCount.
+	CConnections* iTempCopyOfConnections;
+
+	// To support the 'connections changed' notification.
+	TBool iConnectionsChanged;
 	};
 
 // Inlines

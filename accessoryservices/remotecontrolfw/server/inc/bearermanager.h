@@ -40,10 +40,7 @@ Owns bearer plugin instances, allows access to them, and observes them.
 APIs are provided to bring up and down connections on specific 
 TRemConAddresses. 
 The bearer manager keeps track of connections which we are in the process or 
-bringing up or down (i.e. by request). For connection and disconnection 
-_indications_, it defers to the connection history system to check that, for 
-example, a disconnect indication refers to a connection we actually already 
-knew about.
+bringing up or down (i.e. by request).
 */
 NONSHARABLE_CLASS(CBearerManager) : public CBase, public MRemConBearerObserver
 	{

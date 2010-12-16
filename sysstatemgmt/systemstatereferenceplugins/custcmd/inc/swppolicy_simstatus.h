@@ -63,12 +63,7 @@ private:
 private:
 	CSsmCommandList* iCommandList;
 	RProperty iProperty;
-	
-    /** Indicates whether the SIM has ever been readable since the device was started. */
-    TBool iSimHasBeenReadable;
-
-    /** Indicates whether the SIM has ever been usable since the device was started. */
-    TBool iSimHasBeenUsable;
+	RProperty iSimPreviousStatusProp;
 	};
 
 #endif //__CSIMSTATUSPOLICY_H__

@@ -210,9 +210,7 @@ TInt CRemConBulkServer::ClientOpened(CRemConBulkSession& aSession, TProcessId aP
 			{
 			aSession.SetId(id);
 		
-			// Register the session by appending it to our array, and also making an 
-			// item for it in the record of which points in the connection history 
-			// sessions are interested in.
+			// Register the session by appending it to our array.
 			ret = iSessions.Append(&aSession);
 			
 			if ( ret == KErrNone )

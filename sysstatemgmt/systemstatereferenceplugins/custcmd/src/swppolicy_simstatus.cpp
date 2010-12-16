@@ -50,11 +50,13 @@ CSimStatuspolicy::~CSimStatuspolicy()
 	{
 	delete iCommandList;
 	iProperty.Close();
+	iSimPreviousStatusProp.Close();
 	}
 
 void CSimStatuspolicy::ConstructL()
 	{
 	User::LeaveIfError(iProperty.Attach(CSsmUiSpecific::StartupPSUid(), CSsmUiSpecific::SimStatusPropertyKey()));
+	User::LeaveIfError(iSimPreviousStatusProp.Attach(CSsmUiSpecific::StartupPSUid(), KPSSimPreviousState));
 	}
 
 void CSimStatuspolicy::Initialize(TRequestStatus& aStatus)
@@ -102,22 +104,36 @@ MSsmSwpPolicy::TResponse CSimStatuspolicy::TransitionAllowed(const TSsmSwp& aSwp
 			break;
 		}
 
+	DEBUGPRINT3A("CSimStatuspolicy TransitionAllowed with aSwp - %d with Result %d ", aSwp.Value(), isTransitionAllowed);
 	return isTransitionAllowed;
 	}
 
 MSsmSwpPolicy::TResponse CSimStatuspolicy::IsSimReadableTransitionAllowed()
     {
     TInt simStatus;
-    iProperty.Get(simStatus);
+    TInt err = iProperty.Get(simStatus);
 
-    if ((ESimStatusUninitialized == simStatus ||
+	DEBUGPRINT3A("IsSimReadableTransitionAllowed Getting simstatus - %d completed with %d", simStatus, err);
+    
+	TInt simPreviousStatus = ESimPreviousStateUninitialized;	
+	err = iSimPreviousStatusProp.Get(simPreviousStatus);
+	DEBUGPRINT3A("Getting KPSSimPreviousState %d value completed with - %d", simPreviousStatus, err);
+
+	const TBool simHasBeenReadable = ESimHasBeenReadable & simPreviousStatus;
+
+	if ((ESimStatusUninitialized == simStatus ||
     		ESimNotPresent == simStatus ||
     		ESimReadable == simStatus ||
-    		(iSimHasBeenReadable && ESimUsable ==simStatus) ||
-    		(iSimHasBeenReadable && ESimNotReady == simStatus) ) &&
+    		(simHasBeenReadable && ESimUsable ==simStatus) ||
+    		(simHasBeenReadable && ESimNotReady == simStatus) ) &&
     		CSsmUiSpecific::IsSimStateChangeAllowed())
     	{
-    	iSimHasBeenReadable = ETrue;
+		if (!simHasBeenReadable)
+			{
+			err =iSimPreviousStatusProp.Set(simPreviousStatus | ESimHasBeenReadable);
+			DEBUGPRINT2A("CSimStatuspolicy setting KPSSimPreviousState to ESimHasBeenReadable completed with err - %d", err);
+			}
+		
     	return EAllowed;
     	}
     return ENotAllowed;
@@ -126,14 +142,27 @@ MSsmSwpPolicy::TResponse CSimStatuspolicy::IsSimReadableTransitionAllowed()
 MSsmSwpPolicy::TResponse CSimStatuspolicy::IsSimUsableTransitionAllowed()
 	{
 	TInt simStatus;
-	iProperty.Get(simStatus);
+	TInt err = iProperty.Get(simStatus);
+	DEBUGPRINT2A("CSimStatuspolicy IsSimUsableTransitionAllowed from simstatus - %d", simStatus);
+
+	TInt simPreviousStatus = ESimPreviousStateUninitialized;
+	err = iSimPreviousStatusProp.Get(simPreviousStatus);
+	DEBUGPRINT3A("CSimStatuspolicy getting KPSSimPreviousState %d value completed with - %d", simPreviousStatus, err);
+
+	const TBool simHasBeenUsable = ESimHasBeenUsable & simPreviousStatus;
+
 	if ((ESimReadable == simStatus ||
 			ESimNotPresent == simStatus ||
 			ESimUsable == simStatus ||
-			(iSimHasBeenUsable && ESimNotReady ==simStatus)) &&
+			(simHasBeenUsable && ESimNotReady ==simStatus)) &&
 			CSsmUiSpecific::IsSimStateChangeAllowed())
 		{
-		iSimHasBeenUsable = ETrue;
+		if (!simHasBeenUsable)
+			{
+			err =iSimPreviousStatusProp.Set(simPreviousStatus | ESimHasBeenUsable);
+			DEBUGPRINT2A("CSimStatuspolicy setting KPSSimPreviousState to ESimHasBeenUsable completed with err - %d", err);
+			}
+
 		return EAllowed;
 		}
 	return ENotAllowed;

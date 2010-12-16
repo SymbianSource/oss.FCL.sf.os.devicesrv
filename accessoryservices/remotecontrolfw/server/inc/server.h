@@ -42,7 +42,6 @@ class CRemConConverterPlugin;
 class CMessageRecipientsList;
 class TClientInfo;
 class TRemConAddress;
-class CConnectionHistory;
 class CConnections;
 class MRemConTargetSelectorPluginInterface;
 class MRemConTargetSelectorPluginInterfaceV2;
@@ -114,21 +113,6 @@ public: // called by session objects
 
 	/** Returns the current bearer-level connection state of the system. */
 	CConnections& Connections();
-
-	/** Each session has a pointer into the connection history- pointing at 
-	the record in the history in which the session is interested. This 
-	function moves the pointer (for the given session) to the last item in the 
-	history. */
-	void SetConnectionHistoryPointer(TUint aSessionId);
-
-	/** Gets the record in the connection history which the session is 
-	pointing to. */
-	const CConnections& Connections(TUint aSessionId) const;
-
-	/** Returns ETrue if the given session's currently flagged connection 
-	history record is the 'Last' connection history record, i.e. the current 
-	connection set. Returns EFalse otherwise. */
-	TBool ConnectionHistoryPointerAtLatest(TUint aSessionId) const;
 
 	/**
 	Sends a command.
@@ -295,10 +279,6 @@ private: // from MRemConTargetSelectorPluginObserver
 	TInt MrctspoSetLocalAddressedClient(const TUid& aBearerUid, const TClientInfo& aClientInfo);
 
 private: // utility
-	/** Removes connection history records which are no longer interesting and 
-	updates the indices in iSession2ConnHistory accordingly. */
-	void UpdateConnectionHistoryAndPointers();
-
 	CRemConSession* Session(TUint aSessionId) const;
 	
 	void StartShutdownTimerIfNoSessionsOrBulkThread();
@@ -309,7 +289,6 @@ private: // utility
 #ifdef __FLOG_ACTIVE
 	void LogSessions() const;
 	void LogRemotes() const;
-	void LogConnectionHistoryAndInterest() const;
 	void LogOutgoingCmdPendingTsp() const;
 	void LogOutgoingNotifyCmdPendingTsp() const;
 	void LogOutgoingRspPendingTsp() const;
@@ -413,8 +392,8 @@ private: // called by the shutdown timer
 	static TInt TimerFired(TAny* aThis);
 
 private: // owned
-	// Holds the history of the connection states of the system.
-	CConnectionHistory* iConnectionHistory;
+	// Holds the current bearer connection states of the system.
+	CConnections* iConnections;
 
 	// NB This isn't really being used as a CPeriodic, but (a) it will do the 
 	// job, and (b) it saves us writing our own concrete timer (there aren't 
@@ -550,19 +529,6 @@ private: // owned
 	// knows to remove them when the TSP is finished
 	TBool iTspDropIncomingCommand;
 	TBool iTspDropIncomingNotifyCommand;
-	
-	/** We have an array of these records, one for each session. At any point 
-	in time, each session's record's iIndex is the index of the connection 
-	history record in which that session is currently interested. */
-	struct TSessionPointerToConnectionHistory
-		{
-		/** The session ID. */
-		TUint iSessionId;
-
-		/** The index of the connection history record. */
-		TUint iIndex;
-		};
-	RArray<TSessionPointerToConnectionHistory> iSession2ConnHistory;
 	
 	TTspV4Stub iTspIf4Stub;
 

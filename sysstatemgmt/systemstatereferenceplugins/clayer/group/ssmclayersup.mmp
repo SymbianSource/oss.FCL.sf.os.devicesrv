@@ -52,6 +52,7 @@ LIBRARY			euser.lib
 LIBRARY			ssmuiproviderdll.lib
 LIBRARY			ssmcmn.lib
 LIBRARY			ssmadaptationcli.lib
+LIBRARY			starterclient.lib
 
 LIBRARY			etel.lib
 LIBRARY			etelmm.lib

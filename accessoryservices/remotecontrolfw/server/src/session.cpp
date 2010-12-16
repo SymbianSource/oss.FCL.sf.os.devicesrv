@@ -90,9 +90,6 @@ void CRemConSession::ConstructL(const RMessage2& aMessage)
 	// Tell the server about us.
 	LEAVEIFERRORL(iServer.ClientOpened(*this));
 
-	// Set our pointer into the connection history at the current/'Last' item.
-	iServer.SetConnectionHistoryPointer(Id());
-	
 	iPendingMsgProcessor = new (ELeave) CActiveHelper(*this);
 	}
 
@@ -111,6 +108,8 @@ CRemConSession::~CRemConSession()
 	iServer.ClientClosed(*this, iRemoteAddress.BearerUid());
 	delete iInterestedAPIs;
 	iPlayerName.Close();
+
+	delete iTempCopyOfConnections;
 	}
 
 void CRemConSession::ServiceL(const RMessage2& aMessage)
@@ -1337,23 +1336,55 @@ void CRemConSession::GetConnectionCount(const RMessage2& aMessage)
 		return;
 		}
 
+	if ( iTempCopyOfConnections )
+		{
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicGetConnectionsFault);
+		return;
+		}
+
+	// Take a copy of the server's record of the current connection state of the system.
+	// This is in case that state changes between GetConnectionCount and GetConnections.
+	TRAPD(err, iTempCopyOfConnections = DoGetConnectionCountL(aMessage));
+	CompleteClient(aMessage, err);
+	}
+
+// Returns ownership of a copy of the current connection state of the system.
+// aMessage is passed only for writing the connection count to, not for 
+// completing.
+CConnections* CRemConSession::DoGetConnectionCountL(const RMessage2& aMessage)
+	{
+	LOG_FUNC;
+
+	CConnections& serverConnections = iServer.Connections();
+	CConnections* copyOfConnections = CConnections::CopyL(serverConnections);
+	CleanupStack::PushL(copyOfConnections);
 	// Get the answer to the question- the number of connections at the 
-	// current point in time (i.e. the latest entry in the connection 
-	// history).
-	const TUint connCount = iServer.Connections().Count();
+	// current point in time.
+	const TUint connCount = serverConnections.Count();
 	LOG1(_L("\tconnCount = %d"), connCount);
 	TPckg<TUint> count(connCount);
-	TInt err = aMessage.Write(0, count);
-
-	// If the client was told the answer with no error, then remember the 
-	// current point in the connection history, so that when the client asks 
-	// for the connections themselves, we give them a consistent answer.
-	if ( err == KErrNone )
+	LEAVEIFERRORL(aMessage.Write(0, count));
+	// If the call succeeds but there are no connections, the client side will 
+	// not call the 'GetConnections' IPC.
+	if ( connCount == 0 )
 		{
-		iServer.SetConnectionHistoryPointer(Id());
-		iInGetConnectionsProcedure = ETrue;
+		// Clean up the copy of the connections and return NULL, as the client 
+		// side will not be calling the 'GetConnections' IPC.
+		CleanupStack::PopAndDestroy(copyOfConnections);
+		copyOfConnections = NULL;
 		}
-	CompleteClient(aMessage, err);
+	else
+		{
+		// Return ownership of the copy of the connections. The session stores 
+		// this until the client calls the 'GetConnections' IPC.
+		CleanupStack::Pop(copyOfConnections);
+		}
+	// The client doesn't need a notification completion about any connection 
+	// changes up to this point in time because they effectively obtain that 
+	// information in their current call to RRemCon::GetConnections.
+	iConnectionsChanged = EFalse;
+	LOG1(_L("\treturning 0x%08x"), copyOfConnections);
+	return copyOfConnections;
 	}
 
 void CRemConSession::GetConnections(const RMessage2& aMessage)
@@ -1369,20 +1400,19 @@ void CRemConSession::GetConnections(const RMessage2& aMessage)
 		return;
 		}
 
-	iInGetConnectionsProcedure = EFalse;
+	if ( !iTempCopyOfConnections )
+		{
+		PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicGetConnectionsFault);
+		return;
+		}
 
-	// Get the array of connections at the point in the history we're 
-	// interested in and write it back to the client. NB This is not 
-	// necessarily the Last item in the history but the item that we were 
-	// pointing at when GetConnectionCount was called.
-	const CConnections& conns = iServer.Connections(iId);
-	const TUint count = conns.Count();
+	const TUint count = iTempCopyOfConnections->Count();
 	LOG1(_L("\tcount = %d"), count);
 	RBuf8 buf;
 	TInt err = buf.Create(count * sizeof(TRemConAddress));
 	if ( err == KErrNone )
 		{
-		TSglQueIter<TRemConAddress>& iter = conns.SetToFirst();
+		TSglQueIter<TRemConAddress>& iter = iTempCopyOfConnections->SetToFirst();
 		TRemConAddress* addr;
 		while ( ( addr = iter++ ) != NULL )
 			{
@@ -1394,20 +1424,16 @@ void CRemConSession::GetConnections(const RMessage2& aMessage)
 		buf.Close();
 		if ( err != KErrNone )
 			{
-			// We don't need to call SetConnectionHistoryPointer here because 
-			// the server will do it when it cleans up the panicked client.
+			// iTempCopyOfConnections will be cleaned up in the session destructor.
 			PANIC_MSG(aMessage, KRemConClientPanicCat, ERemConClientPanicBadDescriptor);
 			return;
 			}	   		
 		}
 
-	// Whether or not there was an error, we're no longer interested in the 
-	// history item we're currently registered as being interested in, so tell 
-	// the server to bump up our pointer to the current (latest) one. NB This 
-	// may in fact be the same record, if no connection changes have occurred 
-	// since GetConnectionCount was called, but it's still important to give 
-	// the server a chance to remove obsolete history records.
-	iServer.SetConnectionHistoryPointer(Id());
+	// Regardless of any (non-panicking) error, clean this up so we're ready for another call from the client.
+	delete iTempCopyOfConnections;
+	iTempCopyOfConnections = NULL;
+
 	CompleteClient(aMessage, err);
 	}
 
@@ -1433,14 +1459,11 @@ void CRemConSession::NotifyConnectionsChange(const RMessage2& aMessage)
 	else
 		{
 		iNotifyConnectionsChangeMsg = aMessage;
-		// Check the connection history for any more recent items than that we 
-		// currently know about. If our pointer into the connection history 
-		// isn't pointing at the 'current' item, we can complete the 
-		// notification immediately and move the pointer up.
-		if ( !iServer.ConnectionHistoryPointerAtLatest(Id()) )
+		LOG1(_L("\tiConnectionsChanged = %d"), iConnectionsChanged);
+		if ( iConnectionsChanged )
 			{
 			CompleteClient(iNotifyConnectionsChangeMsg, KErrNone);
-			iServer.SetConnectionHistoryPointer(Id());
+			iConnectionsChanged = EFalse;
 			}
 		}
 	}
@@ -1572,18 +1595,15 @@ void CRemConSession::CompleteDisconnect(const TRemConAddress& aAddr, TInt aError
 void CRemConSession::ConnectionsChanged()
 	{
 	LOG_FUNC;
-	
-	LOG1(_L("\tiInGetConnectionsProcedure = %d"), iInGetConnectionsProcedure);
-	// Only update the connections history pointer if we're not in the middle 
-	// of a 'GetConnections' procedure. 
-	if ( !iInGetConnectionsProcedure )
-		{
-		iServer.SetConnectionHistoryPointer(Id());
-		}
+	LOG1(_L("\tiConnectionsChanged = %d"), iConnectionsChanged);
 	LOG1(_L("\tiNotifyConnectionsChangeMsg.Handle = %d"), iNotifyConnectionsChangeMsg.Handle());
+
+	iConnectionsChanged = ETrue;
+	
 	if ( iNotifyConnectionsChangeMsg.Handle() )
 		{
 		CompleteClient(iNotifyConnectionsChangeMsg, KErrNone);
+		iConnectionsChanged = EFalse;
 		}
 	}
 

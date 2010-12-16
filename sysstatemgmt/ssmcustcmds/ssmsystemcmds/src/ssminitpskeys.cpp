@@ -194,6 +194,13 @@ void CSsmInitPsKeys::InitializeKeysL()
              KWriteDeviceDataPolicy );
     SetL( KPSUidStartup, KPSSimStatus, ESimStatusUninitialized );
 
+    INFO( "KPSUidStartup::KPSSimPreviousState" );
+    DefineL( KPSUidStartup,
+             KPSSimPreviousState,
+             KReadDeviceDataPolicy,
+             KWriteDeviceDataPolicy );
+    SetL( KPSUidStartup, KPSSimPreviousState, ESimPreviousStateUninitialized );
+
     INFO( "KPSUidStartup::KPSSimOwned" );
     DefineL( KPSUidStartup,
              KPSSimOwned,

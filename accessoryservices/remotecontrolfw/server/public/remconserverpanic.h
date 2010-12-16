@@ -144,6 +144,11 @@ enum TRemConClientPanic
 	The client is paniced for misusing this API.
 	*/
 	ERemConClientPanicRegisterInterestedOperationsInNonTargetSession	= 16,
+
+	/**
+	This panic code indicates a programming error in RRemCon::GetConnections.
+	*/
+	ERemConClientPanicGetConnectionsFault								= 17,
 	};
 
 #endif // REMCONSERVERPANIC_H

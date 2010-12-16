@@ -102,17 +102,18 @@ RESOURCE SSM_COMMAND_LIST r_cmds
         r_cmd_taskswitcher,
         // prio 0xFFA6
         r_cmd_dmfirstbootreason,
-        r_cmd_fota,
-        // prio 0x7F87
-        r_cmd_waitcleanbootinfo,
-        // prio 0x7F97
+        r_cmd_fota,        
+        // prio 0x7F97		
         r_cmd_dcmo,
-        r_cmd_amastart,
-        // prio 0x7F96
+		// prio 0x7F96
         r_cmd_multiple_wait,
+		// prio 0x7F87
+        r_cmd_waitcleanbootinfo,
+		// prio 0x7F86
+        r_cmd_amastart,        
         // prio 0x7F55
         r_cmd_createswp_noncriticalphase,
-				// prio 0x7F54
+		// prio 0x7F54
         r_cmd_setswp_noncriticalstart
         };
     }
@@ -128,7 +129,7 @@ RESOURCE SSM_COMMAND_LIST r_cmds
 //
 RESOURCE SSM_START_AMA_STARTER r_cmd_amastart
     {
-    priority = 0x7F97;
+    priority = 0x7F86; //CR:JTHI-8B8CYS
     conditional_information = r_cond_ps_normalboot;
     }
 
@@ -501,6 +502,7 @@ RESOURCE SSM_START_PROCESS_INFO r_cmd_watcher
     {
     priority = 0xFFB7;
     name = "z:\\sys\\bin\\watcher.exe";
+	execution_behaviour = ESsmWaitForSignal; //Execution behaviour ESsmWaitForSignal provided as part of SCB CR JPHN-8AGARH. 
     monitor_info = r_mon_3_restarts_ignore;
     }
 

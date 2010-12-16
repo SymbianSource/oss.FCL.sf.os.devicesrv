@@ -69,8 +69,7 @@ CConnections* CConnections::CopyL(CConnections& aItem)
 	while ( ( orig = iter++ ) != NULL )
 		{
 		TRemConAddress* const newAddr = new(ELeave) TRemConAddress;
-		newAddr->BearerUid() = orig->BearerUid();
-		newAddr->Addr() = orig->Addr();
+		*newAddr = *orig;
 		self->Append(*newAddr);
 		}
 

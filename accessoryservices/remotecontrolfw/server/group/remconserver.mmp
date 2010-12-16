@@ -33,7 +33,6 @@ VENDORID		0x70000001
 SOURCEPATH		../src
 SOURCE			activehelper.cpp
 SOURCE			bearermanager.cpp
-SOURCE			connectionhistory.cpp
 SOURCE			connections.cpp
 SOURCE			convertermanager.cpp
 SOURCE			main.cpp

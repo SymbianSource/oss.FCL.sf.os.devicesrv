@@ -34,7 +34,6 @@
 #include "convertermanager.h"
 #include "remconmessage.h"
 #include "connections.h"
-#include "connectionhistory.h"
 #include "messagerecipients.h"
 
 #ifdef __FLOG_ACTIVE
@@ -46,7 +45,6 @@ PANICCATEGORY("server");
 #ifdef __FLOG_ACTIVE
 #define LOGSESSIONS							LogSessions()
 #define LOGREMOTES							LogRemotes()
-#define LOGCONNECTIONHISTORYANDINTEREST		LogConnectionHistoryAndInterest()
 #define LOGOUTGOINGCMDPENDINGTSP			LogOutgoingCmdPendingTsp()
 #define LOGOUTGOINGNOTIFYCMDPENDINGTSP		LogOutgoingNotifyCmdPendingTsp()
 #define LOGOUTGOINGRSPPENDINGTSP			LogOutgoingRspPendingTsp()
@@ -60,7 +58,6 @@ PANICCATEGORY("server");
 #else
 #define LOGSESSIONS
 #define LOGREMOTES
-#define LOGCONNECTIONHISTORYANDINTEREST
 #define LOGOUTGOINGCMDPENDINGTSP
 #define LOGOUTGOINGNOTIFYCMDPENDINGTSP
 #define LOGOUTGOINGRSPPENDINGTSP
@@ -135,11 +132,8 @@ CRemConServer::~CRemConServer()
 	// Clean up the connection information (must be done after the bearer 
 	// manager is destroyed).
 	LOGREMOTES;
-	LOGCONNECTIONHISTORYANDINTEREST;
-	delete iConnectionHistory;
+	delete iConnections;
 
-	iSession2ConnHistory.Close();
-	
 	// This is the odd ECOM code for cleaning our session. NB This must be 
 	// done AFTER destroying all the other things in this thread which use 
 	// ECOM!
@@ -182,11 +176,11 @@ void CRemConServer::ConstructL()
 
 	iShutdownTimer = CPeriodic::NewL(CActive::EPriorityStandard);
 
-	// Make the connection history holder before creating the bearer manager, 
-	// as some bearers might call the bearer manager back synchronously with a 
-	// new connection, and we need iConnectionHistory to be able to handle 
-	// that.
-	iConnectionHistory = CConnectionHistory::NewL();
+	// Make the connection object (implicitly containing no addresses) before
+	// creating the bearer manager, as some bearers might call the bearer
+	// manager back synchronously with a new connection, and we need
+	// iConnections to be able to handle that.
+	iConnections = CConnections::NewL();
 
 	// Make the queues before making the bearer manager because otherwise a 
 	// 'connection up' which is indicated synchronously with 
@@ -219,7 +213,6 @@ void CRemConServer::ConstructL()
 	LoadTspL();
 
 	LOGREMOTES;
-	LOGCONNECTIONHISTORYANDINTEREST;
 	}
 
 CSession2* CRemConServer::NewSessionL(const TVersion& aVersion, 
@@ -389,22 +382,9 @@ TInt CRemConServer::ClientOpened(CRemConSession& aSession)
 	LOG1(_L("\t&aSession = 0x%08x"), &aSession);
 	LOGSESSIONS;
 
-	// Register the session by appending it to our array, and also making an 
-	// item for it in the record of which points in the connection history 
-	// sessions are interested in.
+	// Register the session by appending it to our array.
 	iSessionsLock.Wait();
 	TInt ret = iSessions.Append(&aSession);
-	if ( ret == KErrNone )
-		{
-		TSessionPointerToConnectionHistory item;
-		item.iSessionId = aSession.Id();
-		item.iIndex = 0; // there is always at least one item in the connection history
-		ret = iSession2ConnHistory.Append(item);
-		if ( ret != KErrNone )
-			{
-			iSessions.Remove(iSessions.Count() - 1);
-			}
-		}
 	iSessionsLock.Signal();
 
 	if ( ret == KErrNone )
@@ -706,18 +686,6 @@ void CRemConServer::ClientClosed(CRemConSession& aSession, TUid aUid)
 		}
 	iSessionsLock.Signal();
 
-	// Also remove its record from the connection history record.
-	const TUint count = iSession2ConnHistory.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		if ( iSession2ConnHistory[ii].iSessionId == aSession.Id() )
-			{
-			iSession2ConnHistory.Remove(ii);
-			UpdateConnectionHistoryAndPointers();
-			break;
-			}
-		}
-
 	StartShutdownTimerIfNoSessionsOrBulkThread();
 
 	LOGSESSIONS;
@@ -764,31 +732,9 @@ void CRemConServer::LogSessions() const
 void CRemConServer::LogRemotes() const
 	{
 	// Called from dtor- this may not have been made yet.
-	if ( iConnectionHistory )
+	if ( iConnections )
 		{
-		CConnections& conns = iConnectionHistory->Last();
-		conns.LogConnections();
-		}
-	}
-
-void CRemConServer::LogConnectionHistoryAndInterest() const
-	{
-	LOG(_L("Logging connection history and interest in it"));
-	if ( iConnectionHistory )
-		{
-		iConnectionHistory->LogConnectionHistory();
-
-		const TUint count = iSession2ConnHistory.Count();
-		LOG1(_L("\tNumber of sessions = %d"), count);
-		for ( TUint ii = 0 ; ii < count ; ++ii )
-			{
-			const TSessionPointerToConnectionHistory& interest = iSession2ConnHistory[ii];
-			LOG3(_L("\t\tinterest %d, iSessionId = %d, iIndex = %d"), 
-				ii, 
-				interest.iSessionId,
-				interest.iIndex
-				);
-			}
+		iConnections->LogConnections();
 		}
 	}
 #endif // __FLOG_ACTIVE
@@ -2889,44 +2835,10 @@ CMessageQueue& CRemConServer::IncomingNotifyCmdPendingReAddress()
 	return *iIncomingNotifyCmdPendingReAddress;
 	}
 
-TBool CRemConServer::ConnectionHistoryPointerAtLatest(TUint aSessionId) const
-	{
-	LOG_FUNC;
-	LOG1(_L("\taSessionId = %d"), aSessionId);
-
-#ifdef _DEBUG
-	TBool found = EFalse;
-#endif
-	TUint index = 0;
-	const TUint count = iSession2ConnHistory.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		if ( iSession2ConnHistory[ii].iSessionId == aSessionId )
-			{
-			index = iSession2ConnHistory[ii].iIndex;
-#ifdef _DEBUG
-			found = ETrue;
-#endif
-			break;
-			}
-		}
-	ASSERT_DEBUG(found);
-
-	TBool ret = EFalse;
-	ASSERT_DEBUG(iConnectionHistory);
-	if ( index == iConnectionHistory->Count() - 1 )
-		{
-		ret = ETrue;
-		}
-
-	LOG1(_L("\tret = %d"), ret);
-	return ret;
-	}
-
 CConnections& CRemConServer::Connections()
 	{
-	ASSERT_DEBUG(iConnectionHistory);
-	return iConnectionHistory->Last();
+	ASSERT_DEBUG(iConnections);
+	return *iConnections;
 	}
 
 TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
@@ -2937,13 +2849,22 @@ TInt CRemConServer::HandleConnection(const TRemConAddress& aAddr, TInt aError)
 	LOGOUTGOINGPENDINGSEND;
 	LOGOUTGOINGSENT;
 
-	// Try to update the connection history. If this fails (it involves memory 
-	// allocation) we need to return the error so the connection will be 
-	// dropped.
+	// Try to update the record of the current connection status.
+	// If this fails (it involves memory allocation) we need to return the 
+	// error so the connection will be dropped.
 	if ( aError == KErrNone )
 		{
-		ASSERT_DEBUG(iConnectionHistory);
-		aError = iConnectionHistory->NewConnection(aAddr);
+		ASSERT_DEBUG(iConnections);
+		TRemConAddress* addr = new TRemConAddress;
+		if ( !addr )
+			{
+			aError = KErrNoMemory;
+			}
+		else
+			{
+			*addr = aAddr;
+			iConnections->Append(*addr);
+			}
 		}
 
 	// If we have a real new connection and we could handle it, aError is 
@@ -3070,11 +2991,22 @@ void CRemConServer::RemoveConnection(const TRemConAddress& aAddr)
 	LOG1(_L("\taAddr.BearerUid = 0x%08x"), aAddr.BearerUid());
 	LOGREMOTES;
 
-	// We make a new item in the connection history and inform the sessions so 
-	// they can complete outstanding connection status notifications.
+	// Remove the address from the record of current connections and inform 
+	// the sessions so they can complete outstanding connection status 
+	// notifications.
 
-	ASSERT_DEBUG(iConnectionHistory);
-	iConnectionHistory->Disconnection(aAddr);
+	ASSERT_DEBUG(iConnections);
+	TSglQueIter<TRemConAddress>& addrIter = iConnections->SetToFirst();
+	TRemConAddress* addr;
+	while ( ( addr = addrIter++ ) != NULL )
+		{
+		if ( *addr == aAddr )
+			{
+			iConnections->Remove(*addr);
+			delete addr;
+			}
+		}
+
 	iSessionsLock.Wait();
 	const TUint count = iSessions.Count();
 	for ( TUint ii = 0 ; ii < count ; ++ii )
@@ -3116,107 +3048,6 @@ void CRemConServer::RemoveConnection(const TRemConAddress& aAddr)
 		}
 
 	LOGREMOTES;
-	}
-
-void CRemConServer::SetConnectionHistoryPointer(TUint aSessionId)
-	{
-	LOG_FUNC;
-	LOG1(_L("\taSessionId = %d"), aSessionId);
-	LOGSESSIONS;
-	LOGCONNECTIONHISTORYANDINTEREST;
-
-	// Update the record for this session.
-	const TUint count = iSession2ConnHistory.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		if ( iSession2ConnHistory[ii].iSessionId == aSessionId )
-			{
-			ASSERT_DEBUG(iConnectionHistory);
-			iSession2ConnHistory[ii].iIndex = iConnectionHistory->Count() - 1;
-			break;
-			}
-		}
-
-	// If the calling session was the last session pointing to that item in 
-	// the history, and if it was the earliest item in the history, then we'll 
-	// be able to clean up the history a bit.
-	UpdateConnectionHistoryAndPointers();
-
-	LOGCONNECTIONHISTORYANDINTEREST;
-	}
-
-const CConnections& CRemConServer::Connections(TUint aSessionId) const
-	{
-	LOG_FUNC;
-	LOG1(_L("\taSessionId = %d"), aSessionId);
-
-	// Get the connection history record for this session.
-	const CConnections* conns = NULL; 
-	const TUint count = iSession2ConnHistory.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		if ( iSession2ConnHistory[ii].iSessionId == aSessionId )
-			{
-			ASSERT_DEBUG(iConnectionHistory);
-			conns = &(*iConnectionHistory)[iSession2ConnHistory[ii].iIndex];
-			break;
-			}
-		}
-
-	ASSERT_DEBUG(conns);
-
-	return *conns;
-	}
-
-void CRemConServer::UpdateConnectionHistoryAndPointers()
-	{
-	LOG_FUNC;
-	LOGCONNECTIONHISTORYANDINTEREST;
-	
-	// This function is called whenever a session finishes its interest in a 
-	// connection history record, either by closing or by completing 
-	// GetConnections. We remove uninteresting records in the history by 
-	// removing the lowest-indexed item in the history until the 
-	// lowest-indexed item has a session interested in it. As we do so, adjust 
-	// the other sessions' pointers so they're still pointing at the right 
-	// records.
-	TUint lowestInterestingRecord = KMaxTUint;
-	const TUint count = iSession2ConnHistory.Count();
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		if ( iSession2ConnHistory[ii].iIndex < lowestInterestingRecord )
-			{
-			lowestInterestingRecord = iSession2ConnHistory[ii].iIndex;
-			}
-		}
-
-	// In theory, lowestInterestingRecord is now the number of connection 
-	// history records we have to delete, starting with the 0th. This will not 
-	// be the case (lowestInterestingRecord will still be KMaxTUint) if there 
-	// are no sessions left. So adjust lowestInterestingRecord down to 
-	// iConnectionHistory->Count() - 1 so that we remove all but the 'current' 
-	// connection history record. This cleans up as much as possible in case 
-	// server termination is interrupted.
-	ASSERT_DEBUG(iConnectionHistory);
-	if ( lowestInterestingRecord >= iConnectionHistory->Count() )
-		{
-		lowestInterestingRecord = iConnectionHistory->Count() - 1;
-		}
-	ASSERT_DEBUG(iConnectionHistory);
-	for ( TUint ii = 0 ; ii < lowestInterestingRecord ; ++ii )
-		{
-		iConnectionHistory->DestroyFirst();
-		}
-
-	// We now have to go through iSession2ConnHistory and decrement each 
-	// iIndex by lowestInterestingRecord, to keep _those_ records pointing 
-	// at the right history records.
-	for ( TUint ii = 0 ; ii < count ; ++ii )
-		{
-		iSession2ConnHistory[ii].iIndex -= lowestInterestingRecord;
-		}
-
-	LOGCONNECTIONHISTORYANDINTEREST;
 	}
 
 TConnectionState CRemConServer::ConnectionState(const TRemConAddress& aAddr)

@@ -211,6 +211,19 @@ enum TStartupCodeQueryStatus
     ESecurityQueryActive
     };
 
+/**
+* Used by Starter to know the SIM card previous status, in case the same SIM card is removed and re-inserted.
+* Bitwise operations are used for checking the SIM card previous status.
+*/
+const TUint32 KPSSimPreviousState = 0x00000005;
+enum TPSSimPreviousState
+    {
+	ESimPreviousStateUninitialized	= 0x00000000, /*!< 0x00000000: PS is uninitialized */
+	ESimHasBeenReadable				= 0x00000001, /*!< 0x00000001: Indicates whether the SIM has ever been readable since the device was started.*/
+	ESimHasBeenUsable				= 0x00000002 /*!< 0x00000002: Indicates whether the SIM has ever been usable since the device was started.  */
+    };
+
+
 // =============================================================================
 // System Startup Control API
 // =============================================================================

@@ -22,6 +22,7 @@
 #include <e32property.h>
 #include <ssm/ssmstates.hrh>
 #include <ssm/startupreason.h>
+#include <ssm/starterclient.h>
 
 /**
  * Allocates and returns a new SIM status observer.
@@ -62,6 +63,7 @@ void CSsmSimStatusObserver::InitializeL()
 		DEBUGPRINT2A("CSsmSimStatusObserver error connecting to SIM adaptation: %d", err);
 		User::Leave(err);
 		}
+	iPreviousEventType = (TSsmSimEventType) -1; 
 	}
 
 /**
@@ -118,6 +120,7 @@ void CSsmSimStatusObserver::RunL()
 			User::Leave(KErrNotSupported);
 			break;
 		}
+	iPreviousEventType = iSimEventPckg();
 	// Re-request notification
 	iSimAdaptation.NotifySimEvent(iSimEventPckg, iStatus);
 	SetActive();
@@ -131,6 +134,20 @@ void CSsmSimStatusObserver::RunL()
 void CSsmSimStatusObserver::RequestSimStatusChangeL(TPSSimStatus aSimStatus)
 	{
 	DEBUGPRINT2A("CSsmSimStatusObserver SIM status change: %d", aSimStatus);
+	
+	if ( (ESimNotPresent != aSimStatus) && ( ESsmSimRemoved == iPreviousEventType))
+		{
+		DEBUGPRINT1A("CSsmSimStatusObserver Switching Off the RF");
+		RStarterSession startersession;
+		if ( KErrNone == startersession.Connect())		
+			{
+			//IGNORE the error returned by DeactivateRfAfterEmergencyCall()
+			TInt err = startersession.DeactivateRfAfterEmergencyCall();
+			DEBUGPRINT2A("CSsmSimStatusObserver DeactivateRfAfterEmergencyCall() returned err: %d", err);
+			}		
+		startersession.Close();
+		}
+	
 	RSsmStateManager ssm;
 	User::LeaveIfError(ssm.Connect());
 	CleanupClosePushL(ssm);

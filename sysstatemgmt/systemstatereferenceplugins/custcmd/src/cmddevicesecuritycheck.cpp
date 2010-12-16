@@ -152,7 +152,7 @@ void CCustomCmdDeviceSecurityCheck::Execute(const TDesC8& /*aParams*/, TRequestS
 	errorCode = RProperty::Get(CSsmUiSpecific::StartupPSUid(), KPSStartupReason, startupReason);
 	DEBUGPRINT3A("Getting KPSStartupReason : %d completed with : %d", startupReason, errorCode);
 	
-	if (CSsmUiSpecific::IsNormalBoot() || CSsmUiSpecific::IsSimChangedReset() || (EStartupDevLockNotSucess ==  val && EUnknownReset == startupReason))
+	if (CSsmUiSpecific::IsNormalBoot() || CSsmUiSpecific::IsSimChangedReset() || (EStartupDevLockNotSucess ==  val && EUnknownReset == startupReason) || (EFirmwareUpdate == startupReason))
         {
         iPhone.GetLockInfo( iStatus, RMobilePhone::ELockPhoneDevice, iLockInfoPckg );
         SetActive();
